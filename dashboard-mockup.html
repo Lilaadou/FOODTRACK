@@ -173,23 +173,206 @@
 
     .empty{text-align:center;padding:28px;color:#aaa;font-size:13px;}
 
-    @media print{
-      body > *:not(#bon-overlay){ display:none !important; }
-      #bon-overlay{
-        display:block !important; position:static !important;
-        background:none !important; padding:0 !important;
-      }
-      #bon-overlay > div{ box-shadow:none !important; border-radius:0 !important; width:100% !important; max-height:none !important; }
-      button{ display:none !important; }
+    /* ── LOGIN SCREEN ── */
+    .login-card{
+      background:#fff;border-radius:14px;border:1.5px solid #f0f0f0;
+      padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;
+      cursor:pointer;transition:all .18s;text-align:center;
+    }
+    .login-card:hover{border-color:#d44218;box-shadow:0 4px 16px rgba(212,66,24,.12);transform:translateY(-2px);}
+    .login-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+    .login-name{font-size:12px;font-weight:700;color:#1a1a2e;line-height:1.3;}
+    .login-role{font-size:10px;color:#aaa;font-weight:500;}
+
+    @media(max-width:600px){
+      #login-screen > div:nth-child(2){ grid-template-columns:repeat(2,1fr) !important; max-width:100% !important; }
     }
 
+    @media print{ body{ display:none; } }
+
+    /* ── TABLETTE ── */
     @media(max-width:1100px){
       .stat-grid{grid-template-columns:repeat(2,1fr);}
       .two-col{grid-template-columns:1fr;}
     }
+
+    /* ── MOBILE ── */
+    @media(max-width:768px){
+      /* Sidebar cachée, remplacée par overlay */
+      .sidebar{
+        transform:translateX(-100%);
+        transition:transform .25s ease;
+        z-index:500;
+        width:260px;
+        box-shadow:4px 0 20px rgba(0,0,0,.1);
+      }
+      .sidebar.open{ transform:translateX(0); }
+
+      /* Overlay sombre derrière la sidebar */
+      #sidebar-overlay{
+        display:none;position:fixed;inset:0;
+        background:rgba(0,0,0,.4);z-index:499;
+      }
+      #sidebar-overlay.open{ display:block; }
+
+      /* Main prend toute la largeur */
+      .main{ margin-left:0; padding:16px; padding-bottom:80px; }
+
+      /* Topbar mobile */
+      .topbar{ flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+      .topbar h1{ font-size:17px; }
+      .topbar-sub{ font-size:11px; }
+      .search-bar{ width:140px; }
+      .topbar-right{ gap:8px; }
+
+      /* Bouton hamburger */
+      #hamburger{
+        display:flex;align-items:center;justify-content:center;
+        width:36px;height:36px;background:#fff;border:1px solid #efefef;
+        border-radius:10px;cursor:pointer;font-size:18px;flex-shrink:0;
+      }
+
+      /* Stat grid 2 colonnes */
+      .stat-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+      .stat-value{ font-size:20px; }
+      .stat-card{ padding:14px 14px; }
+
+      /* Tables scrollables */
+      .card{ padding:14px; overflow-x:auto; }
+      table{ min-width:500px; }
+
+      /* Formulaires — inputs plus grands */
+      .form-group input, .form-group select{
+        padding:12px 11px; font-size:16px; /* évite le zoom iOS */
+      }
+      .fg-3{ grid-template-columns:1fr; }
+      .fg-2{ grid-template-columns:1fr; }
+      .btn{ padding:12px 18px; font-size:14px; }
+
+      /* Barre de navigation en bas */
+      #bottom-nav{
+        display:flex;
+        position:fixed;bottom:0;left:0;right:0;
+        background:#fff;border-top:1px solid #efefef;
+        z-index:400;padding:6px 0 10px;
+        justify-content:space-around;
+      }
+      .bottom-nav-item{
+        display:flex;flex-direction:column;align-items:center;gap:3px;
+        font-size:10px;font-weight:600;color:#aaa;cursor:pointer;
+        padding:4px 8px;border-radius:8px;transition:color .15s;
+        border:none;background:none;flex:1;
+      }
+      .bottom-nav-item .bn-icon{ font-size:20px;line-height:1; }
+      .bottom-nav-item.active{ color:#d44218; }
+
+      /* Login screen mobile */
+      #login-screen > div:last-of-type{ flex-direction:column; }
+      .login-card{ width:130px; }
+
+      /* Two-col reste 1 col */
+      .two-col{ grid-template-columns:1fr; }
+
+      /* Zero grid */
+      .zero-grid{ grid-template-columns:repeat(2,1fr); }
+    }
+
+    /* Desktop : cacher éléments mobile */
+    @media(min-width:769px){
+      #hamburger{ display:none; }
+      #bottom-nav{ display:none; }
+      #sidebar-overlay{ display:none !important; }
+    }
   </style>
 </head>
 <body>
+
+<!-- ══════ ÉCRAN DE CONNEXION ══════ -->
+<div id="login-screen" style="position:fixed;inset:0;background:#fff;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
+
+  <!-- Logo + titre -->
+  <img src="logo.png" alt="Kooki" style="height:60px;margin-bottom:10px">
+  <div style="font-size:14px;color:#888;font-weight:500;margin-bottom:4px">Traçabilité & gestion de production</div>
+  <div style="font-size:12px;color:#bbb;margin-bottom:36px">Qui êtes-vous ?</div>
+
+  <!-- Groupes de profils -->
+  <div style="width:100%;max-width:640px;display:flex;flex-direction:column;gap:24px">
+
+    <!-- Administration -->
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Administration</div>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <div class="login-card" onclick="loginAs('Virginia')">
+          <div class="login-av" style="background:#7c3aed">VK</div>
+          <div class="login-name">Virginia Kunnen</div>
+          <div class="login-role">Patron</div>
+        </div>
+        <div class="login-card" onclick="loginAs('Abenazer')">
+          <div class="login-av" style="background:#d44218">AH</div>
+          <div class="login-name">Abenazer Hailu</div>
+          <div class="login-role">Patron</div>
+        </div>
+        <div class="login-card" onclick="loginAs('Sebastien')">
+          <div class="login-av" style="background:#0662aa">SK</div>
+          <div class="login-name">Sebastien Kunnen</div>
+          <div class="login-role">Associé</div>
+        </div>
+        <div class="login-card" onclick="loginAs('DavidD')">
+          <div class="login-av" style="background:#2c7a3a">DD</div>
+          <div class="login-name">David Deridder</div>
+          <div class="login-role">Manager</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production -->
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Équipe production</div>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <div class="login-card" onclick="loginAs('Meg')">
+          <div class="login-av" style="background:#e8956a">MD</div>
+          <div class="login-name">Meg Dollinger</div>
+          <div class="login-role">Production</div>
+        </div>
+        <div class="login-card" onclick="loginAs('Alexandre')">
+          <div class="login-av" style="background:#3a8fc9">AM</div>
+          <div class="login-name">Alexandre Michel</div>
+          <div class="login-role">Production</div>
+        </div>
+        <div class="login-card" onclick="loginAs('DavidC')">
+          <div class="login-av" style="background:#a02e10">DC</div>
+          <div class="login-name">David Cohenca</div>
+          <div class="login-role">Production</div>
+        </div>
+        <div class="login-card" onclick="loginAs('Lila')">
+          <div class="login-av" style="background:#c0392b">LD</div>
+          <div class="login-name">Lila Doudou</div>
+          <div class="login-role">Production</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frigo -->
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Équipe vente</div>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <div class="login-card" onclick="loginAs('Noemie')">
+          <div class="login-av" style="background:#888">NL</div>
+          <div class="login-name">Noémie Lambiotte</div>
+          <div class="login-role">Équipe vente</div>
+        </div>
+        <div class="login-card" onclick="loginAs('Delia')">
+          <div class="login-av" style="background:#9b59b6">DR</div>
+          <div class="login-name">Délia Ruettner</div>
+          <div class="login-role">Équipe vente</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:32px;font-size:11px;color:#ccc">KOOKI COMPANY SRL · BE1015746980</div>
+</div>
 
 <!-- LOADING OVERLAY -->
 <div id="loading-overlay" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
@@ -198,6 +381,28 @@
   <div style="width:180px;height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden">
     <div id="loading-bar" style="height:100%;width:0%;background:#d44218;border-radius:2px;transition:width .4s ease"></div>
   </div>
+</div>
+
+<!-- Overlay sidebar mobile -->
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- Barre navigation mobile (bas d'écran) -->
+<div id="bottom-nav">
+  <button class="bottom-nav-item active" onclick="showPage('dashboard',this);closeSidebar()">
+    <span class="bn-icon">📊</span>Dashboard
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('production',this);closeSidebar()">
+    <span class="bn-icon">🏭</span>Production
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('stock',this);closeSidebar()">
+    <span class="bn-icon">📦</span>Stock
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('frigo',this);closeSidebar()">
+    <span class="bn-icon">🧊</span>Sorties
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('premix',this);closeSidebar()">
+    <span class="bn-icon">🥣</span>Premix
+  </button>
 </div>
 
 <!-- SIDEBAR -->
@@ -232,9 +437,12 @@
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div>
-      <h1 id="page-title">Dashboard</h1>
-      <div class="topbar-sub" id="page-date">Samedi 6 juin 2026 — Données en temps réel</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="hamburger" onclick="toggleSidebar()">☰</button>
+      <div>
+        <h1 id="page-title">Dashboard</h1>
+        <div class="topbar-sub" id="page-date">Données en temps réel</div>
+      </div>
     </div>
     <div class="topbar-right">
       <!-- SEARCH -->
@@ -255,7 +463,12 @@
         <span class="profile-arrow">▾</span>
       </div>
       <div class="profile-dropdown" id="profile-dropdown">
-        <div class="profile-dropdown-title">Changer de profil</div>
+        <div class="profile-dropdown-title">Profil actif</div>
+        <div onclick="showLoginScreen()" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;background:#fbe8e2;margin-bottom:8px;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <span style="font-size:16px">🔄</span>
+          <span style="font-size:13px;font-weight:700;color:#d44218">Changer de profil</span>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;padding:0 8px 6px">Passer à</div>
 
         <div style="font-size:9px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.06em;padding:2px 10px 4px">Administration</div>
         <div class="profile-option selected" onclick="selectProfile('Lila')">
@@ -476,7 +689,12 @@
     </div>
     <div class="two-col">
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Stock par saveur</div><div class="card-sub">Lots triés par date (FIFO)</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Stock par saveur</div><div class="card-sub">Lots triés par date (FIFO)</div></div>
+          <button onclick="refreshStock()" id="btn-refresh-stock" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;display:flex;align-items:center;gap:6px">
+            🔄 Mettre à jour
+          </button>
+        </div>
         <table>
           <thead><tr><th>Code Lot</th><th>Date</th><th>Big</th><th>Small</th></tr></thead>
           <tbody>
@@ -525,16 +743,7 @@
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
       <div class="form-grid fg-3">
-        <div class="form-group">
-          <label>Saveur *</label>
-          <select id="sortie-saveur" onchange="loadLotsForSortie()">
-            <option value="">-- Choisir --</option>
-            <option>SUZZY</option><option>JACKY</option><option>BENNY</option>
-            <option>DAVY</option><option>MOLLY</option><option>WALLY</option>
-            <option>CHARLY</option><option>LENI</option><option>EMMY</option>
-            <option>WOODY</option><option>DANNY</option>
-          </select>
-        </div>
+        <div></div><!-- saveur sélectionnée par bloc ci-dessous -->
         <div class="form-group">
           <label>Type de destination *</label>
           <select id="sortie-type" onchange="toggleDestination()">
@@ -568,23 +777,49 @@
         </div>
       </div>
 
-      <!-- Résumé boîtes (calculé automatiquement, B2B uniquement) -->
-      <div id="boites-section" style="display:none;margin-bottom:13px">
+      <!-- Boîtes plastiques B2B (auto) -->
+      <div id="boites-section-b2b" style="display:none;margin-bottom:13px">
         <div style="background:#e0edf8;border-radius:10px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
           <div>
-            <div style="font-size:13px;font-weight:700;color:#0662aa">📦 Boîtes plastiques nécessaires</div>
-            <div style="font-size:11px;color:#888;margin-top:2px">Calculé automatiquement · Big : 1 boîte = 12 cookies · Small : 1 boîte = 25 cookies · À retourner à la prochaine livraison</div>
+            <div style="font-size:13px;font-weight:700;color:#0662aa">📦 Boîtes plastiques — calculé automatiquement</div>
+            <div style="font-size:11px;color:#888;margin-top:2px">Big : 1 boîte = 12 cookies · Small : 1 boîte = 25 cookies · À retourner à la prochaine livraison</div>
           </div>
           <div style="font-size:28px;font-weight:700;color:#0662aa" id="boites-total-display">0</div>
         </div>
       </div>
 
-      <!-- Lots disponibles -->
-      <div class="form-group" style="margin-bottom:13px">
-        <label>Lots à sortir * <span style="font-weight:400;color:#bbb">— indiquez les quantités par lot</span></label>
-        <div id="sortie-lots-container" style="border:1.5px solid #e8e8e8;border-radius:9px;background:#f9f9f9;overflow:hidden">
-          <div class="fac-empty">Choisissez d'abord une saveur pour voir les lots disponibles</div>
+      <!-- Boîtes plastiques optionnelles (événement / usage interne) -->
+      <div id="boites-section-opt" style="display:none;margin-bottom:13px">
+        <div style="background:#f7f8fa;border-radius:10px;padding:13px 16px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <input type="checkbox" id="boites-opt-toggle" onchange="toggleBoitesOpt()" style="accent-color:#d44218;width:15px;height:15px;cursor:pointer">
+            <label for="boites-opt-toggle" style="font-size:13px;font-weight:700;color:#1a1a2e;cursor:pointer">📦 Utiliser des boîtes plastiques pour cette livraison ?</label>
+          </div>
+          <div id="boites-opt-detail" style="display:none">
+            <div style="font-size:11px;color:#888;margin-bottom:8px">Big : 1 boîte = 12 cookies · Small : 1 boîte = 25 cookies</div>
+            <div style="font-size:24px;font-weight:700;color:#0662aa" id="boites-total-display-opt">0</div>
+          </div>
         </div>
+      </div>
+
+      <!-- Boîtes blanches Magasin Ixelles -->
+      <div id="boites-section-ixelles" style="display:none;margin-bottom:13px">
+        <div style="background:#f0f7f0;border-radius:10px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1a7a3a">🗃️ Boîtes blanches — calculé automatiquement</div>
+            <div style="font-size:11px;color:#888;margin-top:2px">1 boîte blanche = 40 cookies (Big + Small confondus)</div>
+          </div>
+          <div style="font-size:28px;font-weight:700;color:#1a7a3a" id="boites-ixelles-display">0</div>
+        </div>
+      </div>
+
+      <!-- Saveurs multiples -->
+      <div style="margin-bottom:13px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em">Saveurs & lots à sortir *</label>
+          <button onclick="addSaveurBlock()" style="display:flex;align-items:center;gap:5px;background:#fbe8e2;color:#d44218;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer">+ Ajouter une saveur</button>
+        </div>
+        <div id="saveurs-blocks"></div>
       </div>
 
       <div class="form-footer">
@@ -669,7 +904,7 @@
   <div id="bon-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
     <div style="background:#fff;border-radius:16px;padding:32px;width:580px;max-height:90vh;overflow-y:auto;position:relative">
       <button onclick="document.getElementById('bon-overlay').style.display='none'" style="position:absolute;top:14px;right:16px;border:none;background:none;font-size:18px;cursor:pointer;color:#aaa">✕</button>
-      <button onclick="window.print()" class="btn btn-primary" style="position:absolute;top:14px;right:50px;font-size:12px;padding:6px 14px">🖨️ Imprimer</button>
+      <button onclick="printBon()" class="btn btn-primary" style="position:absolute;top:14px;right:50px;font-size:12px;padding:6px 14px">🖨️ Imprimer</button>
 
       <div id="bon-content">
         <!-- En-tête -->
@@ -913,8 +1148,8 @@ const PROFILES = {
   Alexandre: { color:'#3a8fc9', initial:'AM', role:'Production',     pages: PROD_PAGES },
   DavidC:    { color:'#a02e10', initial:'DC', role:'Production',     pages: PROD_PAGES },
   // ── Frigo uniquement ──
-  Noemie:    { color:'#888',    initial:'NL', role:'Frigo',          pages: FRIGO_PAGES },
-  Delia:     { color:'#9b59b6', initial:'DR', role:'Frigo',          pages: FRIGO_PAGES },
+  Noemie:    { color:'#888',    initial:'NL', role:'Équipe vente',   pages: FRIGO_PAGES },
+  Delia:     { color:'#9b59b6', initial:'DR', role:'Équipe vente',   pages: FRIGO_PAGES },
 };
 
 const titles  = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres' };
@@ -1212,6 +1447,27 @@ function fillClientInfo() {
 // MISE À JOUR STOCK EN TEMPS RÉEL
 // ─────────────────────────────────────
 
+async function refreshStock() {
+  const btn = document.getElementById('btn-refresh-stock');
+  btn.textContent = '⏳ Chargement…';
+  btn.disabled = true;
+  try {
+    const data = await fetchAPI('getStock');
+    applyStock(data);
+    btn.textContent = '✓ Mis à jour !';
+    btn.style.background = '#e0edf8';
+    btn.style.color = '#0662aa';
+  } catch {
+    btn.textContent = '❌ Erreur';
+  }
+  setTimeout(() => {
+    btn.textContent = '🔄 Mettre à jour';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.disabled = false;
+  }, 2500);
+}
+
 function updateStockPage() {
   // Regrouper stockLocal par saveur, triés alphabétiquement
   const bySaveur = {};
@@ -1342,47 +1598,189 @@ function updateDashboardStockTable() {
 }
 
 function calcBoites() {
-  let totalBig = 0, totalSmall = 0;
+  const type = document.getElementById('sortie-type')?.value || '';
+  const showPlastic = type === 'b2b' || ((type === 'evenement' || type === 'interne') && document.getElementById('boites-opt-toggle')?.checked);
+  let totalBigBoxes = 0, totalSmallBoxes = 0, totalCookies = 0;
 
-  stockLocal.forEach(l => {
-    const bigInput   = document.getElementById('lot-big-'   + l.code);
-    const smallInput = document.getElementById('lot-small-' + l.code);
-
-    if (bigInput) {
-      const big      = parseInt(bigInput.value) || 0;
-      const boitesBig = Math.ceil(big / 12);
-      totalBig += boitesBig;
-      const el = document.getElementById('boites-big-lot-' + l.code);
-      if (el) {
-        el.textContent = boitesBig;
-        el.parentElement.style.background = boitesBig > 0 ? '#fbe8e2' : '#f0f6fc';
+  // Parcourir tous les blocs multi-saveurs
+  document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
+    const bId = block.id.replace('saveur-block-', '');
+    const saveur = document.getElementById('saveur-sel-' + bId)?.value;
+    if (!saveur) return;
+    stockLocal.filter(l => l.saveur === saveur).forEach(l => {
+      const big   = parseInt(document.getElementById(`b${bId}-big-${l.code}`)?.value)   || 0;
+      const small = parseInt(document.getElementById(`b${bId}-small-${l.code}`)?.value) || 0;
+      if (!big && !small) return;
+      totalCookies += big + small;
+      if (showPlastic) {
+        const bBig   = big   > 0 ? Math.ceil(big   / 12) : 0;
+        const bSmall = small > 0 ? Math.ceil(small / 25) : 0;
+        totalBigBoxes   += bBig;
+        totalSmallBoxes += bSmall;
+        const boxEl = document.getElementById(`b${bId}-boxes-${l.code}`);
+        if (boxEl) {
+          boxEl.textContent = bSmall || bBig;
+          boxEl.parentElement.style.background = (bSmall || bBig) > 0 ? '#e0edf8' : '#f0f6fc';
+        }
       }
-    }
-
-    if (smallInput) {
-      const small      = parseInt(smallInput.value) || 0;
-      const boitesSmall = Math.ceil(small / 25);
-      totalSmall += boitesSmall;
-      const el = document.getElementById('boites-lot-' + l.code);
-      if (el) {
-        el.textContent = boitesSmall;
-        el.parentElement.style.background = boitesSmall > 0 ? '#e0edf8' : '#f0f6fc';
-      }
-    }
+    });
   });
 
-  const totalEl = document.getElementById('boites-total-display');
-  if (totalEl) totalEl.innerHTML =
-    `<span style="color:#d44218">${totalBig} <span style="font-size:13px;font-weight:500">Big</span></span>` +
+  // Résumé B2B
+  const elB2B = document.getElementById('boites-total-display');
+  if (elB2B) elB2B.innerHTML =
+    `<span style="color:#d44218">${totalBigBoxes} <span style="font-size:13px;font-weight:500">Big</span></span>` +
     `<span style="color:#ccc;font-size:18px;margin:0 6px">+</span>` +
-    `<span style="color:#0662aa">${totalSmall} <span style="font-size:13px;font-weight:500">Small</span></span>`;
+    `<span style="color:#0662aa">${totalSmallBoxes} <span style="font-size:13px;font-weight:500">Small</span></span>`;
+
+  // Résumé optionnel
+  const elOpt = document.getElementById('boites-total-display-opt');
+  if (elOpt) elOpt.innerHTML = `<span style="color:#d44218">${totalBigBoxes} Big</span> &nbsp;+&nbsp; <span style="color:#0662aa">${totalSmallBoxes} Small</span>`;
+
+  // Boîtes blanches Ixelles
+  const elIx = document.getElementById('boites-ixelles-display');
+  if (elIx) elIx.textContent = totalCookies > 0 ? Math.ceil(totalCookies / 40) : 0;
+
+  // Stocker globalement
+  window._boitesBig   = totalBigBoxes;
+  window._boitesSmall = totalSmallBoxes;
+  window._boitesIx    = totalCookies > 0 ? Math.ceil(totalCookies / 40) : 0;
+}
+
+// ─────────────────────────────────────
+// BLOCS MULTI-SAVEURS (sortie frigo)
+// ─────────────────────────────────────
+let saveurBlockCount = 0;
+
+function addSaveurBlock() {
+  saveurBlockCount++;
+  const id = saveurBlockCount;
+  const container = document.getElementById('saveurs-blocks');
+
+  const block = document.createElement('div');
+  block.id = 'saveur-block-' + id;
+  block.style.cssText = 'border:1.5px solid #e8e8e8;border-radius:12px;background:#f9f9f9;margin-bottom:10px;overflow:hidden';
+
+  block.innerHTML = `
+    <!-- En-tête du bloc -->
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-bottom:1px solid #f0f0f0">
+      <span style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase">🍪 Saveur</span>
+      <select id="saveur-sel-${id}" onchange="loadLotsBlock(${id})"
+        style="flex:1;padding:7px 10px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:13px;font-weight:600;color:#1a1a2e;background:#fff;outline:none">
+        <option value="">-- Choisir une saveur --</option>
+        <option>SUZZY</option><option>JACKY</option><option>BENNY</option><option>DAVY</option>
+        <option>MOLLY</option><option>WALLY</option><option>CHARLY</option><option>LENI</option>
+        <option>EMMY</option><option>WOODY</option><option>DANNY</option>
+      </select>
+      ${id > 1 ? `<button onclick="removeSaveurBlock(${id})" style="background:#fde8e8;color:#c0392b;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer">✕</button>` : ''}
+    </div>
+    <!-- Lots du bloc -->
+    <div id="lots-block-${id}" style="padding:10px 14px">
+      <div style="text-align:center;color:#bbb;font-size:12px;padding:10px 0">Choisissez une saveur pour voir les lots disponibles</div>
+    </div>`;
+
+  container.appendChild(block);
+}
+
+function removeSaveurBlock(id) {
+  const el = document.getElementById('saveur-block-' + id);
+  if (el) el.remove();
+  calcBoites();
+}
+
+function loadLotsBlock(id) {
+  const saveur = document.getElementById('saveur-sel-' + id)?.value;
+  const container = document.getElementById('lots-block-' + id);
+  if (!container) return;
+
+  if (!saveur) {
+    container.innerHTML = '<div style="text-align:center;color:#bbb;font-size:12px;padding:10px 0">Choisissez une saveur pour voir les lots disponibles</div>';
+    return;
+  }
+
+  const lots = stockLocal.filter(l => l.saveur === saveur && (l.big > 0 || l.small > 0));
+  const type = document.getElementById('sortie-type')?.value || '';
+  const isB2B = type === 'b2b' || type === 'evenement' || type === 'interne';
+
+  if (!lots.length) {
+    container.innerHTML = '<div style="text-align:center;color:#d44218;font-size:12px;padding:10px 0">⚠️ Aucun lot en stock pour cette saveur</div>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B ? '1.2fr' : '1fr'};font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid #efefef;margin-bottom:6px">
+      <span>Code lot</span>
+      <span style="text-align:center;color:#d44218">Big (max)</span>
+      <span style="text-align:center;color:#0662aa">Small (max)${isB2B ? ' · 📦' : ''}</span>
+    </div>
+    ${lots.map(l => `
+      <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B ? '1.2fr' : '1fr'};align-items:start;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">
+        <div>
+          <div style="font-weight:600;font-size:12px">${l.code}</div>
+          <div style="font-size:10px;color:#aaa">Stock : ${l.big} Big · ${l.small} Small</div>
+        </div>
+        <div style="text-align:center">
+          <input type="number" min="0" max="${l.big}" placeholder="0"
+            id="b${id}-big-${l.code}"
+            oninput="calcBoites()"
+            style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none"
+            onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
+          <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.big}</div>
+        </div>
+        <div style="text-align:center">
+          <input type="number" min="0" max="${l.small}" placeholder="0"
+            id="b${id}-small-${l.code}"
+            oninput="calcBoites()"
+            style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none"
+            onfocus="this.style.borderColor='#0662aa'" onblur="this.style.borderColor='#e8e8e8'">
+          <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.small}</div>
+          ${isB2B ? `
+          <div style="margin-top:5px;background:#f0f6fc;border-radius:6px;padding:4px 6px;display:inline-block;min-width:62px">
+            <div style="font-size:8px;font-weight:700;color:#0662aa;text-transform:uppercase">📦 boîtes</div>
+            <div id="b${id}-boxes-${l.code}" style="font-size:13px;font-weight:700;color:#0662aa">0</div>
+          </div>` : ''}
+        </div>
+      </div>`).join('')}`;
+}
+
+function getAllSaveursLots() {
+  // Collecte toutes les saveurs et lots saisis dans tous les blocs
+  const result = [];
+  document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
+    const bId = block.id.replace('saveur-block-', '');
+    const saveur = document.getElementById('saveur-sel-' + bId)?.value;
+    if (!saveur) return;
+    const lots = stockLocal
+      .filter(l => l.saveur === saveur)
+      .map(l => ({
+        code:  l.code,
+        big:   parseInt(document.getElementById(`b${bId}-big-${l.code}`)?.value)   || 0,
+        small: parseInt(document.getElementById(`b${bId}-small-${l.code}`)?.value) || 0,
+      }))
+      .filter(l => l.big > 0 || l.small > 0);
+    if (lots.length) result.push({ saveur, lots });
+  });
+  return result;
 }
 
 function toggleDestination() {
   const type = document.getElementById('sortie-type').value;
-  document.getElementById('b2b-client-group').style.display   = type === 'b2b'   ? '' : 'none';
-  document.getElementById('autre-dest-group').style.display   = type === 'autre' ? '' : 'none';
-  document.getElementById('boites-section').style.display     = type === 'b2b'   ? '' : 'none';
+  document.getElementById('b2b-client-group').style.display      = type === 'b2b'   ? '' : 'none';
+  document.getElementById('autre-dest-group').style.display      = type === 'autre' ? '' : 'none';
+  document.getElementById('boites-section-b2b').style.display    = type === 'b2b'   ? '' : 'none';
+  document.getElementById('boites-section-opt').style.display    = (type === 'evenement' || type === 'interne') ? '' : 'none';
+  document.getElementById('boites-section-ixelles').style.display= type === 'magasin' ? '' : 'none';
+  // Reset option boîtes
+  const tog = document.getElementById('boites-opt-toggle');
+  if (tog) { tog.checked = false; document.getElementById('boites-opt-detail').style.display = 'none'; }
+  // Recalculer si Ixelles
+  if (type === 'magasin') calcBoites();
+}
+
+function toggleBoitesOpt() {
+  const checked = document.getElementById('boites-opt-toggle').checked;
+  document.getElementById('boites-opt-detail').style.display = checked ? '' : 'none';
+  if (checked) calcBoites();
 }
 
 function showRetourBoites() {
@@ -1427,7 +1825,37 @@ function saveRetourBoites() {
   document.getElementById('retour-nb').value = '';
 }
 
-function showBonLivraison({ client, saveur, lots, boites, livreur }) {
+function printBon() {
+  const content = document.getElementById('bon-content').innerHTML;
+  const win = window.open('', '_blank', 'width=700,height=900');
+  win.document.write(`<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8">
+<title>Bon de livraison — Kooki</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; color:#1a1a2e; padding:32px; font-size:13px; }
+  * { color:#1a1a2e !important; }
+  [style*="color:#888"],[style*="color:#aaa"],[style*="color:#bbb"],[style*="color:#ccc"] { color:#1a1a2e !important; }
+  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; font-weight:600; }
+  .tag-o { background:#fbe8e2; color:#d44218 !important; }
+  .tag-b { background:#e0edf8; color:#0662aa !important; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; font-size:11px; color:#1a1a2e !important; font-weight:600; text-transform:uppercase; padding:7px 10px; }
+  td { padding:8px 10px; border-bottom:1px solid #f5f5f5; }
+  @media print {
+    body { padding: 16px; }
+    @page { margin: 1cm; }
+  }
+</style>
+</head><body>
+${content}
+<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); }; }<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique', livreur }) {
   const now    = new Date();
   const dateStr = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   const num    = 'BL-' + now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2) + '-' + Math.floor(Math.random()*900+100);
@@ -1461,9 +1889,44 @@ function showBonLivraison({ client, saveur, lots, boites, livreur }) {
     bBig   += Math.ceil((l.big   || 0) / 12);
     bSmall += Math.ceil((l.small || 0) / 25);
   });
-  document.getElementById('bon-boites-big').textContent   = bBig;
-  document.getElementById('bon-boites-small').textContent = bSmall;
-  document.getElementById('bon-boites-section').style.display = (bBig + bSmall) > 0 ? '' : 'none';
+  const bonBoitesSection = document.getElementById('bon-boites-section');
+  if (boites > 0) {
+    bonBoitesSection.style.display = '';
+    if (typeBoite === 'blanche') {
+      // Boîtes blanches Ixelles
+      bonBoitesSection.style.background = '#f0f7f0';
+      bonBoitesSection.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">🗃️ Boîtes blanches</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#d4edda;border-radius:8px;padding:10px 14px">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#1a7a3a">Boîtes blanches envoyées</div>
+            <div style="font-size:11px;color:#888;margin-top:1px">1 boîte = 40 cookies</div>
+          </div>
+          <div style="font-size:28px;font-weight:700;color:#1a7a3a">${boites}</div>
+        </div>`;
+    } else {
+      // Boîtes plastiques
+      bonBoitesSection.style.background = '#f7f8fa';
+      bonBoitesSection.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">📦 Boîtes plastiques envoyées</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div style="background:#fbe8e2;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:10px;font-weight:700;color:#d44218;text-transform:uppercase">Big (165g)</div><div style="font-size:10px;color:#888;margin-top:1px">1 boîte = 12 cookies</div></div>
+            <div style="font-size:26px;font-weight:700;color:#d44218">${bBig}</div>
+          </div>
+          <div style="background:#e0edf8;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase">Small (80g)</div><div style="font-size:10px;color:#888;margin-top:1px">1 boîte = 25 cookies</div></div>
+            <div style="font-size:26px;font-weight:700;color:#0662aa">${bSmall}</div>
+          </div>
+        </div>
+        <div style="padding-top:10px;border-top:1px dashed #e0e0e0;display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;color:#aaa">
+          <span>Boîtes retournées ce jour : ___________</span>
+          <span>Solde après livraison : ___________</span>
+        </div>`;
+    }
+  } else {
+    bonBoitesSection.style.display = 'none';
+  }
 
   document.getElementById('bon-overlay').style.display = 'flex';
 }
@@ -1479,170 +1942,110 @@ let stockLocal = [
   { code:'DAV-260606-01', saveur:'DAVY',  big:135, small:60 },
 ];
 
-function loadLotsForSortie() {
-  const saveur = document.getElementById('sortie-saveur').value;
-  const container = document.getElementById('sortie-lots-container');
-  const empty     = document.getElementById('sortie-lots-empty');
-
-  if (!saveur) {
-    container.innerHTML = '<div class="fac-empty" id="sortie-lots-empty">Choisissez d\'abord une saveur pour voir les lots disponibles</div>';
-    return;
-  }
-
-  const lots = stockLocal.filter(l => l.saveur === saveur && (l.big > 0 || l.small > 0));
-
-  if (!lots.length) {
-    container.innerHTML = '<div class="fac-empty">Aucun lot en stock pour cette saveur</div>';
-    return;
-  }
-
-  const isB2B = document.getElementById('sortie-type').value === 'b2b';
-
-  container.innerHTML = `
-    <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B?'1.2fr':' 1fr'};gap:0;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;padding:10px 14px 6px;border-bottom:1px solid #efefef">
-      <span>Code lot</span>
-      <span style="text-align:center;color:#d44218">Big (165g) à sortir</span>
-      <span style="text-align:center;color:#0662aa">Small (80g) à sortir${isB2B?' · 📦 Boîtes':''}</span>
-    </div>
-    ${lots.map(l => `
-      <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B?'1.2fr':'1fr'};align-items:start;gap:0;padding:12px 14px;border-bottom:1px solid #f5f5f5">
-        <div>
-          <div style="font-weight:600;font-size:13px">${l.code}</div>
-          <div style="font-size:11px;color:#aaa;margin-top:2px">Stock : <b>${l.big}</b> Big · <b>${l.small}</b> Small</div>
-        </div>
-        <div style="text-align:center">
-          <input type="number" min="0" max="${l.big}" placeholder="0"
-            id="lot-big-${l.code}"
-            oninput="calcBoites()"
-            style="width:70px;padding:6px 8px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;background:#fff;outline:none"
-            onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
-          <div style="font-size:10px;color:#bbb;margin-top:3px">max ${l.big}</div>
-          ${isB2B ? `
-          <div style="margin-top:7px;background:#f0f6fc;border-radius:7px;padding:5px 8px;display:inline-block;min-width:70px">
-            <div style="font-size:9px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.04em">📦 Boîtes</div>
-            <div id="boites-big-lot-${l.code}" style="font-size:15px;font-weight:700;color:#d44218">0</div>
-          </div>` : ''}
-        </div>
-        <div style="text-align:center">
-          <input type="number" min="0" max="${l.small}" placeholder="0"
-            id="lot-small-${l.code}"
-            oninput="calcBoites()"
-            style="width:70px;padding:6px 8px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:13px;text-align:center;background:#fff;outline:none"
-            onfocus="this.style.borderColor='#0662aa'" onblur="this.style.borderColor='#e8e8e8'">
-          <div style="font-size:10px;color:#bbb;margin-top:3px">max ${l.small}</div>
-          ${isB2B ? `
-          <div style="margin-top:7px;background:#f0f6fc;border-radius:7px;padding:5px 8px;display:inline-block;min-width:70px">
-            <div style="font-size:9px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.04em">📦 Boîtes</div>
-            <div id="boites-lot-${l.code}" style="font-size:15px;font-weight:700;color:#0662aa">0</div>
-          </div>` : ''}
-        </div>
-      </div>`).join('')}
-  `;
-}
-
 async function saveSortie() {
-  const saveur  = document.getElementById('sortie-saveur').value;
-  const type    = document.getElementById('sortie-type').value;
+  const type      = document.getElementById('sortie-type').value;
   const b2bClient = document.getElementById('sortie-b2b-client')?.value || '';
-  const custom  = document.getElementById('sortie-destination-custom')?.value.trim() || '';
-  // Boîtes calculées automatiquement (1 boîte = 25 Small)
-  const boites = parseInt(document.getElementById('boites-total-display')?.textContent) || 0;
+  const custom    = document.getElementById('sortie-destination-custom')?.value.trim() || '';
 
   let destination = '';
-  if (type === 'b2b')       destination = b2bClient;
-  else if (type === 'magasin')  destination = 'Magasin Ixelles';
+  if      (type === 'b2b')       destination = b2bClient;
+  else if (type === 'magasin')   destination = 'Magasin Ixelles';
   else if (type === 'evenement') destination = 'Événement';
-  else if (type === 'interne')  destination = 'Usage interne';
-  else if (type === 'autre')   destination = custom || 'Autre';
+  else if (type === 'interne')   destination = 'Usage interne';
+  else if (type === 'autre')     destination = custom || 'Autre';
 
-  if (!saveur)      { toast('sortie','⚠️ Choisissez une saveur','err'); return; }
-  if (!destination) { toast('sortie','⚠️ Choisissez une destination','err'); return; }
-  if (type === 'b2b' && !b2bClient) { toast('sortie','⚠️ Choisissez un client B2B','err'); return; }
+  if (!destination)                   { toast('sortie','⚠️ Choisissez une destination','err'); return; }
+  if (type==='b2b' && !b2bClient)    { toast('sortie','⚠️ Choisissez un client B2B','err');   return; }
 
-  const lots = stockLocal
-    .filter(l => l.saveur === saveur)
-    .map(l => ({
-      code:  l.code,
-      big:   parseInt(document.getElementById('lot-big-'   + l.code)?.value) || 0,
-      small: parseInt(document.getElementById('lot-small-' + l.code)?.value) || 0,
-    }))
-    .filter(l => l.big > 0 || l.small > 0);
+  // Collecter toutes les saveurs et leurs lots
+  const saveursLots = getAllSaveursLots();
+  if (!saveursLots.length) { toast('sortie','⚠️ Ajoutez au moins une saveur avec des quantités','err'); return; }
 
-  if (!lots.length) { toast('sortie','⚠️ Indiquez au moins une quantité à sortir','err'); return; }
-
-  for (const lot of lots) {
-    const s = stockLocal.find(s => s.code === lot.code);
-    if (s && (lot.big > s.big || lot.small > s.small)) {
-      toast('sortie', `⚠️ Quantité dépasse le stock pour ${lot.code}`, 'err'); return;
+  // Vérifier les stocks
+  for (const { lots } of saveursLots) {
+    for (const lot of lots) {
+      const s = stockLocal.find(s => s.code === lot.code);
+      if (s && (lot.big > s.big || lot.small > s.small)) {
+        toast('sortie', `⚠️ Quantité dépasse le stock pour ${lot.code}`, 'err'); return;
+      }
     }
   }
 
+  // Boîtes
+  let boites = 0, typeBoite = 'plastique';
+  if (type === 'b2b' || ((type==='evenement'||type==='interne') && document.getElementById('boites-opt-toggle')?.checked)) {
+    boites    = (window._boitesBig||0) + (window._boitesSmall||0);
+    typeBoite = 'plastique';
+  } else if (type === 'magasin') {
+    boites    = window._boitesIx || 0;
+    typeBoite = 'blanche';
+  }
+
+  // Aplatir tous les lots pour l'API
+  const allLots   = saveursLots.flatMap(sv => sv.lots);
+  const allSaveur = saveursLots.map(sv => sv.saveur).join(', ');
+
   try {
-    const res  = await fetch(API, { method:'POST', body: JSON.stringify({ action:'sortie', saveur, destination, lots }) });
+    const res  = await fetch(API, { method:'POST', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLots }) });
     const json = await res.json();
 
     if (json.success) {
-      // Mise à jour stock local
-      lots.forEach(lot => {
-        const s = stockLocal.find(s => s.code === lot.code);
-        if (s) { s.big -= lot.big; s.small -= lot.small; }
+      const now     = new Date();
+      const time    = now.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
+      const date    = now.toLocaleDateString('fr-FR',{ day:'2-digit', month:'2-digit' });
+      const livreur = FULL_NAMES[currentProfile] || currentProfile;
+      const tbody   = document.getElementById('sortie-history');
+
+      saveursLots.forEach(({ saveur, lots }) => {
+        // Décrémenter stock local
+        lots.forEach(lot => {
+          const s = stockLocal.find(s => s.code === lot.code);
+          if (s) { s.big -= lot.big; s.small -= lot.small; }
+        });
+        // Historique — 1 ligne par lot
+        lots.forEach(lot => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="sub-text">${date} ${time}</td>
+            <td><span class="tag tag-o">${saveur}</span></td>
+            <td><b>${destination}</b></td>
+            <td>${lot.code}</td>
+            <td>${lot.big||0}</td><td>${lot.small||0}</td>
+            <td>${boites > 0 ? boites : '—'}</td>
+            <td class="sub-text">${livreur}</td>`;
+          tbody.prepend(tr);
+        });
       });
 
-      // Mise à jour tableau boîtes si B2B
+      // Boîtes plastiques B2B
       if (type === 'b2b' && boites > 0) {
         const rows = document.querySelectorAll('#boites-table tr');
-        let found = false;
+        let found  = false;
         rows.forEach(row => {
           if (row.cells[0]?.textContent.trim() === b2bClient) {
-            const env  = parseInt(row.cells[1].textContent) + boites;
-            const ret  = parseInt(row.cells[2].textContent);
-            const sol  = env - ret;
+            const env = parseInt(row.cells[1].textContent) + boites;
+            const ret = parseInt(row.cells[2].textContent);
+            const sol = env - ret;
             row.cells[1].textContent = env;
             row.cells[3].textContent = sol;
             row.cells[3].style.color = sol > 0 ? '#d44218' : '#0662aa';
             row.cells[3].style.fontWeight = '700';
-            row.cells[4].innerHTML = sol > 0
-              ? `<span class="status s-warn">${sol} manquantes</span>`
-              : `<span class="status s-ok">À jour</span>`;
+            row.cells[4].innerHTML = sol > 0 ? `<span class="status s-warn">${sol} manquantes</span>` : `<span class="status s-ok">À jour</span>`;
             found = true;
           }
         });
         if (!found) {
-          const tbody = document.getElementById('boites-table');
           const tr = document.createElement('tr');
           tr.innerHTML = `<td><b>${b2bClient}</b></td><td>${boites}</td><td>0</td><td style="color:#d44218;font-weight:700">${boites}</td><td><span class="status s-warn">${boites} manquantes</span></td>`;
-          tbody.prepend(tr);
+          document.getElementById('boites-table').prepend(tr);
         }
       }
 
-      // Ajouter dans l'historique
-      const now  = new Date();
-      const time = now.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
-      const date = now.toLocaleDateString('fr-FR',{ day:'2-digit', month:'2-digit' });
-      const livreur = FULL_NAMES[currentProfile] || currentProfile;
-      const tbody = document.getElementById('sortie-history');
-      lots.forEach(lot => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="sub-text">${date} ${time}</td>
-          <td><span class="tag tag-o">${saveur}</span></td>
-          <td><b>${destination}</b></td>
-          <td>${lot.code}</td>
-          <td>${lot.big||0}</td><td>${lot.small||0}</td>
-          <td>${type==='b2b' ? boites : '—'}</td>
-          <td class="sub-text">${livreur}</td>`;
-        tbody.prepend(tr);
-      });
-
-      toast('sortie','✓ Sortie enregistrée !','ok');
-
-      // Mettre à jour pages Stock et Dashboard
       updateStockPage();
       updateDashboardStockTable();
-
-      // Afficher le bon de livraison
-      showBonLivraison({ client: destination, saveur, lots, boites: type==='b2b' ? boites : 0, livreur });
-
+      toast('sortie','✓ Sortie enregistrée !','ok');
+      // Bon de livraison avec tous les lots
+      showBonLivraison({ client: destination, saveur: allSaveur, lots: allLots, boites, typeBoite, livreur });
       resetSortie();
     } else {
       toast('sortie','❌ '+(json.error||'Erreur'),'err');
@@ -1653,17 +2056,28 @@ async function saveSortie() {
 }
 
 function resetSortie() {
-  ['sortie-saveur','sortie-type','sortie-b2b-client'].forEach(id => {
+  ['sortie-type','sortie-b2b-client'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
-  ['sortie-destination-custom','boites-envoyees'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
+  const custom = document.getElementById('sortie-destination-custom');
+  if (custom) custom.value = '';
+  const tog = document.getElementById('boites-opt-toggle');
+  if (tog) { tog.checked = false; }
+
+  ['b2b-client-group','autre-dest-group',
+   'boites-section-b2b','boites-section-opt','boites-section-ixelles',
+   'boites-opt-detail'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
-  document.getElementById('b2b-client-group').style.display  = 'none';
-  document.getElementById('autre-dest-group').style.display  = 'none';
-  document.getElementById('boites-section').style.display    = 'none';
-  document.getElementById('sortie-lots-container').innerHTML =
-    '<div class="fac-empty">Choisissez d\'abord une saveur pour voir les lots disponibles</div>';
+
+  const preview = document.getElementById('b2b-client-preview');
+  if (preview) preview.style.display = 'none';
+
+  // Réinitialiser les blocs saveurs — repartir avec 1 bloc vide
+  saveurBlockCount = 0;
+  document.getElementById('saveurs-blocks').innerHTML = '';
+  addSaveurBlock();
+  window._boitesBig = 0; window._boitesSmall = 0; window._boitesIx = 0;
 }
 
 function resetPmx() { document.getElementById('pmx-code').value=''; document.getElementById('pmx-nom').value=''; document.querySelectorAll('#pmx-fac-list input').forEach(c=>c.checked=false); }
@@ -2273,9 +2687,44 @@ function applyManquants(data) {
 // ─────────────────────────────────────
 // INIT
 // ─────────────────────────────────────
-selectProfile('Lila');
-loadAllData();
+function loginAs(name) {
+  // Cacher l'écran de connexion
+  document.getElementById('login-screen').style.display = 'none';
+  // Appliquer le profil sélectionné
+  selectProfile(name);
+  // Lancer le chargement des données
+  loadAllData();
+}
+
+// Bouton "Changer de profil" — réaffiche l'écran de connexion
+function showLoginScreen() {
+  document.getElementById('profile-dropdown').classList.remove('open');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+addSaveurBlock();
 window.addEventListener('resize', () => drawChart(currentChartMode));
+
+// ── NAVIGATION MOBILE ──
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+// Sync barre du bas avec la navigation
+const origShowPage = showPage;
+window.showPage = function(name, btn) {
+  origShowPage(name, btn);
+  // Mettre à jour la bottom nav
+  document.querySelectorAll('.bottom-nav-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${name}'`));
+  });
+  closeSidebar();
+};
 </script>
 </body>
 </html>
