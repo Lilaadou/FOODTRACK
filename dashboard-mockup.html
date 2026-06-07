@@ -2122,22 +2122,23 @@ function resetProd() { ['prod-pmx','prod-code','prod-big','prod-small'].forEach(
 function resetRec() { ['rec-numero','rec-nom','rec-date'].forEach(id=>document.getElementById(id).value=''); document.getElementById('rec-fournisseur').selectedIndex=0; }
 function resetFac() { ['fac-numero','fac-code'].forEach(id=>document.getElementById(id).value=''); document.getElementById('fac-fournisseur').selectedIndex=0; }
 
-async function savePremix() {
+function savePremix() {
   const code = val('pmx-code'), nom = val('pmx-nom');
   if (!code||!nom) { toast('pmx','⚠️ Code et producteur requis','err'); return; }
   const factures = getCheckedFactures('pmx-fac-list');
   if (!factures.length) { toast('pmx','⚠️ Cochez au moins 1 facture','err'); return; }
-  try {
-    const res = await fetch(API, { method:'POST', body: JSON.stringify({ action:'premix', code, nom, factures }) });
-    const json = await res.json();
-    if (json.success) {
-      toast('pmx','✓ Premix enregistré !','ok');
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td><b>${code}</b></td><td>${nom}</td><td>${factures.map(f=>`<span class="tag tag-o">${f}</span>`).join(' ')}</td><td><span class="status s-warn">Nouveau</span></td>`;
-      document.getElementById('pmx-table').prepend(tr);
-      resetPmx();
-    } else toast('pmx','❌ '+(json.error||'Erreur'),'err');
-  } catch { toast('pmx','❌ Connexion échouée','err'); }
+
+  // Sauvegarder dans localStorage
+  const stored = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  if (stored.find(r => r.codePremix === code)) { toast('pmx','⚠️ Ce code existe déjà','err'); return; }
+  stored.unshift({ codePremix: code, nom, factures, date: new Date().toISOString() });
+  localStorage.setItem('kooki_premix', JSON.stringify(stored));
+
+  toast('pmx','✓ Premix enregistré !','ok');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><b>${code}</b></td><td>${nom}</td><td>${factures.map(f=>`<span class="tag tag-o">${f}</span>`).join(' ')}</td><td><span class="status s-ok">Enregistré</span></td>`;
+  document.getElementById('pmx-table').prepend(tr);
+  resetPmx();
 }
 
 async function saveProduction() {
@@ -2650,11 +2651,14 @@ function applySorties(data) {
 
 // ── Premix ──
 function applyPremix(data) {
-  if (!Array.isArray(data) || !data.length) return;
+  // Priorité : localStorage (données locales persistantes)
+  const local = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const source = local.length ? local : (Array.isArray(data) ? data : []);
   const tbody = document.getElementById('pmx-table');
   if (!tbody) return;
+  if (!source.length) return;
   tbody.innerHTML = '';
-  data.forEach(r => {
+  source.forEach(r => {
     const facs = (r.factures || []).map(f => `<span class="tag tag-o">${f}</span>`).join(' ') || '—';
     tbody.innerHTML += `<tr>
       <td><b>${r.codePremix}</b></td>
