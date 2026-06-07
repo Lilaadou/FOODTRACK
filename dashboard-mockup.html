@@ -2117,8 +2117,8 @@ function resetSortie() {
   window._boitesBig = 0; window._boitesSmall = 0; window._boitesIx = 0;
 }
 
-function resetPmx() { document.getElementById('pmx-code').value=''; document.getElementById('pmx-nom').value=''; document.querySelectorAll('#pmx-fac-list input').forEach(c=>c.checked=false); }
-function resetProd() { ['prod-nom','prod-pmx','prod-code','prod-big','prod-small'].forEach(id=>document.getElementById(id).value=''); document.getElementById('prod-saveur').selectedIndex=0; document.querySelectorAll('#prod-fac-list input').forEach(c=>c.checked=false); }
+function resetPmx() { document.getElementById('pmx-code').value=''; document.querySelectorAll('#pmx-fac-list input').forEach(c=>c.checked=false); }
+function resetProd() { ['prod-pmx','prod-code','prod-big','prod-small'].forEach(id=>document.getElementById(id).value=''); document.getElementById('prod-saveur').selectedIndex=0; document.querySelectorAll('#prod-fac-list input').forEach(c=>c.checked=false); }
 function resetRec() { ['rec-numero','rec-nom','rec-date'].forEach(id=>document.getElementById(id).value=''); document.getElementById('rec-fournisseur').selectedIndex=0; }
 function resetFac() { ['fac-numero','fac-code'].forEach(id=>document.getElementById(id).value=''); document.getElementById('fac-fournisseur').selectedIndex=0; }
 
@@ -2740,6 +2740,7 @@ function showLoginScreen() {
 }
 
 addSaveurBlock();
+selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
 
 // ── NAVIGATION MOBILE ──
