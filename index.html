@@ -188,6 +188,47 @@
       #login-screen > div:nth-child(2){ grid-template-columns:repeat(2,1fr) !important; max-width:100% !important; }
     }
 
+    /* ── INVENTAIRE PREMIX ── */
+    .pmx-sac-card{background:#fff;border:1.5px solid #e8e8e8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s;}
+    .pmx-sac-card.dispo{border-color:#27ae60;background:#f0faf4;}
+    .pmx-sac-card.vide{border-color:#e0e0e0;background:#f9f9f9;opacity:.75;}
+    .pmx-sac-card.manquant{border-color:#d44218;background:#fdf0ec;}
+    .pmx-sac-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .pmx-sac-label{font-size:13px;font-weight:700;}
+    .pmx-sac-sub{font-size:11px;color:#888;}
+    .pmx-sac-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:inline-block;margin-top:2px;}
+    .pmx-sac-status.dispo{background:#d4edda;color:#1a7a3a;}
+    .pmx-sac-status.vide{background:#f0f0f0;color:#999;}
+    .pmx-sac-status.manquant{background:#fbe8e2;color:#d44218;}
+    /* Carte récap manquants */
+    .mq-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:#fff;border:1.5px solid #f5cbb8;margin-bottom:8px;}
+    .mq-item:last-child{margin-bottom:0;}
+    .mq-badge{min-width:28px;height:28px;border-radius:50%;background:#d44218;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .mq-info{flex:1;min-width:0;}
+    .mq-title{font-size:13px;font-weight:700;}
+    .mq-sub{font-size:11px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    /* ── CALENDRIER PRODUCTION ── */
+    .cal-card{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+    .cal-card.urgence{background:#fdf0ec;border:1.5px solid #f5cbb8;}
+    .cal-card.priorite{background:#fef7d6;border:1.5px solid #f0d96e;}
+    .cal-card.ok{background:#f0faf4;border:1.5px solid #a8d8b4;}
+    .cal-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;}
+    .cal-badge.urgence{background:#d44218;color:#fff;}
+    .cal-badge.priorite{background:#e6a800;color:#fff;}
+    .cal-badge.ok{background:#27ae60;color:#fff;}
+
+    /* ── LOTS DU JOUR ── */
+    .lot-jour-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:9px;background:#f7f8fa;font-size:12px;}
+    .lot-jour-sav{font-weight:700;}
+    .lot-jour-qty{display:flex;gap:8px;}
+    .lot-jour-b{color:#d44218;font-weight:700;}
+    .lot-jour-s{color:#0662aa;font-weight:700;}
+
+    @media(max-width:768px){
+      #prod-chart-row{grid-template-columns:1fr !important;}
+    }
+
     @media print{ body{ display:none; } }
 
     /* ── TABLETTE ── */
@@ -599,12 +640,7 @@
       <!-- Classement -->
       <div class="card">
         <div class="card-header"><div><div class="card-title">🏆 Classement stock</div><div class="card-sub">Total Big en frigo</div></div></div>
-        <div class="rank-item"><span class="rank-num r1">#1</span><div class="rank-dot" style="background:#d44218"></div><div class="rank-info"><div class="rank-name">SUZZY</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:100%;background:#d44218"></div></div></div><div class="rank-totals"><div class="rank-big" style="color:#d44218">425</div><div class="rank-small">5 Small</div></div></div>
-        <div class="rank-item"><span class="rank-num r2">#2</span><div class="rank-dot" style="background:#0662aa"></div><div class="rank-info"><div class="rank-name">WOODY</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:79%;background:#0662aa"></div></div></div><div class="rank-totals"><div class="rank-big" style="color:#0662aa">335</div><div class="rank-small">65 Small</div></div></div>
-        <div class="rank-item"><span class="rank-num">#3</span><div class="rank-dot" style="background:#e8956a"></div><div class="rank-info"><div class="rank-name">JACKY</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:32%;background:#e8956a"></div></div></div><div class="rank-totals"><div class="rank-big" style="color:#e8956a">135</div><div class="rank-small">30 Small</div></div></div>
-        <div class="rank-item"><span class="rank-num">#4</span><div class="rank-dot" style="background:#3a8fc9"></div><div class="rank-info"><div class="rank-name">BENNY</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:32%;background:#3a8fc9"></div></div></div><div class="rank-totals"><div class="rank-big" style="color:#3a8fc9">135</div><div class="rank-small">30 Small</div></div></div>
-        <div class="rank-item"><span class="rank-num">#5</span><div class="rank-dot" style="background:#a02e10"></div><div class="rank-info"><div class="rank-name">DAVY</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:32%;background:#a02e10"></div></div></div><div class="rank-totals"><div class="rank-big" style="color:#a02e10">135</div><div class="rank-small">60 Small</div></div></div>
-        <div class="rank-item"><span class="rank-num" style="color:#e0e0e0">#6</span><div class="rank-dot" style="background:#e0e0e0"></div><div class="rank-info"><div class="rank-name" style="color:#ccc">MOLLY · +5</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:0%"></div></div></div><div class="rank-totals"><div class="rank-big" style="color:#ddd">0</div><div class="rank-small">0 Small</div></div></div>
+        <div id="dashboard-classement"><div class="empty" style="padding:16px">Chargement…</div></div>
       </div>
     </div>
 
@@ -627,6 +663,39 @@
 
   <!-- ══════════════════ PREMIX ══════════════════ -->
   <div id="page-premix" class="page">
+
+    <!-- ══ Récapitulatif ingrédients manquants ══ -->
+    <div id="manquants-summary-card" style="display:none;margin-bottom:18px">
+      <div style="background:#fdf0ec;border:1.5px solid #f5cbb8;border-radius:16px;padding:19px 21px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#d44218;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#d44218">Ingrédients manquants</div>
+              <div style="font-size:11px;color:#888" id="mq-summary-sub">— premix incomplets</div>
+            </div>
+          </div>
+          <div style="background:#d44218;color:#fff;font-size:22px;font-weight:700;min-width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0 10px" id="mq-total-badge">0</div>
+        </div>
+        <div id="mq-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ Inventaire étagère ══ -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">
+        <div><div class="card-title">🗄️ Inventaire étagère Premix</div><div class="card-sub">2 sacs par saveur — état en temps réel</div></div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:11px;color:#888;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#27ae60;display:inline-block"></span>Disponible</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#d44218;display:inline-block"></span>Ingrédient manquant</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#d0d0d0;display:inline-block"></span>Vide</span>
+        </div>
+      </div>
+      <div id="inventaire-premix-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+        <div class="empty" style="grid-column:1/-1">Chargement…</div>
+      </div>
+    </div>
+
     <div class="form-section">
       <div class="form-title">🥣 Ajouter un code Premix</div>
       <div class="form-grid fg-3">
@@ -635,6 +704,24 @@
           <label>Producteur</label>
           <input type="text" id="pmx-nom" readonly style="background:#f0f0f0;color:#888;cursor:default;border-color:#e8e8e8;">
         </div>
+        <div class="form-group">
+          <label>Saveur *</label>
+          <select id="pmx-saveur" onchange="autoFillPmxCode()">
+            <option value="">-- Choisir --</option>
+            <option>SUZZY</option><option>JACKY</option><option>BENNY</option><option>DAVY</option>
+            <option>MOLLY</option><option>WALLY</option><option>CHARLY</option><option>LENI</option>
+            <option>EMMY</option><option>WOODY</option><option>DANNY</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>N° de sac *</label>
+          <select id="pmx-sac" onchange="autoFillPmxCode()">
+            <option value="">-- Choisir --</option>
+            <option value="1">Sac 1</option>
+            <option value="2">Sac 2</option>
+          </select>
+        </div>
+        <div></div>
         <div></div>
       </div>
       <div class="form-group" style="margin-bottom:13px">
@@ -652,20 +739,28 @@
         <div id="pmx-manquants-detail" style="display:none;background:#fdf0ec;border-radius:10px;padding:13px 16px;border:1.5px solid #f5cbb8">
           <div style="font-size:12px;color:#d44218;font-weight:700;margin-bottom:10px">Cochez les ingrédients manquants :</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:10px">
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Farine" style="accent-color:#d44218;cursor:pointer"> Farine</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Beurre" style="accent-color:#d44218;cursor:pointer"> Beurre</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Sucre" style="accent-color:#d44218;cursor:pointer"> Sucre</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Chocolat" style="accent-color:#d44218;cursor:pointer"> Chocolat</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Œufs" style="accent-color:#d44218;cursor:pointer"> Œufs</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Vanille" style="accent-color:#d44218;cursor:pointer"> Vanille</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Noisettes" style="accent-color:#d44218;cursor:pointer"> Noisettes</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Amandes" style="accent-color:#d44218;cursor:pointer"> Amandes</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Levure" style="accent-color:#d44218;cursor:pointer"> Levure</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Sucre brun" style="accent-color:#d44218;cursor:pointer"> Sucre brun</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Sucre blanc" style="accent-color:#d44218;cursor:pointer"> Sucre blanc</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Fécule de maïs" style="accent-color:#d44218;cursor:pointer"> Fécule de maïs</label>
             <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Sel" style="accent-color:#d44218;cursor:pointer"> Sel</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Bicarbonate" style="accent-color:#d44218;cursor:pointer"> Bicarbonate</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Levure chimique" style="accent-color:#d44218;cursor:pointer"> Levure chimique</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Chocolat noir" style="accent-color:#d44218;cursor:pointer"> Chocolat noir</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Chocolat blanc" style="accent-color:#d44218;cursor:pointer"> Chocolat blanc</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Chocolat au lait" style="accent-color:#d44218;cursor:pointer"> Chocolat au lait</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Chocolat caramel" style="accent-color:#d44218;cursor:pointer"> Chocolat caramel</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Chocolat vegan" style="accent-color:#d44218;cursor:pointer"> Chocolat vegan</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Cacahuètes" style="accent-color:#d44218;cursor:pointer"> Cacahuètes</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Noisettes" style="accent-color:#d44218;cursor:pointer"> Noisettes</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Poudre d'amandes" style="accent-color:#d44218;cursor:pointer"> Poudre d'amandes</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Noix" style="accent-color:#d44218;cursor:pointer"> Noix</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Coconut" style="accent-color:#d44218;cursor:pointer"> Coconut</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Pistaches" style="accent-color:#d44218;cursor:pointer"> Pistaches</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pmx-ing-check" value="Poudre de cacao" style="accent-color:#d44218;cursor:pointer"> Poudre de cacao</label>
           </div>
           <div class="form-group">
             <label>Autre ingrédient manquant</label>
-            <input type="text" id="pmx-manquant-autre" placeholder="Ex: Pistaches, Caramel, Noix de coco…">
+            <input type="text" id="pmx-manquant-autre" placeholder="Ex: Beurre, Vanille, Œufs…">
           </div>
         </div>
       </div>
@@ -679,13 +774,9 @@
     <div class="card">
       <div class="card-header"><div><div class="card-title">Codes Premix enregistrés</div></div></div>
       <table>
-        <thead><tr><th>Code Premix</th><th>Producteur</th><th>Factures</th><th>Statut</th></tr></thead>
+        <thead><tr><th>Code Premix</th><th>Saveur · Sac</th><th>Producteur</th><th>Factures</th><th>Statut</th><th></th></tr></thead>
         <tbody id="pmx-table">
-          <tr><td><b>PMX-260606-04</b></td><td>Alexandre</td><td><span class="tag tag-o">FAC liée</span></td><td><span class="status s-ok">Utilisé</span></td></tr>
-          <tr><td><b>PMX-260606-03</b></td><td>Alexandre</td><td><span class="tag tag-o">FAC liée</span></td><td><span class="status s-ok">Utilisé</span></td></tr>
-          <tr><td><b>PMX-260606-02</b></td><td>Alexandre</td><td><span class="tag tag-o">FAC liée</span></td><td><span class="status s-ok">Utilisé</span></td></tr>
-          <tr><td><b>PMX-260605-02</b></td><td>David / Alexandre</td><td><span class="tag tag-o">FAC liée</span></td><td><span class="status s-ok">Utilisé</span></td></tr>
-          <tr><td><b>PMX-260605-01</b></td><td>David</td><td><span class="tag tag-o">FAC liée</span></td><td><span class="status s-ok">Utilisé</span></td></tr>
+          <tr><td colspan="5" class="empty">Chargement…</td></tr>
         </tbody>
       </table>
     </div>
@@ -725,17 +816,54 @@
         <span class="toast" id="toast-prod"></span>
       </div>
     </div>
-    <!-- Graphique production par producteur -->
+    <!-- Graphique + Lots du jour -->
+    <div style="display:grid;grid-template-columns:1fr 230px;gap:16px;margin-bottom:18px" id="prod-chart-row">
+      <!-- Graphique production par producteur -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Pâtes réalisées par producteur</div>
+            <div class="card-sub">Nombre de pâtes par mois</div>
+          </div>
+          <span style="font-size:11px;background:#fbe8e2;color:#d44218;padding:3px 9px;border-radius:20px;font-weight:600">2026</span>
+        </div>
+        <div id="pchart-legend" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px"></div>
+        <canvas id="prod-bar-chart" style="width:100%;height:200px;display:block"></canvas>
+      </div>
+
+      <!-- Lots du jour -->
+      <div class="card" style="display:flex;flex-direction:column;gap:0">
+        <div class="card-header" style="margin-bottom:10px">
+          <div><div class="card-title">📦 Lots du jour</div><div class="card-sub" id="lots-du-jour-date">—</div></div>
+        </div>
+        <div id="lots-du-jour" style="flex:1;display:flex;flex-direction:column;gap:6px">
+          <div class="empty" style="padding:12px;font-size:12px">Aucune production ce jour</div>
+        </div>
+        <div style="border-top:1px solid #f0f0f0;margin-top:10px;padding-top:10px">
+          <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Total du jour</div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:#fbe8e2;border-radius:9px;padding:8px 10px;text-align:center">
+              <div style="font-size:9px;font-weight:700;color:#d44218;text-transform:uppercase">Big</div>
+              <div style="font-size:22px;font-weight:700;color:#d44218" id="lots-total-big">0</div>
+            </div>
+            <div style="flex:1;background:#e0edf8;border-radius:9px;padding:8px 10px;text-align:center">
+              <div style="font-size:9px;font-weight:700;color:#0662aa;text-transform:uppercase">Small</div>
+              <div style="font-size:22px;font-weight:700;color:#0662aa" id="lots-total-small">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendrier de production conseillé -->
     <div class="card" style="margin-bottom:18px">
       <div class="card-header">
-        <div>
-          <div class="card-title">Pâtes réalisées par producteur</div>
-          <div class="card-sub">Nombre de pâtes par mois</div>
-        </div>
-        <span style="font-size:11px;background:#fbe8e2;color:#d44218;padding:3px 9px;border-radius:20px;font-weight:600">2026</span>
+        <div><div class="card-title">📅 Calendrier de production conseillé</div><div class="card-sub">Priorités basées sur le stock actuel</div></div>
+        <button class="btn btn-secondary" onclick="updateCalendrierProduction()" style="font-size:11px;padding:5px 12px">🔄 Recalculer</button>
       </div>
-      <div id="pchart-legend" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px"></div>
-      <canvas id="prod-bar-chart" style="width:100%;height:210px;display:block"></canvas>
+      <div id="calendrier-production" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="empty" style="grid-column:1/-1;padding:16px">Chargement du stock…</div>
+      </div>
     </div>
 
     <div class="card">
@@ -743,13 +871,7 @@
       <table>
         <thead><tr><th>Code Lot</th><th>Saveur</th><th>Big</th><th>Small</th><th>Stock Big</th><th>Stock Small</th><th>Premix</th><th>Producteur</th></tr></thead>
         <tbody id="prod-table">
-          <tr><td><b>SUZ-260605-03</b></td><td><span class="tag tag-o">SUZZY</span></td><td>300+</td><td>5+</td><td style="color:#d44218;font-weight:700">300</td><td>5</td><td class="sub-text">PMX-260605-02</td><td>Alexandre</td></tr>
-          <tr><td><b>WOO-260606-01</b></td><td><span class="tag tag-b">WOODY</span></td><td>200+</td><td>65+</td><td style="color:#0662aa;font-weight:700">200</td><td>65</td><td class="sub-text">PMX-260606-04</td><td>Alexandre</td></tr>
-          <tr><td><b>WOO-260605-01</b></td><td><span class="tag tag-b">WOODY</span></td><td>135+</td><td>75+</td><td style="color:#0662aa;font-weight:700">135</td><td>0</td><td class="sub-text">PMX-260605-02</td><td>David</td></tr>
-          <tr><td><b>JAC-260606-01</b></td><td><span class="tag tag-o">JACKY</span></td><td>135+</td><td>80+</td><td style="color:#d44218;font-weight:700">135</td><td>30</td><td class="sub-text">PMX-260606-02</td><td>Alexandre</td></tr>
-          <tr><td><b>BEN-260606-01</b></td><td><span class="tag tag-o">BENNY</span></td><td>135+</td><td>65+</td><td style="color:#d44218;font-weight:700">135</td><td>30</td><td class="sub-text">PMX-260606-03</td><td>Alexandre</td></tr>
-          <tr><td><b>DAV-260606-01</b></td><td><span class="tag tag-o">DAVY</span></td><td>135</td><td>60</td><td style="color:#d44218;font-weight:700">135</td><td>60</td><td class="sub-text">PMX-260606-05</td><td>—</td></tr>
-          <tr><td><b>SUZ-260605-01</b></td><td><span class="tag tag-o">SUZZY</span></td><td>215+</td><td>125+</td><td style="color:#d44218;font-weight:700">125</td><td>0</td><td class="sub-text">PMX-260605-01</td><td>David</td></tr>
+          <tr><td colspan="8" class="empty">Chargement…</td></tr>
         </tbody>
       </table>
     </div>
@@ -1289,7 +1411,8 @@ function showPage(name, btn) {
   if (name === 'reception') loadRecentInvoices();
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => drawChart(currentChartMode), 60);
-  if (name === 'production') setTimeout(() => { buildProdLegend(); drawProdChart(); initProdChartEvents(); }, 60);
+  if (name === 'production') setTimeout(() => { buildProdByProducer(); buildProdLegend(); drawProdChart(); initProdChartEvents(); updateLotsduJour(); updateCalendrierProduction(); }, 60);
+  if (name === 'premix') setTimeout(() => { updateInventairePremix(); updateManquantsSummary(); }, 60);
 }
 
 // ─────────────────────────────────────
@@ -1654,6 +1777,65 @@ function updateStockPage() {
   }
 }
 
+// Couleurs par saveur
+const SAVEUR_COLORS = {
+  SUZZY:'#d44218', JACKY:'#d44218', BENNY:'#d44218', DAVY:'#d44218',
+  MOLLY:'#d44218', WALLY:'#d44218', CHARLY:'#d44218', LENI:'#d44218',
+  EMMY:'#d44218', DANNY:'#d44218', WOODY:'#0662aa'
+};
+
+function updateDashboardClassement() {
+  const container = document.getElementById('dashboard-classement');
+  if (!container) return;
+
+  // Regrouper par saveur
+  const bySaveur = {};
+  stockLocal.forEach(l => {
+    if (!bySaveur[l.saveur]) bySaveur[l.saveur] = { big: 0, small: 0 };
+    bySaveur[l.saveur].big   += l.big;
+    bySaveur[l.saveur].small += l.small;
+  });
+
+  const sorted = Object.entries(bySaveur).sort((a, b) => b[1].big - a[1].big);
+  const maxBig = sorted.length ? sorted[0][1].big : 1;
+
+  const ZEROS = ['MOLLY','WALLY','CHARLY','LENI','EMMY','DANNY']
+    .filter(s => !bySaveur[s] || bySaveur[s].big === 0);
+
+  const numClass = ['r1','r2','','','',''];
+  let html = sorted.map(([sav, { big, small }], i) => {
+    const color = SAVEUR_COLORS[sav] || '#d44218';
+    const pct   = maxBig > 0 ? Math.round((big / maxBig) * 100) : 0;
+    const nc    = numClass[i] || '';
+    return `<div class="rank-item">
+      <span class="rank-num ${nc}">#${i+1}</span>
+      <div class="rank-dot" style="background:${color}"></div>
+      <div class="rank-info">
+        <div class="rank-name">${sav}</div>
+        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+      <div class="rank-totals">
+        <div class="rank-big" style="color:${color}">${big}</div>
+        <div class="rank-small">${small} Small</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (ZEROS.length) {
+    html += `<div class="rank-item">
+      <span class="rank-num" style="color:#e0e0e0">#${sorted.length+1}</span>
+      <div class="rank-dot" style="background:#e0e0e0"></div>
+      <div class="rank-info">
+        <div class="rank-name" style="color:#ccc">${ZEROS.join(' · ')}</div>
+        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:0%"></div></div>
+      </div>
+      <div class="rank-totals"><div class="rank-big" style="color:#ddd">0</div><div class="rank-small">0 Small</div></div>
+    </div>`;
+  }
+
+  container.innerHTML = html || '<div class="empty">Aucun stock</div>';
+}
+
 function updateDashboardStockTable() {
   // Reconstruire le tableau des lots en stock sur le Dashboard
   const tbody = document.querySelector('#page-dashboard tbody');
@@ -1701,6 +1883,13 @@ function updateDashboardStockTable() {
   if (dashCards[0]) dashCards[0].textContent = totalBig.toLocaleString('fr-FR');
   if (dashCards[1]) dashCards[1].textContent = totalSmall.toLocaleString('fr-FR');
   if (dashCards[3]) dashCards[3].textContent = zeros;
+
+  updateDashboardClassement();
+  updateChartWithStock();
+  // Recalculer le calendrier de production si la page Production est visible
+  if (document.getElementById('page-production')?.classList.contains('active')) {
+    updateCalendrierProduction();
+  }
 }
 
 function calcBoites() {
@@ -2182,6 +2371,305 @@ function resetSortie() {
   window._boitesBig = 0; window._boitesSmall = 0; window._boitesIx = 0;
 }
 
+// ─────────────────────────────────────
+// LOTS DU JOUR
+// ─────────────────────────────────────
+function updateLotsduJour() {
+  const today = new Date().toDateString();
+  const prods = JSON.parse(localStorage.getItem('kooki_productions') || '[]')
+    .filter(p => p.date && new Date(p.date).toDateString() === today);
+
+  const container = document.getElementById('lots-du-jour');
+  const dateEl    = document.getElementById('lots-du-jour-date');
+  const totalBigEl  = document.getElementById('lots-total-big');
+  const totalSmallEl= document.getElementById('lots-total-small');
+  if (!container) return;
+
+  const now = new Date();
+  if (dateEl) dateEl.textContent = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+
+  if (!prods.length) {
+    container.innerHTML = '<div class="empty" style="padding:12px;font-size:12px">Aucune production ce jour</div>';
+    if (totalBigEl) totalBigEl.textContent = '0';
+    if (totalSmallEl) totalSmallEl.textContent = '0';
+    return;
+  }
+
+  // Grouper par saveur
+  const bySav = {};
+  let totalBig = 0, totalSmall = 0;
+  prods.forEach(p => {
+    if (!bySav[p.saveur]) bySav[p.saveur] = { big: 0, small: 0, lots: 0 };
+    bySav[p.saveur].big   += parseInt(p.big   || 0);
+    bySav[p.saveur].small += parseInt(p.small || 0);
+    bySav[p.saveur].lots++;
+    totalBig   += parseInt(p.big   || 0);
+    totalSmall += parseInt(p.small || 0);
+  });
+
+  container.innerHTML = Object.entries(bySav).map(([sav, d]) =>
+    `<div class="lot-jour-item">
+      <div class="lot-jour-sav">${sav} <span style="font-size:10px;color:#aaa;font-weight:400">(${d.lots} lot${d.lots>1?'s':''})</span></div>
+      <div class="lot-jour-qty">
+        <span class="lot-jour-b">${d.big}</span>
+        <span style="color:#ccc">·</span>
+        <span class="lot-jour-s">${d.small}</span>
+      </div>
+    </div>`
+  ).join('');
+
+  if (totalBigEl)   totalBigEl.textContent   = totalBig;
+  if (totalSmallEl) totalSmallEl.textContent = totalSmall;
+}
+
+// ─────────────────────────────────────
+// CALENDRIER DE PRODUCTION CONSEILLÉ
+// ─────────────────────────────────────
+function updateCalendrierProduction() {
+  const container = document.getElementById('calendrier-production');
+  if (!container) return;
+
+  const ALL_SAVEURS = ['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
+  const SEUIL_URGENCE  = 80;   // < 80 big → urgence
+  const SEUIL_PRIORITE = 200;  // < 200 big → prioritaire
+
+  // Calculer stock par saveur
+  const stockBySav = {};
+  ALL_SAVEURS.forEach(s => stockBySav[s] = { big: 0, small: 0 });
+  stockLocal.forEach(l => {
+    if (stockBySav[l.saveur] !== undefined) {
+      stockBySav[l.saveur].big   += l.big;
+      stockBySav[l.saveur].small += l.small;
+    }
+  });
+
+  const today = new Date();
+  const fmt = (daysOffset) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + daysOffset);
+    return d.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+  };
+
+  const items = ALL_SAVEURS.map(sav => {
+    const big = stockBySav[sav].big;
+    let niveau, label, date, days;
+    if (big === 0) {
+      niveau = 'urgence'; label = '🔴 Urgence'; date = fmt(0); days = 0;
+    } else if (big < SEUIL_URGENCE) {
+      niveau = 'urgence'; label = '🔴 Critique'; date = fmt(1); days = 1;
+    } else if (big < SEUIL_PRIORITE) {
+      niveau = 'priorite'; label = '🟡 Prioritaire'; date = fmt(3); days = 3;
+    } else {
+      niveau = 'ok'; label = '🟢 OK'; date = fmt(7); days = 7;
+    }
+    return { sav, big, small: stockBySav[sav].small, niveau, label, date, days };
+  }).sort((a, b) => a.days - b.days || a.big - b.big);
+
+  container.innerHTML = items.map(it => `
+    <div class="cal-card ${it.niveau}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:14px;font-weight:700">${it.sav}</span>
+        <span class="cal-badge ${it.niveau}">${it.niveau === 'urgence' ? (it.big===0?'Urgent':'Critique') : it.niveau === 'priorite' ? 'Bientôt' : 'OK'}</span>
+      </div>
+      <div style="font-size:11px;color:#888">Stock : <b>${it.big}</b> Big · ${it.small} Small</div>
+      <div style="font-size:11px;font-weight:600;margin-top:2px">${it.days === 0 ? '📌 Aujourd\'hui' : it.days === 1 ? '📌 Demain' : '📅 ' + it.date}</div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────
+// INVENTAIRE PREMIX ÉTAGÈRE
+// ─────────────────────────────────────
+const ALL_SAVEURS_PMX = ['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
+
+function getInventairePremix() {
+  return JSON.parse(localStorage.getItem('kooki_inventaire_premix') || '{}');
+}
+
+function saveInventairePremix(inv) {
+  localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
+}
+
+function marquerSacDisponible(saveur, sac, codePremix) {
+  const inv = getInventairePremix();
+  if (!inv[saveur]) inv[saveur] = {};
+  inv[saveur][sac] = { statut: 'dispo', codePremix, date: new Date().toISOString() };
+  saveInventairePremix(inv);
+  updateInventairePremix();
+}
+
+function marquerSacVide(codePremix) {
+  const inv = getInventairePremix();
+  // Chercher quel sac correspond à ce code premix
+  for (const sav of Object.keys(inv)) {
+    for (const sac of ['1','2']) {
+      if (inv[sav][sac]?.codePremix === codePremix && inv[sav][sac]?.statut === 'dispo') {
+        inv[sav][sac].statut = 'vide';
+        inv[sav][sac].dateVide = new Date().toISOString();
+        saveInventairePremix(inv);
+        updateInventairePremix();
+        return;
+      }
+    }
+  }
+}
+
+function getPremixManquantsMap() {
+  // Retourne un Map codePremix → { manquants, resolus }
+  const stored = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const map = {};
+  stored.forEach(r => {
+    if (r.codePremix) map[r.codePremix] = { manquants: r.manquants || [], resolus: r.manquantsResolus || false };
+  });
+  return map;
+}
+
+function updateInventairePremix() {
+  const container = document.getElementById('inventaire-premix-grid');
+  if (!container) return;
+  const inv     = getInventairePremix();
+  const mqMap   = getPremixManquantsMap();
+
+  container.innerHTML = ALL_SAVEURS_PMX.map(sav => {
+    const s1 = inv[sav]?.['1'] || { statut: 'vide' };
+    const s2 = inv[sav]?.['2'] || { statut: 'vide' };
+
+    const sacState = (data) => {
+      if (data.statut !== 'dispo') return 'vide';
+      const mq = mqMap[data.codePremix];
+      if (mq && mq.manquants.length > 0 && !mq.resolus) return 'manquant';
+      return 'dispo';
+    };
+
+    const state1 = sacState(s1);
+    const state2 = sacState(s2);
+
+    const COLOR  = { dispo:'#27ae60', manquant:'#d44218', vide:'#d0d0d0' };
+    const BG     = { dispo:'#e8f8f0', manquant:'#fdf0ec', vide:'#f5f5f5' };
+    const TXTCOL = { dispo:'#1a7a3a', manquant:'#d44218', vide:'#999' };
+    const SUBBG  = { dispo:'#1a7a3a', manquant:'#a0200a', vide:'#bbb' };
+
+    const sacHTML = (data, num, state) => {
+      const isDispo = data.statut === 'dispo';
+      const label = isDispo ? (data.codePremix || '—') : 'Vide';
+      const icon  = state === 'manquant' ? '⚠️ ' : '';
+      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;background:${BG[state]};cursor:pointer"
+          onclick="toggleSacManuel('${sav}','${num}')"
+          title="${state==='manquant'?'Ingrédient manquant — voir récapitulatif':isDispo?'Cliquer pour marquer vide':'Cliquer pour marquer disponible'}">
+        <div class="pmx-sac-dot" style="background:${COLOR[state]}"></div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:${TXTCOL[state]}">Sac ${num}</div>
+          <div style="font-size:10px;color:${SUBBG[state]}">${icon}${label}</div>
+        </div>
+      </div>`;
+    };
+
+    // Classe de la carte : manquant > dispo > vide
+    const cardClass = (state1==='manquant'||state2==='manquant') ? 'manquant'
+                    : (state1==='dispo'||state2==='dispo') ? 'dispo' : 'vide';
+
+    return `<div class="pmx-sac-card ${cardClass}">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:${cardClass==='manquant'?'#d44218':'inherit'}">${sav}</div>
+      ${sacHTML(s1, '1', state1)}
+      ${sacHTML(s2, '2', state2)}
+    </div>`;
+  }).join('');
+
+  // Synchroniser le récapitulatif manquants
+  updateManquantsSummary();
+}
+
+function updateManquantsSummary() {
+  const card    = document.getElementById('manquants-summary-card');
+  const list    = document.getElementById('mq-list');
+  const badge   = document.getElementById('mq-total-badge');
+  const subEl   = document.getElementById('mq-summary-sub');
+  if (!card || !list) return;
+
+  const stored = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const actifs = stored.filter(r => r.manquants?.length > 0 && !r.manquantsResolus);
+
+  if (!actifs.length) {
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = '';
+  if (badge) badge.textContent = actifs.length;
+  if (subEl) subEl.textContent = `${actifs.length} premix incomplet${actifs.length > 1 ? 's' : ''}`;
+
+  list.innerHTML = actifs.map(r => `
+    <div class="mq-item">
+      <div class="mq-badge">⚠️</div>
+      <div class="mq-info">
+        <div class="mq-title">${r.codePremix}
+          <span style="font-size:11px;font-weight:400;color:#888;margin-left:6px">${r.saveur || ''}${r.sac ? ' · Sac ' + r.sac : ''}</span>
+        </div>
+        <div class="mq-sub">Manquant : ${(r.manquants || []).join(', ')}</div>
+      </div>
+      <button onclick="resoudrePremix('${r.codePremix}')"
+        style="background:#27ae60;color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s"
+        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        ✓ Résolu
+      </button>
+    </div>`).join('');
+}
+
+function resoudrePremix(codePremix) {
+  const stored = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const entry  = stored.find(r => r.codePremix === codePremix);
+  if (!entry) return;
+
+  entry.manquantsResolus = true;
+  localStorage.setItem('kooki_premix', JSON.stringify(stored));
+
+  // Mettre à jour le statut dans la table récap
+  const rows = document.querySelectorAll(`#pmx-table tr[data-code="${codePremix}"]`);
+  rows.forEach(row => {
+    const statusCell = row.querySelector('.status');
+    if (statusCell) {
+      statusCell.className = 'status s-ok';
+      statusCell.textContent = 'Disponible';
+    }
+  });
+
+  // Rafraîchir inventaire (retirera le rouge) + récapitulatif
+  updateInventairePremix();
+
+  // Petit feedback visuel sur l'item résolu
+  const items = document.querySelectorAll('#mq-list .mq-item');
+  items.forEach(item => {
+    if (item.querySelector('button')?.getAttribute('onclick')?.includes(codePremix)) {
+      item.style.transition = 'opacity .3s';
+      item.style.opacity = '0';
+      setTimeout(() => updateManquantsSummary(), 300);
+    }
+  });
+}
+
+function toggleSacManuel(saveur, num) {
+  const inv = getInventairePremix();
+  if (!inv[saveur]) inv[saveur] = {};
+  const current = inv[saveur][num]?.statut || 'vide';
+  inv[saveur][num] = current === 'dispo'
+    ? { statut: 'vide', dateVide: new Date().toISOString() }
+    : { statut: 'dispo', codePremix: '—', date: new Date().toISOString() };
+  saveInventairePremix(inv);
+  updateInventairePremix();
+}
+
+function autoFillPmxCode() {
+  const sav = document.getElementById('pmx-saveur')?.value;
+  const sac = document.getElementById('pmx-sac')?.value;
+  const codeEl = document.getElementById('pmx-code');
+  if (sav && sac && codeEl && !codeEl.value) {
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const dd = String(now.getDate()).padStart(2,'0');
+    codeEl.value = `PMX-${sav.slice(0,3)}-${yy}${mm}${dd}-${sac}`;
+  }
+}
+
 function toggleManquants() {
   const checked = document.getElementById('pmx-manquants-toggle').checked;
   document.getElementById('pmx-manquants-detail').style.display = checked ? '' : 'none';
@@ -2196,6 +2684,8 @@ function getManquantsFromForm() {
 
 function resetPmx() {
   document.getElementById('pmx-code').value = '';
+  const savEl = document.getElementById('pmx-saveur'); if (savEl) savEl.selectedIndex = 0;
+  const sacEl = document.getElementById('pmx-sac');    if (sacEl) sacEl.selectedIndex = 0;
   document.querySelectorAll('#pmx-fac-list input').forEach(c => c.checked = false);
   document.getElementById('pmx-manquants-toggle').checked = false;
   document.getElementById('pmx-manquants-detail').style.display = 'none';
@@ -2208,8 +2698,12 @@ function resetRec() { ['rec-numero','rec-nom','rec-date'].forEach(id=>document.g
 function resetFac() { ['fac-numero','fac-code'].forEach(id=>document.getElementById(id).value=''); document.getElementById('fac-fournisseur').selectedIndex=0; }
 
 function savePremix() {
-  const code = val('pmx-code'), nom = val('pmx-nom');
-  if (!code||!nom) { toast('pmx','⚠️ Code et producteur requis','err'); return; }
+  const code   = val('pmx-code'), nom = val('pmx-nom');
+  const saveur = document.getElementById('pmx-saveur')?.value || '';
+  const sac    = document.getElementById('pmx-sac')?.value || '';
+  if (!code||!nom)      { toast('pmx','⚠️ Code et producteur requis','err'); return; }
+  if (!saveur)          { toast('pmx','⚠️ Choisissez une saveur','err');      return; }
+  if (!sac)             { toast('pmx','⚠️ Choisissez un numéro de sac','err'); return; }
   const factures = getCheckedFactures('pmx-fac-list');
   if (!factures.length) { toast('pmx','⚠️ Cochez au moins 1 facture','err'); return; }
 
@@ -2218,19 +2712,102 @@ function savePremix() {
   // Sauvegarder dans localStorage
   const stored = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
   if (stored.find(r => r.codePremix === code)) { toast('pmx','⚠️ Ce code existe déjà','err'); return; }
-  stored.unshift({ codePremix: code, nom, factures, manquants, date: new Date().toISOString() });
+  stored.unshift({ codePremix: code, nom, saveur, sac, factures, manquants, date: new Date().toISOString() });
   localStorage.setItem('kooki_premix', JSON.stringify(stored));
+
+  // Marquer le sac comme disponible dans l'inventaire étagère
+  marquerSacDisponible(saveur, sac, code);
 
   if (manquants.length) {
     addAlerteManquant(code, manquants, nom);
   }
 
-  toast('pmx','✓ Premix enregistré !','ok');
+  // ── Envoi vers Google Sheets ──
+  const toastEl = document.getElementById('toast-pmx');
+  try {
+    fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'premix',
+        codePremix: code,
+        nom,
+        saveur,
+        sac,
+        factures,
+        manquants,
+        date: new Date().toISOString()
+      })
+    })
+    .then(r => r.json())
+    .then(json => {
+      if (json?.success) {
+        toast('pmx', '✓ Premix enregistré + Google Sheets mis à jour !', 'ok');
+      } else {
+        // API a répondu mais pas de succès — données locales sauvées quand même
+        toast('pmx', '✓ Enregistré en local (Google Sheets : ' + (json?.error || 'non disponible') + ')', 'ok');
+      }
+    })
+    .catch(() => {
+      toast('pmx', '✓ Enregistré en local (Google Sheets hors ligne)', 'ok');
+    });
+  } catch {
+    toast('pmx', '✓ Enregistré en local (Google Sheets hors ligne)', 'ok');
+  }
+
   const hasMq = manquants.length > 0;
   const tr = document.createElement('tr');
-  tr.innerHTML = `<td><b>${code}</b>${hasMq ? ' <span class="tag" style="background:#fbe8e2;color:#d44218">⚠️ manquants</span>' : ''}</td><td>${nom}</td><td>${factures.map(f=>`<span class="tag tag-o">${f}</span>`).join(' ')}</td><td><span class="status ${hasMq?'s-warn':'s-ok'}">${hasMq?'Incomplet':'Enregistré'}</span></td>`;
+  tr.setAttribute('data-code', code);
+  tr.innerHTML = `<td><b>${code}</b>${hasMq ? ' <span class="tag" style="background:#fbe8e2;color:#d44218">⚠️ manquants</span>' : ''}</td>
+    <td><b>${saveur}</b> · Sac ${sac}</td>
+    <td>${nom}</td>
+    <td>${factures.map(f=>`<span class="tag tag-o">${f}</span>`).join(' ')}</td>
+    <td><span class="status ${hasMq?'s-warn':'s-ok'}">${hasMq?'Incomplet':'Disponible'}</span></td>
+    <td><button onclick="deletePremix('${code}')"
+      style="background:none;border:none;cursor:pointer;font-size:15px;color:#ccc;padding:2px 6px;border-radius:6px;transition:color .15s,background .15s"
+      onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
+      onmouseout="this.style.color='#ccc';this.style.background='none'"
+      title="Supprimer ce premix">🗑️</button></td>`;
   document.getElementById('pmx-table').prepend(tr);
   resetPmx();
+}
+
+function deletePremix(codePremix) {
+  if (!confirm(`Supprimer le premix ${codePremix} ?\nCette action est irréversible.`)) return;
+
+  // 1. Retirer du localStorage
+  const stored = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const entry  = stored.find(r => r.codePremix === codePremix);
+  const filtered = stored.filter(r => r.codePremix !== codePremix);
+  localStorage.setItem('kooki_premix', JSON.stringify(filtered));
+
+  // 2. Remettre le sac à "vide" dans l'inventaire si c'était "disponible"
+  if (entry?.saveur && entry?.sac) {
+    const inv = getInventairePremix();
+    if (inv[entry.saveur]?.[entry.sac]?.codePremix === codePremix) {
+      inv[entry.saveur][entry.sac] = { statut: 'vide' };
+      saveInventairePremix(inv);
+    }
+  }
+
+  // 3. Supprimer la ligne du tableau
+  const row = document.querySelector(`#pmx-table tr[data-code="${codePremix}"]`);
+  if (row) {
+    row.style.transition = 'opacity .25s';
+    row.style.opacity = '0';
+    setTimeout(() => {
+      row.remove();
+      // Afficher "Aucun premix" si tableau vide
+      const tbody = document.getElementById('pmx-table');
+      if (tbody && !tbody.querySelector('tr:not(.empty-row)')) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucun premix enregistré.</td></tr>';
+      }
+    }, 250);
+  }
+
+  // 4. Mettre à jour l'inventaire visuellement
+  updateInventairePremix();
+
+  toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
 }
 
 function addAlerteManquant(codePremix, manquants, producteur) {
@@ -2301,6 +2878,13 @@ async function saveProduction() {
       // 5. Ajouter dans la base de recherche
       SEARCH_DB.unshift({ cat:'Production', icon:'🏭', ref:code, detail:`${saveur} · ${pmx} · ${nom}`, page:'production' });
 
+      // 6. Rafraîchir le graphique producteur + lots du jour + calendrier + inventaire
+      buildProdByProducer();
+      if (document.getElementById('prod-bar-chart')) drawProdChart();
+      updateLotsduJour();
+      updateCalendrierProduction();
+      marquerSacVide(pmx); // Marquer le sac premix utilisé comme vide dans l'inventaire
+
       resetProd();
     } else toast('prod','❌ '+(json.error||'Erreur'),'err');
   } catch { toast('prod','❌ Connexion échouée','err'); }
@@ -2359,16 +2943,50 @@ async function loadRecentInvoices() {
 // ─────────────────────────────────────
 // GRAPHIQUE PRODUCTION PAR PRODUCTEUR
 // ─────────────────────────────────────
-// Nombre de pâtes réalisées par mois (données réelles Juin + historique)
-const prodByProducer = {
-  labels: ['Jan','Fév','Mar','Avr','Mai','Juin'],
-  producers: [
-    { name:'Alexandre Michel', color:'#d44218', pates:[12, 15, 14, 18, 20, 4] },
-    { name:'David Cohenca',    color:'#0662aa', pates:[ 8, 10, 12,  9, 11, 2] },
-    { name:'Meg Dollinger',    color:'#e8956a', pates:[ 0,  0,  4,  6,  7, 0] },
-    { name:'David Deridder',   color:'#2c7a3a', pates:[ 0,  0,  0,  2,  3, 0] },
-  ]
-};
+// Graphique producteur — reconstruit dynamiquement depuis localStorage
+const PROD_PRODUCERS = [
+  { key:'Alexandre', name:'Alexandre Michel', color:'#d44218' },
+  { key:'David C',   name:'David Cohenca',    color:'#0662aa' },
+];
+
+let prodByProducer = { labels: [], producers: [] };
+
+function buildProdByProducer() {
+  const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth();
+
+  // Afficher les 6 derniers mois jusqu'à aujourd'hui
+  const monthIdxs = [];
+  for (let i = 5; i >= 0; i--) {
+    let m = curMonth - i;
+    if (m < 0) m += 12;
+    monthIdxs.push(m);
+  }
+
+  const stored = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
+
+  const producers = PROD_PRODUCERS.map(p => ({
+    name: p.name,
+    color: p.color,
+    pates: monthIdxs.map(mi => {
+      return stored.filter(r => {
+        if (!r.date) return false;
+        const d = new Date(r.date);
+        if (d.getFullYear() !== curYear) return false;
+        if (d.getMonth() !== mi) return false;
+        const nom = (r.nom || '').toLowerCase();
+        return nom.includes(p.key.toLowerCase());
+      }).length;
+    })
+  }));
+
+  prodByProducer = {
+    labels: monthIdxs.map(i => MONTHS[i]),
+    producers
+  };
+}
 
 let prodTooltip = { visible:false, mIdx:0 };
 
@@ -2447,7 +3065,7 @@ function drawProdChart() {
     ctx.beginPath(); ctx.moveTo(cx, pT); ctx.lineTo(cx, pT + gH); ctx.stroke();
     ctx.setLineDash([]);
 
-    const items  = data.producers.filter(p => p[key][mi] > 0);
+    const items  = data.producers.filter(p => p.pates[mi] > 0);
     const bW = 150, bH = 16 + items.length * 18 + 8;
     const bx = Math.min(cx + 10, W - pR - bW - 4);
     const by = Math.max(pT, pT + gH / 2 - bH / 2);
@@ -2504,30 +3122,68 @@ function buildProdLegend() {
 // ─────────────────────────────────────
 // GRAPHIQUE CANVAS (dashboard)
 // ─────────────────────────────────────
+// Données historiques de référence (avant cette session)
+// Le dernier point de chaque série est mis à jour dynamiquement depuis stockLocal
+const CHART_SAVEURS = [
+  { name:'SUZZY', color:'#d44218' },
+  { name:'WOODY', color:'#0662aa' },
+  { name:'JACKY', color:'#e8956a' },
+  { name:'BENNY', color:'#3a8fc9' },
+  { name:'DAVY',  color:'#a02e10' },
+];
+
 const chartData = {
   semaine: {
-    labels: ['S20','S21','S22','S23 (act.)'],
+    labels: ['S20','S21','S22','Aujourd\'hui'],
     subtitle: 'Par semaine · Big (165g)',
-    series: [
-      { name:'SUZZY', color:'#d44218', values:[0,120,280,425] },
-      { name:'WOODY', color:'#0662aa', values:[0, 80,135,335] },
-      { name:'JACKY', color:'#e8956a', values:[0,  0, 80,135] },
-      { name:'BENNY', color:'#3a8fc9', values:[0, 60,100,135] },
-      { name:'DAVY',  color:'#a02e10', values:[0,  0, 60,135] },
-    ]
+    series: CHART_SAVEURS.map(s => ({ ...s, values: [0, 0, 0, 0] }))
   },
   mois: {
-    labels: ['Jan','Fév','Mar','Avr','Mai','Juin'],
+    labels: ['Jan','Fév','Mar','Avr','Mai','Aujourd\'hui'],
     subtitle: 'Par mois · Big (165g)',
-    series: [
-      { name:'SUZZY', color:'#d44218', values:[180,220,310,280,350,425] },
-      { name:'WOODY', color:'#0662aa', values:[100,150,200,180,240,335] },
-      { name:'JACKY', color:'#e8956a', values:[ 80,100,120, 90,110,135] },
-      { name:'BENNY', color:'#3a8fc9', values:[ 60, 80,100, 85,100,135] },
-      { name:'DAVY',  color:'#a02e10', values:[ 40, 60, 80, 70, 90,135] },
-    ]
+    series: CHART_SAVEURS.map(s => ({ ...s, values: [0, 0, 0, 0, 0, 0] }))
   }
 };
+
+function updateChartWithStock() {
+  if (!stockLocal.length) return;
+  // Recalculer les totaux Big par saveur depuis stockLocal
+  const totaux = {};
+  stockLocal.forEach(l => {
+    totaux[l.saveur] = (totaux[l.saveur] || 0) + l.big;
+  });
+
+  // Mettre à jour le dernier point des deux vues
+  ['semaine','mois'].forEach(mode => {
+    const series = chartData[mode].series;
+    // Conserver les saveurs présentes dans le stock, ajouter celles qui manquent
+    const savsInStock = Object.keys(totaux);
+    savsInStock.forEach(sav => {
+      let serie = series.find(s => s.name === sav);
+      if (!serie) {
+        const color = SAVEUR_COLORS[sav] || '#d44218';
+        serie = { name: sav, color, values: new Array(chartData[mode].labels.length).fill(0) };
+        series.push(serie);
+      }
+      serie.values[serie.values.length - 1] = totaux[sav] || 0;
+    });
+    // Remettre à 0 les saveurs qui ne sont plus en stock
+    series.forEach(s => {
+      if (!totaux[s.name]) s.values[s.values.length - 1] = 0;
+    });
+  });
+
+  // Mettre à jour le badge "Lots produits aujourd'hui"
+  const today = new Date().toDateString();
+  const prodsAujourdhui = JSON.parse(localStorage.getItem('kooki_productions') || '[]')
+    .filter(p => p.date && new Date(p.date).toDateString() === today);
+  const lotsBadge = document.querySelector('#page-dashboard .stat-card:nth-child(3) .stat-badge');
+  const lotsVal   = document.querySelector('#page-dashboard .stat-card:nth-child(3) .stat-value');
+  if (lotsVal) lotsVal.textContent = prodsAujourdhui.length;
+  if (lotsBadge) lotsBadge.textContent = prodsAujourdhui.map(p => p.saveur?.slice(0,3) || '?').join(' · ') || '—';
+
+  if (typeof currentChartMode !== 'undefined') drawChart(currentChartMode);
+}
 
 let currentChartMode = 'semaine';
 let chartTooltip = { visible:false, idx:0 };
@@ -2781,47 +3437,91 @@ function applySorties(data) {
 
 // ── Production historique ──
 function applyProduction(data) {
-  const local = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
-  const source = local.length ? local : (Array.isArray(data) ? data : []);
+  // Normaliser les données venant de Google Sheets
+  // Format attendu depuis l'onglet "Production" (ligne 72+) :
+  // { saveur, codePremix, code (ou codeLot), big (ou bigSize), small (ou babySize), nom (ou producteur), date }
+  const normalise = r => ({
+    code:    r.code      || r.codeLot      || r.lot        || '—',
+    saveur:  r.saveur    || r.flavor        || '—',
+    pmx:     r.pmx       || r.codePremix    || r.premix     || '—',
+    big:     parseInt(r.big   || r.bigSize   || r.qtyBig   || 0),
+    small:   parseInt(r.small || r.babySize  || r.qtySmall || 0),
+    nom:     r.nom       || r.producteur    || r.producer   || '—',
+    date:    r.date      || null,
+  });
+
+  const apiData  = Array.isArray(data) ? data.map(normalise) : [];
+  const local    = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
+  // Fusionner : localStorage en premier, puis les entrées API qui n'y sont pas déjà
+  const localCodes = new Set(local.map(r => r.code));
+  const merged = [...local, ...apiData.filter(r => r.code !== '—' && !localCodes.has(r.code))];
+
   const tbody = document.getElementById('prod-table');
-  if (!tbody || !source.length) return;
-  tbody.innerHTML = '';
-  source.forEach(r => {
+  if (!tbody) return;
+
+  if (!merged.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucune production enregistrée.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = merged.map(r => {
     const isBlue = r.saveur === 'WOODY';
-    const color = isBlue ? '#0662aa' : '#d44218';
-    tbody.innerHTML += `<tr>
-      <td><b>${r.code}</b></td>
+    const color  = isBlue ? '#0662aa' : '#d44218';
+    const dateStr = r.date ? new Date(r.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
+    return `<tr>
+      <td><b>${r.code}</b>${dateStr ? `<div class="sub-text">${dateStr}</div>` : ''}</td>
       <td><span class="tag ${isBlue?'tag-b':'tag-o'}">${r.saveur}</span></td>
-      <td>${r.big}</td><td>${r.small}</td>
+      <td>${r.big}</td>
+      <td>${r.small}</td>
       <td style="color:${color};font-weight:700">${r.big}</td>
       <td>${r.small}</td>
-      <td class="sub-text">${r.pmx || r.premix || '—'}</td>
-      <td>${r.nom || r.producteur || '—'}</td>
+      <td class="sub-text">${r.pmx}</td>
+      <td>${r.nom}</td>
     </tr>`;
-  });
+  }).join('');
+
+  // Mettre à jour le graphique producteur avec les nouvelles données
+  buildProdByProducer();
 }
 
 // ── Premix ──
 function applyPremix(data) {
-  // Priorité : localStorage (données locales persistantes)
   const local = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
   const source = local.length ? local : (Array.isArray(data) ? data : []);
   const tbody = document.getElementById('pmx-table');
   if (!tbody) return;
-  if (!source.length) return;
-  tbody.innerHTML = '';
-  source.forEach(r => {
-    const facs = (r.factures || []).map(f => `<span class="tag tag-o">${f}</span>`).join(' ') || '—';
-    tbody.innerHTML += `<tr>
-      <td><b>${r.codePremix}</b></td>
-      <td>${r.nom || r.producteur || '—'}</td>
-      <td>${facs}</td>
-      <td><span class="status s-ok">Enregistré</span></td>
-    </tr>`;
-    if (!SEARCH_DB.find(d => d.ref === r.codePremix)) {
-      SEARCH_DB.push({ cat:'Premix', icon:'🥣', ref: r.codePremix, detail: (r.factures || []).join(', '), page:'premix' });
-    }
-  });
+
+  if (!source.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Aucun premix enregistré.</td></tr>';
+  } else {
+    tbody.innerHTML = '';
+    source.forEach(r => {
+      const facs = (r.factures || []).map(f => `<span class="tag tag-o">${f}</span>`).join(' ') || '—';
+      const savSac = r.saveur ? `<b>${r.saveur}</b> · Sac ${r.sac||'?'}` : '—';
+      // Déterminer statut depuis inventaire
+      const inv = getInventairePremix();
+      const sacData = r.saveur && r.sac ? inv[r.saveur]?.[r.sac] : null;
+      const statut = sacData?.statut === 'dispo' ? 'Disponible' : sacData?.statut === 'vide' ? 'Utilisé' : 'Enregistré';
+      const statusClass = sacData?.statut === 'dispo' ? 's-ok' : sacData?.statut === 'vide' ? 's-zero' : 's-ok';
+      tbody.innerHTML += `<tr data-code="${r.codePremix}">
+        <td><b>${r.codePremix}</b></td>
+        <td>${savSac}</td>
+        <td>${r.nom || r.producteur || '—'}</td>
+        <td>${facs}</td>
+        <td><span class="status ${statusClass}">${statut}</span></td>
+        <td><button onclick="deletePremix('${r.codePremix}')"
+          style="background:none;border:none;cursor:pointer;font-size:15px;color:#ccc;padding:2px 6px;border-radius:6px;transition:color .15s,background .15s"
+          onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
+          onmouseout="this.style.color='#ccc';this.style.background='none'"
+          title="Supprimer ce premix">🗑️</button></td>
+      </tr>`;
+      if (!SEARCH_DB.find(d => d.ref === r.codePremix)) {
+        SEARCH_DB.push({ cat:'Premix', icon:'🥣', ref: r.codePremix, detail: `${r.saveur||''} Sac ${r.sac||'?'} · ${(r.factures||[]).join(', ')}`, page:'premix' });
+      }
+    });
+  }
+  // Reconstruire l'inventaire
+  updateInventairePremix();
 }
 
 // ── Factures liées productions ──
