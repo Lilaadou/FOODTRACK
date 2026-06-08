@@ -5290,18 +5290,36 @@ function applySorties(data) {
 // ─────────────────────────────────────
 
 function supprimerProduction(code) {
-  if (!confirm('Supprimer la production ' + code + ' ?\nAttention : le stock cookies NE sera pas modifié automatiquement.')) return;
+  if (!confirm('Supprimer la production ' + code + ' ?\nLe stock cookies sera mis à jour automatiquement.')) return;
 
-  // 1. Supprimer du localStorage
+  // 1. Retrouver la production pour connaître les quantités
   const stored = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
+  const prod = stored.find(r => r.code === code);
+
+  // 2. Soustraire du stock cookies
+  if (prod) {
+    const idx = stockLocal.findIndex(s => s.code === code);
+    if (idx !== -1) {
+      stockLocal[idx].big   = Math.max(0, stockLocal[idx].big   - (prod.big   || 0));
+      stockLocal[idx].small = Math.max(0, stockLocal[idx].small - (prod.small || 0));
+      if (stockLocal[idx].big === 0 && stockLocal[idx].small === 0) {
+        stockLocal.splice(idx, 1);
+      }
+    }
+    localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
+    updateStockPage();
+    updateDashboardStockTable();
+  }
+
+  // 3. Supprimer du localStorage productions
   localStorage.setItem('kooki_productions', JSON.stringify(stored.filter(r => r.code !== code)));
 
-  // 2. Garder une liste noire pour que les données Google Sheets ne fassent pas réapparaître la ligne
+  // 4. Liste noire pour éviter que Google Sheets ne la réinjecte
   const deleted = JSON.parse(localStorage.getItem('kooki_productions_deleted') || '[]');
   if (!deleted.includes(code)) deleted.push(code);
   localStorage.setItem('kooki_productions_deleted', JSON.stringify(deleted));
 
-  // 3. Retirer la ligne du DOM avec animation
+  // 5. Retirer la ligne du DOM avec animation
   const row = document.querySelector('[data-prod-code="' + code + '"]');
   if (row) { row.style.opacity = '0'; row.style.transition = 'opacity .3s'; setTimeout(() => row.remove(), 300); }
 
