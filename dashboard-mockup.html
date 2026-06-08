@@ -5115,6 +5115,10 @@ async function loadAllData() {
     applyManquants(manquantsData);
 
     setLoading('Prêt !', 100);
+
+    // Reconstruire le récapitulatif factures maintenant que productions + premix sont chargés
+    await loadCorrespondances(); // charge les correspondances BL→facture puis appelle buildFacturesRecap
+
     setTimeout(() => {
       document.getElementById('loading-overlay').style.display = 'none';
       drawChart('semaine');
