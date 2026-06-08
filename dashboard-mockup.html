@@ -2697,7 +2697,7 @@ async function saveSortie() {
   const allSaveur = saveursLots.map(sv => sv.saveur).join(', ');
 
   try {
-    const res  = await fetch(API, { method:'POST', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLots }) });
+    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLots }) });
     const json = await res.json();
 
     if (json.success) {
@@ -3129,7 +3129,7 @@ async function saveStockCorrections() {
 
   // Envoi API
   try {
-    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'corrigerStock', corrections }) })
+    fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'corrigerStock', corrections }) })
       .then(r => r.json())
       .then(json => {
         toast('ing', json?.success ? '✓ Stock corrigé !' : '✓ Corrigé localement', 'ok');
@@ -3211,6 +3211,7 @@ async function saveLivraisonIngredients() {
   try {
     fetch(API, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({ action: 'livraisonIngredients', bl, fournisseur, livraison })
     })
     .then(r => r.json())
@@ -3276,7 +3277,7 @@ async function deduireIngredientsProduction(codePremix) {
   const sacNom = entry.saveur + ' ' + entry.sac;
 
   try {
-    const res  = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'deduireIngredients', sacNom }) });
+    const res  = await fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'deduireIngredients', sacNom }) });
     const json = await res.json();
     if (json?.success) {
       if (json.stockMisAJour) {
@@ -3960,6 +3961,7 @@ function savePremix() {
   try {
     fetch(API, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({
         action: 'premix',
         codePremix: code,
@@ -4077,7 +4079,7 @@ async function saveProduction() {
   const factures = getCheckedFactures('prod-fac-list');
   if (!factures.length) { toast('prod','⚠️ Cochez au moins 1 BL','err'); return; }
   try {
-    const res = await fetch(API, { method:'POST', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures }) });
+    const res = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures }) });
     const json = await res.json();
     if (json.success) {
       toast('prod','✓ Production enregistrée !','ok');
@@ -4145,7 +4147,7 @@ async function saveReception() {
   }
 
   try {
-    const res  = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'reception', fournisseur, numero, nom, date, factureOdoo }) });
+    const res  = await fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'reception', fournisseur, numero, nom, date, factureOdoo }) });
     const json = await res.json();
     if (json.success) {
       toast('rec', factureOdoo ? '✓ BL réceptionné + facture liée automatiquement !' : '✓ BL réceptionné !', 'ok');
@@ -4246,6 +4248,7 @@ async function saveCorrespondance(bl, fac, fournisseur, fromInline) {
   try {
     fetch(API, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({ action: 'correspondance', bl: blVal, facture: facVal, fournisseur: fourn })
     })
     .then(r => r.json())
