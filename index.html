@@ -1665,7 +1665,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxI56XHgMtfflQXKr28zrgmZiy4AF1YD6SpsJG21Y5HmNUngw8z5jpxkPxqkbs_zjZH/exec';
+const API = 'https://script.google.com/macros/s/AKfycbwyxONeaAkFB-G3C7ucJW1lwjouICyz06x85UCNIoDW8g0GWr4iYN8XfMYf_45VIOfADA/exec';
 
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
@@ -2697,7 +2697,7 @@ async function saveSortie() {
   const allSaveur = saveursLots.map(sv => sv.saveur).join(', ');
 
   try {
-    const res  = await fetch(API, { method:'POST', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLots }) });
+    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLots }) });
     const json = await res.json();
 
     if (json.success) {
@@ -3129,7 +3129,7 @@ async function saveStockCorrections() {
 
   // Envoi API
   try {
-    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'corrigerStock', corrections }) })
+    fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'corrigerStock', corrections }) })
       .then(r => r.json())
       .then(json => {
         toast('ing', json?.success ? '✓ Stock corrigé !' : '✓ Corrigé localement', 'ok');
@@ -3211,6 +3211,7 @@ async function saveLivraisonIngredients() {
   try {
     fetch(API, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({ action: 'livraisonIngredients', bl, fournisseur, livraison })
     })
     .then(r => r.json())
@@ -3276,7 +3277,7 @@ async function deduireIngredientsProduction(codePremix) {
   const sacNom = entry.saveur + ' ' + entry.sac;
 
   try {
-    const res  = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'deduireIngredients', sacNom }) });
+    const res  = await fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'deduireIngredients', sacNom }) });
     const json = await res.json();
     if (json?.success) {
       if (json.stockMisAJour) {
@@ -3960,6 +3961,7 @@ function savePremix() {
   try {
     fetch(API, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({
         action: 'premix',
         codePremix: code,
@@ -4077,7 +4079,7 @@ async function saveProduction() {
   const factures = getCheckedFactures('prod-fac-list');
   if (!factures.length) { toast('prod','⚠️ Cochez au moins 1 BL','err'); return; }
   try {
-    const res = await fetch(API, { method:'POST', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures }) });
+    const res = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures }) });
     const json = await res.json();
     if (json.success) {
       toast('prod','✓ Production enregistrée !','ok');
@@ -4145,7 +4147,7 @@ async function saveReception() {
   }
 
   try {
-    const res  = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'reception', fournisseur, numero, nom, date, factureOdoo }) });
+    const res  = await fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'reception', fournisseur, numero, nom, date, factureOdoo }) });
     const json = await res.json();
     if (json.success) {
       toast('rec', factureOdoo ? '✓ BL réceptionné + facture liée automatiquement !' : '✓ BL réceptionné !', 'ok');
@@ -4246,6 +4248,7 @@ async function saveCorrespondance(bl, fac, fournisseur, fromInline) {
   try {
     fetch(API, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({ action: 'correspondance', bl: blVal, facture: facVal, fournisseur: fourn })
     })
     .then(r => r.json())
@@ -5112,6 +5115,10 @@ async function loadAllData() {
     applyManquants(manquantsData);
 
     setLoading('Prêt !', 100);
+
+    // Reconstruire le récapitulatif factures maintenant que productions + premix sont chargés
+    await loadCorrespondances(); // charge les correspondances BL→facture puis appelle buildFacturesRecap
+
     setTimeout(() => {
       document.getElementById('loading-overlay').style.display = 'none';
       drawChart('semaine');
@@ -5388,6 +5395,9 @@ function applyProduction(data) {
   const localCodes = new Set(localFiltered.map(r => r.code));
   const merged = [...localFiltered, ...apiData.filter(r => r.code !== '—' && !localCodes.has(r.code) && !deletedCodes.has(r.code))];
 
+  // Synchroniser le localStorage avec les données Google Sheets pour que le récapitulatif fonctionne sur tous les appareils
+  localStorage.setItem('kooki_productions', JSON.stringify(merged));
+
   const tbody = document.getElementById('prod-table');
   if (!tbody) return;
 
@@ -5424,7 +5434,12 @@ function applyProduction(data) {
 // ── Premix ──
 function applyPremix(data) {
   const local = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
-  const source = local.length ? local : (Array.isArray(data) ? data : []);
+  const apiData = Array.isArray(data) ? data : [];
+  // Fusionner local + API sans doublons, et synchroniser dans localStorage
+  const localCodes = new Set(local.map(r => r.codePremix));
+  const merged = [...local, ...apiData.filter(r => r.codePremix && !localCodes.has(r.codePremix))];
+  if (merged.length) localStorage.setItem('kooki_premix', JSON.stringify(merged));
+  const source = merged;
   const tbody = document.getElementById('pmx-table');
   if (!tbody) return;
 
