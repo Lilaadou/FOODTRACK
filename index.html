@@ -4075,6 +4075,17 @@ toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
   } catch {}
   if (btn) { btn.textContent = '🔄 Actualiser'; btn.disabled = false; }
 }
+ 
+  async function refreshInventaireDepuisSheets() {
+  try {
+    const inv = await fetchAPI('getInventairePremix');
+    if (inv && Object.keys(inv).length > 0) {
+      localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
+    }
+  } catch {}
+  updateInventairePremix();
+  updateManquantsSummary();
+}
   
 function addAlerteManquant(codePremix, manquants, producteur) {
   const alertPage = document.querySelector('#page-alertes .card');
