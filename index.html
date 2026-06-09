@@ -1763,7 +1763,16 @@ function showPage(name, btn) {
   if (name === 'production') setTimeout(() => { buildProdByProducer(); buildProdLegend(); drawProdChart(); initProdChartEvents(); updateLotsduJour(); updateCalendrierProduction(); }, 60);
   if (name === 'ixelles')     setTimeout(() => { initCommandeIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
-  if (name === 'premix') setTimeout(() => { updateInventairePremix(); updateManquantsSummary(); }, 60);
+  if (name === 'premix') setTimeout(async () => {
+  const data = await fetchAPI('getPremix');
+  applyPremix(data);
+  const inv = await fetchAPI('getInventairePremix');
+  if (inv && Object.keys(inv).length > 0) {
+    localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
+  }
+  updateInventairePremix();
+  updateManquantsSummary();
+}, 60);
 }
 
 // ─────────────────────────────────────
