@@ -5240,8 +5240,13 @@ function annulerSortie(sortieId) {
 }
 
 function applySorties(data) {
-  const local = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  const source = local.length ? local : (Array.isArray(data) ? data : []);
+  const local   = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
+  const apiData = Array.isArray(data) ? data : [];
+  // Fusionner local + API (dédoublonnage par date+destination+saveur)
+  const localKeys = new Set(local.map(r => (r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0)));
+  const merged = [...local, ...apiData.filter(r => !localKeys.has((r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0)))];
+  if (merged.length) localStorage.setItem('kooki_sorties', JSON.stringify(merged));
+  const source = merged;
   const tbody = document.getElementById('sortie-history');
   if (!tbody) return;
 
