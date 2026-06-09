@@ -3871,6 +3871,11 @@ function resoudrePremix(codePremix) {
   entry.manquantsResolus = true;
   localStorage.setItem('kooki_premix', JSON.stringify(stored));
 
+  // Sauvegarder dans Google Sheets
+  fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({
+    action: 'resoldrePremix', codePremix
+  })}).catch(() => {});
+
   // Mettre à jour le statut dans la table récap
   const rows = document.querySelectorAll(`#pmx-table tr[data-code="${codePremix}"]`);
   rows.forEach(row => {
@@ -3894,7 +3899,6 @@ function resoudrePremix(codePremix) {
     }
   });
 }
-
 function toggleSacManuel(saveur, num) {
   const inv = getInventairePremix();
   if (!inv[saveur]) inv[saveur] = {};
