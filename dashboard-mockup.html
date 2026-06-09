@@ -4039,11 +4039,15 @@ function deletePremix(codePremix) {
     }, 250);
   }
 
-  // 4. Mettre à jour l'inventaire visuellement
+// 4. Mettre à jour l'inventaire visuellement
   updateInventairePremix();
 
+  // 5. Supprimer dans Google Sheets
+  fetch(API, { method: 'POST', body: JSON.stringify({
+    action: 'supprimerPremix', codePremix
+  })}).catch(() => {});
+
   toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
-}
 
 function addAlerteManquant(codePremix, manquants, producteur) {
   const alertPage = document.querySelector('#page-alertes .card');
