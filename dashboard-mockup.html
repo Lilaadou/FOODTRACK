@@ -5201,9 +5201,11 @@ function annulerSortie(sortieId) {
   if (!confirm('Annuler cette sortie et retourner les cookies dans le stock ?')) return;
 
   const sorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  const sortie  = sorties.find(s => String(s.id) === String(sortieId));
+  let sortie = sorties.find(s => String(s.id) === String(sortieId));
+  // Fallback : chercher par index si pas trouvé par id
+  if (!sortie && !isNaN(sortieId) && sorties[sortieId]) sortie = sorties[sortieId];
 
-  if (!sortie) { alert('Sortie introuvable dans le stock local.'); return; }
+  if (!sortie) { alert('Sortie introuvable. Rechargez la page et réessayez.'); return; }
   if (sortie.annule) { alert('Cette sortie est déjà annulée.'); return; }
 
   // Retourner les cookies dans stockLocal
@@ -5245,6 +5247,8 @@ function applySorties(data) {
   // Fusionner local + API (dédoublonnage par date+destination+saveur)
   const localKeys = new Set(local.map(r => (r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0)));
   const merged = [...local, ...apiData.filter(r => !localKeys.has((r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0)))];
+  // Assigner un id à chaque sortie qui n'en a pas (sorties venant de Google Sheets)
+  merged.forEach((r, i) => { if (!r.id) r.id = 'sortie_' + i + '_' + (r.date||'').replace(/\D/g,'').slice(0,10); });
   if (merged.length) localStorage.setItem('kooki_sorties', JSON.stringify(merged));
   const source = merged;
   const tbody = document.getElementById('sortie-history');
