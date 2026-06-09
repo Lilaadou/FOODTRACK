@@ -5244,10 +5244,17 @@ function annulerSortie(sortieId) {
 function applySorties(data) {
   const local   = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
   const apiData = Array.isArray(data) ? data : [];
-  // Fusionner local + API (dédoublonnage par date+destination+saveur)
-  const localKeys = new Set(local.map(r => (r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0)));
-  const merged = [...local, ...apiData.filter(r => !localKeys.has((r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0)))];
-  // Assigner un id à chaque sortie qui n'en a pas (sorties venant de Google Sheets)
+
+  // Google Sheets = source de vérité
+  // Garder les entrées locales récentes pas encore dans l'API (ajoutées dans les dernières minutes)
+  const makeKey = r => (r.date||'') + '|' + (r.destination||'') + '|' + (r.saveur||'') + '|' + (r.big||0) + '|' + (r.small||0);
+  const apiKeys   = new Set(apiData.map(makeKey));
+  const localOnly = local.filter(r => !apiKeys.has(makeKey(r)));
+  const merged = apiData.length
+    ? [...apiData, ...localOnly]
+    : local; // fallback hors-ligne
+
+  // Assigner un id stable à chaque sortie
   merged.forEach((r, i) => { if (!r.id) r.id = 'sortie_' + i + '_' + (r.date||'').replace(/\D/g,'').slice(0,10); });
   if (merged.length) localStorage.setItem('kooki_sorties', JSON.stringify(merged));
   const source = merged;
@@ -5396,16 +5403,18 @@ function applyProduction(data) {
     bls:     Array.isArray(r.bls) ? r.bls : (r.factures ? (Array.isArray(r.factures) ? r.factures : String(r.factures).split(',').map(s=>s.trim()).filter(Boolean)) : []),
   });
 
-  const apiData  = Array.isArray(data) ? data.map(normalise) : [];
+  const apiData  = Array.isArray(data) ? data.map(normalise).filter(r => r.code !== '—') : [];
   const local    = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
   const deletedCodes = new Set(JSON.parse(localStorage.getItem('kooki_productions_deleted') || '[]'));
-  // Fusionner : localStorage en premier, puis les entrées API qui n'y sont pas déjà
-  // Les codes supprimés sont exclus des deux sources
-  const localFiltered = local.filter(r => !deletedCodes.has(r.code));
-  const localCodes = new Set(localFiltered.map(r => r.code));
-  const merged = [...localFiltered, ...apiData.filter(r => r.code !== '—' && !localCodes.has(r.code) && !deletedCodes.has(r.code))];
 
-  // Synchroniser le localStorage avec les données Google Sheets pour que le récapitulatif fonctionne sur tous les appareils
+  // Google Sheets = source de vérité. L'API a priorité.
+  // On garde en plus les entrées locales pas encore dans l'API (ajoutées à l'instant sur cet appareil)
+  const apiCodes = new Set(apiData.map(r => r.code));
+  const localOnly = local.filter(r => !apiCodes.has(r.code) && !deletedCodes.has(r.code));
+  const merged = apiData.length
+    ? [...apiData.filter(r => !deletedCodes.has(r.code)), ...localOnly]
+    : local.filter(r => !deletedCodes.has(r.code)); // fallback hors-ligne
+
   localStorage.setItem('kooki_productions', JSON.stringify(merged));
 
   const tbody = document.getElementById('prod-table');
@@ -5443,11 +5452,14 @@ function applyProduction(data) {
 
 // ── Premix ──
 function applyPremix(data) {
-  const local = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
-  const apiData = Array.isArray(data) ? data : [];
-  // Fusionner local + API sans doublons, et synchroniser dans localStorage
-  const localCodes = new Set(local.map(r => r.codePremix));
-  const merged = [...local, ...apiData.filter(r => r.codePremix && !localCodes.has(r.codePremix))];
+  const local   = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const apiData = Array.isArray(data) ? data.filter(r => r.codePremix) : [];
+  // Google Sheets = source de vérité
+  const apiCodes  = new Set(apiData.map(r => r.codePremix));
+  const localOnly = local.filter(r => !apiCodes.has(r.codePremix));
+  const merged = apiData.length
+    ? [...apiData, ...localOnly]
+    : local; // fallback hors-ligne
   if (merged.length) localStorage.setItem('kooki_premix', JSON.stringify(merged));
   const source = merged;
   const tbody = document.getElementById('pmx-table');
