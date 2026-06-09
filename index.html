@@ -4057,6 +4057,16 @@ toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
     action: 'supprimerPremix', codePremix
   })}).catch(() => {});
 }
+  async function refreshPremix() {
+  const btn = document.querySelector('[onclick="refreshPremix()"]');
+  if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
+  try {
+    const data = await fetchAPI('getPremix');
+    applyPremix(data);
+  } catch {}
+  if (btn) { btn.textContent = '🔄 Actualiser'; btn.disabled = false; }
+}
+  
 function addAlerteManquant(codePremix, manquants, producteur) {
   const alertPage = document.querySelector('#page-alertes .card');
   if (!alertPage) return;
