@@ -1068,6 +1068,7 @@
             <option value="">-- Choisir --</option>
             <option value="b2b">Client B2B</option>
             <option value="magasin">Magasin Ixelles</option>
+            <option value="anderlecht">Magasin Anderlecht</option>
             <option value="evenement">Événement</option>
             <option value="interne">Usage interne</option>
             <option value="autre">Autre</option>
@@ -2490,12 +2491,12 @@ function toggleDestination() {
   document.getElementById('autre-dest-group').style.display      = type === 'autre' ? '' : 'none';
   document.getElementById('boites-section-b2b').style.display    = type === 'b2b'   ? '' : 'none';
   document.getElementById('boites-section-opt').style.display    = (type === 'evenement' || type === 'interne') ? '' : 'none';
-  document.getElementById('boites-section-ixelles').style.display= type === 'magasin' ? '' : 'none';
+  document.getElementById('boites-section-ixelles').style.display= (type === 'magasin' || type === 'anderlecht') ? '' : 'none';
   // Reset option boîtes
   const tog = document.getElementById('boites-opt-toggle');
   if (tog) { tog.checked = false; document.getElementById('boites-opt-detail').style.display = 'none'; }
-  // Recalculer si Ixelles
-  if (type === 'magasin') calcBoites();
+  // Recalculer si magasin
+  if (type === 'magasin' || type === 'anderlecht') calcBoites();
 }
 
 function toggleBoitesOpt() {
@@ -2656,7 +2657,8 @@ async function saveSortie() {
 
   let destination = '';
   if      (type === 'b2b')       destination = b2bClient;
-  else if (type === 'magasin')   destination = 'Magasin Ixelles';
+  else if (type === 'magasin')    destination = 'Magasin Ixelles';
+  else if (type === 'anderlecht') destination = 'Magasin Anderlecht';
   else if (type === 'evenement') destination = 'Événement';
   else if (type === 'interne')   destination = 'Usage interne';
   else if (type === 'autre')     destination = custom || 'Autre';
@@ -2683,7 +2685,7 @@ async function saveSortie() {
   if (type === 'b2b' || ((type==='evenement'||type==='interne') && document.getElementById('boites-opt-toggle')?.checked)) {
     boites    = (window._boitesBig||0) + (window._boitesSmall||0);
     typeBoite = 'plastique';
-  } else if (type === 'magasin') {
+  } else if (type === 'magasin' || type === 'anderlecht') {
     boites    = window._boitesIx || 0;
     typeBoite = 'blanche';
   }
