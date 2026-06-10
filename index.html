@@ -1550,7 +1550,7 @@
         <div><div class="card-title">Bons de livraison reçus</div><div class="card-sub">30 derniers jours</div></div>
       </div>
       <table>
-        <thead><tr><th>Date</th><th>Fournisseur</th><th>N° BL</th><th>Ajouté par</th><th>Facture Odoo</th></tr></thead> 
+        <thead><tr><th>Date</th><th>Fournisseur</th><th>N° BL</th><th>Ajouté par</th></tr></thead> 
         <tbody id="rec-table"><tr><td colspan="5" class="empty">Aucune réception ce mois-ci.</td></tr></tbody>
       </table>
     </div>
@@ -4365,8 +4365,7 @@ async function saveReception() {
   tr.innerHTML = `<td class="sub-text">${today}</td>
     <td><b>${fournisseur}</b></td>
     <td><span class="bl-tag">${numero}</span></td>
-    <td>${nom || '—'}</td>
-    <td id="fac-cell-${numero.replace(/[^a-zA-Z0-9]/g,'_')}">${facCell}</td>`;
+    <td>${nom || '—'}</td>`;
   tbody.prepend(tr);
 
   resetRec();
@@ -4887,7 +4886,6 @@ async function loadRecentInvoices() {
         <td><b>${r.fournisseur||'—'}</b></td>
         <td><span class="bl-tag">${r.numero}</span></td>
         <td>${r.nom||'—'}</td>
-        <td id="fac-cell-${safeNum}">${r.factureOdoo ? `<span style="color:#27ae60;font-weight:700">✓ ${r.factureOdoo}</span>` : facCell}</td>
       </tr>`;
     }).join('');
   } catch {}
