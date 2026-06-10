@@ -5641,8 +5641,9 @@ function applyPremix(data) {
       const savSac = r.saveur ? `<b>${r.saveur}</b> · Bac ${r.sac||'?'}` : '—';
       const inv = getInventairePremix();
       const sacData = r.saveur && r.sac ? inv[r.saveur]?.[r.sac] : null;
-      const statut = sacData?.statut === 'dispo' ? 'Disponible' : sacData?.statut === 'vide' ? 'Utilisé' : 'Enregistré';
-      const statusClass = sacData?.statut === 'dispo' ? 's-ok' : sacData?.statut === 'vide' ? 's-zero' : 's-ok';
+      const hasMq = (r.manquants || []).length > 0 && !r.manquantsResolus;
+      const statut = hasMq ? 'Incomplet' : sacData?.statut === 'dispo' ? 'Disponible' : sacData?.statut === 'vide' ? 'Utilisé' : 'Enregistré';
+      const statusClass = hasMq ? 's-warn' : sacData?.statut === 'dispo' ? 's-ok' : sacData?.statut === 'vide' ? 's-zero' : 's-ok';
       tbody.innerHTML += `<tr data-code="${r.codePremix}">
         <td><b>${r.codePremix}</b></td>
         <td>${savSac}</td>
