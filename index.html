@@ -1550,7 +1550,7 @@
         <div><div class="card-title">Bons de livraison reçus</div><div class="card-sub">30 derniers jours</div></div>
       </div>
       <table>
-        <thead><tr><th>Date</th><th>Fournisseur</th><th>N° BL</th><th>Ajouté par</th><th>N° Facture Odoo</th></tr></thead> 
+        <thead><tr><th>Date</th><th>Fournisseur</th><th>N° BL</th><th>Ajouté par</th></tr></thead> 
         <tbody id="rec-table"><tr><td colspan="5" class="empty">Aucune réception ce mois-ci.</td></tr></tbody>
       </table>
     </div>
@@ -4365,18 +4365,7 @@ async function saveReception() {
   tr.innerHTML = `<td class="sub-text">${today}</td>
     <td><b>${fournisseur}</b></td>
     <td><span class="bl-tag">${numero}</span></td>
-    <td>${nom || '—'}</td>
-    <td>
-      <div style="display:flex;gap:6px;align-items:center">
-        <input type="text" id="odoo_${safeNum}" placeholder="BILL/2026/…"
-          style="padding:4px 8px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:12px;outline:none;width:130px"
-          onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
-        <button onclick="lierFactureDepuisReception('${numero.replace(/'/g,"\\'")}','${safeFo}')"
-          style="padding:4px 10px;background:#d44218;color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
-          Lier
-        </button>
-      </div>
-    </td>`;
+    <td>${nom || '—'}</td>`;
   tbody.prepend(tr);
 
   resetRec();
@@ -4897,20 +4886,6 @@ async function loadRecentInvoices() {
         <td><b>${r.fournisseur||'—'}</b></td>
         <td><span class="bl-tag">${r.numero}</span></td>
         <td>${r.nom||'—'}</td>
-        <td>
-          ${r.factureOdoo 
-            ? `<span style="color:#27ae60;font-weight:700">✓ ${r.factureOdoo}</span>`
-            : `<div style="display:flex;gap:6px;align-items:center">
-                <input type="text" id="odoo_${safeNum}" placeholder="BILL/2026/…"
-                  style="padding:4px 8px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:12px;outline:none;width:130px"
-                  onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
-                <button onclick="lierFactureDepuisReception('${safeBl}','${safeFo}')"
-                  style="padding:4px 10px;background:#d44218;color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
-                  Lier
-                </button>
-               </div>`
-          }
-        </td>
       </tr>`;
     }).join('');
   } catch {}
