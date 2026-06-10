@@ -4365,8 +4365,8 @@ async function saveReception() {
   tr.innerHTML = `<td class="sub-text">${today}</td>
     <td><b>${fournisseur}</b></td>
     <td><span class="bl-tag">${numero}</span></td>
-    <td id="fac-cell-${numero.replace(/[^a-zA-Z0-9]/g,'_')}">${facCell}</td>
-    <td>${nom || '—'}</td>`;
+    <td>${nom || '—'}</td>
+    <td id="fac-cell-${numero.replace(/[^a-zA-Z0-9]/g,'_')}">${facCell}</td>`;
   tbody.prepend(tr);
 
   resetRec();
