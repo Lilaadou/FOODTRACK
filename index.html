@@ -5679,10 +5679,23 @@ function applyPremix(data) {
   const tbody = document.getElementById('pmx-table');
   if (!tbody) return;
   if (!source.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">Aucun premix enregistré.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucun premix enregistré.</td></tr>';
   } else {
     tbody.innerHTML = '';
+    // Grouper par date
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    let currentDay = null;
     source.forEach(r => {
+      const dateStr = r.date ? new Date(r.date).toDateString() : 'Inconnu';
+      if (dateStr !== currentDay) {
+        currentDay = dateStr;
+        let label;
+        if (dateStr === today) label = '📅 Aujourd\'hui — ' + new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+        else if (dateStr === yesterday) label = '📅 Hier — ' + new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+        else label = '📅 ' + new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+        tbody.innerHTML += `<tr><td colspan="6" style="background:#f7f8fa;font-size:11px;font-weight:700;color:#888;padding:8px 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0f0f0">${label}</td></tr>`;
+      }
       const facs = (r.factures || []).map(f => `<span class="tag tag-o">${f}</span>`).join(' ') || '—';
       const savSac = r.saveur ? `<b>${r.saveur}</b> · Bac ${r.sac||'?'}` : '—';
       const inv = getInventairePremix();
