@@ -1677,7 +1677,8 @@
 <!-- ══════════════════ TÂCHES ══════════════════ -->
 <div id="page-taches" class="page">
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
     <!-- Colonne gauche -->
     <div style="display:flex;flex-direction:column;gap:16px">
@@ -1728,7 +1729,9 @@
 
     </div>
 
-    <!-- Colonne droite : Vue semaine -->
+    </div>
+
+    <!-- Vue semaine horizontale -->
     <div class="card">
       <div class="card-header">
         <div><div class="card-title">📅 Vue de la semaine</div><div class="card-sub" id="taches-semaine-label">—</div></div>
@@ -4484,8 +4487,8 @@ function renderTachesSemaine() {
     label.textContent = 'Semaine du ' + monday.toLocaleDateString('fr-FR', { day:'numeric', month:'long' }) + ' au ' + sunday.toLocaleDateString('fr-FR', { day:'numeric', month:'long' });
   }
 
-  const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-  let html = '';
+  const JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  let html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px">';
 
   for (let i = 0; i < 7; i++) {
     const jour = new Date(monday);
@@ -4509,10 +4512,11 @@ function renderTachesSemaine() {
       ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fef7d6;color:#a07800">${terminees}/${total}</span>`
       : `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fbe8e2;color:#d44218">${terminees}/${total}</span>`;
 
-    html += `<div style="padding:10px 0;border-bottom:1px solid #f5f5f5">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="font-size:12px;font-weight:700;color:${isToday?'#d44218':isPast?'#aaa':'#1a1a2e'}">${isToday?'📍 ':''} ${JOURS[i]} ${jour.toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span>
-        ${badge}
+    html += `<div style="padding:12px;border-radius:12px;background:${isToday?'#fdf0ec':'#f9f9f9'};border:1.5px solid ${isToday?'#f5cbb8':'#f0f0f0'}">
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:${isToday?'#d44218':isPast?'#aaa':'#1a1a2e'}">${JOURS[i]}</div>
+        <div style="font-size:13px;font-weight:700;color:${isToday?'#d44218':isPast?'#aaa':'#1a1a2e'}">${jour.toLocaleDateString('fr-FR', { day:'numeric' })}</div>
+        <div style="margin-top:4px">${badge}</div>
       </div>`;
 
     if (!tachesJour.length) {
@@ -4532,6 +4536,7 @@ function renderTachesSemaine() {
     html += '</div>';
   }
 
+  html += '</div>';
   container.innerHTML = html;
 }
 
