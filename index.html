@@ -6076,37 +6076,62 @@ function renderRecapB2b(offset) {
     byClient[s.destination][s.saveur].small += s.small || 0;
   });
 
-  let html = '<div style="display:flex;flex-direction:column;gap:12px;padding:4px 0">';
-  for (const [client, saveurs] of Object.entries(byClient)) {
-    const totalBig   = Object.values(saveurs).reduce((a,v) => a + v.big, 0);
-    const totalSmall = Object.values(saveurs).reduce((a,v) => a + v.small, 0);
-    html += `
-      <div style="background:#f9f9f9;border-radius:12px;padding:13px 16px;border:1px solid #f0f0f0">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
-          <div style="font-size:14px;font-weight:700;color:#1a1a2e">🏪 ${client}</div>
-          <div style="display:flex;gap:10px">
-            <span style="background:#e0edf8;color:#0662aa;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Big : ${totalBig}</span>
-            <span style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Small : ${totalSmall}</span>
+  // Grouper par jour puis par client
+  const parJour = {};
+  b2b.forEach(s => {
+    const jour = new Date(s.date).toDateString();
+    if (!parJour[jour]) parJour[jour] = {};
+    if (!parJour[jour][s.destination]) parJour[jour][s.destination] = {};
+    if (!parJour[jour][s.destination][s.saveur]) parJour[jour][s.destination][s.saveur] = { big:0, small:0 };
+    parJour[jour][s.destination][s.saveur].big   += s.big   || 0;
+    parJour[jour][s.destination][s.saveur].small += s.small || 0;
+  });
+
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+  let html = '<div style="display:flex;flex-direction:column;gap:16px;padding:4px 0">';
+
+  Object.entries(parJour).sort((a,b) => new Date(b[0]) - new Date(a[0])).forEach(([jour, clients]) => {
+    let label;
+    if (jour === today) label = '📅 Aujourd\'hui — ' + new Date(jour).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    else if (jour === yesterday) label = '📅 Hier — ' + new Date(jour).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    else label = '📅 ' + new Date(jour).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+
+    html += `<div>
+      <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;padding:6px 0;border-bottom:2px solid #f0f0f0;margin-bottom:10px">${label}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">`;
+
+    for (const [client, saveurs] of Object.entries(clients)) {
+      const totalBig   = Object.values(saveurs).reduce((a,v) => a + v.big, 0);
+      const totalSmall = Object.values(saveurs).reduce((a,v) => a + v.small, 0);
+      html += `
+        <div style="background:#f9f9f9;border-radius:12px;padding:13px 16px;border:1px solid #f0f0f0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+            <div style="font-size:14px;font-weight:700;color:#1a1a2e">🤝 ${client}</div>
+            <div style="display:flex;gap:10px">
+              <span style="background:#e0edf8;color:#0662aa;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Big : ${totalBig}</span>
+              <span style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Small : ${totalSmall}</span>
+            </div>
           </div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="color:#aaa;font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-            <th style="text-align:left;padding:3px 6px;font-weight:600">Saveur</th>
-            <th style="text-align:center;padding:3px 6px;font-weight:600">Big (165g)</th>
-            <th style="text-align:center;padding:3px 6px;font-weight:600">Small (80g)</th>
-            <th style="text-align:center;padding:3px 6px;font-weight:600">Total cookies</th>
-          </tr></thead>
-          <tbody>`;
-    for (const [saveur, qty] of Object.entries(saveurs)) {
-      html += `<tr style="border-top:1px solid #f0f0f0">
-        <td style="padding:5px 6px;font-weight:600">${saveur}</td>
-        <td style="text-align:center;padding:5px 6px">${qty.big || '—'}</td>
-        <td style="text-align:center;padding:5px 6px">${qty.small || '—'}</td>
-        <td style="text-align:center;padding:5px 6px;color:#888">${(qty.big * 165 + qty.small * 80) > 0 ? qty.big + qty.small + ' pcs' : '—'}</td>
-      </tr>`;
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead><tr style="color:#aaa;font-size:11px;text-transform:uppercase;letter-spacing:.04em">
+              <th style="text-align:left;padding:3px 6px;font-weight:600">Saveur</th>
+              <th style="text-align:center;padding:3px 6px;font-weight:600">Big (165g)</th>
+              <th style="text-align:center;padding:3px 6px;font-weight:600">Small (80g)</th>
+            </tr></thead>
+            <tbody>`;
+      for (const [saveur, qty] of Object.entries(saveurs)) {
+        html += `<tr style="border-top:1px solid #f0f0f0">
+          <td style="padding:5px 6px;font-weight:600">${saveur}</td>
+          <td style="text-align:center;padding:5px 6px">${qty.big || '—'}</td>
+          <td style="text-align:center;padding:5px 6px">${qty.small || '—'}</td>
+        </tr>`;
+      }
+      html += '</tbody></table></div>';
     }
-    html += '</tbody></table></div>';
-  }
+    html += '</div></div>';
+  });
 
   // Ligne totaux globaux
   const totBig   = b2b.reduce((a,s) => a + (s.big   || 0), 0);
