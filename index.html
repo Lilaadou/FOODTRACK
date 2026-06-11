@@ -1804,7 +1804,10 @@ function showPage(name, btn) {
   document.getElementById('page-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
   document.getElementById('page-title').textContent = titles[name] || name;
-  if (name === 'reception') { loadRecentInvoices(); renderPdfList(); loadBLSelect(); renderLiensBL(); }
+  if (name === 'reception') { 
+  loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); 
+  renderPdfList(); 
+}
   if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
   if (name === 'premix' || name === 'production') refreshFactureLists();
