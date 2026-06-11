@@ -1701,6 +1701,13 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div class="form-group">
+            <label>Date *</label>
+            <input type="date" id="tache-date">
+          </div>
+          <div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
             <label>Assignée à *</label>
             <select id="tache-assignee">
               <option value="Tout le monde">Tout le monde</option>
@@ -4545,17 +4552,19 @@ async function ajouterTache() {
   const assignee = document.getElementById('tache-assignee').value;
   const priorite = document.getElementById('tache-priorite').value;
   const note     = document.getElementById('tache-note').value.trim();
+  const dateVal  = document.getElementById('tache-date').value;
   if (!titre) { toast('tache', '⚠️ Le titre est requis', 'err'); return; }
+  if (!dateVal) { toast('tache', '⚠️ La date est requise', 'err'); return; }
 
   const creePar = FULL_NAMES[currentProfile] || currentProfile;
   try {
-    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverTache', titre, assignee, priorite, note, creePar }) });
+    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverTache', titre, assignee, priorite, note, creePar, date: new Date(dateVal).toISOString() }) });
     const json = await res.json();
     if (json.success) {
       toast('tache', '✓ Tâche ajoutée !', 'ok');
       document.getElementById('tache-titre').value = '';
       document.getElementById('tache-note').value = '';
-      tachesData.unshift({ date: new Date().toISOString(), titre, assignee, priorite, note, creePar, statut: 'En cours', cocheePar: '', dateCoche: '' });
+      tachesData.unshift({ date: new Date(dateVal).toISOString(), titre, assignee, priorite, note, creePar, statut: 'En cours', cocheePar: '', dateCoche: '' });
       renderTachesJour();
       renderTachesSemaine();
     }
