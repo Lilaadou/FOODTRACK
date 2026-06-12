@@ -2480,18 +2480,15 @@ function calcBoites() {
       if (!big && !small) return;
       totalCookies += big + small;
       if (showPlastic) {
-        const bBig   = big   > 0 ? Math.ceil(big   / 14) : 0;
-        const bSmall = small > 0 ? Math.ceil(small / 25) : 0;
-        totalBigBoxes   += bBig;
-        totalSmallBoxes += bSmall;
+        totalBigBoxes   += big;
+        totalSmallBoxes += small;
+        const bBoites = Math.ceil(big / 14) + Math.ceil(small / 25);
         const boxEl = document.getElementById(`b${bId}-boxes-${l.code}`);
         if (boxEl) {
-          boxEl.textContent = bSmall || bBig;
-          boxEl.parentElement.style.background = (bSmall || bBig) > 0 ? '#e0edf8' : '#f0f6fc';
+          boxEl.textContent = bBoites;
+          boxEl.parentElement.style.background = bBoites > 0 ? '#e0edf8' : '#f0f6fc';
         }
       }
-    });
-  });
 
   // Résumé B2B
   const elB2B = document.getElementById('boites-total-display');
@@ -2509,8 +2506,8 @@ function calcBoites() {
   if (elIx) elIx.textContent = totalCookies > 0 ? Math.ceil(totalCookies / 40) : 0;
 
   // Stocker globalement
-  window._boitesBig   = totalBigBoxes;
-  window._boitesSmall = totalSmallBoxes;
+  window._boitesBig   = Math.ceil(totalBigBoxes / 14);
+window._boitesSmall = Math.ceil(totalSmallBoxes / 25);
   window._boitesIx    = totalCookies > 0 ? Math.ceil(totalCookies / 40) : 0;
 }
 
