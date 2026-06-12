@@ -2915,7 +2915,7 @@ async function saveSortie() {
       toast('sortie','✓ Sortie enregistrée !','ok');
       // Bon de livraison avec tous les lots
       if (type !== 'magasin' && type !== 'anderlecht') {
-        showBonLivraison({ client: destination, saveur: allSaveur, lots: allLots, boites, typeBoite, livreur });
+        showBonLivraison({ client: destination, saveur: allSaveur, lots: allLotsAvecSaveur, boites, typeBoite, livreur });
       }
       resetSortie();
     } else {
