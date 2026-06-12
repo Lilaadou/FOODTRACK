@@ -2836,7 +2836,7 @@ async function saveSortie() {
   }
 
   // Aplatir tous les lots pour l'API
-  const allLots   = saveursLots.flatMap(sv => sv.lots);
+  const allLots = saveursLots.flatMap(sv => sv.lots.map(l => ({ ...l, saveur: sv.saveur })));
   const allSaveur = saveursLots.map(sv => sv.saveur).join(', ');
 
   try {
