@@ -3283,6 +3283,53 @@ function updateLivTotal(safeId, ing) {
   }
 }
 
+  async function loadIngredients() {
+  const cached = JSON.parse(localStorage.getItem('kooki_stock_ingredients') || '{}');
+  if (Object.keys(cached).length) Object.assign(stockIngredients, cached);
+
+  try {
+    const data = await fetchAPI('getStockIngredients');
+    if (Array.isArray(data) && data.length) {
+      data.forEach(r => {
+        if (r.nom && r.stock !== undefined) stockIngredients[r.nom] = Number(r.stock) || 0;
+      });
+      // Garder les ingrédients locaux qui ne sont pas dans Sheets
+      Object.keys(cached).forEach(ing => {
+        if (!data.find(r => r.nom === ing)) stockIngredients[ing] = cached[ing];
+      });
+      localStorage.setItem('kooki_stock_ingredients', JSON.stringify(stockIngredients));
+    }
+  } catch {}
+
+  try {
+    const data = await fetchAPI('getSacsDispo');
+    if (Array.isArray(data)) sacsDispo = data;
+  } catch {}
+
+  try {
+    const hist = await fetchAPI('getLivraisonsIngredients');
+    if (Array.isArray(hist) && hist.length) {
+      const local = JSON.parse(localStorage.getItem('kooki_livraisons_ing') || '[]');
+      const localBLs = new Set(local.map(r => r.bl));
+      hist.forEach(r => {
+        if (r.bl && !localBLs.has(r.bl)) {
+          local.push({ date: r.date, bl: r.bl, fournisseur: r.fournisseur || '' });
+        }
+      });
+      local.sort((a, b) => new Date(b.date) - new Date(a.date));
+      localStorage.setItem('kooki_livraisons_ing', JSON.stringify(local));
+    }
+  } catch {}
+
+  renderIngStockGrid();
+  renderSacsDispoGrid();
+  renderHistoriqueLivraisons();
+  // Reconstruire les tableaux avec les nouveaux stocks
+  document.getElementById('deduire-table-body').innerHTML = '';
+  document.getElementById('livraison-table-body').innerHTML = '';
+  buildLivraisonInputs();
+}
+  
 function switchConsoTab(tab) {
   document.getElementById('tab-content-deduire').style.display  = tab === 'deduire'   ? '' : 'none';
   document.getElementById('tab-content-livraison').style.display = tab === 'livraison' ? '' : 'none';
