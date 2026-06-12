@@ -5750,7 +5750,12 @@ function annulerSortieGroupe(idGroupe) {
   if (!confirm('Annuler cette sortie et retourner les cookies dans le stock ?')) return;
 
   const sorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  const groupe  = sorties.filter(s => (s.idGroupe || (s.date + '_' + s.destination + '_' + s.producteur)) === idGroupe);
+  
+  const groupe = sorties.filter(s => {
+    if (s.idGroupe && s.idGroupe === idGroupe) return true;
+    const key = s.date + '_' + s.destination + '_' + (s.producteur || '');
+    return key === idGroupe;
+  });
 
   if (!groupe.length) { alert('Sortie introuvable.'); return; }
 
@@ -5767,7 +5772,6 @@ function annulerSortieGroupe(idGroupe) {
 
   localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
   localStorage.setItem('kooki_sorties', JSON.stringify(sorties));
-
   updateStockPage();
   updateDashboardStockTable();
   applySorties([]);
