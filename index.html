@@ -5836,7 +5836,7 @@ function applySorties(data) {
   // Regrouper par idGroupe
   const groupes = {};
   source.forEach(r => {
-    const key = r.idGroupe || (r.date + '_' + r.destination + '_' + r.producteur);
+    const key = r.idGroupe || (r.date + '_' + r.destination + '_' + (r.producteur || ''));
     if (!groupes[key]) {
       groupes[key] = {
         date: r.date,
@@ -5894,7 +5894,7 @@ function applySorties(data) {
               </div>
               <div style="display:flex;gap:8px;align-items:center">
                 <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${type.color};color:${type.textColor}">${type.badge}</span>
-                <button onclick="annulerSortieGroupe('${g.idGroupe}')"
+                <buttononclick="annulerSortieGroupe(this.dataset.id)" data-id="${g.idGroupe}"
                   style="background:none;border:none;cursor:pointer;font-size:12px;color:#ccc;padding:3px 7px;border-radius:6px;transition:all .15s"
                   onmouseover="this.style.background='#fbe8e2';this.style.color='#d44218'"
                   onmouseout="this.style.background='none';this.style.color='#ccc'"
