@@ -4986,9 +4986,8 @@ function renderBLTable(data) {
           const d = bl.date ? new Date(bl.date).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
           const totalBig   = bl.lots.reduce((s, l) => s + l.big, 0);
           const totalSmall = bl.lots.reduce((s, l) => s + l.small, 0);
-          const lotsHTML = bl.lots.map(l => `
-            <span class="tag tag-o" style="font-size:10px">${l.saveur}</span>
-            <span style="font-size:10px;color:#888">${l.lot}</span><br>`).join('');
+          const saveursUniques = [...new Set(bl.lots.map(l => l.saveur))];
+          const lotsHTML = saveursUniques.map(s => `<span class="tag tag-o" style="font-size:10px;margin:1px">${s}</span>`).join(' ');
           return `<tr>
             <td><span class="bl-tag">${bl.numeroBL}</span></td>
             <td class="sub-text">${d}</td>
