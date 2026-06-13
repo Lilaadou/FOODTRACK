@@ -3024,7 +3024,7 @@ async function saveSortie() {
           action: 'sauverBL',
           numeroBL,
           client: destination,
-          lots: allLotsAvecSaveur,
+          lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
           boites,
           sortiPar: livreur
         })}).catch(() => {});
@@ -3032,7 +3032,7 @@ async function saveSortie() {
           numeroBL,
           date: new Date().toISOString(),
           client: destination,
-          lots: allLotsAvecSaveur,
+          lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
           boites,
           sortiPar: livreur
         });
