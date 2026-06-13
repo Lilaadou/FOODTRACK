@@ -1944,6 +1944,7 @@ function showPage(name, btn) {
   if (name === 'ixelles')     setTimeout(() => { initCommandeIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
 if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
+if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
   if (name === 'premix') setTimeout(async () => {
   const data = await fetchAPI('getPremix');
   applyPremix(data);
