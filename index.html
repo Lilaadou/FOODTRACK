@@ -3769,7 +3769,7 @@ function updateDashboardIxellesBanner() {
   if (!banner) return;
 
   const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
-  const pending = stored.filter(c => c.statut === 'en_attente');
+  const pending = stored.filter(c => c.statut === 'en_attente' || c.statut === 'valide');
 
   if (!pending.length) { banner.style.display = 'none'; return; }
 
@@ -3969,8 +3969,9 @@ function cmdCardHTML(cmd) {
   }).join('');
 
   const totalBacs = cmd.totalBacs || cmd.lignes.reduce((s, l) => s + l.bacs, 0);
-  const cardClass = globalOk ? 'ok' : globalPartial ? 'partial' : 'nok';
-  const cardLabel = globalOk ? '✅ Faisable' : globalPartial ? '⚡ Partiel' : '❌ Impossible';
+  const isValide = cmd.statut === 'valide';
+  const cardClass = isValide ? 'ok' : globalOk ? 'ok' : globalPartial ? 'partial' : 'nok';
+  const cardLabel = isValide ? '✅ Préparée' : globalOk ? '✅ Faisable' : globalPartial ? '⚡ Partiel' : '❌ Impossible';
 
   return `<div class="cmd-pending-card ${cardClass}" style="margin-bottom:10px" id="cmd-card-${cmd.id}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px">
@@ -4002,7 +4003,9 @@ function cmdCardHTML(cmd) {
     </div>`}
 
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      ${canPrepareOrder() && (globalOk || globalPartial)
+      ${isValide
+        ? `<div style="flex:1;padding:9px;background:#e8f8f0;color:#1a7a3a;border-radius:9px;font-size:12px;text-align:center;font-weight:700">✅ Commande préparée et livrée</div>`
+        : canPrepareOrder() && (globalOk || globalPartial)
         ? `<button onclick="validerCommandeIxellesConfirme(this.dataset.id)" data-id="${cmd.id}" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🚀 Confirmer et préparer</button>`
         : canPrepareOrder()
           ? `<div style="flex:1;padding:9px;background:#f0f0f0;color:#aaa;border-radius:9px;font-size:12px;text-align:center">❌ Stock insuffisant</div>`
