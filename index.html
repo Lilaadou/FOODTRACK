@@ -4003,7 +4003,7 @@ function cmdCardHTML(cmd) {
 
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       ${canPrepareOrder() && (globalOk || globalPartial)
-        ? `<button onclick="validerCommandeIxellesConfirme(this.dataset.id)" data-id="${cmd.id}", ${JSON.stringify(cmd.lignes)})" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🚀 Confirmer et préparer</button>`
+        ? `<button onclick="validerCommandeIxellesConfirme(this.dataset.id)" data-id="${cmd.id}" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🚀 Confirmer et préparer</button>`
         : canPrepareOrder()
           ? `<div style="flex:1;padding:9px;background:#f0f0f0;color:#aaa;border-radius:9px;font-size:12px;text-align:center">❌ Stock insuffisant</div>`
           : `<div style="flex:1;padding:9px;background:#e0edf8;color:#0662aa;border-radius:9px;font-size:12px;text-align:center;font-weight:600">✓ Commande transmise — en attente</div>`
@@ -4065,7 +4065,6 @@ async function loadCommandesIxelles() {
     if (Array.isArray(data) && data.length) {
       // Fusionner avec localStorage
       const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
-      data.forEach(cmd => {
         data.forEach(cmd => {
         // Chercher par date + par + statut pour éviter les doublons
         const existe = stored.find(c => 
