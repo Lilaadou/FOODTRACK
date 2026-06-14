@@ -4300,6 +4300,13 @@ function annulerCommandeIxelles(id) {
     stored[idx].statut = 'annule'; 
     localStorage.setItem('kooki_commandes_ixelles', JSON.stringify(stored)); 
   }
+  // Supprimer aussi de Google Sheets
+  fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+    action: 'majCommandeIxelles',
+    id,
+    statut: 'annule',
+    validePar: FULL_NAMES[currentProfile] || currentProfile
+  })}).catch(() => {});
   loadCommandesIxelles();
   updateDashboardIxellesBanner();
 }
