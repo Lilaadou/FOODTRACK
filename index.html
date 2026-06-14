@@ -3769,7 +3769,7 @@ function updateDashboardIxellesBanner() {
   if (!banner) return;
 
   const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
-  const pending = stored.filter(c => c.statut === 'en_attente' || c.statut === 'valide');
+  const pending = stored.filter(c => c.statut === 'en_attente' && c.statut !== 'annule');
 
   if (!pending.length) { banner.style.display = 'none'; return; }
 
@@ -4092,7 +4092,7 @@ async function loadCommandesIxelles() {
   } catch {}
 
   const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
-  const pending = stored.filter(c => c.statut === 'en_attente');
+  const pending = stored.filter(c => c.statut === 'en_attente' || c.statut === 'valide');
   const history = stored.filter(c => c.statut !== 'en_attente').slice(0, 5);
   const listEl  = document.getElementById('ixelles-pending-list');
   const badge   = document.getElementById('ixelles-pending-badge');
