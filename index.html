@@ -7322,13 +7322,12 @@ function supprimerPdf(id) {
 }
 
 function loginAs(name) {
-  // Charger le stock initial si localStorage est vide
   chargerStockInitial();
-  // Cacher l'écran de connexion
   document.getElementById('login-screen').style.display = 'none';
-  // Appliquer le profil sélectionné
   selectProfile(name);
-  // Lancer le chargement des données
+  const p = PROFILES[name];
+  const firstPage = p.pages[0] || 'dashboard';
+  showPage(firstPage, document.getElementById('nav-' + firstPage));
   loadAllData();
 }
 
