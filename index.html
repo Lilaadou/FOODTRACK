@@ -3992,12 +3992,12 @@ function cmdCardHTML(cmd) {
 
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       ${canPrepareOrder() && (globalOk || globalPartial)
-        ? `<button onclick="validerCommandeIxellesConfirme(${cmd.id}, ${JSON.stringify(cmd.lignes)})" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🚀 Confirmer et préparer</button>`
+        ? `<button onclick="validerCommandeIxellesConfirme(this.dataset.id)" data-id="${cmd.id}", ${JSON.stringify(cmd.lignes)})" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🚀 Confirmer et préparer</button>`
         : canPrepareOrder()
           ? `<div style="flex:1;padding:9px;background:#f0f0f0;color:#aaa;border-radius:9px;font-size:12px;text-align:center">❌ Stock insuffisant</div>`
           : `<div style="flex:1;padding:9px;background:#e0edf8;color:#0662aa;border-radius:9px;font-size:12px;text-align:center;font-weight:600">✓ Commande transmise — en attente</div>`
       }
-      <button onclick="annulerCommandeIxelles(${cmd.id})" style="padding:9px 14px;background:#f0f0f0;color:#888;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer">✕</button>
+      <button onclick="annulerCommandeIxelles(this.dataset.id)" data-id="${cmd.id}" style="padding:9px 14px;background:#f0f0f0;color:#888;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer">✕</button>
     </div>
   </div>`;
 }
