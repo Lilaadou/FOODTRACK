@@ -4231,6 +4231,7 @@ function validerCommandeIxelles(id) {
   renderHistoriqueIxelles();
 
   toast('ixelles', '✅ Commande préparée — stock mis à jour !', 'ok');
+  setTimeout(() => showPage('frigo', document.getElementById('nav-frigo')), 1500);
 }
 
 function getSemaineLabel(date) {
