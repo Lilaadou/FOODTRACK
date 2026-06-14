@@ -3876,7 +3876,7 @@ function calculerFIFO_bacs(saveur, nbBacs) {
   };
 }
 
-function submitCommandeIxelles() {
+async function submitCommandeIxelles() {
   const lignes = [];
   ALL_SAVEURS_CMD.forEach(sav => {
     const bacs = parseInt(document.getElementById('cmd-bacs-' + sav)?.value) || 0;
@@ -3884,10 +3884,22 @@ function submitCommandeIxelles() {
   });
   if (!lignes.length) { toast('ixelles', '⚠️ Entrez au moins 1 bac', 'err'); return; }
   const totalBacs = lignes.reduce((s, l) => s + l.bacs, 0);
-  const commande = { id: Date.now(), date: new Date().toISOString(), par: FULL_NAMES[currentProfile] || currentProfile, lignes, totalBacs, statut: 'en_attente' };
+  const par = FULL_NAMES[currentProfile] || currentProfile;
+  const commande = { id: Date.now(), date: new Date().toISOString(), par, lignes, totalBacs, statut: 'en_attente' };
+  
+  // Sauvegarder dans localStorage
   const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
   stored.unshift(commande);
   localStorage.setItem('kooki_commandes_ixelles', JSON.stringify(stored));
+
+  // Sauvegarder dans Google Sheets
+  fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+    action: 'sauverCommandeIxelles',
+    par,
+    statut: 'en_attente',
+    lignes: lignes.map(l => ({ saveur: l.saveur, bacsDemandesé: l.bacs, bacsConfirmes: 0 }))
+  })}).catch(() => {});
+
   toast('ixelles', '✓ Commande de ' + totalBacs + ' bac' + (totalBacs > 1 ? 's' : '') + ' envoyée !', 'ok');
   resetCommandeIxelles();
   loadCommandesIxelles();
@@ -3902,28 +3914,54 @@ function resetCommandeIxelles() {
 function cmdCardHTML(cmd) {
   const d = new Date(cmd.date).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
   let globalOk = true, globalPartial = false;
+  const LIMITE_BOITES = 12;
+
   const lignesHTML = cmd.lignes.map(l => {
     const fifo = calculerFIFO_bacs(l.saveur, l.bacs);
     if (!fifo.suffisant) { globalOk = false; if (fifo.plan.length) globalPartial = true; }
-    const isBlue = l.saveur === 'WOODY';
     const icon   = fifo.suffisant ? '✅' : fifo.plan.length ? '⚡' : '❌';
     const chips  = fifo.plan.map(p => `<span class="cmd-lot-chip">${p.code} (${p.total} 🍪)</span>`).join('');
     const manque = !fifo.suffisant ? `<span style="font-size:11px;color:#d44218;font-weight:600">· manque ${fifo.manqueCookies} cookies</span>` : '';
-    return `<div style="padding:6px 0;border-bottom:1px solid #f5f5f5">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
-        <span>${icon}</span>
-        <span class="tag ${'tag-o'}" style="font-size:11px">${l.saveur}</span>
-        <span style="font-size:13px;font-weight:700;color:#1a7a3a">${l.bacs} bac${l.bacs > 1 ? 's' : ''}</span>
-        <span style="font-size:11px;color:#888">= ${l.bacs * COOKIES_PAR_BAC} Big (165g)</span>
-        ${manque}
-      </div>
-      <div>${chips || '<span style="font-size:11px;color:#ccc">Aucun lot disponible</span>'}</div>
-    </div>`;
+    const maxBacs = Math.min(l.bacs, fifo.bacsDispos);
+
+    if (canPrepareOrder()) {
+      return `<div style="padding:8px 0;border-bottom:1px solid #f5f5f5">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+          <span>${icon}</span>
+          <span class="tag tag-o" style="font-size:11px">${l.saveur}</span>
+          <span style="font-size:12px;color:#888">Demandé : <b>${l.bacs} bac${l.bacs>1?'s':''}</b></span>
+          <span style="font-size:12px;color:#1a7a3a">Dispo : <b>${fifo.bacsDispos} bac${fifo.bacsDispos>1?'s':''}</b></span>
+          ${manque}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;font-weight:600;color:#1a1a2e">Confirmer :</span>
+          <input type="number" min="0" max="${maxBacs}" value="${maxBacs}"
+            id="confirm-bacs-${cmd.id}-${l.saveur}"
+            oninput="updateTotalConfirme('${cmd.id}')"
+            style="width:60px;padding:5px 8px;border:1.5px solid #27ae60;border-radius:8px;font-size:13px;text-align:center;outline:none">
+          <span style="font-size:11px;color:#888">/ ${l.bacs} demandés · max ${fifo.bacsDispos} dispo</span>
+        </div>
+        <div style="margin-top:4px">${chips || '<span style="font-size:11px;color:#ccc">Aucun lot disponible</span>'}</div>
+      </div>`;
+    } else {
+      return `<div style="padding:6px 0;border-bottom:1px solid #f5f5f5">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
+          <span>${icon}</span>
+          <span class="tag tag-o" style="font-size:11px">${l.saveur}</span>
+          <span style="font-size:13px;font-weight:700;color:#1a7a3a">${l.bacs} bac${l.bacs > 1 ? 's' : ''}</span>
+          <span style="font-size:11px;color:#888">= ${l.bacs * COOKIES_PAR_BAC} Big (165g)</span>
+          ${manque}
+        </div>
+        <div>${chips || '<span style="font-size:11px;color:#ccc">Aucun lot disponible</span>'}</div>
+      </div>`;
+    }
   }).join('');
+
   const totalBacs = cmd.totalBacs || cmd.lignes.reduce((s, l) => s + l.bacs, 0);
   const cardClass = globalOk ? 'ok' : globalPartial ? 'partial' : 'nok';
   const cardLabel = globalOk ? '✅ Faisable' : globalPartial ? '⚡ Partiel' : '❌ Impossible';
-  return `<div class="cmd-pending-card ${cardClass}" style="margin-bottom:10px">
+
+  return `<div class="cmd-pending-card ${cardClass}" style="margin-bottom:10px" id="cmd-card-${cmd.id}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px">
       <div>
         <div style="font-size:13px;font-weight:700">📋 ${totalBacs} bac${totalBacs > 1 ? 's' : ''} commandé${totalBacs > 1 ? 's' : ''}</div>
@@ -3932,20 +3970,81 @@ function cmdCardHTML(cmd) {
       <span class="lot-recap-badge ${cardClass === 'ok' ? 'badge-complet' : cardClass === 'partial' ? 'badge-partiel' : 'badge-aucun'}">${cardLabel}</span>
     </div>
     ${lignesHTML}
+
+    ${canPrepareOrder() ? `
+    <!-- Total confirmé + limite voiture -->
+    <div style="margin-top:10px;background:#f0f7f0;border-radius:9px;padding:9px 13px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <span style="font-size:12px;color:#1a7a3a;font-weight:600">🗃️ Total bacs confirmés</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span id="total-confirme-${cmd.id}" style="font-size:20px;font-weight:700;color:#1a7a3a">0</span>
+          <span style="font-size:11px;color:#888">/ ${LIMITE_BOITES} max voiture</span>
+        </div>
+      </div>
+      <div id="limite-warning-${cmd.id}" style="display:none;background:#fbe8e2;border-radius:7px;padding:6px 10px;margin-top:8px;font-size:12px;color:#d44218;font-weight:600">
+        ⚠️ Dépasse la capacité de la voiture (max ${LIMITE_BOITES} boîtes) !
+      </div>
+    </div>` : `
     <div style="margin-top:10px;background:#f0f7f0;border-radius:9px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:12px;color:#1a7a3a;font-weight:600">🗃️ Total bacs à préparer</span>
       <span style="font-size:20px;font-weight:700;color:#1a7a3a">${totalBacs} bac${totalBacs > 1 ? 's' : ''}</span>
-    </div>
+    </div>`}
+
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       ${canPrepareOrder() && (globalOk || globalPartial)
-        ? `<button onclick="validerCommandeIxelles(${cmd.id})" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">🚀 Préparer la commande</button>`
+        ? `<button onclick="validerCommandeIxellesConfirme(${cmd.id}, ${JSON.stringify(cmd.lignes)})" style="flex:1;padding:9px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🚀 Confirmer et préparer</button>`
         : canPrepareOrder()
           ? `<div style="flex:1;padding:9px;background:#f0f0f0;color:#aaa;border-radius:9px;font-size:12px;text-align:center">❌ Stock insuffisant</div>`
-          : `<div style="flex:1;padding:9px;background:#e0edf8;color:#0662aa;border-radius:9px;font-size:12px;text-align:center;font-weight:600">✓ Commande transmise — en attente de préparation</div>`
+          : `<div style="flex:1;padding:9px;background:#e0edf8;color:#0662aa;border-radius:9px;font-size:12px;text-align:center;font-weight:600">✓ Commande transmise — en attente</div>`
       }
       <button onclick="annulerCommandeIxelles(${cmd.id})" style="padding:9px 14px;background:#f0f0f0;color:#888;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer">✕</button>
     </div>
   </div>`;
+}
+
+function updateTotalConfirme(cmdId) {
+  const LIMITE_BOITES = 12;
+  let total = 0;
+  document.querySelectorAll(`[id^="confirm-bacs-${cmdId}-"]`).forEach(input => {
+    total += parseInt(input.value) || 0;
+  });
+  const el = document.getElementById('total-confirme-' + cmdId);
+  const warning = document.getElementById('limite-warning-' + cmdId);
+  if (el) {
+    el.textContent = total;
+    el.style.color = total > LIMITE_BOITES ? '#d44218' : '#1a7a3a';
+  }
+  if (warning) warning.style.display = total > LIMITE_BOITES ? '' : 'none';
+}
+
+function validerCommandeIxellesConfirme(id, lignes) {
+  const LIMITE_BOITES = 12;
+
+  // Récupérer les quantités confirmées
+  const lignesConfirmees = lignes.map(l => ({
+    saveur: l.saveur,
+    bacs: parseInt(document.getElementById(`confirm-bacs-${id}-${l.saveur}`)?.value) || 0
+  })).filter(l => l.bacs > 0);
+
+  if (!lignesConfirmees.length) { alert('⚠️ Entrez au moins 1 bac confirmé'); return; }
+
+  const totalConfirme = lignesConfirmees.reduce((s, l) => s + l.bacs, 0);
+  if (totalConfirme > LIMITE_BOITES) {
+    alert(`⚠️ Total dépasse la capacité de la voiture (${totalConfirme} > ${LIMITE_BOITES} boîtes) !`);
+    return;
+  }
+
+  // Valider avec les quantités confirmées
+  const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
+  const cmd = stored.find(c => c.id === id);
+  if (!cmd) return;
+
+  // Remplacer les lignes par les quantités confirmées
+  cmd.lignes = lignesConfirmees;
+  cmd.totalBacs = totalConfirme;
+  localStorage.setItem('kooki_commandes_ixelles', JSON.stringify(stored));
+
+  validerCommandeIxelles(id);
 }
 
 function loadCommandesIxelles() {
