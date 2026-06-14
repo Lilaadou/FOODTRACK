@@ -4055,7 +4055,9 @@ async function loadCommandesIxelles() {
       // Fusionner avec localStorage
       const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
       data.forEach(cmd => {
-        if (!stored.find(c => c.id === cmd.id)) {
+        // Chercher par date + par pour éviter les doublons
+        const existe = stored.find(c => c.date === cmd.date && c.par === cmd.par);
+        if (!existe) {
           stored.unshift({
             id: cmd.id || Date.now(),
             date: cmd.date,
