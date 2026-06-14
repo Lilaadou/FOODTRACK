@@ -4030,7 +4030,53 @@ function updateTotalConfirme(cmdId) {
   }
   if (warning) warning.style.display = total > LIMITE_BOITES ? '' : 'none';
 }
+async function loadCommandesIxelles() {
+  try {
+    const data = await fetchAPI('getCommandesIxelles');
+    if (Array.isArray(data) && data.length) {
+      const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
+      data.forEach(cmd => {
+        const existe = stored.find(c => 
+          Math.abs(new Date(c.date) - new Date(cmd.date)) < 60000 && 
+          c.par === cmd.par
+        );
+        if (existe && existe.statut === 'annule') return;
+        if (!existe) {
+          stored.unshift({
+            id: cmd.id || Date.now(),
+            date: cmd.date,
+            par: cmd.par,
+            statut: cmd.statut || 'en_attente',
+            lignes: cmd.lignes.map(l => ({ saveur: l.saveur, bacs: l.bacsDemandesé || l.bacs || 0 })),
+            totalBacs: cmd.lignes.reduce((s, l) => s + (l.bacsDemandesé || l.bacs || 0), 0)
+          });
+        }
+      });
+      localStorage.setItem('kooki_commandes_ixelles', JSON.stringify(stored));
+    }
+  } catch {}
 
+  const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
+  const pending = stored.filter(c => c.statut === 'en_attente' || c.statut === 'valide');
+  const history = stored.filter(c => c.statut !== 'en_attente').slice(0, 5);
+  const listEl  = document.getElementById('ixelles-pending-list');
+  const badge   = document.getElementById('ixelles-pending-badge');
+  const histEl  = document.getElementById('ixelles-history-list');
+
+  if (badge) { badge.style.display = pending.length ? '' : 'none'; badge.textContent = pending.length; }
+  if (listEl) listEl.innerHTML = pending.length ? pending.map(cmdCardHTML).join('') : '<div class="empty" style="padding:16px;font-size:12px">Aucune commande en attente</div>';
+  if (histEl) histEl.innerHTML = !history.length ? '<div class="empty" style="font-size:12px;padding:8px 0">Aucune commande validée</div>'
+    : history.map(cmd => {
+        const d = new Date(cmd.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+        const icon = cmd.statut === 'valide' ? '✅' : '✕';
+        const t = cmd.totalBacs || 0;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px"><span>${icon} ${d} · ${cmd.par}</span><span style="font-weight:700;color:#1a7a3a">${t} bac${t > 1 ? 's' : ''}</span></div>`;
+      }).join('');
+
+  updateDashboardIxellesBanner();
+  pending.forEach(cmd => updateTotalConfirme(cmd.id));
+}
+  
 function validerCommandeIxellesConfirme(id) {
   const LIMITE_BOITES = 14;
   const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
