@@ -544,6 +544,22 @@
 
   </div>
 
+  <div>
+    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Tablettes magasins</div>
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+      <div class="login-card" onclick="loginAs('Ixelles')">
+        <div class="login-av" style="background:#d44218">IX</div>
+        <div class="login-name">Magasin Ixelles</div>
+        <div class="login-role">Commandes</div>
+      </div>
+      <div class="login-card" onclick="loginAs('Anderlecht')">
+        <div class="login-av" style="background:#0662aa">AN</div>
+        <div class="login-name">Magasin Anderlecht</div>
+        <div class="login-role">Frigo · Tâches</div>
+      </div>
+    </div>
+  </div>
+
   <div style="margin-top:32px;font-size:11px;color:#ccc">KOOKI COMPANY SRL · BE1015746980</div>
 </div>
 
@@ -1904,8 +1920,10 @@ const API = 'https://script.google.com/macros/s/AKfycbw7T3tIGINm6FnKuRfb428KohGh
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
 const IXELLES_PAGES = ['ixelles'];
+const ANDERLECHT_PAGES = ['frigo','taches'];
 const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','historique','alertes','parametres','taches','bl'];
-const PROD_PAGES  = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','historique','alertes','parametres','taches','bl'];
+const PROD_PAGES  = ['premix','production','stock','ingredients','frigo','ixelles'];
+const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','taches','bl'];
 
 const PROFILES = {
@@ -1920,8 +1938,10 @@ const PROFILES = {
   Alexandre: { color:'#3a8fc9', initial:'AM', role:'Production',     pages: PROD_PAGES },
   DavidC:    { color:'#a02e10', initial:'DC', role:'Production',     pages: PROD_PAGES },
   // ── Frigo uniquement ──
-  Noemie:    { color:'#888',    initial:'NL', role:'Équipe vente',   pages: IXELLES_PAGES },
+ Noemie:    { color:'#888',    initial:'NL', role:'Équipe vente',   pages: IXELLES_PAGES },
   Delia:     { color:'#9b59b6', initial:'DR', role:'Équipe vente',   pages: IXELLES_PAGES },
+  Ixelles:   { color:'#d44218', initial:'IX', role:'Magasin Ixelles',   pages: IXELLES_PAGES },
+  Anderlecht:{ color:'#0662aa', initial:'AN', role:'Magasin Anderlecht', pages: ANDERLECHT_PAGES },
 };
 
 const titles  = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'Bons de livraison B2B' };
@@ -1930,7 +1950,8 @@ const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder',
   Meg:'Meg Dollinger', Alexandre:'Alexandre Michel', DavidC:'David Cohenca',
-  Noemie:'Noémie Lambiotte', Delia:'Délia Ruettner'
+  Noemie:'Noémie Lambiotte', Delia:'Délia Ruettner',
+  Ixelles:'Magasin Ixelles', Anderlecht:'Magasin Anderlecht'
 };
 
 let currentProfile = 'Lila';
