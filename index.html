@@ -7587,14 +7587,14 @@ function showPinModal(name) {
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0">
         ${[1,2,3,4,5,6,7,8,9].map(k => `
           <button onclick="pinInput('${name}','${k}')"
-            style="height:64px;border:1px solid #f0f0f0;border-radius:14px;font-size:22px;font-weight:600;cursor:pointer;background:#f7f8fa;color:#1a1a2e;transition:all .1s"
+            style="height:64px;border:1px solid #f0f0f0;border-radius:14px;font-size:22px;font-weight:600;cursor:pointer;background:#f7f8fa;color:#1a1a2e;transition:background .05s"
             onmousedown="this.style.background='#e8e8e8';this.style.transform='scale(.95)'"
             onmouseup="this.style.background='#f7f8fa';this.style.transform='scale(1)'"
             ontouchstart="this.style.background='#e8e8e8';this.style.transform='scale(.95)'"
             ontouchend="this.style.background='#f7f8fa';this.style.transform='scale(1)'">${k}</button>`).join('')}
         <div></div>
         <button onclick="pinInput('${name}','0')"
-          style="height:64px;border:1px solid #f0f0f0;border-radius:14px;font-size:22px;font-weight:600;cursor:pointer;background:#f7f8fa;color:#1a1a2e;transition:all .1s"
+          style="height:64px;border:1px solid #f0f0f0;border-radius:14px;font-size:22px;font-weight:600;cursor:pointer;background:#f7f8fa;color:#1a1a2e;transition:background .05s"
           onmousedown="this.style.background='#e8e8e8';this.style.transform='scale(.95)'"
           onmouseup="this.style.background='#f7f8fa';this.style.transform='scale(1)'"
           ontouchstart="this.style.background='#e8e8e8';this.style.transform='scale(.95)'"
