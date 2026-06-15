@@ -1902,9 +1902,9 @@ const API = 'https://script.google.com/macros/s/AKfycbw7T3tIGINm6FnKuRfb428KohGh
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
+const IXELLES_PAGES = ['ixelles'];
 const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','historique','alertes','parametres','taches','bl'];
 const PROD_PAGES  = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','historique','alertes','parametres','taches','bl'];
-const IXELLES_PAGES = ['ixelles'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','taches','bl'];
 
 const PROFILES = {
@@ -1919,8 +1919,8 @@ const PROFILES = {
   Alexandre: { color:'#3a8fc9', initial:'AM', role:'Production',     pages: PROD_PAGES },
   DavidC:    { color:'#a02e10', initial:'DC', role:'Production',     pages: PROD_PAGES },
   // ── Frigo uniquement ──
-  Noemie:    { color:'#888',    initial:'NL', role:'Équipe vente',   pages: FRIGO_PAGES },
-  Delia:     { color:'#9b59b6', initial:'DR', role:'Équipe vente',   pages: FRIGO_PAGES },
+  Noemie:    { color:'#888',    initial:'NL', role:'Équipe vente',   pages: IXELLES_PAGES },
+  Delia:     { color:'#9b59b6', initial:'DR', role:'Équipe vente',   pages: IXELLES_PAGES },
 };
 
 const titles  = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'Bons de livraison B2B' };
