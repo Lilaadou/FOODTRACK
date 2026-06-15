@@ -3868,7 +3868,19 @@ function updateDashboardIxellesBanner() {
   const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
   const pending = stored.filter(c => c.statut === 'en_attente');
 
-  if (!pending.length) { banner.style.display = 'none'; return; }
+  banner.style.display = '';
+
+  if (!pending.length) {
+    banner.innerHTML = `
+      <div style="background:#f7f8fa;border:1.5px solid #e8e8e8;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:18px">🏪</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#888">Commandes Ixelles</div>
+          <div style="font-size:12px;color:#aaa;margin-top:2px">Aucune commande en attente · 0 bac</div>
+        </div>
+      </div>`;
+    return;
+  }
 
   const cmd   = pending[0];
   const d     = new Date(cmd.date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
@@ -3880,7 +3892,6 @@ function updateDashboardIxellesBanner() {
       <span style="color:#888"> · ${l.bacs} bac${l.bacs > 1 ? 's' : ''}</span>
     </div>`).join('');
 
-  banner.style.display = '';
   banner.innerHTML = `
     <div style="background:#fef7d6;border:1.5px solid #f0d96e;border-radius:14px;padding:16px 18px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
