@@ -4218,17 +4218,13 @@ function cmdCardHTML(cmd) {
         <div style="margin-top:4px">${chips || '<span style="font-size:11px;color:#ccc">Aucun lot disponible</span>'}</div>
       </div>`;
     } else {
-      return `<div style="padding:6px 0;border-bottom:1px solid #f5f5f5">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
-          <span>${icon}</span>
-          <span class="tag tag-o" style="font-size:11px">${l.saveur}</span>
-          <span style="font-size:13px;font-weight:700;color:#1a7a3a">${l.bacs} bac${l.bacs > 1 ? 's' : ''}</span>
-          <span style="font-size:11px;color:#888">= ${l.bacs * COOKIES_PAR_BAC} Big (165g)</span>
-          ${manque}
-        </div>
-        <div>${chips || '<span style="font-size:11px;color:#ccc">Aucun lot disponible</span>'}</div>
-      </div>`;
-    }
+  return `<div style="padding:6px 0;border-bottom:1px solid #f5f5f5">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span class="tag tag-o" style="font-size:11px">${l.saveur}</span>
+      <span style="font-size:13px;font-weight:700;color:#1a7a3a">${l.bacs} bac${l.bacs > 1 ? 's' : ''} · ${l.bacs * COOKIES_PAR_BAC} cookies max</span>
+    </div>
+  </div>`;
+}
   }).join('');
 
   const totalBacs = cmd.totalBacs || cmd.lignes.reduce((s, l) => s + l.bacs, 0);
