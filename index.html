@@ -715,12 +715,10 @@
     <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
       <button class="btn btn-secondary" id="btn-refresh-dashboard" onclick="refreshDashboard()" style="font-size:12px;padding:6px 14px;display:flex;align-items:center;gap:6px">🔄 Actualiser le dashboard</button>
     </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Stock total Big (165g)</div><div class="stat-icon ic-o">🍪</div></div><div class="stat-value">1 165</div><span class="stat-badge badge-ok">✓ 5 saveurs actives</span></div>
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Stock total Small (80g)</div><div class="stat-icon ic-b">🍪</div></div><div class="stat-value">190</div><span class="stat-badge badge-ok">✓ Seuil ok</span></div>
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Lots produits aujourd'hui</div><div class="stat-icon ic-o">🏭</div></div><div class="stat-value">4</div><span class="stat-badge badge-ok">JAC · BEN · WOO · DAV</span></div>
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Saveurs hors stock</div><div class="stat-icon ic-w">⚠️</div></div><div class="stat-value">6</div><span class="stat-badge badge-warn">MOLLY · WALLY…</span></div>
-    </div>
+    <div class="stat-grid" style="grid-template-columns:repeat(2,1fr)">
+  <div class="stat-card"><div class="stat-top"><div class="stat-label">Lots produits aujourd'hui</div><div class="stat-icon ic-o">🏭</div></div><div class="stat-value" id="dash-lots-today">0</div><span class="stat-badge badge-ok" id="dash-lots-badge">—</span></div>
+  <div class="stat-card"><div class="stat-top"><div class="stat-label">Saveurs hors stock</div><div class="stat-icon ic-w">⚠️</div></div><div class="stat-value" id="dash-zeros">0</div><span class="stat-badge badge-warn" id="dash-zeros-badge">—</span></div>
+</div>
 
     <div class="two-col">
       <!-- Graphique évolution -->
@@ -775,21 +773,7 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">Lots en stock</div></div><button class="view-all" onclick="showPage('stock',document.getElementById('nav-stock'))">Voir Stock →</button></div>
-      <table>
-        <thead><tr><th>Code Lot</th><th>Saveur</th><th>Big</th><th>Small</th><th>Premix</th><th>Producteur</th><th>Statut</th></tr></thead>
-        <tbody>
-          <tr><td><b>SUZ-260605-03</b><div class="sub-text">05/06</div></td><td><span class="tag tag-o">SUZZY</span></td><td style="color:#d44218;font-weight:700">300</td><td>5</td><td class="sub-text">PMX-260605-02</td><td>Alexandre</td><td><span class="status s-ok">En stock</span></td></tr>
-          <tr><td><b>WOO-260606-01</b><div class="sub-text">06/06</div></td><td><span class="tag tag-o">WOODY</span></td><td style="color:#d44218;font-weight:700">200</td><td>65</td><td class="sub-text">PMX-260606-04</td><td>Alexandre</td><td><span class="status s-ok">En stock</span></td></tr>
-          <tr><td><b>WOO-260605-01</b><div class="sub-text">05/06</div></td><td><span class="tag tag-o">WOODY</span></td><td style="color:#d44218;font-weight:700">135</td><td>0</td><td class="sub-text">PMX-260605-02</td><td>David</td><td><span class="status s-ok">En stock</span></td></tr>
-          <tr><td><b>JAC-260606-01</b><div class="sub-text">06/06</div></td><td><span class="tag tag-o">JACKY</span></td><td style="color:#d44218;font-weight:700">135</td><td>30</td><td class="sub-text">PMX-260606-02</td><td>Alexandre</td><td><span class="status s-ok">En stock</span></td></tr>
-          <tr><td><b>BEN-260606-01</b><div class="sub-text">06/06</div></td><td><span class="tag tag-o">BENNY</span></td><td style="color:#d44218;font-weight:700">135</td><td>30</td><td class="sub-text">PMX-260606-03</td><td>Alexandre</td><td><span class="status s-ok">En stock</span></td></tr>
-          <tr><td><b>DAV-260606-01</b><div class="sub-text">06/06</div></td><td><span class="tag tag-o">DAVY</span></td><td style="color:#d44218;font-weight:700">135</td><td>60</td><td class="sub-text">PMX-260606-05</td><td>—</td><td><span class="status s-ok">En stock</span></td></tr>
-          <tr><td><b>SUZ-260605-01</b><div class="sub-text">05/06</div></td><td><span class="tag tag-o">SUZZY</span></td><td style="color:#d44218;font-weight:700">125</td><td>0</td><td class="sub-text">PMX-260605-01</td><td>David</td><td><span class="status s-ok">En stock</span></td></tr>
-        </tbody>
-      </table>
-    </div>
+  
   </div>
 
   <!-- ══════════════════ PREMIX ══════════════════ -->
@@ -2661,10 +2645,18 @@ function updateDashboardStockTable() {
   const actives    = [...new Set(stockLocal.filter(l => l.big > 0 || l.small > 0).map(l => l.saveur))].length;
   const zeros      = 11 - actives;
 
-  const dashCards = document.querySelectorAll('#page-dashboard .stat-value');
-  if (dashCards[0]) dashCards[0].textContent = totalBig.toLocaleString('fr-FR');
-  if (dashCards[1]) dashCards[1].textContent = totalSmall.toLocaleString('fr-FR');
-  if (dashCards[3]) dashCards[3].textContent = zeros;
+  const zerosEl = document.getElementById('dash-zeros');
+const zerosBadge = document.getElementById('dash-zeros-badge');
+if (zerosEl) zerosEl.textContent = zeros;
+if (zerosBadge) zerosBadge.textContent = zeros > 0 ? 'À planifier' : '✓ Tout en stock';
+
+const today = new Date().toDateString();
+const prodsAujourdhui = JSON.parse(localStorage.getItem('kooki_productions') || '[]')
+  .filter(p => p.date && new Date(p.date).toDateString() === today);
+const lotsEl = document.getElementById('dash-lots-today');
+const lotsBadgeEl = document.getElementById('dash-lots-badge');
+if (lotsEl) lotsEl.textContent = prodsAujourdhui.length;
+if (lotsBadgeEl) lotsBadgeEl.textContent = prodsAujourdhui.map(p => p.saveur?.slice(0,3)).join(' · ') || '—';
 
   updateDashboardClassement();
   updateChartWithStock();
@@ -3874,37 +3866,61 @@ function updateDashboardIxellesBanner() {
   if (!banner) return;
 
   const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
-  const pending = stored.filter(c => c.statut === 'en_attente' && c.statut !== 'annule');
+  const pending = stored.filter(c => c.statut === 'en_attente');
 
   if (!pending.length) { banner.style.display = 'none'; return; }
 
-  const cmd    = pending[0]; // la plus récente
-  const d      = new Date(cmd.date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
-  const total  = cmd.totalBacs || cmd.lignes.reduce((s, l) => s + l.bacs, 0);
-  const detail = cmd.lignes.map(l => `${l.bacs} bac${l.bacs>1?'s':''} ${l.saveur}`).join(' · ');
-  const isPreparer = canPrepareOrder();
+  const cmd   = pending[0];
+  const d     = new Date(cmd.date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+  const total = cmd.totalBacs || cmd.lignes.reduce((s, l) => s + l.bacs, 0);
+
+  const bacsHTML = cmd.lignes.map(l => `
+    <div style="background:#fff;border:0.5px solid #e8e8e8;border-radius:9px;padding:6px 12px;font-size:13px">
+      <span style="font-weight:600">${l.saveur}</span>
+      <span style="color:#888"> · ${l.bacs} bac${l.bacs > 1 ? 's' : ''}</span>
+    </div>`).join('');
 
   banner.style.display = '';
   banner.innerHTML = `
-    <div style="background:${isPreparer?'#fdf0ec':'#e0edf8'};border:1.5px solid ${isPreparer?'#f5cbb8':'#b0c8e8'};border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:40px;height:40px;border-radius:10px;background:${isPreparer?'#d44218':'#0662aa'};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏪</div>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:${isPreparer?'#d44218':'#0662aa'}">
-            ${pending.length > 1 ? pending.length + ' commandes Ixelles en attente' : 'Commande Magasin Ixelles en attente'}
+    <div style="background:#fef7d6;border:1.5px solid #f0d96e;border-radius:14px;padding:16px 18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#e6a800;display:flex;align-items:center;justify-content:center;font-size:18px">🏪</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#a07800">Commande Ixelles en attente</div>
+            <div style="font-size:12px;color:#888;margin-top:2px">Par ${cmd.par} · ${d} · ${total} bac${total > 1 ? 's' : ''} au total</div>
           </div>
-          <div style="font-size:12px;color:#888;margin-top:2px">${detail} · par ${cmd.par} · ${d}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="showPage('ixelles',document.getElementById('nav-ixelles'))"
+            style="padding:7px 14px;background:#e6a800;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
+            🚀 Préparer
+          </button>
+          <button onclick="marquerCommandeLivree('${cmd.id}')"
+            style="padding:7px 14px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
+            ✅ Livré
+          </button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="showPage('ixelles',document.getElementById('nav-ixelles'))"
-          style="padding:8px 16px;background:${isPreparer?'#d44218':'#0662aa'};color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
-          ${isPreparer ? '🚀 Préparer la commande' : '👁️ Voir la commande'}
-        </button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${bacsHTML}
+        <div style="background:#f0d96e;border-radius:9px;padding:6px 12px;font-size:13px;font-weight:700;color:#a07800">
+          Total : ${total} bacs
+        </div>
       </div>
     </div>`;
 }
 
+function marquerCommandeLivree(id) {
+  if (!confirm('Marquer cette commande comme livrée ?')) return;
+  const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
+  const cmd = stored.find(c => String(c.id) === String(id));
+  if (cmd) {
+    cmd.statut = 'valide';
+    localStorage.setItem('kooki_commandes_ixelles', JSON.stringify(stored));
+  }
+  updateDashboardIxellesBanner();
+}
 function initCommandeIxelles() {
   updateIxellesJourBadges();
   buildIxellesForm();
