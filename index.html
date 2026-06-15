@@ -7324,7 +7324,24 @@ function supprimerPdf(id) {
   renderPdfList();
 }
 
+const ADMIN_PINS = {
+  Lila:      '4580',
+  Virginia:  '0000',
+  Abenazer:  '0000',
+  Sebastien: '0000',
+  DavidD:    '0000',
+};
+
 function loginAs(name) {
+  // Vérifier PIN si admin
+  if (ADMIN_PINS[name]) {
+    const pin = prompt(`🔐 Code PIN pour ${FULL_NAMES[name] || name} :`);
+    if (pin === null) return; // annulé
+    if (pin !== ADMIN_PINS[name]) {
+      alert('❌ Code PIN incorrect');
+      return;
+    }
+  }
   chargerStockInitial();
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('loading-overlay').style.display = 'none';
