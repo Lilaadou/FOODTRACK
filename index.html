@@ -7327,6 +7327,7 @@ function supprimerPdf(id) {
 function loginAs(name) {
   chargerStockInitial();
   document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('loading-overlay').style.display = 'none';
   selectProfile(name);
   const p = PROFILES[name];
   const firstPage = p.pages[0] || 'dashboard';
