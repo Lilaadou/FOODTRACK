@@ -6421,8 +6421,10 @@ async function loadAllData() {
     setLoading('⚠️ Erreur de connexion — affichage hors ligne', 100);
     setTimeout(() => {
       document.getElementById('loading-overlay').style.display = 'none';
-      drawChart('semaine');
-      initChartEvents();
+      if (document.getElementById('prod-chart')) {
+        drawChart('semaine');
+        initChartEvents();
+      }
     }, 1500);
   }
 }
