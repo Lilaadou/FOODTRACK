@@ -3866,7 +3866,7 @@ function updateDashboardIxellesBanner() {
   if (!banner) return;
 
   const stored  = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
-  const pending = stored.filter(c => c.statut === 'en_attente');
+  const pending = stored.filter(c => c.statut === 'en_attente' || c.statut === 'sortie_frigo');
 
   banner.style.display = '';
 
@@ -3899,19 +3899,20 @@ function updateDashboardIxellesBanner() {
           <div style="width:36px;height:36px;border-radius:10px;background:#e6a800;display:flex;align-items:center;justify-content:center;font-size:18px">🏪</div>
           <div>
             <div style="font-size:14px;font-weight:700;color:#a07800">Commande Ixelles en attente</div>
-            <div style="font-size:12px;color:#888;margin-top:2px">Par ${cmd.par} · ${d} · ${total} bac${total > 1 ? 's' : ''} au total</div>
+            <div style="font-size:12px;color:#888;margin-top:2px">Par ${cmd.par} · ${d} · ${total} bac${total > 1 ? 's' : ''} au total ${cmd.statut === 'sortie_frigo' ? '· <span style="color:#27ae60;font-weight:600">🧊 Sortie frigo effectuée</span>' : ''}</div>
           </div>
         </div>
         <div style="display:flex;gap:8px">
-          <button onclick="showPage('ixelles',document.getElementById('nav-ixelles'))"
-            style="padding:7px 14px;background:#e6a800;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
-            🚀 Préparer
-          </button>
-          <button onclick="marquerCommandeLivree('${cmd.id}')"
-            style="padding:7px 14px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
-            ✅ Livré
-          </button>
-        </div>
+  ${cmd.statut === 'en_attente' ? `
+    <button onclick="preparerLivraisonIxelles('${cmd.id}')"
+      style="padding:7px 14px;background:#e6a800;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
+      🧊 Sortie frigo
+    </button>` : `
+    <button onclick="marquerCommandeLivree('${cmd.id}')"
+      style="padding:7px 14px;background:#27ae60;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">
+      🏪 Livré au magasin
+    </button>`}
+</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         ${bacsHTML}
@@ -3932,6 +3933,55 @@ function marquerCommandeLivree(id) {
   }
   updateDashboardIxellesBanner();
 }
+
+  function preparerLivraisonIxelles(id) {
+  const stored = JSON.parse(localStorage.getItem('kooki_commandes_ixelles') || '[]');
+  const cmd = stored.find(c => String(c.id) === String(id));
+  if (!cmd) return;
+
+  // Aller sur la page Frigo
+  showPage('frigo', document.getElementById('nav-frigo'));
+
+  setTimeout(() => {
+    // Pré-sélectionner Magasin Ixelles
+    const typeEl = document.getElementById('sortie-type');
+    if (typeEl) {
+      typeEl.value = 'magasin';
+      toggleDestination();
+    }
+
+    // Vider les blocs existants et en créer un par saveur commandée
+    saveurBlockCount = 0;
+    document.getElementById('saveurs-blocks').innerHTML = '';
+
+    cmd.lignes.forEach(l => {
+      addSaveurBlock();
+      const blockId = saveurBlockCount;
+      const sel = document.getElementById('saveur-sel-' + blockId);
+      if (sel) {
+        sel.value = l.saveur;
+        loadLotsBlock(blockId);
+      }
+    });
+
+    // Message d'info
+    const toast = document.getElementById('toast-sortie');
+    if (toast) {
+      toast.textContent = `📋 Commande Ixelles : ${cmd.lignes.map(l => l.saveur + ' ' + l.bacs + ' bac' + (l.bacs > 1 ? 's' : '')).join(' · ')}`;
+      toast.className = 'toast ok';
+      toast.style.display = 'inline-block';
+    }
+  }, 200);
+
+  // Marquer comme sortie_frigo
+  const cmdToUpdate = stored.find(c => String(c.id) === String(id));
+  if (cmdToUpdate) {
+    cmdToUpdate.statut = 'sortie_frigo';
+    localStorage.setItem('kooki_commandes_ixelles', JSON.stringify(stored));
+  }
+  updateDashboardIxellesBanner();
+}
+  
 function initCommandeIxelles() {
   updateIxellesJourBadges();
   buildIxellesForm();
