@@ -7160,6 +7160,13 @@ function loadListeCourses() {
 
 function marquerCourses(id, statut) {
   const stored = JSON.parse(localStorage.getItem('kooki_courses') || '[]');
+  const idx = stored.findIndex(c => c.id === id);
+  if (idx !== -1) {
+    stored[idx].statut = statut;
+    localStorage.setItem('kooki_courses', JSON.stringify(stored));
+  }
+  loadListeCourses();
+}
   
 // ─────────────────────────────────────
 // INIT
