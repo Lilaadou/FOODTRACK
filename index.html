@@ -2061,7 +2061,7 @@ function showPage(name, btn) {
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
-  if (name === 'production') setTimeout(() => { loadPremixDispo(); buildProdByProducer(); buildProdLegend(); drawProdChart(); initProdChartEvents(); updateLotsduJour(); updateCalendrierProduction(); }, 60);
+  if (name === 'production') setTimeout(() => { loadPremixDispo(); buildProdByProducer(); buildProdLegend(); drawProdChart(); initProdChartEvents(); updateLotsduJour(); updateCalendrierProduction(); }, 60); 
   if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
 if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
