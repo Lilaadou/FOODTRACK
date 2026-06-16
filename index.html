@@ -6807,8 +6807,23 @@ function applySorties(data) {
   };
 
   // Construire le HTML
-  tbody.innerHTML = Object.values(groupes).map(g => {
+  const groupesTriés = Object.values(groupes).sort((a, b) => new Date(b.date) - new Date(a.date));
+  let dernierJour = null;
+
+  tbody.innerHTML = groupesTriés.map(g => {
     const d = g.date ? new Date(g.date).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
+    const jourStr = g.date ? new Date(g.date).toDateString() : '';
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    let separateur = '';
+    if (jourStr !== dernierJour) {
+      dernierJour = jourStr;
+      let label = g.date ? new Date(g.date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }) : '—';
+      if (jourStr === today) label = 'Aujourd\'hui — ' + label;
+      else if (jourStr === yesterday) label = 'Hier — ' + label;
+      separateur = `<tr><td colspan="2" style="background:#f7f8fa;font-size:11px;font-weight:700;color:#888;padding:8px 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0f0f0">📅 ${label}</td></tr>`;
+    }
+    return separateur +
     const type = getDestType(g.destination);
     const totalBig = g.lots.reduce((s, l) => s + l.big, 0);
     const totalSmall = g.lots.reduce((s, l) => s + l.small, 0);
