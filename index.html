@@ -6823,10 +6823,10 @@ function applySorties(data) {
       else if (jourStr === yesterday) label = 'Hier — ' + label;
       separateur = `<tr><td colspan="2" style="background:#f7f8fa;font-size:11px;font-weight:700;color:#888;padding:8px 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0f0f0">📅 ${label}</td></tr>`;
     }
-    return separateur +
     const type = getDestType(g.destination);
     const totalBig = g.lots.reduce((s, l) => s + l.big, 0);
     const totalSmall = g.lots.reduce((s, l) => s + l.small, 0);
+    return separateur +
 
     const lignes = g.lots.map(l => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f5">
