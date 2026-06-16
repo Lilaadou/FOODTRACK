@@ -1150,62 +1150,6 @@
       </div>
     </div>
 
-    <!-- Suivi boîtes B2B -->
-    <div class="two-col">
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">📦 Suivi boîtes plastiques B2B</div><div class="card-sub">Envois et retours par client</div></div>
-          <button class="btn btn-secondary" style="font-size:11px;padding:5px 12px" onclick="showRetourBoites()">+ Retour boîtes</button>
-        </div>
-        <table>
-          <thead><tr><th>Client</th><th>Envoyées</th><th>Retournées</th><th>Solde</th><th>Statut</th></tr></thead>
-          <tbody id="boites-table">
-            <tr><td><b>Ecocyclo</b><div class="sub-text">Felix Basile · 047 205 79 97</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Galler Ixelles</b><div class="sub-text">Marie Mayne · 047 734 96 32</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Galler Woluwe</b><div class="sub-text">Marie Mayne · 047 734 96 32</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>La Fourmilière</b><div class="sub-text">Robin Cardoen · 049 805 41 68</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Penta Hotel</b><div class="sub-text">Menno De Richemont · 047 010 12 48</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Café Club</b><div class="sub-text">Nicolas Auffray · +32 484 69 44 25</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Flippers</b><div class="sub-text">Basile Stein · 047 293 06 07</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Slide Coffee</b><div class="sub-text">Sebastien Kunnen · +32 489 39 65 16</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Kooki Anderlecht</b><div class="sub-text">Virginia Kunnen · 0492 80 10 38</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-            <tr><td><b>Petit Mercado</b><div class="sub-text">Pia & Meno · 0487 30 09 69</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Retour boîtes form -->
-      <div class="card" id="retour-boites-card">
-        <div class="card-header"><div><div class="card-title">↩️ Enregistrer un retour</div><div class="card-sub">Boîtes rendues par un client</div></div></div>
-        <div class="form-group" style="margin-bottom:11px">
-          <label>Client B2B</label>
-          <select id="retour-client" onchange="updateRetourMax()">
-            <option value="">-- Sélectionner --</option>
-            <option>Ecocyclo</option>
-            <option>Galler Ixelles</option>
-            <option>Galler Woluwe</option>
-            <option>La Fourmilière</option>
-            <option>Penta Hotel</option>
-            <option>Café Club</option>
-            <option>Flippers</option>
-            <option>Slide Coffee</option>
-            <option>Kooki Anderlecht</option>
-            <option>Petit Mercado</option>
-            <option>La Belladone</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Nombre de boîtes retournées</label>
-          <input type="number" id="retour-nb" min="1" placeholder="Ex: 6"
-            style="padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;outline:none">
-        </div>
-        <div class="form-footer">
-          <button class="btn btn-primary" onclick="saveRetourBoites()">✓ Enregistrer le retour</button>
-          <span class="toast" id="toast-retour"></span>
-        </div>
-      </div>
-    </div>
-
     <!-- Récapitulatif semaine B2B -->
     <div class="card" style="margin-top:18px">
       <div class="card-header" style="flex-wrap:wrap;gap:8px">
@@ -1815,6 +1759,61 @@
     <div class="stat-card"><div class="stat-top"><div class="stat-label">Small livrés</div><div class="stat-icon ic-b">🍪</div></div><div class="stat-value" id="bl-stat-small" style="color:#0662aa">0</div><span class="stat-badge badge-ok">Ce mois-ci</span></div>
   </div>
 
+  <!-- Suivi boîtes B2B -->
+    <div class="two-col" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">📦 Suivi boîtes plastiques B2B</div><div class="card-sub">Envois et retours par client</div></div>
+          <button class="btn btn-secondary" style="font-size:11px;padding:5px 12px" onclick="showRetourBoites()">+ Retour boîtes</button>
+        </div>
+        <table>
+          <thead><tr><th>Client</th><th>Envoyées</th><th>Retournées</th><th>Solde</th><th>Statut</th></tr></thead>
+          <tbody id="boites-table">
+            <tr><td><b>Ecocyclo</b><div class="sub-text">Felix Basile · 047 205 79 97</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Galler Ixelles</b><div class="sub-text">Marie Mayne · 047 734 96 32</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Galler Woluwe</b><div class="sub-text">Marie Mayne · 047 734 96 32</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>La Fourmilière</b><div class="sub-text">Robin Cardoen · 049 805 41 68</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Penta Hotel</b><div class="sub-text">Menno De Richemont · 047 010 12 48</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Café Club</b><div class="sub-text">Nicolas Auffray · +32 484 69 44 25</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Flippers</b><div class="sub-text">Basile Stein · 047 293 06 07</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Slide Coffee</b><div class="sub-text">Sebastien Kunnen · +32 489 39 65 16</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Kooki Anderlecht</b><div class="sub-text">Virginia Kunnen · 0492 80 10 38</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Petit Mercado</b><div class="sub-text">Pia & Meno · 0487 30 09 69</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Retour boîtes form -->
+      <div class="card" id="retour-boites-card">
+        <div class="card-header"><div><div class="card-title">↩️ Enregistrer un retour</div><div class="card-sub">Boîtes rendues par un client</div></div></div>
+        <div class="form-group" style="margin-bottom:11px">
+          <label>Client B2B</label>
+          <select id="retour-client" onchange="updateRetourMax()">
+            <option value="">-- Sélectionner --</option>
+            <option>Ecocyclo</option>
+            <option>Galler Ixelles</option>
+            <option>Galler Woluwe</option>
+            <option>La Fourmilière</option>
+            <option>Penta Hotel</option>
+            <option>Café Club</option>
+            <option>Flippers</option>
+            <option>Slide Coffee</option>
+            <option>Kooki Anderlecht</option>
+            <option>Petit Mercado</option>
+            <option>La Belladone</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Nombre de boîtes retournées</label>
+          <input type="number" id="retour-nb" min="1" placeholder="Ex: 6"
+            style="padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;outline:none">
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-primary" onclick="saveRetourBoites()">✓ Enregistrer le retour</button>
+          <span class="toast" id="toast-retour"></span>
+        </div>
+      </div>
+      </div>
   <!-- Tableau -->
   <div class="card">
     <div class="card-header">
@@ -2057,7 +2056,8 @@ function showPage(name, btn) {
   loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); 
   renderPdfList(); 
 }
-  if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); loadBoites(); }, 60);
+  if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
+  if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
