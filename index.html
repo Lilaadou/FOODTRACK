@@ -3518,7 +3518,9 @@ function updateLivTotal(safeId, ing) {
   const stock = stockIngredients[ing] || 0;
   if (qte > 0) {
     const after = stock + qte;
-    const afterFmt = after >= 1000 ? (after/1000).toFixed(1)+'kg' : after+'g';
+    const afterFmt = ing === 'Oeufs'
+  ? after + ' pièces'
+  : (after / 1000).toFixed(1) + ' kg';
     afterEl.textContent = afterFmt + ' ✅';
     afterEl.style.color = '#27ae60';
   } else {
