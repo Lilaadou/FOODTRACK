@@ -6826,8 +6826,6 @@ function applySorties(data) {
     const type = getDestType(g.destination);
     const totalBig = g.lots.reduce((s, l) => s + l.big, 0);
     const totalSmall = g.lots.reduce((s, l) => s + l.small, 0);
-    return separateur +
-
     const lignes = g.lots.map(l => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f5">
         <div>
@@ -6839,29 +6837,25 @@ function applySorties(data) {
           <span style="color:#0662aa">${l.small} Small</span>
         </div>
       </div>`).join('');
-
-    return `
+    return separateur + `
       <tr>
         <td colspan="2" style="padding:0;padding-bottom:12px">
           <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden">
-            <!-- En-tête -->
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f7f8fa;border-bottom:1px solid #f0f0f0">
               <div>
                 <div style="font-size:13px;font-weight:700">${type.icon} ${g.destination}</div>
-                <div style="font-size:11px;color:#888;margin-top:2px">${d} · Sorti par ${g.producteur || '—'}</div> 
+                <div style="font-size:11px;color:#888;margin-top:2px">${d} · Sorti par ${g.producteur || '—'}</div>
               </div>
               <div style="display:flex;gap:8px;align-items:center">
                 <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${type.color};color:${type.textColor}">${type.badge}</span>
                 <button onclick="annulerSortieGroupe(${JSON.stringify(g.idGroupe)})"
-                  style="background:none;border:none;cursor:pointer;font-size:12px;color:#ccc;padding:3px 7px;border-radius:6px;transition:all .15s"
+                  style="background:none;border:none;cursor:pointer;font-size:12px;color:#ccc;padding:3px 7px;border-radius:6px"
                   onmouseover="this.style.background='#fbe8e2';this.style.color='#d44218'"
                   onmouseout="this.style.background='none';this.style.color='#ccc'"
                   title="Annuler cette sortie">↩️</button>
               </div>
             </div>
-            <!-- Lignes saveurs -->
             <div style="padding:4px 16px">${lignes}</div>
-            <!-- Total -->
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#fdf0ec;border-top:1px solid #f5cbb8">
               <span style="font-size:11px;font-weight:700;color:#d44218">Total${g.boites > 0 ? ' · ' + g.boites + ' boîte(s)' : ''}</span>
               <div style="display:flex;gap:12px;font-size:12px;font-weight:700">
