@@ -605,7 +605,6 @@
   <div class="nav-label" id="nav-label-gestion" style="margin-top:12px">Gestion</div>
   <button class="nav-item" id="nav-reception" onclick="showPage('reception',this)"><span class="nav-icon">📥</span> Réception facture</button>
   <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><span class="nav-icon">🧾</span> Factures</button>
-  <button class="nav-item" id="nav-historique" onclick="showPage('historique',this)"><span class="nav-icon">📅</span> Historique</button>
 <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><span class="nav-icon">📦</span> Bons de livraison B2B</button>
 <button class="nav-item" id="nav-taches" onclick="showPage('taches',this)"><span class="nav-icon">✅</span> Tâches</button>
   <button class="nav-item" id="nav-courses" onclick="showPage('courses',this)"><span class="nav-icon">🛒</span> Liste de courses</button>
@@ -1940,26 +1939,6 @@
 
 </div>
   
-  <!-- ══════════════════ HISTORIQUE ══════════════════ -->
-  <div id="page-historique" class="page">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">Historique complet</div></div></div>
-      <table>
-        <thead><tr><th>Date</th><th>Type</th><th>Référence</th><th>Saveur</th><th>Détail</th></tr></thead>
-        <tbody>
-          <tr><td class="sub-text">06/06 19:56</td><td><span class="tag tag-o">Sortie</span></td><td>SUZ-260605-03</td><td>SUZZY</td><td>10 Small → B2B</td></tr>
-          <tr><td class="sub-text">06/06 —</td><td><span class="tag tag-b">Production</span></td><td>WOO-260606-01</td><td>WOODY</td><td>200 Big · 65 Small</td></tr>
-          <tr><td class="sub-text">06/06 —</td><td><span class="tag tag-b">Production</span></td><td>JAC-260606-01</td><td>JACKY</td><td>135 Big · 30 Small</td></tr>
-          <tr><td class="sub-text">06/06 —</td><td><span class="tag tag-b">Production</span></td><td>BEN-260606-01</td><td>BENNY</td><td>135 Big · 30 Small</td></tr>
-          <tr><td class="sub-text">06/06 —</td><td><span class="tag tag-b">Production</span></td><td>DAV-260606-01</td><td>DAVY</td><td>135 Big · 60 Small</td></tr>
-          <tr><td class="sub-text">05/06 20:57</td><td><span class="tag tag-o">Sortie</span></td><td>SUZ-260604-01</td><td>SUZZY</td><td>100 Big · 90 Small → Magasin Ixelles</td></tr>
-          <tr><td class="sub-text">05/06 —</td><td><span class="tag tag-b">Production</span></td><td>SUZ-260605-03</td><td>SUZZY</td><td>300 Big · 5 Small</td></tr>
-          <tr><td class="sub-text">05/06 —</td><td><span class="tag tag-b">Production</span></td><td>WOO-260605-01</td><td>WOODY</td><td>135 Big</td></tr>
-          <tr><td class="sub-text">05/06 —</td><td><span class="tag tag-b">Production</span></td><td>SUZ-260605-01</td><td>SUZZY</td><td>125 Big</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
 
   <!-- ══════════════════ ALERTES ══════════════════ -->
   <div id="page-alertes" class="page">
@@ -1990,7 +1969,7 @@ const API = 'https://script.google.com/macros/s/AKfycbxVTPZCQvJGf1dV0Kvckh9iYXjW
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles', 'courses'];
 const ANDERLECHT_PAGES = ['frigo','taches'];
-const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','historique','alertes','parametres','taches','bl','courses'];
+const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','taches','bl','courses'];
 const PROD_PAGES  = ['premix','production','stock','ingredients','frigo','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','taches','bl'];
