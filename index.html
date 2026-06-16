@@ -606,7 +606,6 @@
   <button class="nav-item" id="nav-reception" onclick="showPage('reception',this)"><span class="nav-icon">📥</span> Réception facture</button>
   <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><span class="nav-icon">🧾</span> Factures</button>
 <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><span class="nav-icon">🤝</span> B2B</button>
-<button class="nav-item" id="nav-taches" onclick="showPage('taches',this)"><span class="nav-icon">✅</span> Tâches</button>
   <button class="nav-item" id="nav-courses" onclick="showPage('courses',this)"><span class="nav-icon">🛒</span> Liste de courses</button>
 
   <div class="sidebar-bottom">
@@ -1656,80 +1655,6 @@
       <div id="recap-bl-container"></div>
     </div>
   </div>
-<!-- ══════════════════ TÂCHES ══════════════════ -->
-<div id="page-taches" class="page">
-
-  <div style="display:flex;flex-direction:column;gap:16px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-
-    <!-- Colonne gauche -->
-    <div style="display:flex;flex-direction:column;gap:16px">
-
-      <!-- Tâches du jour -->
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">📋 Tâches du jour</div><div class="card-sub" id="taches-date-label">—</div></div>
-          <button class="btn btn-secondary" onclick="loadTaches()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
-        </div>
-        <div id="taches-jour-list"><div class="empty">Chargement…</div></div>
-      </div>
-
-      <!-- Ajouter une tâche (admins seulement) -->
-      <div class="card" id="taches-form-card" style="display:none">
-        <div class="card-header"><div><div class="card-title">➕ Ajouter une tâche</div></div></div>
-        <div class="form-group">
-          <label>Titre *</label>
-          <input type="text" id="tache-titre" placeholder="Ex: Préparer bacs SUZZY">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="form-group">
-            <label>Date *</label>
-            <input type="date" id="tache-date">
-          </div>
-          <div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="form-group">
-            <label>Assignée à *</label>
-            <select id="tache-assignee">
-              <option value="Tout le monde">Tout le monde</option>
-              <option value="Équipe Production">Équipe Production</option>
-              <option value="Équipe Vente">Équipe Vente</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Priorité</label>
-            <select id="tache-priorite">
-              <option value="Urgent">🔴 Urgent</option>
-              <option value="Normal">🟡 Normal</option>
-              <option value="Faible">🟢 Faible</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Note (optionnel)</label>
-          <textarea id="tache-note" rows="2" placeholder="Détails supplémentaires…" style="padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;outline:none;resize:none;width:100%"></textarea>
-        </div>
-        <div class="form-footer">
-          <button class="btn btn-primary" onclick="ajouterTache()">➕ Ajouter</button>
-          <span class="toast" id="toast-tache"></span>
-        </div>
-      </div>
-
-    </div>
-
-    </div>
-
-    <!-- Vue semaine horizontale -->
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">📅 Vue de la semaine</div><div class="card-sub" id="taches-semaine-label">—</div></div>
-      </div>
-      <div id="taches-semaine-list"><div class="empty">Chargement…</div></div>
-    </div>
-
-  </div>
-</div>
 
   <!-- ══════════════════ BONS DE LIVRAISON ══════════════════ -->
 <div id="page-bl" class="page">
@@ -1950,11 +1875,11 @@ const API = 'https://script.google.com/macros/s/AKfycbxVTPZCQvJGf1dV0Kvckh9iYXjW
 // ─────────────────────────────────────
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles', 'courses'];
-const ANDERLECHT_PAGES = ['frigo','taches'];
-const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','taches','bl','courses'];
+const ANDERLECHT_PAGES = ['frigo'];
+const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','courses'];
 const PROD_PAGES  = ['premix','production','stock','ingredients','frigo','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
-const FRIGO_PAGES = ['dashboard','frigo','ixelles','taches','bl'];
+const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
 
 const PROFILES = {
   // ── Accès complet ──
