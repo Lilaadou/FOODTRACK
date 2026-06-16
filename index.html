@@ -3425,7 +3425,9 @@ function buildLivraisonInputs() {
     deduireBody.innerHTML = INGREDIENTS_LIST.map(ing => {
       const safeId = 'ded_' + ing.replace(/[^a-zA-Z0-9]/g, '_');
       const qty = stockIngredients[ing] || 0;
-      const kg = qty >= 1000 ? (qty/1000).toFixed(1)+'kg' : qty+'g';
+      const kg = ing === 'Oeufs'
+  ? qty + ' pièces'
+  : (qty / 1000).toFixed(1) + ' kg';
       return `<tr>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f5">
           <div style="font-size:13px;font-weight:600">${ing}</div>
@@ -3459,7 +3461,9 @@ function buildLivraisonInputs() {
     livraisonBody.innerHTML = INGREDIENTS_LIST.map(ing => {
       const safeId = 'ing_' + ing.replace(/[^a-zA-Z0-9]/g, '_');
       const qty = stockIngredients[ing] || 0;
-      const kg = qty >= 1000 ? (qty/1000).toFixed(1)+'kg' : qty+'g';
+      const kg = ing === 'Oeufs'
+        ? qty + ' pièces'
+        : (qty / 1000).toFixed(1) + ' kg';
       return `<tr>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f5">
           <div style="font-size:13px;font-weight:600">${ing}</div>
@@ -3494,7 +3498,9 @@ function updateDedTotal(safeId, ing) {
       afterEl.textContent = '⚠️ Insuffisant !';
       afterEl.style.color = '#d44218';
     } else {
-      const afterFmt = after >= 1000 ? (after/1000).toFixed(1)+'kg' : after+'g';
+      const afterFmt = ing === 'Oeufs'
+  ? after + ' pièces'
+  : (after / 1000).toFixed(1) + ' kg';
       afterEl.textContent = afterFmt + ' ✅';
       afterEl.style.color = '#27ae60';
     }
