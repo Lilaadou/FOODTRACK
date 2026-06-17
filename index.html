@@ -1969,7 +1969,7 @@ function showPage(name, btn) {
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
-  if (name === 'production') setTimeout(() => { loadPremixDispo(); buildProdByProducer(); buildProdLegend(); drawProdChart(); initProdChartEvents(); updateLotsduJour(); updateCalendrierProduction(); }, 60); 
+  if (name === 'production') setTimeout(() => { loadPremixDispo(); updateLotsduJour(); updateCalendrierProduction(); }, 60); 
   if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
 if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
@@ -6879,9 +6879,9 @@ function applyProduction(data) {
   // Les codes supprimés sont exclus des deux sources
   const localFiltered = local.filter(r => !deletedCodes.has(r.code));
   const localCodes = new Set(localFiltered.map(r => r.code));
-  const merged = apiData.length 
+  const merged = (apiData.length 
   ? apiData.filter(r => r.code !== '—' && !deletedCodes.has(r.code))
-  : localFiltered;
+  : localFiltered).sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const tbody = document.getElementById('prod-table');
   if (!tbody) return;
