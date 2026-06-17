@@ -6812,6 +6812,11 @@ function supprimerProduction(code) {
   if (!deleted.includes(code)) deleted.push(code);
   localStorage.setItem('kooki_productions_deleted', JSON.stringify(deleted));
 
+  // Supprimer dans Google Sheets
+fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({
+  action: 'supprimerProduction', code
+})}).catch(() => {});
+
   // 5. Retirer la ligne du DOM avec animation
   const row = document.querySelector('[data-prod-code="' + code + '"]');
   if (row) { row.style.opacity = '0'; row.style.transition = 'opacity .3s'; setTimeout(() => row.remove(), 300); }
