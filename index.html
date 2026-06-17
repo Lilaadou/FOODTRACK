@@ -6814,7 +6814,7 @@ function supprimerProduction(code) {
 
   // Supprimer dans Google Sheets
 fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({
-  action: 'supprimerProduction', code
+  action: 'supprimerProduction', code: code, big: prod ? (prod.big || 0) : 0, small: prod ? (prod.small || 0) : 0
 })}).catch(() => {});
 
   // 5. Retirer la ligne du DOM avec animation
