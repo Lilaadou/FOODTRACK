@@ -6879,7 +6879,9 @@ function applyProduction(data) {
   // Les codes supprimés sont exclus des deux sources
   const localFiltered = local.filter(r => !deletedCodes.has(r.code));
   const localCodes = new Set(localFiltered.map(r => r.code));
-  const merged = [...localFiltered, ...apiData.filter(r => r.code !== '—' && !localCodes.has(r.code) && !deletedCodes.has(r.code))];
+  const merged = apiData.length 
+  ? apiData.filter(r => r.code !== '—' && !deletedCodes.has(r.code))
+  : localFiltered;
 
   const tbody = document.getElementById('prod-table');
   if (!tbody) return;
