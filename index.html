@@ -4754,8 +4754,8 @@ async function confirmerResoudre() {
 
   // Sauvegarder dans Google Sheets
   fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({
-    action: 'resoldrePremix', codePremix, bl, fournisseur
-  })}).catch(() => {});
+  action: 'supprimerProduction', code: code, big: prod?.big || 0, small: prod?.small || 0
+})}).catch(() => {});
 
   // Enregistrer le nouveau BL dans Réception si fourni
   if (bl) {
