@@ -6925,6 +6925,7 @@ function applyProduction(data) {
     </tr>`;
   });
 
+  localStorage.setItem('kooki_productions', JSON.stringify(merged));
   tbody.innerHTML = html || '<tr><td colspan="9" class="empty">Aucune production enregistrée.</td></tr>';
   buildProdByProducer();
 }
