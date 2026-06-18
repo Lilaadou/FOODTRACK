@@ -8015,6 +8015,7 @@ async function flConfirmerIx() {
     const s = stockLocal.find(s => s.code === b.lot);
     if (s) s.big = Math.max(0, s.big - b.qty);
     // Mettre à jour statut dans Sheets
+    console.log('majStatutBac:', b.lot, b.lettre);
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
       action: 'majStatutBac', lot: b.lot, lettre: b.lettre, restant: 0, statut: 'sorti Ixelles'
     })}).catch(()=>{});
