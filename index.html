@@ -600,6 +600,7 @@
   <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)"><i class="ti ti-package nav-icon" aria-hidden="true"></i> Stock cookies</button>
   <button class="nav-item" id="nav-ingredients" onclick="showPage('ingredients',this)"><i class="ti ti-salt nav-icon" aria-hidden="true"></i> Stock ingrédients</button>
   <button class="nav-item" id="nav-frigo" onclick="showPage('frigo',this)"><i class="ti ti-snowflake nav-icon" aria-hidden="true"></i> Frigo / Sorties</button>
+  <button class="nav-item" id="nav-frigoLive" onclick="showPage('frigoLive',this)"><i class="ti ti-live-view nav-icon" aria-hidden="true"></i> Frigo live</button>
   <button class="nav-item" id="nav-ixelles" onclick="showPage('ixelles',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Commandes Ixelles</button>
 
   <div class="nav-label" id="nav-label-gestion" style="margin-top:12px">Gestion</div>
@@ -1694,6 +1695,56 @@
     </div>
   </div>
 
+  <!-- ══════════════════ FRIGO LIVE ══════════════════ -->
+<div id="page-frigoLive" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <i class="ti ti-snowflake" style="font-size:18px;color:#0662aa" aria-hidden="true"></i>
+      <div style="font-size:14px;font-weight:700">Frigo live — bacs en temps réel</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="frigo-live-sync" style="font-size:10px;background:#e0edf8;color:#0662aa;padding:3px 10px;border-radius:20px;font-weight:700">--:--</span>
+      <button class="btn btn-secondary" onclick="loadFrigoLive()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
+    </div>
+  </div>
+
+  <!-- Barre Ixelles -->
+  <div id="fl-bar-ix" style="display:none;background:#e0edf8;border:0.5px solid #b5d4f4;border-radius:10px;padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:12px;color:#0662aa;font-weight:700" id="fl-ix-info">0 bacs</div>
+      <div style="font-size:13px;font-weight:700;color:#0662aa" id="fl-ix-total">0 cookies → Ixelles</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="flClearIx()">Annuler</button>
+      <button class="btn btn-secondary" style="background:#0662aa;color:#fff;border-color:#0662aa" onclick="flConfirmerIx()">🏪 Confirmer Ixelles</button>
+    </div>
+  </div>
+
+  <!-- Barre Anderlecht -->
+  <div id="fl-bar-and" style="display:none;background:#fbe8e2;border:0.5px solid #f5cbb8;border-radius:10px;padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <div style="flex:1">
+      <div style="font-size:12px;color:#d44218;font-weight:700;margin-bottom:4px">Sorties Anderlecht en cours</div>
+      <div id="fl-and-recap" style="display:flex;flex-direction:column;gap:3px"></div>
+      <div style="font-size:13px;font-weight:700;color:#d44218;margin-top:6px" id="fl-and-total">Total : 0 cookies → Anderlecht</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn" onclick="flClearAnd()">Annuler</button>
+      <button class="btn btn-primary" onclick="flConfirmerAnd()">🏬 Confirmer Anderlecht</button>
+    </div>
+  </div>
+
+  <!-- Contenu frigo -->
+  <div id="frigo-live-content">
+    <div class="empty" style="padding:40px">Chargement du frigo…</div>
+  </div>
+
+  <!-- Légende -->
+  <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888"><div style="width:14px;height:10px;border-radius:2px;background:#0662aa"></div>Bac simple — Ixelles</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888"><div style="width:14px;height:10px;border-radius:2px;background:#d44218"></div>Bac double — Anderlecht</div>
+  </div>
+</div>
+  
   <!-- ══════════════════ BONS DE LIVRAISON ══════════════════ -->
 <div id="page-bl" class="page">
 
@@ -1914,8 +1965,8 @@ const API = 'https://script.google.com/macros/s/AKfycbwfFxPuVmanYCRc6a0vwtBw43rb
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles', 'courses'];
 const ANDERLECHT_PAGES = ['frigo'];
-const ALL_PAGES   = ['dashboard','premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','courses'];
-const PROD_PAGES  = ['premix','production','stock','ingredients','frigo','ixelles'];
+const ALL_PAGES = ['dashboard','premix','production','stock','ingredients','frigo','frigoLive','ixelles','reception','factures','alertes','parametres','bl','courses'];
+const PROD_PAGES = ['premix','production','stock','ingredients','frigo','frigoLive','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
 
@@ -2005,6 +2056,7 @@ function showPage(name, btn) {
   if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
   if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
+  if (name === 'frigoLive') setTimeout(() => { loadFrigoLive(); }, 60);
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
   if (name === 'production') setTimeout(async () => { loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
@@ -7751,6 +7803,293 @@ window.showPage = function(name, btn) {
   });
   closeSidebar();
 };
+
+  // ─────────────────────────────────────
+// FRIGO LIVE
+// ─────────────────────────────────────
+
+const FRIGO_CONFIG = {
+  gauche: {
+    label: 'Côté gauche',
+    etageres: [
+      { id: 'g1', label: 'Étagère 1', type: 'ixelles', saveurs: ['Davy','Jacky','Emmy','Benny'] },
+      { id: 'g2', label: 'Étagère 2', type: 'ixelles', saveurs: ['Suzzy','Jacky','Emmy','Benny'] },
+      { id: 'g3', label: 'Étagère 3', type: 'anderlecht', saveurs: ['Davy','Suzzy','Jacky','Emmy','Benny'] },
+    ]
+  },
+  droite: {
+    label: 'Côté droit',
+    etageres: [
+      { id: 'd1', label: 'Étagère 1', type: 'ixelles', saveurs: ['Molly','Wally','Leni'] },
+      { id: 'd2', label: 'Étagère 2', type: 'ixelles', saveurs: ['Molly','Woody','Charly'] },
+      { id: 'd3', label: 'Étagère 3', type: 'anderlecht', saveurs: ['Molly','Wally','Leni','Woody','Charly'] },
+    ]
+  }
+};
+
+const SAVEUR_CPB = { SUZZY:45,JACKY:40,EMMY:40,BENNY:40,MOLLY:45,DAVY:45,WOODY:45,WALLY:35,CHARLY:35,LENI:35,DANNY:45 };
+const SAVEUR_CPB_DOUBLE = { SUZZY:90,JACKY:80,EMMY:80,BENNY:80,MOLLY:90,DAVY:90,WOODY:90,WALLY:70,CHARLY:70,LENI:70,DANNY:90 };
+
+let flSelIx = [];
+let flAndData = {};
+
+function loadFrigoLive() {
+  const now = new Date();
+  const hm = now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  const syncEl = document.getElementById('frigo-live-sync');
+  if (syncEl) syncEl.textContent = hm;
+
+  const prods = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
+  const sorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
+
+  // Construire les bacs depuis les productions
+  const bacs = buildBacsFromProductions(prods, sorties);
+  renderFrigoLive(bacs);
+}
+
+function buildBacsFromProductions(prods, sorties) {
+  const LETTRES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const result = {};
+
+  prods.forEach(prod => {
+    const sav = (prod.saveur || '').toUpperCase();
+    const code = prod.code;
+    const nbSimple = prod.bacsSimple || Math.floor((prod.big || 0) / (SAVEUR_CPB[sav] || 45));
+    const nbDouble = prod.bacsDouble || 0;
+    const cpbSimple = SAVEUR_CPB[sav] || 45;
+    const cpbDouble = SAVEUR_CPB_DOUBLE[sav] || 90;
+
+    if (!result[sav]) result[sav] = [];
+
+    let letIdx = 0;
+    for (let i = 0; i < nbSimple; i++) {
+      result[sav].push({ lot: code, lettre: LETTRES[letIdx++], qty: cpbSimple, type: 'simple', sorti: false });
+    }
+    for (let i = 0; i < nbDouble; i++) {
+      result[sav].push({ lot: code, lettre: LETTRES[letIdx++], qty: cpbDouble, type: 'double', sorti: false, restant: cpbDouble });
+    }
+  });
+  return result;
+}
+
+function renderFrigoLive(bacs) {
+  const container = document.getElementById('frigo-live-content');
+  if (!container) return;
+
+  let html = '';
+
+  ['gauche','droite'].forEach(side => {
+    const cfg = FRIGO_CONFIG[side];
+    html += `<div style="border:1.5px solid #b0c4d8;border-radius:12px;overflow:hidden;background:#eef4f9;margin-bottom:14px">
+      <div style="background:#1a1a2e;color:#fff;font-size:11px;font-weight:700;padding:8px 14px;letter-spacing:.04em">${cfg.label}</div>`;
+
+    cfg.etageres.forEach(et => {
+      const isAnd = et.type === 'anderlecht';
+      const tagHtml = isAnd
+        ? '<span style="display:inline-block;font-size:8px;font-weight:700;color:#fff;background:#d44218;padding:1px 5px;border-radius:8px;margin-top:3px">Anderlecht</span>'
+        : '<span style="display:inline-block;font-size:8px;font-weight:700;color:#fff;background:#0662aa;padding:1px 5px;border-radius:8px;margin-top:3px">Ixelles</span>';
+
+      html += `<div style="border-bottom:1.5px dashed #b0c4d8;padding:10px 12px;display:flex;align-items:flex-start;gap:12px">
+        <div style="width:68px;flex-shrink:0;padding-top:3px">
+          <div style="font-size:9px;font-weight:700;color:#6b8ea8;text-transform:uppercase;letter-spacing:.05em;line-height:1.4">${et.label}</div>
+          ${tagHtml}
+        </div>
+        <div style="display:flex;gap:6px;flex:1">`;
+
+      et.saveurs.forEach(sav => {
+        const savUp = sav.toUpperCase();
+        const savBacs = (bacs[savUp] || []).filter(b => isAnd ? b.type === 'double' : b.type === 'simple');
+
+        html += `<div style="display:flex;flex-direction:column;gap:3px;flex:1">
+          <div style="font-size:10px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:3px 4px;background:var(--color-background-primary);border-radius:5px;border:0.5px solid var(--color-border-tertiary);margin-bottom:3px">${sav}</div>`;
+
+        if (!savBacs.length) {
+          html += `<div style="background:rgba(180,200,218,.25);border:1.5px dashed #b0c4d8;border-radius:5px;padding:8px;text-align:center;font-size:9px;color:#9ab0c4">Vide</div>`;
+        } else {
+          savBacs.forEach((b, idx) => {
+            const bgColor = isAnd ? '#d44218' : '#0662aa';
+            const uid = `fl-${savUp}-${b.lot}-${b.lettre}`;
+            if (isAnd) {
+              html += `<div style="background:${bgColor};border-radius:5px;padding:6px 7px;cursor:pointer;border:2px solid transparent" id="${uid}" onclick="flOpenAnd('${uid}','${b.lot}','${sav}','${b.lettre}',${b.qty})">
+                <div style="font-size:18px;font-weight:500;color:#fff;line-height:1">${b.lettre}</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.75);font-family:monospace">${b.lot}</div>
+                <div style="font-size:9px;color:rgba(255,255,255,.7)" id="${uid}-qty">${b.qty} 🍪 · double</div>
+              </div>
+              <div style="background:#fbe8e2;border:1.5px solid #f5cbb8;border-radius:6px;padding:8px;margin-top:3px;display:none;flex-direction:column;gap:5px" id="${uid}-panel">
+                <div style="font-size:9px;color:#d44218;font-weight:700">${sav}-${b.lettre} · Combien sortis ?</div>
+                <div style="display:flex;gap:4px">
+                  <input type="number" id="${uid}-inp" placeholder="0" min="0" max="${b.qty}" style="flex:1;padding:5px 7px;border:1px solid #f5cbb8;border-radius:5px;font-size:14px;font-weight:700;color:#d44218;outline:none" oninput="flUpdateAnd('${uid}','${sav}','${b.lettre}','${b.lot}',${b.qty})">
+                </div>
+                <div style="font-size:9px;color:#d44218" id="${uid}-restant">Restant : ${b.qty} 🍪</div>
+              </div>`;
+            } else {
+              html += `<div style="background:${bgColor};border-radius:5px;padding:6px 7px;cursor:pointer;border:2px solid transparent" id="${uid}" onclick="flToggleIx(this,${b.qty},'${b.lot}','${sav}','${b.lettre}')">
+                <div style="font-size:18px;font-weight:500;color:#fff;line-height:1">${b.lettre}</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.75);font-family:monospace">${b.lot}</div>
+                <div style="font-size:9px;color:rgba(255,255,255,.7)">${b.qty} 🍪 · simple</div>
+                <div style="font-size:9px;color:#fff;font-weight:700;display:none" class="fl-check">✓ sélectionné</div>
+              </div>`;
+            }
+          });
+        }
+
+        html += `</div>`;
+      });
+
+      html += `</div></div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function flToggleIx(el, qty, lot, saveur, lettre) {
+  if (el.classList.contains('sorti')) return;
+  const key = lot + '-' + lettre;
+  const idx = flSelIx.findIndex(s => s.key === key);
+  if (idx === -1) {
+    el.style.boxShadow = '0 0 0 2px #1a7a3a';
+    el.style.borderColor = '#fff';
+    el.querySelector('.fl-check').style.display = 'block';
+    flSelIx.push({ el, qty, lot, saveur, lettre, key });
+  } else {
+    el.style.boxShadow = '';
+    el.style.borderColor = 'transparent';
+    el.querySelector('.fl-check').style.display = 'none';
+    flSelIx.splice(idx, 1);
+  }
+  flUpdateBarIx();
+}
+
+function flUpdateBarIx() {
+  const bar = document.getElementById('fl-bar-ix');
+  if (!bar) return;
+  if (!flSelIx.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const tot = flSelIx.reduce((s,b) => s + b.qty, 0);
+  document.getElementById('fl-ix-info').textContent = flSelIx.length + ' bac' + (flSelIx.length>1?'s':'') + ' — ' + flSelIx.map(b=>b.saveur+'-'+b.lettre).join(' · ');
+  document.getElementById('fl-ix-total').textContent = 'Total : ' + tot + ' cookies → Ixelles';
+}
+
+function flClearIx() {
+  flSelIx.forEach(s => {
+    s.el.style.boxShadow = '';
+    s.el.style.borderColor = 'transparent';
+    s.el.querySelector('.fl-check').style.display = 'none';
+  });
+  flSelIx = [];
+  flUpdateBarIx();
+}
+
+async function flConfirmerIx() {
+  const tot = flSelIx.reduce((s,b) => s + b.qty, 0);
+  const livreur = FULL_NAMES[currentProfile] || currentProfile;
+  const lots = flSelIx.map(b => ({ code: b.lot, saveur: b.saveur.toUpperCase(), big: b.qty, small: 0 }));
+
+  // Sauvegarder dans les sorties
+  const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
+  flSelIx.forEach(b => {
+    storedSorties.unshift({ id: Date.now()+Math.random(), date: new Date().toISOString(), saveur: b.saveur.toUpperCase(), destination: 'Magasin Ixelles', lot: b.lot, big: b.qty, small: 0, boites: 0, producteur: livreur });
+    // Mettre à jour stockLocal
+    const s = stockLocal.find(s => s.code === b.lot);
+    if (s) s.big = Math.max(0, s.big - b.qty);
+  });
+  localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
+  localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
+
+  // Marquer les bacs comme sortis visuellement
+  flSelIx.forEach(b => {
+    b.el.style.opacity = '.3';
+    b.el.onclick = null;
+    b.el.querySelector('.fl-check').style.display = 'none';
+    const qtyEl = b.el.querySelector('div:last-child');
+    if (qtyEl) qtyEl.textContent = 'Sorti ✓';
+  });
+
+  flSelIx = [];
+  flUpdateBarIx();
+  updateStockPage();
+  updateDashboardStockTable();
+  toast('sortie', '✓ ' + tot + ' cookies livrés à Ixelles !', 'ok');
+}
+
+function flOpenAnd(uid, lot, saveur, lettre, max) {
+  const panel = document.getElementById(uid + '-panel');
+  if (!panel) return;
+  // Fermer les autres panels ouverts
+  document.querySelectorAll('[id$="-panel"]').forEach(p => { if (p !== panel) p.style.display = 'none'; });
+  panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function flUpdateAnd(uid, saveur, lettre, lot, max) {
+  const inp = document.getElementById(uid + '-inp');
+  const val = parseInt(inp.value) || 0;
+  const restant = Math.max(0, max - val);
+  const restEl = document.getElementById(uid + '-restant');
+  if (restEl) restEl.textContent = 'Restant : ' + restant + ' 🍪';
+
+  if (val > 0) {
+    flAndData[uid] = { val, max, saveur, lettre, lot, restant, uid };
+  } else {
+    delete flAndData[uid];
+  }
+  flUpdateBarAnd();
+}
+
+function flUpdateBarAnd() {
+  const bar = document.getElementById('fl-bar-and');
+  if (!bar) return;
+  const entries = Object.values(flAndData);
+  if (!entries.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const tot = entries.reduce((s,e) => s + e.val, 0);
+  document.getElementById('fl-and-recap').innerHTML = entries.map(e =>
+    `<div style="font-size:11px;color:#d44218;font-weight:700;background:#fff;border-radius:5px;padding:3px 8px">${e.saveur}-${e.lettre} : ${e.val} cookies (${e.restant} restants)</div>`
+  ).join('');
+  document.getElementById('fl-and-total').textContent = 'Total : ' + tot + ' cookies → Anderlecht';
+}
+
+function flClearAnd() {
+  Object.values(flAndData).forEach(e => {
+    const inp = document.getElementById(e.uid + '-inp');
+    if (inp) inp.value = '';
+    const panel = document.getElementById(e.uid + '-panel');
+    if (panel) panel.style.display = 'none';
+    const restEl = document.getElementById(e.uid + '-restant');
+    if (restEl) restEl.textContent = 'Restant : ' + e.max + ' 🍪';
+    const qtyEl = document.getElementById(e.uid + '-qty');
+    if (qtyEl) qtyEl.textContent = e.max + ' 🍪 · double';
+  });
+  flAndData = {};
+  flUpdateBarAnd();
+}
+
+async function flConfirmerAnd() {
+  const entries = Object.values(flAndData);
+  const tot = entries.reduce((s,e) => s + e.val, 0);
+  const livreur = FULL_NAMES[currentProfile] || currentProfile;
+
+  const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
+  entries.forEach(e => {
+    storedSorties.unshift({ id: Date.now()+Math.random(), date: new Date().toISOString(), saveur: e.saveur.toUpperCase(), destination: 'Magasin Anderlecht', lot: e.lot, big: e.val, small: 0, boites: 0, producteur: livreur });
+    const s = stockLocal.find(s => s.code === e.lot);
+    if (s) s.big = Math.max(0, s.big - e.val);
+    const qtyEl = document.getElementById(e.uid + '-qty');
+    if (qtyEl) qtyEl.textContent = e.restant > 0 ? e.restant + ' 🍪 restants' : 'Vide ✓';
+    const panel = document.getElementById(e.uid + '-panel');
+    if (panel) panel.style.display = 'none';
+  });
+  localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
+  localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
+
+  flAndData = {};
+  flUpdateBarAnd();
+  updateStockPage();
+  updateDashboardStockTable();
+  toast('sortie', '✓ ' + tot + ' cookies livrés à Anderlecht !', 'ok');
+}
 </script>
 </body>
 </html>
