@@ -5003,10 +5003,10 @@ function savePremix() {
   const hasMq = manquants.length > 0;
   const tr = document.createElement('tr');
   tr.setAttribute('data-code', code);
-  tr.innerHTML = `<td><b>${code}</b>${hasMq ? ' <span class="tag" style="background:#fbe8e2;color:#d44218">⚠️ manquants</span>' : ''}</td>
-    <td><b>${saveur}</b> · Bac ${sac}</td>
-    <td>${nom}</td>
-    <td>${bls.map(f=>`<span class="tag tag-o">${f}</span>`).join(' ')}</td>
+  tr.innerHTML = `<td><b>${code}</b><div style="font-size:10px;color:var(--color-text-secondary);margin-top:1px">${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}</div>${hasMq ? ' <span class="tag" style="background:#fbe8e2;color:#d44218">⚠️ manquants</span>' : ''}</td>
+    <td><span class="tag tag-o">${saveur}</span> <span style="font-size:11px;color:var(--color-text-secondary)">Bac ${sac}</span></td>
+    <td style="font-size:12px">${nom}</td>
+    <td>${bls.map(f=>`<span style="display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);margin:1px">${f}</span>`).join('')}</td>
     <td><span class="status ${hasMq?'s-warn':'s-ok'}">${hasMq?'Incomplet':'Disponible'}</span></td>
     <td><button onclick="deletePremix('${code}')"
       style="background:none;border:none;cursor:pointer;font-size:15px;color:#ccc;padding:2px 6px;border-radius:6px;transition:color .15s,background .15s"
@@ -7065,7 +7065,7 @@ function applyPremix(data) {
         else label = '📅 ' + new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
         tbody.innerHTML += `<tr><td colspan="6" style="background:#f7f8fa;font-size:11px;font-weight:700;color:#888;padding:8px 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0f0f0">${label}</td></tr>`;
       }
-      const facs = (r.factures || []).map(f => `<span class="tag tag-o">${f}</span>`).join(' ') || '—';
+      const facs = (r.factures || []).map(f => `<span style="display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);margin:1px">${f}</span>`).join('') || '—';
       const savSac = r.saveur ? `<b>${r.saveur}</b> · Bac ${r.sac||'?'}` : '—';
       const inv = getInventairePremix();
       const sacData = r.saveur && r.sac ? inv[r.saveur]?.[r.sac] : null;
