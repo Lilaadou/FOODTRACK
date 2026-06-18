@@ -7966,6 +7966,7 @@ function renderFrigoLive(bacs) {
 }
 
 function flToggleIx(el, qty, lot, saveur, lettre) {
+  console.log('flToggleIx appelé', lot, lettre, window.flSelIx);
   if (el.classList.contains('sorti')) return;
   const key = lot + '-' + lettre;
   const idx = window.flSelIx.findIndex(s => s.key === key);
@@ -7980,6 +7981,7 @@ function flToggleIx(el, qty, lot, saveur, lettre) {
     el.querySelector('.fl-check').style.display = 'none';
     window.flSelIx.splice(idx, 1);
   }
+  console.log('après push', window.flSelIx.length);
   flUpdateBarIx();
 }
 
