@@ -805,7 +805,7 @@
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#d0d0d0;display:inline-block"></span>Vide</span>
         </div>
       </div>
-      <div id="inventaire-premix-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+      <div id="inventaire-premix-grid" style="display:grid;grid-template-columns:repeat(11,1fr);gap:8px">
         <div class="empty" style="grid-column:1/-1">Chargement…</div>
       </div>
     </div>
@@ -4674,34 +4674,29 @@ function updateInventairePremix() {
     const state1 = sacState(s1);
     const state2 = sacState(s2);
 
-    const COLOR  = { dispo:'#27ae60', manquant:'#d44218', vide:'#d0d0d0' };
-    const BG     = { dispo:'#e8f8f0', manquant:'#fdf0ec', vide:'#f5f5f5' };
-    const TXTCOL = { dispo:'#1a7a3a', manquant:'#d44218', vide:'#999' };
-    const SUBBG  = { dispo:'#1a7a3a', manquant:'#a0200a', vide:'#bbb' };
+    const BORDER = { dispo:'#27ae60', manquant:'#d44218', vide:'var(--color-border-tertiary)' };
+    const BG     = { dispo:'#f0faf4', manquant:'#fdf0ec', vide:'var(--color-background-secondary)' };
+    const DOTCOL = { dispo:'#27ae60', manquant:'#d44218', vide:'#d0d0d0' };
+    const TXTCOL = { dispo:'#1a7a3a', manquant:'#d44218', vide:'#aaa' };
+
+    const overallState = (state1==='manquant'||state2==='manquant') ? 'manquant'
+                       : (state1==='dispo'||state2==='dispo') ? 'dispo' : 'vide';
 
     const sacHTML = (data, num, state) => {
-      const isDispo = data.statut === 'dispo';
-      const label = isDispo ? (data.codePremix || '—') : 'Vide';
-      const icon  = state === 'manquant' ? '⚠️ ' : '';
-      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;background:${BG[state]};cursor:pointer"
-          onclick="toggleSacManuel('${sav}','${num}')"
-          title="${state==='manquant'?'Ingrédient manquant — voir récapitulatif':isDispo?'Cliquer pour marquer vide':'Cliquer pour marquer disponible'}">
-        <div class="pmx-sac-dot" style="background:${COLOR[state]}"></div>
+      const label = data.statut === 'dispo' ? (data.codePremix || '—') : 'Vide';
+      return `<div style="display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer" onclick="toggleSacManuel('${sav}','${num}')">
+        <div style="width:7px;height:7px;border-radius:50%;background:${DOTCOL[state]};flex-shrink:0"></div>
         <div>
-          <div style="font-size:11px;font-weight:700;color:${TXTCOL[state]}">Bac ${num}</div>
-          <div style="font-size:10px;color:${SUBBG[state]}">${icon}${label}</div>
+          <div style="font-size:9px;font-weight:600;color:${TXTCOL[state]}">Bac ${num}</div>
+          <div style="font-size:9px;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px">${label}</div>
         </div>
       </div>`;
     };
 
-    // Classe de la carte : manquant > dispo > vide
-    const cardClass = (state1==='manquant'||state2==='manquant') ? 'manquant'
-                    : (state1==='dispo'||state2==='dispo') ? 'dispo' : 'vide';
-
-    return `<div class="pmx-sac-card ${cardClass}">
-      <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:${cardClass==='manquant'?'#d44218':'inherit'}">${sav}</div>
-      ${sacHTML(s1, '1', state1)}
-      ${sacHTML(s2, '2', state2)}
+    return `<div style="border-radius:var(--border-radius-md);border:0.5px solid ${BORDER[overallState]};background:${BG[overallState]};padding:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--color-text-primary);margin-bottom:6px">${sav}</div>
+      ${sacHTML(s1,'1',state1)}
+      <div style="border-bottom:none">${sacHTML(s2,'2',state2)}</div>
     </div>`;
   }).join('');
 
