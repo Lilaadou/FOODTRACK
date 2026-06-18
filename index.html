@@ -8012,9 +8012,12 @@ async function flConfirmerIx() {
   const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
   flSelIx.forEach(b => {
     storedSorties.unshift({ id: Date.now()+Math.random(), date: new Date().toISOString(), saveur: b.saveur.toUpperCase(), destination: 'Magasin Ixelles', lot: b.lot, big: b.qty, small: 0, boites: 0, producteur: livreur });
-    // Mettre à jour stockLocal
     const s = stockLocal.find(s => s.code === b.lot);
     if (s) s.big = Math.max(0, s.big - b.qty);
+    // Mettre à jour statut dans Sheets
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+      action: 'majStatutBac', lot: b.lot, lettre: b.lettre, restant: 0, statut: 'sorti Ixelles'
+    })}).catch(()=>{});
   });
   localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
   localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
@@ -8030,6 +8033,7 @@ async function flConfirmerIx() {
 
   flSelIx = [];
   flUpdateBarIx();
+  setTimeout(() => loadFrigoLive(), 800);
   updateStockPage();
   updateDashboardStockTable();
   toast('sortie', '✓ ' + tot + ' cookies livrés à Ixelles !', 'ok');
