@@ -7994,45 +7994,37 @@ function flUpdateBarIx() {
 }
 
 function flClearIx() {
-  flSelIx.forEach(s => {
+  window.flSelIx.forEach(s => {
     s.el.style.boxShadow = '';
     s.el.style.borderColor = 'transparent';
     s.el.querySelector('.fl-check').style.display = 'none';
   });
-  flSelIx = [];
+  window.flSelIx = [];
   flUpdateBarIx();
 }
 
 async function flConfirmerIx() {
-  const tot = flSelIx.reduce((s,b) => s + b.qty, 0);
+  const tot = window.flSelIx.reduce((s,b) => s + b.qty, 0);
   const livreur = FULL_NAMES[currentProfile] || currentProfile;
-  const lots = flSelIx.map(b => ({ code: b.lot, saveur: b.saveur.toUpperCase(), big: b.qty, small: 0 }));
-
-  // Sauvegarder dans les sorties
   const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  flSelIx.forEach(b => {
+  window.flSelIx.forEach(b => {
     storedSorties.unshift({ id: Date.now()+Math.random(), date: new Date().toISOString(), saveur: b.saveur.toUpperCase(), destination: 'Magasin Ixelles', lot: b.lot, big: b.qty, small: 0, boites: 0, producteur: livreur });
     const s = stockLocal.find(s => s.code === b.lot);
     if (s) s.big = Math.max(0, s.big - b.qty);
-    // Mettre à jour statut dans Sheets
-    console.log('majStatutBac:', b.lot, b.lettre);
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
       action: 'majStatutBac', lot: b.lot, lettre: b.lettre, restant: 0, statut: 'sorti Ixelles'
     })}).catch(()=>{});
   });
   localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
   localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
-
-  // Marquer les bacs comme sortis visuellement
-  flSelIx.forEach(b => {
+  window.flSelIx.forEach(b => {
     b.el.style.opacity = '.3';
     b.el.onclick = null;
     b.el.querySelector('.fl-check').style.display = 'none';
     const qtyEl = b.el.querySelector('div:last-child');
     if (qtyEl) qtyEl.textContent = 'Sorti ✓';
   });
-
-  flSelIx = [];
+  window.flSelIx = [];
   flUpdateBarIx();
   setTimeout(() => loadFrigoLive(), 2000);
   updateStockPage();
