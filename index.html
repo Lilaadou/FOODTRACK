@@ -7930,11 +7930,12 @@ function renderFrigoLive(bacs) {
             const bgColor = isAnd ? '#d44218' : '#0662aa';
             const uid = `fl-${savUp}-${b.lot}-${b.lettre}`;
             if (isAnd) {
-              html += `<div style="background:${bgColor};border-radius:5px;padding:6px 7px;cursor:pointer;border:2px solid transparent" id="${uid}" onclick="flOpenAnd('${uid}','${b.lot}','${sav}','${b.lettre}',${b.qty})">
-                <div style="font-size:18px;font-weight:500;color:#fff;line-height:1">${b.lettre}</div>
-                <div style="font-size:8px;color:rgba(255,255,255,.75);font-family:monospace">${b.lot}</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.7)" id="${uid}-qty">${b.qty} 🍪 · double</div>
-              </div>
+              html += `<div style="background:${bgColor};border-radius:5px;padding:6px 7px;cursor:pointer;border:2px solid transparent" id="${uid}" onclick="flToggleIx(this,${b.qty},'${b.lot}','${sav}','${b.lettre}')">
+  <div style="font-size:18px;font-weight:500;color:#fff;line-height:1;pointer-events:none">${b.lettre}</div>
+  <div style="font-size:8px;color:rgba(255,255,255,.75);font-family:monospace;pointer-events:none">${b.lot}</div>
+  <div style="font-size:9px;color:rgba(255,255,255,.7);pointer-events:none">${b.qty} 🍪 · simple</div>
+  <div style="font-size:9px;color:#fff;font-weight:700;display:none;pointer-events:none" class="fl-check">✓ sélectionné</div>
+</div>`;
               <div style="background:#fbe8e2;border:1.5px solid #f5cbb8;border-radius:6px;padding:8px;margin-top:3px;display:none;flex-direction:column;gap:5px" id="${uid}-panel">
                 <div style="font-size:9px;color:#d44218;font-weight:700">${sav}-${b.lettre} · Combien sortis ?</div>
                 <div style="display:flex;gap:4px">
