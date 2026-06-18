@@ -5639,7 +5639,9 @@ async function saveProduction() {
 
       // Sauvegarder dans localStorage
       const storedProd = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
-      storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString() });
+      const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
+      const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
+      storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString(), bacsSimple: nbSimple, bacsDouble: nbDouble });
       localStorage.setItem('kooki_productions', JSON.stringify(storedProd));
 
       // 2. Ajouter dans le tableau historique production
