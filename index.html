@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KOOKI — Traçabilité</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#d44218">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,7 +23,7 @@
     .nav-item:hover{background:#fdf0ec;color:#d44218;}
     .nav-item.active{background:#fbe8e2;color:#d44218;font-weight:600;border-right:3px solid #d44218;}
     .nav-item.hidden{display:none;}
-    .nav-icon{font-size:15px;width:18px;text-align:center;}
+    .nav-icon{font-size:17px;width:18px;text-align:center;}
     .sidebar-bottom{margin-top:auto;border-top:1px solid #efefef;padding-top:10px;}
 
     /* ── MAIN ── */
@@ -590,30 +590,30 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <img src="logo.png" alt="Kooki" style="height:58px;width:auto;object-fit:contain;">
+    <img src="logo.png" alt="Kooki" style="height:52px;width:auto;object-fit:contain;">
   </div>
 
   <div class="nav-label">Principal</div>
-  <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</button>
-  <button class="nav-item" id="nav-premix" onclick="showPage('premix',this)"><span class="nav-icon">🥣</span> Premix</button>
-  <button class="nav-item" id="nav-production" onclick="showPage('production',this)"><span class="nav-icon">🏭</span> Production</button>
-  <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)"><span class="nav-icon">📦</span> Stock cookies</button>
-  <button class="nav-item" id="nav-ingredients" onclick="showPage('ingredients',this)"><span class="nav-icon">🧂</span> Stock ingrédients</button>
-  <button class="nav-item" id="nav-frigo" onclick="showPage('frigo',this)"><span class="nav-icon">🧊</span> Frigo / Sorties</button>
-  <button class="nav-item" id="nav-ixelles" onclick="showPage('ixelles',this)"><span class="nav-icon">🏪</span> Commandes Ixelles</button>
+  <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard nav-icon" aria-hidden="true"></i> Dashboard</button>
+  <button class="nav-item" id="nav-premix" onclick="showPage('premix',this)"><i class="ti ti-flask nav-icon" aria-hidden="true"></i> Premix</button>
+  <button class="nav-item" id="nav-production" onclick="showPage('production',this)"><i class="ti ti-building-factory nav-icon" aria-hidden="true"></i> Production</button>
+  <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)"><i class="ti ti-package nav-icon" aria-hidden="true"></i> Stock cookies</button>
+  <button class="nav-item" id="nav-ingredients" onclick="showPage('ingredients',this)"><i class="ti ti-salt nav-icon" aria-hidden="true"></i> Stock ingrédients</button>
+  <button class="nav-item" id="nav-frigo" onclick="showPage('frigo',this)"><i class="ti ti-snowflake nav-icon" aria-hidden="true"></i> Frigo / Sorties</button>
+  <button class="nav-item" id="nav-ixelles" onclick="showPage('ixelles',this)"><i class="ti ti-store nav-icon" aria-hidden="true"></i> Commandes Ixelles</button>
 
   <div class="nav-label" id="nav-label-gestion" style="margin-top:12px">Gestion</div>
-  <button class="nav-item" id="nav-reception" onclick="showPage('reception',this)"><span class="nav-icon">📥</span> Réception facture</button>
-  <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><span class="nav-icon">🧾</span> Factures</button>
-<button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><span class="nav-icon">🤝</span> B2B</button>
-  <button class="nav-item" id="nav-courses" onclick="showPage('courses',this)"><span class="nav-icon">🛒</span> Liste de courses</button>
+  <button class="nav-item" id="nav-reception" onclick="showPage('reception',this)"><i class="ti ti-file-download nav-icon" aria-hidden="true"></i> Réception facture</button>
+  <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><i class="ti ti-receipt nav-icon" aria-hidden="true"></i> Factures</button>
+  <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><i class="ti ti-truck-delivery nav-icon" aria-hidden="true"></i> B2B</button>
+  <button class="nav-item" id="nav-courses" onclick="showPage('courses',this)"><i class="ti ti-shopping-cart nav-icon" aria-hidden="true"></i> Liste de courses</button>
 
   <div class="sidebar-bottom">
     <button class="nav-item" id="nav-alertes" onclick="showPage('alertes',this)">
-      <span class="nav-icon">🔔</span> Alertes
+      <i class="ti ti-bell nav-icon" aria-hidden="true"></i> Alertes
       <span style="margin-left:auto;background:#d44218;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;">2</span>
     </button>
-    <button class="nav-item" id="nav-parametres" onclick="showPage('parametres',this)"><span class="nav-icon">⚙️</span> Paramètres</button>
+    <button class="nav-item" id="nav-parametres" onclick="showPage('parametres',this)"><i class="ti ti-settings nav-icon" aria-hidden="true"></i> Paramètres</button>
   </div>
 </aside>
 
