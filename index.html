@@ -926,24 +926,24 @@
         </div>
         </div>
       <!-- Section Grands -->
-      <div style="background:#f9f9f9;border-radius:10px;padding:13px 16px;margin-bottom:11px;border:1.5px solid #e8e8e8">
+      <div style="background:#f9f9f9;border-radius:10px;padding:13px 16px;margin-bottom:11px;border:1.5px solid #e8e8e8;grid-column:1/-1">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div style="font-size:13px;font-weight:700">Grands (Big 165g)</div>
           <span id="prod-bac-tag" style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">45 cookies/bac</span>
         </div>
         <div class="form-grid fg-2" style="margin-bottom:10px">
           <div class="form-group"><label>Bacs simples (1 étage)</label><input type="number" id="prod-bacs-simple" placeholder="0" min="0" oninput="calcProdTotaux()"></div>
-          <div class="form-group">
-            <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+          <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:6px">
               <input type="checkbox" id="prod-has-double" onchange="toggleProdDouble()" style="accent-color:#d44218;width:14px;height:14px;cursor:pointer">
               Bacs doubles (2 étages · Anderlecht)
             </label>
-            <input type="number" id="prod-bacs-double" placeholder="0" min="0" oninput="calcProdTotaux()" style="display:none;margin-top:6px">
+            <input type="number" id="prod-bacs-double" placeholder="0" min="0" oninput="calcProdTotaux()" style="display:none;padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;color:#1a1a2e;background:#f9f9f9;outline:none;width:100%">
           </div>
         </div>
         <div style="background:#fbe8e2;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-size:12px;color:#d44218">Total Big</div>
+            <div style="font-size:12px;color:#d44218;font-weight:600">Total Big</div>
             <div id="prod-bac-detail" style="font-size:10px;color:#d44218;opacity:.7">0 × 45</div>
           </div>
           <span id="prod-total-big-display" style="font-size:18px;font-weight:700;color:#d44218">0 cookies</span>
