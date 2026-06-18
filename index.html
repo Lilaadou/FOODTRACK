@@ -7968,17 +7968,17 @@ function renderFrigoLive(bacs) {
 function flToggleIx(el, qty, lot, saveur, lettre) {
   if (el.classList.contains('sorti')) return;
   const key = lot + '-' + lettre;
-  const idx = flSelIx.findIndex(s => s.key === key);
+  const idx = window.flSelIx.findIndex(s => s.key === key);
   if (idx === -1) {
     el.style.boxShadow = '0 0 0 2px #1a7a3a';
     el.style.borderColor = '#fff';
     el.querySelector('.fl-check').style.display = 'block';
-    flSelIx.push({ el, qty, lot, saveur, lettre, key });
+    window.flSelIx.push({ el, qty, lot, saveur, lettre, key });
   } else {
     el.style.boxShadow = '';
     el.style.borderColor = 'transparent';
     el.querySelector('.fl-check').style.display = 'none';
-    flSelIx.splice(idx, 1);
+    window.flSelIx.splice(idx, 1);
   }
   flUpdateBarIx();
 }
@@ -7986,10 +7986,10 @@ function flToggleIx(el, qty, lot, saveur, lettre) {
 function flUpdateBarIx() {
   const bar = document.getElementById('fl-bar-ix');
   if (!bar) return;
-  if (!flSelIx.length) { bar.style.display = 'none'; return; }
+  if (!window.flSelIx.length) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
-  const tot = flSelIx.reduce((s,b) => s + b.qty, 0);
-  document.getElementById('fl-ix-info').textContent = flSelIx.length + ' bac' + (flSelIx.length>1?'s':'') + ' — ' + flSelIx.map(b=>b.saveur+'-'+b.lettre).join(' · ');
+  const tot = window.flSelIx.reduce((s,b) => s + b.qty, 0);
+  document.getElementById('fl-ix-info').textContent = window.flSelIx.length + ' bac' + (window.flSelIx.length>1?'s':'') + ' — ' + window.flSelIx.map(b=>b.saveur+'-'+b.lettre).join(' · ');
   document.getElementById('fl-ix-total').textContent = 'Total : ' + tot + ' cookies → Ixelles';
 }
 
