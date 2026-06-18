@@ -8020,12 +8020,8 @@ async function flConfirmerIx() {
   localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
   localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
   window.flSelIx.forEach(b => {
-    b.el.style.opacity = '.3';
-    b.el.onclick = null;
-    b.el.querySelector('.fl-check').style.display = 'none';
-    const qtyEl = b.el.querySelector('div:last-child');
-    if (qtyEl) qtyEl.textContent = 'Sorti ✓';
-  });
+  b.el.style.display = 'none';
+});
   window.flSelIx = [];
   flUpdateBarIx();
   updateStockPage();
