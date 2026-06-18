@@ -5137,7 +5137,8 @@ function autoFillFromPremix() {
   } else {
     if (warn) warn.style.display = 'none';
   }
-calcProdTotaux(); // ← ajoute cette ligne
+calcProdTotaux();
+  autoGenCodeLot();
 }
 function loadBLSelect() {
   const select = document.getElementById('lier-bl-select');
