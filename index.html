@@ -5613,7 +5613,6 @@ async function saveProduction() {
   const cpbDouble = cpbSimple * 2;
   const date = new Date().toISOString();
   let letIdx = 0;
-
   const bacsACreer = [];
   for (let i = 0; i < nbSimple; i++) {
     bacsACreer.push({ date, lot: code, saveur, lettre: LETTRES[letIdx++], type: 'simple', cookies: cpbSimple, restant: cpbSimple, statut: 'en frigo' });
@@ -5621,12 +5620,10 @@ async function saveProduction() {
   for (let i = 0; i < nbDouble; i++) {
     bacsACreer.push({ date, lot: code, saveur, lettre: LETTRES[letIdx++], type: 'double', cookies: cpbDouble, restant: cpbDouble, statut: 'en frigo' });
   }
-
   bacsACreer.forEach(bac => {
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) }).catch(() => {});
   });
       toast('prod','✓ Production enregistrée !','ok');
-
       // 1. Mettre à jour stockLocal (utilisé par le frigo)
       const existing = stockLocal.find(s => s.code === code);
       if (existing) {
@@ -5636,11 +5633,8 @@ async function saveProduction() {
         stockLocal.push({ code, saveur, big, small });
       }
       localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
-
       // Sauvegarder dans localStorage
       const storedProd = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
-      const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
-      const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
       storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString(), bacsSimple: nbSimple, bacsDouble: nbDouble });
       localStorage.setItem('kooki_productions', JSON.stringify(storedProd));
 
