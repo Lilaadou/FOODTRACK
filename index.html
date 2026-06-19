@@ -5588,8 +5588,12 @@ function renderBLTable(data) {
             <td style="font-weight:700;color:#0662aa">${totalSmall}</td>
             <td>${bl.boites || 0}</td>
             <td class="sub-text">${bl.sortiPar || '—'}</td>
-            <td><button onclick="reimprimerBL('${bl.numeroBL}')"
-              style="background:#d44218;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🖨️</button></td>
+            <td style="display:flex;gap:4px">
+  <button onclick="reimprimerBL('${bl.numeroBL}')"
+    style="background:#d44218;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🖨️</button>
+  <button onclick="reimprimerEtiquettes('${bl.numeroBL}')"
+    style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🏷️</button>
+</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -5629,6 +5633,12 @@ async function reimprimerBL(numeroBL) {
   const livreur = bl.sortiPar || '—';
   const allLotsAvecSaveur = bl.lots.map(l => ({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small }));
   showBonLivraison({ client: bl.client, saveur: bl.lots.map(l => l.saveur).join(', '), lots: allLotsAvecSaveur, boites: bl.boites || 0, typeBoite: 'plastique', livreur });
+}
+  function reimprimerEtiquettes(numeroBL) {
+  const bl = blData.find(b => b.numeroBL === numeroBL);
+  if (!bl) return;
+  const lots = bl.lots.map(l => ({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small }));
+  imprimerEtiquettesLot(lots, bl.client);
 }
   
 function addAlerteManquant(codePremix, manquants, producteur) {
