@@ -7866,6 +7866,7 @@ function loadFrigoLive() {
 function buildBacsFromProductions(prods, sorties) {
   const LETTRES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const result = {};
+  const bacsSortis = new Set(JSON.parse(localStorage.getItem('kooki_bacs_sortis') || '[]'));
 
   prods.forEach(prod => {
     const sav = (prod.saveur || '').toUpperCase();
@@ -7879,7 +7880,10 @@ function buildBacsFromProductions(prods, sorties) {
 
     let letIdx = 0;
     for (let i = 0; i < nbSimple; i++) {
-      result[sav].push({ lot: code, lettre: LETTRES[letIdx++], qty: cpbSimple, type: 'simple', sorti: false });
+      const lettre = LETTRES[letIdx++];
+if (!bacsSortis.has(code + '-' + lettre)) {
+  result[sav].push({ lot: code, lettre, qty: cpbSimple, type: 'simple', sorti: false });
+}
     }
     for (let i = 0; i < nbDouble; i++) {
       result[sav].push({ lot: code, lettre: LETTRES[letIdx++], qty: cpbDouble, type: 'double', sorti: false, restant: cpbDouble });
@@ -8005,19 +8009,25 @@ async function flConfirmerIx() {
   const tot = window.flSelIx.reduce((s,b) => s + b.qty, 0);
   const livreur = FULL_NAMES[currentProfile] || currentProfile;
   const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
+
+  // Sauvegarder les bacs sortis pour ne plus les afficher
+  const bacsSortis = JSON.parse(localStorage.getItem('kooki_bacs_sortis') || '[]');
+
   window.flSelIx.forEach(b => {
     storedSorties.unshift({ id: Date.now()+Math.random(), date: new Date().toISOString(), saveur: b.saveur.toUpperCase(), destination: 'Magasin Ixelles', lot: b.lot, big: b.qty, small: 0, boites: 0, producteur: livreur });
     const s = stockLocal.find(s => s.code === b.lot);
     if (s) s.big = Math.max(0, s.big - b.qty);
+    bacsSortis.push(b.lot + '-' + b.lettre);
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
       action: 'majStatutBac', lot: b.lot, lettre: b.lettre, restant: 0, statut: 'sorti Ixelles'
     })}).catch(()=>{});
   });
+
   localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
   localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
-  window.flSelIx.forEach(b => {
-  b.el.style.display = 'none';
-});
+  localStorage.setItem('kooki_bacs_sortis', JSON.stringify(bacsSortis));
+
+  window.flSelIx.forEach(b => { b.el.style.display = 'none'; });
   window.flSelIx = [];
   flUpdateBarIx();
   updateStockPage();
