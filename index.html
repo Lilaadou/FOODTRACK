@@ -3051,7 +3051,7 @@ ${content}
 
   function imprimerEtiquettesLot(lots, client) {
   const now = new Date();
-  const typeCookies = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+  const typeCookies = _typeCookies || document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
   const dlc = new Date(now);
   if (typeCookies === 'crus') {
     dlc.setMonth(now.getMonth() + 3);
