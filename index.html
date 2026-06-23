@@ -1158,29 +1158,41 @@
       </div>
 
       <!-- Type de cookies B2B -->
-      <div id="type-cookies-section" style="display:none;margin-bottom:13px">
-        <div style="background:#f7f8fa;border-radius:10px;padding:13px 16px;border:1.5px solid #e8e8e8">
-          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-            🍪 Type de cookies livrés
+<div id="type-cookies-section" style="display:none;margin-bottom:13px">
+  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
+    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px">
+      🕐 Type de livraison · DLC
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <label id="label-cuits" style="padding:14px 16px;cursor:pointer;border-right:0.5px solid #e8e8e8;background:#fbe8e2;border-bottom:2px solid #d44218">
+        <input type="radio" name="type-cookies" value="cuits" id="cookies-cuits" onchange="updateTypeCookies()" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div id="dot-cuits" style="width:14px;height:14px;border-radius:50%;border:2px solid #d44218;background:#d44218;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="width:5px;height:5px;border-radius:50%;background:#fff"></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <label id="label-cuits" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:9px;border:1.5px solid #e8e8e8;background:#fff">
-              <input type="radio" name="type-cookies" value="cuits" id="cookies-cuits" onchange="updateTypeCookies()" style="accent-color:#d44218;width:15px;height:15px">
-              <div>
-                <div style="font-size:13px;font-weight:700">🔥 Cookies cuits</div>
-                <div style="font-size:11px;color:#888">DLC : livraison + 4 jours</div>
-              </div>
-            </label>
-            <label id="label-crus" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:9px;border:1.5px solid #e8e8e8;background:#fff">
-              <input type="radio" name="type-cookies" value="crus" id="cookies-crus" onchange="updateTypeCookies()" style="accent-color:#0662aa;width:15px;height:15px">
-              <div>
-                <div style="font-size:13px;font-weight:700">❄️ Cookies crus</div>
-                <div style="font-size:11px;color:#888">DLC : livraison + 3 mois</div>
-              </div>
-            </label>
-          </div>
+          <span style="font-size:13px;font-weight:700;color:#712b13">🔥 Cookies cuits</span>
         </div>
-      </div>
+        <div style="padding:8px 10px;background:#fff;border-radius:9px;text-align:center">
+          <div style="font-size:10px;color:#993c1d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">DLC</div>
+          <div id="dlc-cuits-display" style="font-size:15px;font-weight:700;color:#712b13">—</div>
+          <div style="font-size:10px;color:#b85d3a;margin-top:1px">+ 4 jours</div>
+        </div>
+      </label>
+      <label id="label-crus" style="padding:14px 16px;cursor:pointer">
+        <input type="radio" name="type-cookies" value="crus" id="cookies-crus" onchange="updateTypeCookies()" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div id="dot-crus" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:13px;font-weight:700;color:#1a1a2e">❄️ Cookies crus</span>
+        </div>
+        <div style="padding:8px 10px;background:#f7f8fa;border-radius:9px;text-align:center">
+          <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">DLC</div>
+          <div id="dlc-crus-display" style="font-size:15px;font-weight:700;color:#aaa">—</div>
+          <div style="font-size:10px;color:#aaa;margin-top:1px">+ 3 mois</div>
+        </div>
+      </label>
+    </div>
+  </div>
+</div>
       
       <!-- Saveurs multiples -->
       <div style="margin-bottom:13px">
@@ -2776,10 +2788,34 @@ function toggleDestination() {
 
   function updateTypeCookies() {
   const val = document.querySelector('input[name="type-cookies"]:checked')?.value;
-  document.getElementById('label-cuits').style.borderColor = val === 'cuits' ? '#d44218' : '#e8e8e8';
-  document.getElementById('label-cuits').style.background  = val === 'cuits' ? '#fbe8e2' : '#fff';
-  document.getElementById('label-crus').style.borderColor  = val === 'crus'  ? '#0662aa' : '#e8e8e8';
-  document.getElementById('label-crus').style.background   = val === 'crus'  ? '#e0edf8' : '#fff';
+  const now = new Date();
+
+  const lc = document.getElementById('label-cuits');
+  const lr = document.getElementById('label-crus');
+  const dc = document.getElementById('dot-cuits');
+  const dr = document.getElementById('dot-crus');
+  const dlcC = document.getElementById('dlc-cuits-display');
+  const dlcR = document.getElementById('dlc-crus-display');
+
+  if (val === 'cuits') {
+    lc.style.background = '#fbe8e2'; lc.style.borderBottom = '2px solid #d44218';
+    lr.style.background = '#fff'; lr.style.borderBottom = 'none';
+    dc.style.background = '#d44218'; dc.style.borderColor = '#d44218';
+    dr.style.background = 'transparent'; dr.style.borderColor = '#e8e8e8';
+    const d = new Date(now); d.setDate(now.getDate()+4);
+    dlcC.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    dlcC.style.color = '#712b13';
+    dlcR.textContent = '—'; dlcR.style.color = '#aaa';
+  } else if (val === 'crus') {
+    lr.style.background = '#e6f1fb'; lr.style.borderBottom = '2px solid #185fa5';
+    lc.style.background = '#fff'; lc.style.borderBottom = 'none';
+    dr.style.background = '#185fa5'; dr.style.borderColor = '#185fa5';
+    dc.style.background = 'transparent'; dc.style.borderColor = '#e8e8e8';
+    const d = new Date(now); d.setMonth(now.getMonth()+3);
+    dlcR.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    dlcR.style.color = '#0c447c';
+    dlcC.textContent = '—'; dlcC.style.color = '#aaa';
+  }
 }
 
 function toggleBoitesOpt() {
