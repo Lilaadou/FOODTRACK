@@ -3049,9 +3049,9 @@ ${content}
   win.document.close();
 }
 
-  function imprimerEtiquettesLot(lots, client) {
+  function imprimerEtiquettesLot(lots, client, typeCookiesParam) {
   const now = new Date();
-  const typeCookies = _typeCookies || document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+  const typeCookies = typeCookiesParam || document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
   const dlc = new Date(now);
   if (typeCookies === 'crus') {
     dlc.setMonth(now.getMonth() + 3);
@@ -5739,7 +5739,7 @@ async function reimprimerBL(numeroBL) {
   const bl = blData.find(b => b.numeroBL === numeroBL);
   if (!bl) return;
   const lots = bl.lots.map(l => ({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small }));
-  imprimerEtiquettesLot(lots, bl.client);
+  imprimerEtiquettesLot(lots, bl.client, bl.typeCookies || 'cuits');
 }
   
 function addAlerteManquant(codePremix, manquants, producteur) {
