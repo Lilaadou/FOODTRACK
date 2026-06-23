@@ -2263,14 +2263,18 @@ function fillClientInfo() {
   const name = document.getElementById('sortie-b2b-client').value;
   const info = B2B_CLIENTS[name];
   const preview = document.getElementById('b2b-client-preview');
+  const nom = document.getElementById('b2b-client-nom');
+  const adresse = document.querySelector('#b2b-client-adresse-preview span');
+  const contact = document.querySelectorAll('#b2b-client-contact-preview span');
+
   if (info && name) {
-    document.getElementById('b2b-client-nom').textContent = name;
-    document.querySelectorAll('#b2b-client-adresse-preview span')[0].textContent = info.adresse;
-    document.querySelectorAll('#b2b-client-contact-preview span')[0].textContent = info.contact;
-    document.querySelectorAll('#b2b-client-contact-preview span')[1].textContent = info.tel;
-    preview.style.display = 'block';
+    if (nom) nom.textContent = name;
+    if (adresse) adresse.textContent = info.adresse;
+    if (contact[0]) contact[0].textContent = info.contact;
+    if (contact[1]) contact[1].textContent = info.tel;
+    if (preview) preview.style.display = 'block';
   } else {
-    preview.style.display = 'none';
+    if (preview) preview.style.display = 'none';
   }
 }
 
