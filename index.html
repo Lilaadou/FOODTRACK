@@ -2856,7 +2856,8 @@ function getAllSaveursLots() {
 function toggleDestination() {
   const type = document.getElementById('sortie-type').value;
   document.getElementById('b2b-client-group').style.display      = type === 'b2b'   ? '' : 'none';
-  document.getElementById('autre-dest-group').style.display      = type === 'autre' ? '' : 'none';
+  const autreGroup = document.getElementById('autre-dest-group');
+  if (autreGroup) autreGroup.style.display = type === 'autre' ? '' : 'none';
   document.getElementById('boites-section-b2b').style.display    = type === 'b2b'   ? '' : 'none';
   document.getElementById('boites-section-opt').style.display    = (type === 'evenement' || type === 'interne') ? '' : 'none';
   document.getElementById('boites-section-ixelles').style.display= (type === 'magasin' || type === 'anderlecht') ? '' : 'none';
