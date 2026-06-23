@@ -3114,7 +3114,7 @@ ${content}
   win.document.close();
 }
 
-function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique', livreur, numeroBL }) {
+function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique', livreur, numeroBL, typeCookies: _typeCookies }) {
   window.currentBonLots = lots;
   window.currentBonClient = client;
   console.log('lots reçus:', lots);
@@ -3185,7 +3185,7 @@ function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique',
 
   document.getElementById('bon-overlay').style.display = 'flex';
 
-const typeCookies = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+const typeCookies = _typeCookies || document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
 const dlcJours = typeCookies === 'crus' ? 90 : 4;
 const dlcDate = new Date();
 dlcDate.setDate(dlcDate.getDate() + dlcJours);
@@ -3263,27 +3263,28 @@ async function saveSortie() {
     const json = await res.json();
 
     if (json.success) {
-      // Sauvegarder dans BonsDeLivraison si B2B
-      if (type === 'b2b' && numeroBL) {
-        fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
-          action: 'sauverBL',
-          numeroBL,
-          client: destination,
-          lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
-          boites,
-          sortiPar: livreur
-        })}).catch(() => {});
-        const typeCookiesSave = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
-blData.unshift({
-  numeroBL,
-  date: new Date().toISOString(),
-  client: destination,
-  lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
-  boites,
-  sortiPar: livreur,
-  typeCookies: typeCookiesSave
-});
-      }
+  // Sauvegarder dans BonsDeLivraison si B2B
+  const typeCookiesSave = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+  if (type === 'b2b' && numeroBL) {
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+      action: 'sauverBL',
+      numeroBL,
+      client: destination,
+      lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
+      boites,
+      sortiPar: livreur,
+      typeCookies: typeCookiesSave
+    })}).catch(() => {});
+    blData.unshift({
+      numeroBL,
+      date: new Date().toISOString(),
+      client: destination,
+      lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
+      boites,
+      sortiPar: livreur,
+      typeCookies: typeCookiesSave
+    });
+  }
 
       const now     = new Date();
       const time    = now.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
@@ -3341,7 +3342,7 @@ blData.unshift({
       toast('sortie','✓ Sortie enregistrée !','ok');
       // Bon de livraison avec tous les lots
       if (type !== 'magasin' && type !== 'anderlecht') {
-        showBonLivraison({ client: destination, saveur: allSaveur, lots: allLotsAvecSaveur, boites, typeBoite, livreur, numeroBL });
+        showBonLivraison({ client: destination, saveur: allSaveur, lots: allLotsAvecSaveur, boites, typeBoite, livreur, numeroBL, typeCookies: typeCookiesSave });
       }
       resetSortie();
     } else {
@@ -5731,13 +5732,8 @@ async function reimprimerBL(numeroBL) {
   const bl = blData.find(b => b.numeroBL === numeroBL);
   if (!bl) return;
   const livreur = bl.sortiPar || '—';
-  const typeCookies = bl.typeCookies || 'cuits';
-  // Forcer le radio au bon état pour que showBonLivraison et imprimerEtiquettesLot lisent correctement
-  document.querySelectorAll('input[name="type-cookies"]').forEach(r => {
-    r.checked = r.value === typeCookies;
-  });
   const allLotsAvecSaveur = bl.lots.map(l => ({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small }));
-  showBonLivraison({ client: bl.client, saveur: bl.lots.map(l => l.saveur).join(', '), lots: allLotsAvecSaveur, boites: bl.boites || 0, typeBoite: 'plastique', livreur });
+  showBonLivraison({ client: bl.client, saveur: bl.lots.map(l => l.saveur).join(', '), lots: allLotsAvecSaveur, boites: bl.boites || 0, typeBoite: 'plastique', livreur, typeCookies: bl.typeCookies || 'cuits' });
 }
   function reimprimerEtiquettes(numeroBL) {
   const bl = blData.find(b => b.numeroBL === numeroBL);
