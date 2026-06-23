@@ -3055,6 +3055,7 @@ function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique',
   document.getElementById('bon-overlay').style.display = 'flex';
 
 const typeCookies = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+console.log('typeCookies détecté:', typeCookies);
 const dlcJours = typeCookies === 'crus' ? 90 : 4;
 const dlcDate = new Date();
 dlcDate.setDate(dlcDate.getDate() + dlcJours);
