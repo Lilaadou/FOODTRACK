@@ -1157,6 +1157,31 @@
         </div>
       </div>
 
+      <!-- Type de cookies B2B -->
+      <div id="type-cookies-section" style="display:none;margin-bottom:13px">
+        <div style="background:#f7f8fa;border-radius:10px;padding:13px 16px;border:1.5px solid #e8e8e8">
+          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+            🍪 Type de cookies livrés
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <label id="label-cuits" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:9px;border:1.5px solid #e8e8e8;background:#fff">
+              <input type="radio" name="type-cookies" value="cuits" id="cookies-cuits" onchange="updateTypeCookies()" style="accent-color:#d44218;width:15px;height:15px">
+              <div>
+                <div style="font-size:13px;font-weight:700">🔥 Cookies cuits</div>
+                <div style="font-size:11px;color:#888">DLC : livraison + 4 jours</div>
+              </div>
+            </label>
+            <label id="label-crus" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:9px;border:1.5px solid #e8e8e8;background:#fff">
+              <input type="radio" name="type-cookies" value="crus" id="cookies-crus" onchange="updateTypeCookies()" style="accent-color:#0662aa;width:15px;height:15px">
+              <div>
+                <div style="font-size:13px;font-weight:700">❄️ Cookies crus</div>
+                <div style="font-size:11px;color:#888">DLC : livraison + 14 jours</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+      
       <!-- Saveurs multiples -->
       <div style="margin-bottom:13px">
         <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Saveurs & lots à sortir *</label>
@@ -2741,6 +2766,20 @@ function toggleDestination() {
   if (tog) { tog.checked = false; document.getElementById('boites-opt-detail').style.display = 'none'; }
   // Recalculer si Ixelles
   if (type === 'magasin' || type === 'anderlecht') calcBoites();
+  // Type de cookies — visible uniquement en B2B
+  const typeCookiesSection = document.getElementById('type-cookies-section');
+  if (typeCookiesSection) {
+    typeCookiesSection.style.display = type === 'b2b' ? '' : 'none';
+    if (type !== 'b2b') document.querySelectorAll('input[name="type-cookies"]').forEach(r => r.checked = false);
+  }
+}
+
+  function updateTypeCookies() {
+  const val = document.querySelector('input[name="type-cookies"]:checked')?.value;
+  document.getElementById('label-cuits').style.borderColor = val === 'cuits' ? '#d44218' : '#e8e8e8';
+  document.getElementById('label-cuis').style.background   = val === 'cuits' ? '#fbe8e2' : '#fff';
+  document.getElementById('label-crus').style.borderColor  = val === 'crus'  ? '#0662aa' : '#e8e8e8';
+  document.getElementById('label-crus').style.background   = val === 'crus'  ? '#e0edf8' : '#fff';
 }
 
 function toggleBoitesOpt() {
