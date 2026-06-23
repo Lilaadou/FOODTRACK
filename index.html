@@ -2820,20 +2820,34 @@ function updateBoitesIxelles() {
 }
 
 function getAllSaveursLots() {
-  // Collecte toutes les saveurs et lots saisis dans tous les blocs
   const result = [];
+  const type = document.getElementById('sortie-type')?.value || '';
+  const isIxelles = type === 'magasin';
+
   document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
     const bId = block.id.replace('saveur-block-', '');
     const saveur = document.getElementById('saveur-sel-' + bId)?.value;
     if (!saveur) return;
+    const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
+
     const lots = stockLocal
       .filter(l => l.saveur === saveur)
-      .map(l => ({
-        code:  l.code,
-        big:   parseInt(document.getElementById(`b${bId}-big-${l.code}`)?.value)   || 0,
-        small: parseInt(document.getElementById(`b${bId}-small-${l.code}`)?.value) || 0,
-      }))
+      .map(l => {
+        if (isIxelles) {
+          const safeCode = l.code.replace(/-/g, '_');
+          const nbBacs = parseInt(document.getElementById('bac-ix-' + bId + '-' + safeCode)?.textContent) || 0;
+          return { code: l.code, saveur, big: nbBacs * cpb, small: 0 };
+        } else {
+          return {
+            code: l.code,
+            saveur,
+            big:   parseInt(document.getElementById(`b${bId}-big-${l.code}`)?.value)   || 0,
+            small: parseInt(document.getElementById(`b${bId}-small-${l.code}`)?.value) || 0,
+          };
+        }
+      })
       .filter(l => l.big > 0 || l.small > 0);
+
     if (lots.length) result.push({ saveur, lots });
   });
   return result;
