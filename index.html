@@ -1962,8 +1962,7 @@ const PROFILES = {
   Anderlecht:{ color:'#0662aa', initial:'AN', role:'Magasin Anderlecht', pages: ANDERLECHT_PAGES },
 };
 
-const titles  = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B' }; 
-
+const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'ixelles-livraisons':'Livraisons Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder',
@@ -4999,7 +4998,7 @@ async function confirmerResoudre() {
 
   // Sauvegarder dans Google Sheets
   fetch(API, { method: 'POST', redirect: 'follow', body: JSON.stringify({
-  action: 'supprimerProduction', code: code, big: prod?.big || 0, small: prod?.small || 0
+  action: 'resoudrePremix', codePremix: codePremix
 })}).catch(() => {});
 
   // Enregistrer le nouveau BL dans Réception si fourni
