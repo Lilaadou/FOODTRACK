@@ -2828,17 +2828,19 @@ function toggleDestination() {
   document.getElementById('boites-section-b2b').style.display    = type === 'b2b'   ? '' : 'none';
   document.getElementById('boites-section-opt').style.display    = (type === 'evenement' || type === 'interne') ? '' : 'none';
   document.getElementById('boites-section-ixelles').style.display= (type === 'magasin' || type === 'anderlecht') ? '' : 'none';
-  // Reset option boîtes
   const tog = document.getElementById('boites-opt-toggle');
   if (tog) { tog.checked = false; document.getElementById('boites-opt-detail').style.display = 'none'; }
-  // Recalculer si Ixelles
   if (type === 'magasin' || type === 'anderlecht') calcBoites();
-  // Type de cookies — visible uniquement en B2B
   const typeCookiesSection = document.getElementById('type-cookies-section');
   if (typeCookiesSection) {
     typeCookiesSection.style.display = type === 'b2b' ? '' : 'none';
     if (type !== 'b2b') document.querySelectorAll('input[name="type-cookies"]').forEach(r => r.checked = false);
   }
+  document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
+    const bId = block.id.replace('saveur-block-', '');
+    const saveur = document.getElementById('saveur-sel-' + bId)?.value;
+    if (saveur) loadLotsBlock(bId);
+  });
 }
 
   function updateTypeCookies() {
