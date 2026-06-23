@@ -1005,14 +1005,6 @@
   </div>
 </div>
 
-    function imprimerEtiquettesProductionFormulaire() {
-  const saveur = document.getElementById('prod-saveur')?.value;
-  const code = document.getElementById('prod-code')?.value;
-  const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
-  const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
-  if (!saveur || !code) { toast('prod', '⚠️ Remplis la saveur et le code lot d\'abord', 'err'); return; }
-  imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
-}
 
     <!-- Calendrier de production conseillé -->
     <div class="card" style="margin-bottom:18px">
@@ -7891,6 +7883,76 @@ function showLoginScreen() {
   document.getElementById('login-screen').style.display = 'flex';
 }
 
+  function imprimerEtiquettesProduction(code, saveur, date, bacsSimple, bacsDouble) {
+  const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
+  const cpbDouble = cpb * 2;
+  const now = new Date(date || new Date());
+  const dlc = new Date(now);
+  dlc.setMonth(dlc.getMonth() + 4);
+  const fmtDate = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  const etiquetteHTML = (type) => {
+    const isDouble = type === 'double';
+    const couleur = isDouble ? '#d44218' : '#0662aa';
+    const bgCouleur = isDouble ? '#fbe8e2' : '#e6f1fb';
+    const borderCouleur = isDouble ? '#f5cbb8' : '#b5d4f4';
+    const cookiesParBac = isDouble ? cpbDouble : cpb;
+    return `<div style="width:480px;height:247px;border:2px solid #1a1a2e;border-radius:12px;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#fff;display:flex;flex-direction:column;page-break-inside:avoid;margin-bottom:20px">
+      <div style="padding:10px;text-align:center;border-bottom:0.5px solid #f0f0f0;background:#fff;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <img src="https://lilaadou.github.io/FOODTRACK/logo.png" alt="Kooki" style="height:44px;object-fit:contain">
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;background:${bgCouleur};border-bottom:0.5px solid ${borderCouleur};border-top:0.5px solid ${borderCouleur}">
+        <div style="font-size:52px;font-weight:700;color:${couleur};letter-spacing:.05em">${saveur}</div>
+      </div>
+      <div style="height:72px;flex-shrink:0;display:flex;align-items:center;padding:0 16px;justify-content:space-between">
+        <div>
+          <div style="font-size:9px;color:#aaa;margin-bottom:2px">Lot</div>
+          <div style="font-family:monospace;font-size:12px;font-weight:600;color:#1a1a2e">${code}</div>
+          <div style="font-size:10px;color:${couleur};font-weight:600;margin-top:2px">${cookiesParBac} cookies / bac</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="text-align:right">
+            <div style="font-size:9px;color:#aaa">Production</div>
+            <div style="font-size:11px;font-weight:600;color:#1a1a2e">${fmtDate(now)}</div>
+          </div>
+          <div style="background:#fbe8e2;border-radius:6px;padding:5px 10px;border-left:3px solid #d44218">
+            <div style="font-size:8px;color:#993c1d">DLC max · +4 mois</div>
+            <div style="font-size:13px;font-weight:700;color:#d44218">${fmtDate(dlc)}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  };
+
+  let contenu = '';
+  for (let i = 0; i < (bacsSimple || 0); i++) contenu += etiquetteHTML('simple');
+  for (let i = 0; i < (bacsDouble || 0); i++) contenu += etiquetteHTML('double');
+
+  if (!contenu) { alert('Aucun bac à imprimer (0 bac simple et 0 bac double)'); return; }
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Étiquettes — ${saveur}</title>
+    <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Segoe UI',sans-serif;background:#fff;padding:10mm;}@media print{body{padding:5mm;}@page{margin:5mm;}button{display:none;}}</style>
+  </head><body>
+    <div style="margin-bottom:8mm;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:14px;font-weight:700;color:#1a1a2e">Étiquettes — ${saveur} · ${code}</div>
+      <button onclick="window.print()" style="padding:6px 14px;background:#d44218;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">🖨️ Imprimer</button>
+    </div>
+    ${contenu}
+  </body></html>`);
+  win.document.close();
+}
+
+function imprimerEtiquettesProductionFormulaire() {
+  const saveur = document.getElementById('prod-saveur')?.value;
+  const code = document.getElementById('prod-code')?.value;
+  const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
+  const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
+  if (!saveur || !code) { toast('prod', '⚠️ Remplis la saveur et le code lot d\'abord', 'err'); return; }
+  imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
+}
+  
 addSaveurBlock();
 selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
