@@ -2864,6 +2864,7 @@ function toggleDestination() {
   if (tog) { tog.checked = false; document.getElementById('boites-opt-detail').style.display = 'none'; }
   if (type === 'magasin' || type === 'anderlecht') calcBoites();
   const typeCookiesSection = document.getElementById('type-cookies-section');
+  console.log('type:', type, 'section trouvée:', !!typeCookiesSection);
   if (typeCookiesSection) {
     typeCookiesSection.style.display = type === 'b2b' ? '' : 'none';
     if (type !== 'b2b') document.querySelectorAll('input[name="type-cookies"]').forEach(r => r.checked = false);
