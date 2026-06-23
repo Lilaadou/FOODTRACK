@@ -3020,6 +3020,13 @@ function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique',
   }
 
   document.getElementById('bon-overlay').style.display = 'flex';
+
+// DLC = date livraison + 4 jours
+const dlcDate = new Date();
+dlcDate.setDate(dlcDate.getDate() + 4);
+const dlcStr = dlcDate.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+const dlcEl = document.getElementById('bon-dlc');
+if (dlcEl) dlcEl.textContent = dlcStr;
 }
 
 // Stock local (depuis getStock) — utilisé pour afficher les lots par saveur
