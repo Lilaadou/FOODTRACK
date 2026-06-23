@@ -585,6 +585,7 @@
   <button class="bottom-nav-item" onclick="showPage('ixelles',this);closeSidebar()">
   <span class="bn-icon">🏪</span>Ixelles
   </button>
+  <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
 </div>
 
 <!-- SIDEBAR -->
@@ -1893,7 +1894,21 @@
   </div>
 </div>
 
-  
+  <!-- ══════════════════ LIVRAISONS IXELLES ══════════════════ -->
+<div id="page-ixelles-livraisons" class="page">
+  <div class="card">
+    <div class="card-header" style="flex-wrap:wrap;gap:8px">
+      <div>
+        <div class="card-title">🏪 Historique livraisons Kooki Ixelles</div>
+        <div class="card-sub">Toutes les sorties frigo vers Magasin Ixelles</div>
+      </div>
+      <button class="btn btn-secondary" onclick="loadIxellesLivraisons()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
+    </div>
+    <div id="ixelles-livraisons-content">
+      <div class="empty">Chargement…</div>
+    </div>
+  </div>
+</div>
 
   <!-- ══════════════════ ALERTES ══════════════════ -->
   <div id="page-alertes" class="page">
@@ -1924,7 +1939,7 @@ const API = 'https://script.google.com/macros/s/AKfycby6mYPkatV1kGaGyhR_TNnjY5B3
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles'];
 const ANDERLECHT_PAGES = ['frigo'];
-const ALL_PAGES = ['dashboard','premix','production','stock','ingredients','frigo','frigoLive','ixelles','reception','factures','alertes','parametres','bl'];
+const ALL_PAGES = ['dashboard','premix','production','stock','ingredients','frigo','frigoLive','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons'];
 const PROD_PAGES = ['premix','production','stock','ingredients','frigo','frigoLive','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
@@ -7890,6 +7905,66 @@ const SAVEUR_CPB_DOUBLE = { SUZZY:90,JACKY:80,EMMY:80,BENNY:80,MOLLY:90,DAVY:90,
 window.flSelIx = [];
 window.flAndData = {};
 
+  function loadIxellesLivraisons() {
+  const container = document.getElementById('ixelles-livraisons-content');
+  if (!container) return;
+
+  const sorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]')
+    .filter(s => s.destination === 'Magasin Ixelles' && !s.annule);
+
+  if (!sorties.length) {
+    container.innerHTML = '<div class="empty">Aucune livraison enregistrée pour Ixelles.</div>';
+    return;
+  }
+
+  // Grouper par idGroupe
+  const groupes = {};
+  sorties.forEach(s => {
+    const key = s.idGroupe || (s.date + '_' + s.destination);
+    if (!groupes[key]) groupes[key] = { date: s.date, lots: [], producteur: s.producteur };
+    groupes[key].lots.push({ saveur: s.saveur, lot: s.lot, big: s.big });
+  });
+
+  let dernierJour = null;
+  let html = '';
+
+  Object.values(groupes)
+    .sort((a,b) => new Date(b.date) - new Date(a.date))
+    .forEach(g => {
+      const jourStr = new Date(g.date).toDateString();
+      if (jourStr !== dernierJour) {
+        dernierJour = jourStr;
+        const label = new Date(g.date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+        html += `<div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;padding:10px 0 6px;border-bottom:2px solid #f0f0f0;margin-bottom:10px">📅 ${label}</div>`;
+      }
+
+      const totalCookies = g.lots.reduce((s,l) => s + (l.big||0), 0);
+      const lotsHTML = g.lots.map(l =>
+        `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5">
+          <div>
+            <span class="tag tag-o">${l.saveur}</span>
+            <span style="font-size:11px;color:#888;margin-left:8px">${l.lot}</span>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:#1a7a3a">${l.big} cookies</span>
+        </div>`
+      ).join('');
+
+      const heure = new Date(g.date).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      html += `<div style="background:#f9f9f9;border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid #f0f0f0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:13px;font-weight:700">🏪 Magasin Ixelles · ${heure}</div>
+            <div style="font-size:11px;color:#888;margin-top:2px">Sorti par ${g.producteur || '—'}</div>
+          </div>
+          <span style="background:#e8f8f0;color:#1a7a3a;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700">${totalCookies} cookies</span>
+        </div>
+        ${lotsHTML}
+      </div>`;
+    });
+
+  container.innerHTML = html;
+}
+  
 function loadFrigoLive() {
   const now = new Date();
   const hm = now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
