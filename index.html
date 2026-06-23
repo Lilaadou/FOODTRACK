@@ -1085,8 +1085,7 @@
     <!-- Formulaire sortie frigo -->
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
-      <div class="form-grid fg-3">
-        <div></div>
+      <div class="form-grid fg-2">
         <div class="form-group">
           <label>Type de destination *</label>
           <select id="sortie-type" onchange="toggleDestination()">
@@ -2263,18 +2262,17 @@ function fillClientInfo() {
   const name = document.getElementById('sortie-b2b-client').value;
   const info = B2B_CLIENTS[name];
   const preview = document.getElementById('b2b-client-preview');
-  const nom = document.getElementById('b2b-client-nom');
-  const adresse = document.querySelector('#b2b-client-adresse-preview span');
-  const contact = document.querySelectorAll('#b2b-client-contact-preview span');
+  if (!preview) return;
 
   if (info && name) {
-    if (nom) nom.textContent = name;
-    if (adresse) adresse.textContent = info.adresse;
-    if (contact[0]) contact[0].textContent = info.contact;
-    if (contact[1]) contact[1].textContent = info.tel;
-    if (preview) preview.style.display = 'block';
+    document.getElementById('b2b-client-nom').textContent = name;
+    document.querySelector('#b2b-client-adresse-preview span').textContent = info.adresse;
+    const contactSpans = document.querySelectorAll('#b2b-client-contact-preview span');
+    if (contactSpans[0]) contactSpans[0].textContent = info.contact;
+    if (contactSpans[1]) contactSpans[1].textContent = info.tel;
+    preview.style.display = 'block';
   } else {
-    if (preview) preview.style.display = 'none';
+    preview.style.display = 'none';
   }
 }
 
