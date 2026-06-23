@@ -3273,14 +3273,16 @@ async function saveSortie() {
           boites,
           sortiPar: livreur
         })}).catch(() => {});
-        blData.unshift({
-          numeroBL,
-          date: new Date().toISOString(),
-          client: destination,
-          lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
-          boites,
-          sortiPar: livreur
-        });
+        const typeCookiesSave = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+blData.unshift({
+  numeroBL,
+  date: new Date().toISOString(),
+  client: destination,
+  lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
+  boites,
+  sortiPar: livreur,
+  typeCookies: typeCookiesSave
+});
       }
 
       const now     = new Date();
@@ -5729,6 +5731,11 @@ async function reimprimerBL(numeroBL) {
   const bl = blData.find(b => b.numeroBL === numeroBL);
   if (!bl) return;
   const livreur = bl.sortiPar || '—';
+  const typeCookies = bl.typeCookies || 'cuits';
+  // Forcer le radio au bon état pour que showBonLivraison et imprimerEtiquettesLot lisent correctement
+  document.querySelectorAll('input[name="type-cookies"]').forEach(r => {
+    r.checked = r.value === typeCookies;
+  });
   const allLotsAvecSaveur = bl.lots.map(l => ({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small }));
   showBonLivraison({ client: bl.client, saveur: bl.lots.map(l => l.saveur).join(', '), lots: allLotsAvecSaveur, boites: bl.boites || 0, typeBoite: 'plastique', livreur });
 }
