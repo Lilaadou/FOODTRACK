@@ -977,10 +977,11 @@
         </div>
       </div>
       <div class="form-footer">
-        <button class="btn btn-primary" onclick="saveProduction()">💾 Enregistrer</button>
-        <button class="btn btn-secondary" onclick="resetProd()">↺ Réinitialiser</button>
-        <span class="toast" id="toast-prod"></span>
-      </div>
+  <button class="btn btn-primary" onclick="saveProduction()">💾 Enregistrer</button>
+  <button class="btn btn-secondary" onclick="resetProd()">↺ Réinitialiser</button>
+  <button class="btn btn-secondary" onclick="imprimerEtiquettesProductionFormulaire()" style="background:#e0edf8;color:#0662aa">🏷️ Imprimer étiquettes</button>
+  <span class="toast" id="toast-prod"></span>
+</div>
     </div>
     <div class="card" style="margin-bottom:18px">
   <div class="card-header" style="margin-bottom:10px">
@@ -1003,6 +1004,15 @@
     </div>
   </div>
 </div>
+
+    function imprimerEtiquettesProductionFormulaire() {
+  const saveur = document.getElementById('prod-saveur')?.value;
+  const code = document.getElementById('prod-code')?.value;
+  const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
+  const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
+  if (!saveur || !code) { toast('prod', '⚠️ Remplis la saveur et le code lot d\'abord', 'err'); return; }
+  imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
+}
 
     <!-- Calendrier de production conseillé -->
     <div class="card" style="margin-bottom:18px">
@@ -7248,11 +7258,15 @@ function applyProduction(data) {
       <td>${r.small}</td>
       <td class="sub-text">${r.pmx}</td>
       <td>${r.nom}</td>
-      <td><button onclick="supprimerProduction('${r.code}')"
-        style="background:none;border:none;cursor:pointer;font-size:13px;color:#ccc;padding:2px 6px;border-radius:6px"
-        onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
-        onmouseout="this.style.color='#ccc';this.style.background='none'"
-        title="Supprimer">🗑️</button></td>
+      <td style="display:flex;gap:4px">
+  <button onclick="imprimerEtiquettesProduction('${r.code}','${r.saveur}','${r.date}',${r.bacsSimple||0},${r.bacsDouble||0})"
+    style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🏷️</button>
+  <button onclick="supprimerProduction('${r.code}')"
+    style="background:none;border:none;cursor:pointer;font-size:13px;color:#ccc;padding:2px 6px;border-radius:6px"
+    onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
+    onmouseout="this.style.color='#ccc';this.style.background='none'"
+    title="Supprimer">🗑️</button>
+</td>
     </tr>`;
   });
 
