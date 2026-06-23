@@ -2036,8 +2036,9 @@ function showPage(name, btn) {
   if (name === 'production') setTimeout(async () => { loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
   if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
-if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
-if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
+  if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
+  if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
+  if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
   if (name === 'premix') setTimeout(async () => {
   const data = await fetchAPI('getPremix');
   applyPremix(data);
