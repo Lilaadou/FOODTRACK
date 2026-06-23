@@ -3195,6 +3195,8 @@ if (dlcEl) dlcEl.textContent = dlcStr;
 const dlcLabel = document.querySelector('.dlc-subtitle');
 if (dlcLabel) dlcLabel.textContent = typeCookies === 'crus' ? 'Cookies crus · À consommer avant le :' : 'Cookies cuits · À consommer avant le :';
 
+} // fermeture de showBonLivraison
+
 // Stock local (depuis getStock) — utilisé pour afficher les lots par saveur
 let stockLocal = JSON.parse(localStorage.getItem('kooki_stock_local') || '[]');
 
