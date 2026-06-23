@@ -3052,8 +3052,13 @@ ${content}
 
   function imprimerEtiquettesLot(lots, client) {
   const now = new Date();
+  const typeCookies = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
   const dlc = new Date(now);
-  dlc.setDate(now.getDate() + 4);
+  if (typeCookies === 'crus') {
+    dlc.setMonth(now.getMonth() + 3);
+  } else {
+    dlc.setDate(now.getDate() + 4);
+  }
   const fmtDate = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 
   const etiquettes = lots.map(l => {
@@ -3070,7 +3075,7 @@ ${content}
       <div class="etiq-divider"></div>
       <div class="etiq-dates">
         <div class="etiq-date-line">Livraison : ${fmtDate(now)}</div>
-        <div class="etiq-date-line">DLC : <span class="dlc">${fmtDate(dlc)}</span></div>
+        <div class="etiq-date-line">DLC (${typeCookies === 'crus' ? 'crus · +3 mois' : 'cuits · +4 jours'}) : <span class="dlc">${fmtDate(dlc)}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -3182,16 +3187,14 @@ function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique',
   document.getElementById('bon-overlay').style.display = 'flex';
 
 const typeCookies = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
-console.log('typeCookies détecté:', typeCookies);
 const dlcJours = typeCookies === 'crus' ? 90 : 4;
 const dlcDate = new Date();
 dlcDate.setDate(dlcDate.getDate() + dlcJours);
 const dlcStr = dlcDate.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 const dlcEl = document.getElementById('bon-dlc');
 if (dlcEl) dlcEl.textContent = dlcStr;
-const dlcLabel = document.querySelector('#bon-dlc-section .dlc-subtitle');
+const dlcLabel = document.querySelector('.dlc-subtitle');
 if (dlcLabel) dlcLabel.textContent = typeCookies === 'crus' ? 'Cookies crus · À consommer avant le :' : 'Cookies cuits · À consommer avant le :';
-}
 
 // Stock local (depuis getStock) — utilisé pour afficher les lots par saveur
 let stockLocal = JSON.parse(localStorage.getItem('kooki_stock_local') || '[]');
