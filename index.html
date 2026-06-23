@@ -2707,10 +2707,39 @@ function loadLotsBlock(id) {
 
   const lots = stockLocal.filter(l => l.saveur === saveur && (l.big > 0 || l.small > 0));
   const type = document.getElementById('sortie-type')?.value || '';
+  const isIxelles = type === 'magasin';
   const isB2B = type === 'b2b' || type === 'evenement' || type === 'interne';
+  const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
 
   if (!lots.length) {
     container.innerHTML = '<div style="text-align:center;color:#d44218;font-size:12px;padding:10px 0">⚠️ Aucun lot en stock pour cette saveur</div>';
+    return;
+  }
+
+  if (isIxelles) {
+    container.innerHTML = `
+      <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid #efefef;margin-bottom:6px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px">
+        <span>Code lot</span>
+        <span style="text-align:center;color:#1a7a3a">Bacs blancs</span>
+        <span style="text-align:center;color:#888">${cpb} cookies/bac</span>
+      </div>
+      ${lots.map(l => {
+        const maxBacs = Math.floor(l.big / cpb);
+        return `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">
+          <div>
+            <div style="font-weight:600;font-size:12px">${l.code}</div>
+            <div style="font-size:10px;color:#aaa">Stock : ${l.big} Big · max ${maxBacs} bac${maxBacs>1?'s':''}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+            <button onclick="changeBacIx('${id}','${l.code}',-1,${maxBacs},${cpb})"
+              style="width:26px;height:26px;border:1.5px solid #e8e8e8;border-radius:7px;background:#f7f8fa;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+            <span id="bac-ix-${id}-${l.code.replace(/-/g,'_')}" style="font-size:15px;font-weight:700;min-width:18px;text-align:center">0</span>
+            <button onclick="changeBacIx('${id}','${l.code}',1,${maxBacs},${cpb})"
+              style="width:26px;height:26px;border:1.5px solid #e8e8e8;border-radius:7px;background:#f7f8fa;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+          </div>
+          <div style="text-align:center;font-size:12px;color:#1a7a3a;font-weight:700" id="ck-ix-${id}-${l.code.replace(/-/g,'_')}">0 cookies</div>
+        </div>`;
+      }).join('')}`;
     return;
   }
 
@@ -2748,6 +2777,28 @@ function loadLotsBlock(id) {
           </div>` : ''}
         </div>
       </div>`).join('')}`;
+}
+
+  function changeBacIx(blockId, lotCode, delta, max, cpb) {
+  const safeCode = lotCode.replace(/-/g, '_');
+  const el = document.getElementById('bac-ix-' + blockId + '-' + safeCode);
+  const ckEl = document.getElementById('ck-ix-' + blockId + '-' + safeCode);
+  if (!el) return;
+  let val = parseInt(el.textContent) || 0;
+  val = Math.max(0, Math.min(max, val + delta));
+  el.textContent = val;
+  if (ckEl) ckEl.textContent = (val * cpb) + ' cookies';
+  updateBoitesIxelles();
+}
+
+function updateBoitesIxelles() {
+  let total = 0;
+  document.querySelectorAll('[id^="bac-ix-"]').forEach(el => {
+    total += parseInt(el.textContent) || 0;
+  });
+  const elIx = document.getElementById('boites-ixelles-display');
+  if (elIx) elIx.textContent = total;
+  window._boitesIx = total;
 }
 
 function getAllSaveursLots() {
