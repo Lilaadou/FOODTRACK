@@ -1321,7 +1321,7 @@
         <div style="background:#fbe8e2;border:0.5px solid #f5cbb8;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
           <div>
             <div style="font-size:12px;font-weight:700;color:#d44218">📅 Date Limite de Consommation (DLC)</div>
-            <div style="font-size:11px;color:#b85d3a;margin-top:2px">Cookies cuits · À consommer avant le :</div>
+            <div class="dlc-subtitle" style="font-size:11px;color:#b85d3a;margin-top:2px">Cookies cuits · À consommer avant le :</div>
           </div>
           <div id="bon-dlc" style="font-size:22px;font-weight:700;color:#d44218"></div>
         </div>
@@ -3054,12 +3054,15 @@ function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique',
 
   document.getElementById('bon-overlay').style.display = 'flex';
 
-// DLC = date livraison + 4 jours
+const typeCookies = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
+const dlcJours = typeCookies === 'crus' ? 90 : 4;
 const dlcDate = new Date();
-dlcDate.setDate(dlcDate.getDate() + 4);
+dlcDate.setDate(dlcDate.getDate() + dlcJours);
 const dlcStr = dlcDate.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 const dlcEl = document.getElementById('bon-dlc');
 if (dlcEl) dlcEl.textContent = dlcStr;
+const dlcLabel = document.querySelector('#bon-dlc-section .dlc-subtitle');
+if (dlcLabel) dlcLabel.textContent = typeCookies === 'crus' ? 'Cookies crus · À consommer avant le :' : 'Cookies cuits · À consommer avant le :';
 }
 
 // Stock local (depuis getStock) — utilisé pour afficher les lots par saveur
