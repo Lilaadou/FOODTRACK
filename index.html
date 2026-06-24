@@ -3170,7 +3170,11 @@ ${content}
       doc.save('etiquettes-' + client + '.pdf');
     };
   };
-  document.head.appendChild(script);
+  if (document.querySelector('script[src*="jspdf"]')) {
+    script.onload();
+  } else {
+    document.head.appendChild(script);
+  }
 }
 
 function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique', livreur, numeroBL, typeCookies: _typeCookies }) {
