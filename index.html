@@ -3097,12 +3097,28 @@ ${content}
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
   <title>Etiquettes - ${client}</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fff;
-    }
-    .page {
+    <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #fff;
+    width: 148mm;
+    height: 210mm;
+  }
+  .page {
+    width: 148mm;
+    height: 210mm;
+    padding: 22mm 0.5mm;
+    display: grid;
+    grid-template-columns: repeat(3, 49mm);
+    grid-template-rows: repeat(2, 82mm);
+    gap: 5mm 0mm;
+    page-break-after: always;
+  }
       width: 148mm;
       min-height: 210mm;
       padding: 22mm 0.5mm;
