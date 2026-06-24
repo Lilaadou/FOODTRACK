@@ -3125,49 +3125,69 @@ ${content}
       border: none;
       background: transparent;
     }
-    .etiq-logo {
-      height: 18mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-bottom: 0.5px solid #f0f0f0;
-      background: #fff;
-    }
-    .etiq-client {
-      background: #fbe8e2;
-      padding: 2mm 3mm;
-      font-size: 10px;
-      font-weight: 700;
-      color: #d44218;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-      border-bottom: 0.5px solid #f5cbb8;
-      height: 14mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .etiq-saveur {
-      padding: 2mm 3mm;
-      font-size: 18px;
-      font-weight: 700;
-      color: #0662aa;
-      text-align: center;
-      border-bottom: 0.5px solid #f0f0f0;
-      height: 20mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .etiq-bas {
-      flex: 1;
-      padding: 2mm 3mm;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 2mm;
-    }
+    .etiquette {
+  display: flex;
+  flex-direction: row !important;
+}
+.etiq-logo {
+  width: 14mm;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 0.5px solid #f0f0f0;
+  border-bottom: none;
+  background: #fff;
+  flex-shrink: 0;
+}
+.etiq-logo img {
+  width: 10mm;
+  transform: rotate(-90deg);
+}
+.etiq-client {
+  background: #fbe8e2;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 2mm;
+  font-size: 9px;
+  font-weight: 700;
+  color: #d44218;
+  text-align: center;
+  text-transform: uppercase;
+  border-right: 0.5px solid #f5cbb8;
+  border-bottom: none;
+  width: 12mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.etiq-saveur {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 2mm;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0662aa;
+  text-align: center;
+  border-right: 0.5px solid #f0f0f0;
+  border-bottom: none;
+  width: 16mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.etiq-bas {
+  flex: 1;
+  padding: 2mm 3mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2mm;
+}
     .etiq-lot {
       font-family: monospace;
       font-size: 9px;
