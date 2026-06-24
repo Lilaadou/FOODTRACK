@@ -3063,27 +3063,27 @@ ${content}
   const fmtDate = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 
   const etiquetteHTML = (lot) => {
-    const couleurDLC = typeCookies === 'crus' ? '#0662aa' : '#d44218';
-    const bgDLC = typeCookies === 'crus' ? '#e6f1fb' : '#fbe8e2';
-    const borderDLC = typeCookies === 'crus' ? '#0662aa' : '#d44218';
-    const labelDLC = typeCookies === 'crus' ? 'DLC - Crus +3 mois' : 'DLC - Cuits +4 jours';
-    return `
-    <div class="etiquette">
-      <div class="etiq-logo"><img src="https://lilaadou.github.io/FOODTRACK/logo.png" style="height:28px"></div>
+  const couleurDLC = typeCookies === 'crus' ? '#0662aa' : '#d44218';
+  const bgDLC = typeCookies === 'crus' ? '#e6f1fb' : '#fbe8e2';
+  const borderDLC = typeCookies === 'crus' ? '#0662aa' : '#d44218';
+  const labelDLC = typeCookies === 'crus' ? 'DLC - Crus +3 mois' : 'DLC - Cuits +4 jours';
+  return `
+  <div class="etiquette">
+    <div class="inner">
+      <div class="etiq-logo"><img src="https://lilaadou.github.io/FOODTRACK/logo.png" style="height:20px"></div>
       <div class="etiq-client">${client.toUpperCase()}</div>
       <div class="etiq-saveur">${lot.saveur}</div>
       <div class="etiq-bas">
         <div class="etiq-lot">${lot.code}</div>
-        <div class="etiq-dates">
-          <div class="etiq-livraison">Livraison - <strong>${fmtDate(now)}</strong></div>
-          <div class="etiq-dlc" style="background:${bgDLC};border-left:3px solid ${borderDLC}">
-            <div style="font-size:8px;color:${couleurDLC}">${labelDLC}</div>
-            <div style="font-size:14px;font-weight:700;color:${couleurDLC}">${fmtDate(dlcDate)}</div>
-          </div>
+        <div class="etiq-livraison">Livraison - <strong>${fmtDate(now)}</strong></div>
+        <div class="etiq-dlc" style="background:${bgDLC};border-left:3px solid ${borderDLC}">
+          <div style="font-size:6px;color:${couleurDLC}">${labelDLC}</div>
+          <div style="font-size:11px;font-weight:700;color:${couleurDLC}">${fmtDate(dlcDate)}</div>
         </div>
       </div>
-    </div>`;
-  };
+    </div>
+  </div>`;
+};
 
   // Paramètre de départ : cases déjà utilisées sur la feuille
   const depart = parseInt(prompt('Combien de cases sont déjà utilisées sur ta feuille APLI ?\n(0 si feuille neuve)', '0')) || 0;
@@ -3129,95 +3129,79 @@ ${content}
       page-break-after: always;
     }
     .etiquette {
-      width: 49mm;
-      height: 82mm;
-      border: 0.5px solid #ddd;
-      border-radius: 4mm;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .etiquette-vide {
-      border: none;
-      background: transparent;
-    }
-    .etiquette {
-  display: flex;
-  flex-direction: row !important;
-}
-.etiq-logo {
-  width: 14mm;
-  height: 100%;
+  width: 49mm;
+  height: 82mm;
+  border: 0.5px solid #ddd;
+  border-radius: 4mm;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 0.5px solid #f0f0f0;
-  border-bottom: none;
+  position: relative;
+}
+.inner {
+  width: 82mm;
+  height: 49mm;
+  transform: rotate(90deg);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+}
+.etiq-logo {
+  height: 13mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 0.5px solid #f0f0f0;
   background: #fff;
   flex-shrink: 0;
 }
-.etiq-logo img {
-  width: 10mm;
-  transform: rotate(-90deg);
-}
 .etiq-client {
   background: #fbe8e2;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  padding: 2mm;
+  height: 10mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 9px;
   font-weight: 700;
   color: #d44218;
-  text-align: center;
   text-transform: uppercase;
-  border-right: 0.5px solid #f5cbb8;
-  border-bottom: none;
-  width: 12mm;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-bottom: 0.5px solid #f5cbb8;
   flex-shrink: 0;
 }
 .etiq-saveur {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  padding: 2mm;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0662aa;
-  text-align: center;
-  border-right: 0.5px solid #f0f0f0;
-  border-bottom: none;
-  width: 16mm;
+  height: 13mm;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0662aa;
+  border-bottom: 0.5px solid #f0f0f0;
   flex-shrink: 0;
 }
 .etiq-bas {
   flex: 1;
-  padding: 2mm 3mm;
+  padding: 1.5mm 2mm;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2mm;
+  gap: 1mm;
 }
-    .etiq-lot {
-      font-family: monospace;
-      font-size: 9px;
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-    .etiq-livraison {
-      font-size: 8px;
-      color: #888;
-    }
-    .etiq-dlc {
-      border-radius: 3px;
-      padding: 2mm 3mm;
-    }
+.etiq-lot {
+  font-family: monospace;
+  font-size: 7px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+.etiq-livraison {
+  font-size: 6px;
+  color: #888;
+}
+.etiq-dlc {
+  border-radius: 2px;
+  padding: 1mm 2mm;
+}
     @media print {
       body { margin: 0; padding: 0; }
       button { display: none; }
