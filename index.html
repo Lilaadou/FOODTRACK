@@ -3069,17 +3069,15 @@ ${content}
   const labelDLC = typeCookies === 'crus' ? 'DLC - Crus +3 mois' : 'DLC - Cuits +4 jours';
   return `
   <div class="etiquette">
-    <div class="inner">
-      <div class="etiq-logo"><img src="https://lilaadou.github.io/FOODTRACK/logo.png" style="height:20px"></div>
-      <div class="etiq-client">${client.toUpperCase()}</div>
-      <div class="etiq-saveur">${lot.saveur}</div>
-      <div class="etiq-bas">
-        <div class="etiq-lot">${lot.code}</div>
-        <div class="etiq-livraison">Livraison - <strong>${fmtDate(now)}</strong></div>
-        <div class="etiq-dlc" style="background:${bgDLC};border-left:3px solid ${borderDLC}">
-          <div style="font-size:6px;color:${couleurDLC}">${labelDLC}</div>
-          <div style="font-size:11px;font-weight:700;color:${couleurDLC}">${fmtDate(dlcDate)}</div>
-        </div>
+    <div class="etiq-logo"><img src="https://lilaadou.github.io/FOODTRACK/logo.png" style="height:28px"></div>
+    <div class="etiq-client">${client.toUpperCase()}</div>
+    <div class="etiq-saveur">${lot.saveur}</div>
+    <div class="etiq-bas">
+      <div class="etiq-lot">${lot.code}</div>
+      <div class="etiq-livraison">Livraison - <strong>${fmtDate(now)}</strong></div>
+      <div class="etiq-dlc" style="background:${bgDLC};border-left:3px solid ${borderDLC}">
+        <div style="font-size:7px;color:${couleurDLC}">${labelDLC}</div>
+        <div style="font-size:12px;font-weight:700;color:${couleurDLC}">${fmtDate(dlcDate)}</div>
       </div>
     </div>
   </div>`;
@@ -3099,57 +3097,27 @@ ${content}
   <style>
     <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #fff;
-    width: 148mm;
-    height: 210mm;
-  }
-  .page {
-    width: 148mm;
-    height: 210mm;
-    padding: 22mm 0.5mm;
-    display: grid;
-    grid-template-columns: repeat(3, 49mm);
-    grid-template-rows: repeat(2, 82mm);
-    gap: 5mm 0mm;
-    page-break-after: always;
-  }
-      width: 148mm;
-      min-height: 210mm;
-      padding: 22mm 0.5mm;
-      display: grid;
-      grid-template-columns: repeat(3, 49mm);
-      grid-template-rows: repeat(2, 82mm);
-      gap: 5mm 0mm;
-      page-break-after: always;
-    }
-    .etiquette {
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: 'Segoe UI', sans-serif; background: #fff; width: 148mm; }
+.page {
+  width: 148mm;
+  padding: 22mm 0.5mm;
+  display: grid;
+  grid-template-columns: repeat(3, 49mm);
+  grid-template-rows: repeat(2, 82mm);
+  gap: 5mm 0mm;
+}
+.etiquette {
   width: 49mm;
   height: 82mm;
   border: 0.5px solid #ddd;
   border-radius: 4mm;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-.inner {
-  width: 80mm;
-  height: 47mm;
-  transform: rotate(90deg);
-  display: flex;
   flex-direction: column;
-  position: absolute;
-  overflow: hidden;
 }
 .etiq-logo {
-  height: 13mm;
+  height: 16mm;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3159,11 +3127,11 @@ ${content}
 }
 .etiq-client {
   background: #fbe8e2;
-  height: 10mm;
+  height: 12mm;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   color: #d44218;
   text-transform: uppercase;
@@ -3171,11 +3139,11 @@ ${content}
   flex-shrink: 0;
 }
 .etiq-saveur {
-  height: 13mm;
+  height: 18mm;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: #0662aa;
   border-bottom: 0.5px solid #f0f0f0;
@@ -3183,31 +3151,31 @@ ${content}
 }
 .etiq-bas {
   flex: 1;
-  padding: 1.5mm 2mm;
+  padding: 2mm 3mm;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1mm;
+  gap: 1.5mm;
 }
 .etiq-lot {
   font-family: monospace;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 600;
   color: #1a1a2e;
 }
 .etiq-livraison {
-  font-size: 6px;
+  font-size: 7px;
   color: #888;
 }
 .etiq-dlc {
   border-radius: 2px;
-  padding: 1mm 2mm;
+  padding: 1.5mm 2mm;
 }
-    @media print {
-      body { margin: 0; padding: 0; }
-      button { display: none; }
-      @page { size: A5 portrait; margin: 0; }
-    }
+@media print {
+  body { margin: 0; padding: 0; }
+  button { display: none; }
+  @page { size: A5 portrait; margin: 0; }
+}
   </style>
   </head><body>
   <div style="padding:4mm;display:flex;justify-content:space-between;align-items:center">
