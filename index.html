@@ -8200,16 +8200,11 @@ window.addEventListener('resize', () => drawChart(currentChartMode));
       doc.text(client.toUpperCase(), x + etiW / 2, y + 23, { align: 'center' });
 
       // Adresse
-      doc.setTextColor(26, 26, 46);
-      doc.setFont('helvetica', 'normal');
+      doc.setFont('courier', 'normal');
       doc.setFontSize(6.5);
-      doc.text(info.adresse, x + etiW / 2, y + 28, { align: 'center' });
-
-      // Contact
-      doc.text(info.contact, x + etiW / 2, y + 34, { align: 'center' });
-
-      // Tel
-      doc.text(info.tel, x + etiW / 2, y + 40, { align: 'center' });
+      doc.text(info.adresse, x + etiW / 2, y + 30, { align: 'center' });
+      doc.text(info.contact, x + etiW / 2, y + 36, { align: 'center' });
+      doc.text(info.tel, x + etiW / 2, y + 42, { align: 'center' });
 
       // Ligne séparatrice
       doc.setDrawColor(240, 240, 240);
