@@ -7944,6 +7944,7 @@ function showLoginScreen() {
 }
 
   function imprimerEtiquettesProduction(code, saveur, date, bacsSimple, bacsDouble) {
+  console.log('bacs:', bacsSimple, bacsDouble);
   const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
   const cpbDouble = cpb * 2;
   const now = new Date(date || new Date());
