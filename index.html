@@ -8032,7 +8032,12 @@ function showLoginScreen() {
   doc.text(fmtDate(dlc), cx, y + 75, { align: 'center' });
 };
 
-    };
+    let index = depart;
+    for (let i = 0; i < (bacsSimple || 0); i++) { dessinerEtiquette(index, 'simple'); index++; }
+    for (let i = 0; i < (bacsDouble || 0); i++) { dessinerEtiquette(index, 'double'); index++; }
+    if (index === depart) { alert('Aucun bac à imprimer'); return; }
+    doc.save('etiquettes-production-' + saveur + '.pdf');
+  };
   if (document.querySelector('script[src*="jspdf"]')) {
     script.onload();
   } else {
