@@ -3219,10 +3219,11 @@ ${content}
         doc.text(lot.code, x + etiW / 2, y + 53, { align: 'center' });
 
         // Livraison
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(6);
-        doc.setTextColor(150, 150, 150);
-        doc.text('Livraison - ' + fmtDate(now), x + etiW / 2, y + 59, { align: 'center' });
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(6.5);
+        doc.text(info.adresse, x + etiW / 2, y + 30, { align: 'center' });
+        doc.text(info.contact, x + etiW / 2, y + 36, { align: 'center' });
+        doc.text(info.tel, x + etiW / 2, y + 42, { align: 'center' });
 
         // DLC
         doc.setFillColor(bgDLC[0], bgDLC[1], bgDLC[2]);
@@ -8186,17 +8187,17 @@ window.addEventListener('resize', () => drawChart(currentChartMode));
       doc.rect(x, y, etiW, etiH, 'F');
 
       // Logo centré en haut
-      if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 12, y + 3, 24, 7);
+      if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 18, y + 2, 36, 11);
 
       // Ligne séparatrice sous logo
       doc.setDrawColor(240, 240, 240);
-      doc.line(x + 4, y + 12, x + etiW - 4, y + 12);
+      doc.line(x + 4, y + 15, x + etiW - 4, y + 15);
 
       // Nom client en bleu centré
       doc.setTextColor(6, 98, 170);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
-      doc.text(client.toUpperCase(), x + etiW / 2, y + 20, { align: 'center' });
+      doc.text(client.toUpperCase(), x + etiW / 2, y + 23, { align: 'center' });
 
       // Adresse
       doc.setTextColor(26, 26, 46);
