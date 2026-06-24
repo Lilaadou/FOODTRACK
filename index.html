@@ -3072,6 +3072,7 @@ function renderBoitesTable() {
       <td>${retournees}</td>
       <td style="color:${solde > 0 ? '#d44218' : '#0662aa'};font-weight:700">${solde}</td>
       <td><span class="status ${solde > 0 ? 's-warn' : 's-ok'}">${solde > 0 ? solde + ' manquantes' : 'À jour'}</span></td>
+      <td><button onclick="imprimerEtiquettesB2B('${client}')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🏷️</button></td>
     </tr>`;
   }).join('');
 
@@ -8154,6 +8155,85 @@ _logoImg.onload = () => {
 addSaveurBlock();
 selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
+
+  function imprimerEtiquettesB2B(client) {
+  const info = B2B_CLIENTS[client];
+  if (!info) { alert('Client introuvable'); return; }
+
+  const depart = parseInt(prompt('Cases deja utilisees sur la feuille ?\n(0 si feuille neuve)', '0')) || 0;
+
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  script.onload = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
+
+    const marginTop = 1;
+    const marginLeft = 22;
+    const etiW = 82;
+    const etiH = 49;
+    const cols = 2;
+    const logoData = window.LOGO_BASE64;
+
+    const dessinerEtiquetteB2B = (index) => {
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+      const x = marginLeft + col * etiW;
+      const y = marginTop + row * etiH;
+
+      // Fond blanc
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x, y, etiW, etiH, 'F');
+
+      // Logo centré en haut
+      if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 12, y + 3, 24, 7);
+
+      // Ligne séparatrice sous logo
+      doc.setDrawColor(240, 240, 240);
+      doc.line(x + 4, y + 12, x + etiW - 4, y + 12);
+
+      // Nom client en bleu centré
+      doc.setTextColor(6, 98, 170);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(client.toUpperCase(), x + etiW / 2, y + 20, { align: 'center' });
+
+      // Adresse
+      doc.setTextColor(26, 26, 46);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.text(info.adresse, x + etiW / 2, y + 28, { align: 'center' });
+
+      // Contact
+      doc.text(info.contact, x + etiW / 2, y + 34, { align: 'center' });
+
+      // Tel
+      doc.text(info.tel, x + etiW / 2, y + 40, { align: 'center' });
+
+      // Ligne séparatrice
+      doc.setDrawColor(240, 240, 240);
+      doc.line(x + 4, y + 43, x + etiW - 4, y + 43);
+
+      // Mention légale
+      doc.setTextColor(180, 180, 180);
+      doc.setFontSize(5);
+      doc.text('KOOKI COMPANY SRL - BE1015746980', x + etiW / 2, y + 47, { align: 'center' });
+    };
+
+    // Imprimer 6 étiquettes (1 feuille complète)
+    for (let i = 0; i < 6; i++) {
+      dessinerEtiquetteB2B((depart + i) % 6);
+    }
+
+    doc.save('etiquettes-b2b-' + client.replace(/ /g, '-') + '.pdf');
+  };
+
+  if (document.querySelector('script[src*="jspdf"]')) {
+    script.onload();
+  } else {
+    document.head.appendChild(script);
+  }
+}
 
 // ── NAVIGATION MOBILE ──
 function toggleSidebar() {
