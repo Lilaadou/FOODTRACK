@@ -3093,96 +3093,48 @@ ${content}
   lots.forEach(lot => { contenu += etiquetteHTML(lot); });
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>Etiquettes - ${client}</title>
-  <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-body { font-family: 'Segoe UI', sans-serif; background: #fff; width: 148mm; }
+<title>Etiquettes - ${client}</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:148mm; height:210mm; }
+html { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body { font-family:'Segoe UI',sans-serif; background:#fff; }
+.btn { padding:5px 14px;background:#d44218;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:block;margin:4mm auto; }
 .page {
-  width: 148mm;
-  padding: 22mm 0.5mm;
-  display: grid;
-  grid-template-columns: repeat(3, 49mm);
-  grid-template-rows: repeat(2, 82mm);
-  gap: 5mm 0mm;
+  width:148mm;
+  height:210mm;
+  padding:22mm 0.5mm;
+  display:grid;
+  grid-template-columns:repeat(3, 49mm);
+  grid-template-rows:repeat(2, 82mm);
+  gap:5mm 0;
 }
 .etiquette {
-  width: 49mm;
-  height: 82mm;
-  border: 0.5px solid #ddd;
-  border-radius: 4mm;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  width:49mm;
+  height:82mm;
+  border:0.5px solid #ddd;
+  border-radius:4mm;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
-.etiq-logo {
-  height: 16mm;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 0.5px solid #f0f0f0;
-  background: #fff;
-  flex-shrink: 0;
-}
-.etiq-client {
-  background: #fbe8e2;
-  height: 12mm;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  font-weight: 700;
-  color: #d44218;
-  text-transform: uppercase;
-  border-bottom: 0.5px solid #f5cbb8;
-  flex-shrink: 0;
-}
-.etiq-saveur {
-  height: 18mm;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0662aa;
-  border-bottom: 0.5px solid #f0f0f0;
-  flex-shrink: 0;
-}
-.etiq-bas {
-  flex: 1;
-  padding: 2mm 3mm;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.5mm;
-}
-.etiq-lot {
-  font-family: monospace;
-  font-size: 8px;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-.etiq-livraison {
-  font-size: 7px;
-  color: #888;
-}
-.etiq-dlc {
-  border-radius: 2px;
-  padding: 1.5mm 2mm;
-}
+.etiquette-vide { border:none; background:transparent; }
+.etiq-logo { height:16mm;display:flex;align-items:center;justify-content:center;border-bottom:0.5px solid #f0f0f0;background:#fff;flex-shrink:0; }
+.etiq-client { background:#fbe8e2;height:12mm;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#d44218;text-transform:uppercase;border-bottom:0.5px solid #f5cbb8;flex-shrink:0; }
+.etiq-saveur { height:18mm;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#0662aa;border-bottom:0.5px solid #f0f0f0;flex-shrink:0; }
+.etiq-bas { flex:1;padding:2mm 3mm;display:flex;flex-direction:column;justify-content:center;gap:1.5mm; }
+.etiq-lot { font-family:monospace;font-size:8px;font-weight:600;color:#1a1a2e; }
+.etiq-livraison { font-size:7px;color:#888; }
+.etiq-dlc { border-radius:2px;padding:1.5mm 2mm; }
 @media print {
-  body { margin: 0; padding: 0; }
-  button { display: none; }
-  @page { size: A5 portrait; margin: 0; }
+  .btn { display:none; }
+  @page { size:148mm 210mm; margin:0; }
 }
-  </style>
-  </head><body>
-  <div style="padding:4mm;display:flex;justify-content:space-between;align-items:center">
-    <span style="font-size:12px;font-weight:700">Etiquettes - ${client}</span>
-    <button onclick="window.print()" style="padding:5px 14px;background:#d44218;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">Imprimer</button>
-  </div>
-  <div class="page">${contenu}</div>
-  </body></html>`;
+</style>
+</head><body>
+<button class="btn" onclick="window.print()">Imprimer</button>
+<div class="page">${contenu}</div>
+</body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
