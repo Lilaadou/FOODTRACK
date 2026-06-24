@@ -3068,10 +3068,10 @@ ${content}
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   script.onload = () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [148.5, 210] });
 
     const marginTop = 22;
-    const marginLeft = 0.5;
+    const marginLeft = (148.5 - (3 * 49)) / 2;
     const etiW = 49;
     const etiH = 82;
     const gapV = 5;
