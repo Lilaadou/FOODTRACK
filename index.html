@@ -8032,6 +8032,14 @@ function showLoginScreen() {
   doc.text(fmtDate(dlc), cx, y + 75, { align: 'center' });
 };
 
+    };
+  if (document.querySelector('script[src*="jspdf"]')) {
+    script.onload();
+  } else {
+    document.head.appendChild(script);
+  }
+}
+
 function imprimerEtiquettesProductionFormulaire() {
   const saveur = document.getElementById('prod-saveur')?.value;
   const code = document.getElementById('prod-code')?.value;
@@ -8041,7 +8049,7 @@ function imprimerEtiquettesProductionFormulaire() {
   imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
 }
 
-    window.LOGO_BASE64 = null;
+window.LOGO_BASE64 = null;
 const _logoImg = new Image();
 _logoImg.crossOrigin = 'anonymous';
 _logoImg.src = 'logo.png';
