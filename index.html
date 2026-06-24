@@ -8063,12 +8063,12 @@ function showLoginScreen() {
 
   // Partie gauche — logo + cercle
   // Logo
-  if (logoData) doc.addImage(logoData, 'PNG', x + 2, y + 3, 28, 8);
+  if (logoData) doc.addImage(logoData, 'PNG', x + 4, y + 2, 16, 5);
 
   // Cercle coloré avec saveur
   const cercleX = x + 18;
-  const cercleY = y + 28;
-  const rayon = 16;
+  const cercleY = y + 27;
+  const rayon = 13;
   doc.setFillColor(couleur[0], couleur[1], couleur[2]);
   doc.circle(cercleX, cercleY, rayon, 'F');
   doc.setTextColor(255, 255, 255);
