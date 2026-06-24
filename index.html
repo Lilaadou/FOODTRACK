@@ -3141,13 +3141,13 @@ ${content}
         doc.setTextColor(26, 26, 46);
         doc.setFontSize(7);
         doc.setFont('courier', 'bold');
-        doc.text(lot.code, x + 3, y + 53);
+        doc.text(lot.code, x + etiW / 2, y + 53, { align: 'center' });
 
         // Livraison
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(6);
         doc.setTextColor(150, 150, 150);
-        doc.text('Livraison - ' + fmtDate(now), x + 3, y + 59);
+        doc.text('Livraison - ' + fmtDate(now), x + etiW / 2, y + 59, { align: 'center' });
 
         // DLC
         doc.setFillColor(bgDLC[0], bgDLC[1], bgDLC[2]);
@@ -3158,10 +3158,10 @@ ${content}
         doc.setTextColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
         doc.setFontSize(6);
         doc.setFont('helvetica', 'normal');
-        doc.text(labelDLC, x + 5, y + 67);
+        doc.text(labelDLC, x + etiW / 2, y + 67, { align: 'center' });
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.text(fmtDate(dlcDate), x + 5, y + 75);
+        doc.text(fmtDate(dlcDate), x + etiW / 2, y + 75, { align: 'center' });
 
         index++;
       });
