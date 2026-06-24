@@ -7970,85 +7970,78 @@ function showLoginScreen() {
     const logoData = window.LOGO_BASE64;
 
     const dessinerEtiquette = (index, type) => {
-      const isDouble = type === 'double';
-      const couleur = isDouble ? [212, 66, 24] : [6, 98, 170];
-      const bgCouleur = isDouble ? [251, 232, 226] : [230, 241, 251];
-      const cookiesParBac = isDouble ? cpbDouble : cpb;
+  const isDouble = type === 'double';
+  const couleur = isDouble ? [212, 66, 24] : [6, 98, 170];
+  const bgCouleur = isDouble ? [251, 232, 226] : [230, 241, 251];
+  const cookiesParBac = isDouble ? cpbDouble : cpb;
 
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      const x = marginLeft + col * etiW;
-      const y = marginTop + row * (etiH + gapV);
+  const col = index % cols;
+  const row = Math.floor(index / cols);
+  const x = marginLeft + col * etiW;
+  const y = marginTop + row * (etiH + gapV);
 
-      // Logo
-      doc.setFillColor(255, 255, 255);
-      doc.rect(x, y, etiW, 16, 'F');
-      if (logoData) doc.addImage(logoData, 'PNG', x + 12, y + 4, 25, 7);
+  // Centre de l'étiquette
+  const cx = x + etiW / 2;
+  const cy = y + etiH / 2;
 
-      // Ligne séparatrice
-      doc.setDrawColor(240, 240, 240);
-      doc.line(x, y + 16, x + etiW, y + 16);
+  // Dimensions après rotation (étiquette en paysage)
+  const W = etiH; // 82mm
+  const H = etiW; // 49mm
 
-      // Saveur
-      doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
-      doc.rect(x, y + 16, etiW, 20, 'F');
-      doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text(saveur, x + etiW / 2, y + 29, { align: 'center' });
+  // Logo
+  doc.setFillColor(255, 255, 255);
+  doc.rect(x, y, etiW, 16, 'F');
+  if (logoData) doc.addImage(logoData, 'PNG', cx - 12, y + 4, 25, 7);
 
-      // Ligne séparatrice
-      doc.setDrawColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
-      doc.line(x, y + 36, x + etiW, y + 36);
+  // Saveur (fond coloré)
+  doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
+  doc.rect(x, y + 16, etiW, 20, 'F');
 
-      // Code lot
-      doc.setFillColor(255, 255, 255);
-      doc.rect(x, y + 36, etiW, etiH - 36, 'F');
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(7);
-      doc.setFont('courier', 'bold');
-      doc.text(code, x + etiW / 2, y + 46, { align: 'center' });
+  // Texte saveur en rotation 90°
+  doc.saveGraphicsState();
+  doc.setTextColor(couleur[0], couleur[1], couleur[2]);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(saveur, cx, y + 16 + 10, { align: 'center', angle: 0 });
+  doc.restoreGraphicsState();
 
-      // Cookies par bac
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6);
-      doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-      doc.text(cookiesParBac + ' cookies / bac', x + etiW / 2, y + 52, { align: 'center' });
+  // Ligne séparatrice
+  doc.setDrawColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
+  doc.line(x, y + 36, x + etiW, y + 36);
 
-      // Production
-      doc.setTextColor(150, 150, 150);
-      doc.text('Production - ' + fmtDate(now), x + etiW / 2, y + 58, { align: 'center' });
+  // Code lot
+  doc.setFillColor(255, 255, 255);
+  doc.rect(x, y + 36, etiW, etiH - 36, 'F');
+  doc.setTextColor(26, 26, 46);
+  doc.setFontSize(7);
+  doc.setFont('courier', 'bold');
+  doc.text(code, cx, y + 46, { align: 'center' });
 
-      // DLC
-      doc.setFillColor(251, 232, 226);
-      doc.roundedRect(x + 2, y + 62, etiW - 4, 16, 1, 1, 'F');
-      doc.setDrawColor(212, 66, 24);
-      doc.setLineWidth(0.8);
-      doc.line(x + 2, y + 62, x + 2, y + 78);
-      doc.setTextColor(153, 60, 29);
-      doc.setFontSize(6);
-      doc.setFont('helvetica', 'normal');
-      doc.text('DLC max - +4 mois', x + etiW / 2, y + 67, { align: 'center' });
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(212, 66, 24);
-      doc.text(fmtDate(dlc), x + etiW / 2, y + 75, { align: 'center' });
-    };
+  // Cookies par bac
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6);
+  doc.setTextColor(couleur[0], couleur[1], couleur[2]);
+  doc.text(cookiesParBac + ' cookies / bac', cx, y + 52, { align: 'center' });
 
-    let index = depart;
-    for (let i = 0; i < (bacsSimple || 0); i++) { dessinerEtiquette(index, 'simple'); index++; }
-    for (let i = 0; i < (bacsDouble || 0); i++) { dessinerEtiquette(index, 'double'); index++; }
+  // Production
+  doc.setTextColor(150, 150, 150);
+  doc.text('Production - ' + fmtDate(now), cx, y + 58, { align: 'center' });
 
-    if (index === depart) { alert('Aucun bac à imprimer'); return; }
-    doc.save('etiquettes-production-' + saveur + '.pdf');
-  };
-
-  if (document.querySelector('script[src*="jspdf"]')) {
-    script.onload();
-  } else {
-    document.head.appendChild(script);
-  }
-}
+  // DLC
+  doc.setFillColor(251, 232, 226);
+  doc.roundedRect(x + 2, y + 62, etiW - 4, 16, 1, 1, 'F');
+  doc.setDrawColor(212, 66, 24);
+  doc.setLineWidth(0.8);
+  doc.line(x + 2, y + 62, x + 2, y + 78);
+  doc.setTextColor(153, 60, 29);
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'normal');
+  doc.text('DLC max - +4 mois', cx, y + 67, { align: 'center' });
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(212, 66, 24);
+  doc.text(fmtDate(dlc), cx, y + 75, { align: 'center' });
+};
 
 function imprimerEtiquettesProductionFormulaire() {
   const saveur = document.getElementById('prod-saveur')?.value;
