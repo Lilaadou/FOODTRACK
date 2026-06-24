@@ -3070,12 +3070,12 @@ ${content}
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [210, 148.5] });
 
-    const marginTop = 22;
-    const marginLeft = (148.5 - (3 * 49)) / 2;
-    const etiW = 49;
-    const etiH = 82;
-    const gapV = 5;
-    const cols = 3;
+    const marginTop = 1;
+    const marginLeft = 22;
+    const etiW = 82;
+    const etiH = 49;
+    const gapV = 0;
+    const cols = 2;
 
     const logoData = LOGO_BASE64;
     (() => {
@@ -3086,7 +3086,7 @@ ${content}
         const col = index % cols;
         const row = Math.floor(index / cols);
         const x = marginLeft + col * etiW;
-        const y = marginTop + row * (etiH + gapV);
+        const y = marginTop + row * etiH;
 
         const couleurDLC = typeCookies === 'crus' ? [6, 98, 170] : [212, 66, 24];
         const bgDLC = typeCookies === 'crus' ? [230, 241, 251] : [251, 232, 226];
@@ -7947,7 +7947,7 @@ function showLoginScreen() {
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   script.onload = () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [148.5, 210] });
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
 
     const marginTop = 1;
     const marginLeft = 22;
