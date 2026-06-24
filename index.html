@@ -1938,6 +1938,19 @@
 </main>
 
 <script>
+  const logoImg = new Image();
+logoImg.crossOrigin = 'anonymous';
+logoImg.src = 'logo.png';
+let LOGO_BASE64 = null;
+logoImg.onload = () => {
+  const c = document.createElement('canvas');
+  c.width = logoImg.width;
+  c.height = logoImg.height;
+  c.getContext('2d').drawImage(logoImg, 0, 0);
+  LOGO_BASE64 = c.toDataURL('image/png');
+};
+
+const API = ...
 const API = 'https://script.google.com/macros/s/AKfycby6mYPkatV1kGaGyhR_TNnjY5B3zMDJOzaUB7UIxk9x2v4hCwwSno5e6phx8vKtnQM1Fg/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
@@ -3077,7 +3090,7 @@ ${content}
     const gapV = 5;
     const cols = 3;
 
-    const logoData = null;
+    const logoData = LOGO_BASE64;
     (() => {
 
       let index = depart;
@@ -3092,18 +3105,11 @@ ${content}
         const bgDLC = typeCookies === 'crus' ? [230, 241, 251] : [251, 232, 226];
         const labelDLC = typeCookies === 'crus' ? 'DLC - Crus +3 mois' : 'DLC - Cuits +4 jours';
 
-        // Bordure étiquette
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.3);
-        doc.roundedRect(x, y, etiW, etiH, 3, 3, 'S');
 
         // Logo
         doc.setFillColor(255, 255, 255);
         doc.rect(x, y, etiW, 16, 'F');
-        doc.setTextColor(212, 66, 24);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text('KOOKI', x + etiW/2, y + 10, { align: 'center' });
+        if (logoData) doc.addImage(logoData, 'PNG', x + 10, y + 4, 29, 8);
 
         // Ligne séparatrice
         doc.setDrawColor(240, 240, 240);
