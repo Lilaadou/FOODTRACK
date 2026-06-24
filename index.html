@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kooki">
-  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png"> 
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',system-ui,sans-serif;background:#f7f8fa;color:#1a1a2e;display:flex;min-height:100vh;}
@@ -3152,12 +3152,12 @@ ${content}
         doc.text('Livraison - ' + fmtDate(now), x + 3, y + 59);
 
         // DLC
-        doc.setFillColor(...bgDLC);
+        doc.setFillColor(bgDLC[0], bgDLC[1], bgDLC[2]);
         doc.roundedRect(x + 2, y + 62, etiW - 4, 16, 1, 1, 'F');
-        doc.setDrawColor(...couleurDLC);
+        doc.setDrawColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
         doc.setLineWidth(0.8);
         doc.line(x + 2, y + 62, x + 2, y + 78);
-        doc.setTextColor(...couleurDLC);
+        doc.setTextColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
         doc.setFontSize(6);
         doc.setFont('helvetica', 'normal');
         doc.text(labelDLC, x + 5, y + 67);
