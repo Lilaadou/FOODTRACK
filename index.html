@@ -8051,7 +8051,19 @@ function imprimerEtiquettesProductionFormulaire() {
   if (!saveur || !code) { toast('prod', '⚠️ Remplis la saveur et le code lot d\'abord', 'err'); return; }
   imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
 }
-  
+
+    window.LOGO_BASE64 = null;
+const _logoImg = new Image();
+_logoImg.crossOrigin = 'anonymous';
+_logoImg.src = 'logo.png';
+_logoImg.onload = () => {
+  const c = document.createElement('canvas');
+  c.width = _logoImg.width;
+  c.height = _logoImg.height;
+  c.getContext('2d').drawImage(_logoImg, 0, 0);
+  window.LOGO_BASE64 = c.toDataURL('image/png');
+};
+
 addSaveurBlock();
 selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
