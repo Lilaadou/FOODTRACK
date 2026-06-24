@@ -3077,16 +3077,8 @@ ${content}
     const gapV = 5;
     const cols = 3;
 
-    // Charger le logo
-    const logoImg = new Image();
-    logoImg.crossOrigin = 'anonymous';
-    logoImg.src = 'https://lilaadou.github.io/FOODTRACK/logo.png';
-    logoImg.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = logoImg.width;
-      canvas.height = logoImg.height;
-      canvas.getContext('2d').drawImage(logoImg, 0, 0);
-      const logoData = canvas.toDataURL('image/png');
+    const logoData = null;
+    (() => {
 
       let index = depart;
 
@@ -3108,7 +3100,10 @@ ${content}
         // Logo
         doc.setFillColor(255, 255, 255);
         doc.rect(x, y, etiW, 16, 'F');
-        doc.addImage(logoData, 'PNG', x + 10, y + 4, 29, 8);
+        doc.setTextColor(212, 66, 24);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('KOOKI', x + etiW/2, y + 10, { align: 'center' });
 
         // Ligne séparatrice
         doc.setDrawColor(240, 240, 240);
@@ -3168,8 +3163,8 @@ ${content}
       });
 
       doc.save('etiquettes-' + client + '.pdf');
-    };
-  };
+    })();
+};
   if (document.querySelector('script[src*="jspdf"]')) {
     script.onload();
   } else {
