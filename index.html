@@ -3209,8 +3209,8 @@ ${content}
       doc.line(x + 2, y + 15, x + etiW - 2, y + 15);
 
       // Saveurs avec codes lots
-      const startY = y + 18;
-      const espacement = Math.min(5, (etiH - 20) / lots.length);
+      const startY = y + 16;
+      const espacement = Math.min(4.5, (etiH - 22) / (lots.length + 1));
       lots.forEach((lot, i) => {
         doc.setTextColor(26, 26, 46);
         doc.setFontSize(7);
