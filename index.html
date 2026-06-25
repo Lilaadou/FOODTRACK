@@ -8062,12 +8062,12 @@ function showLoginScreen() {
   doc.rect(x, y, etiW, etiH, 'F');
 
   // Logo petit en haut à gauche
-  if (logoData) doc.addImage(logoData, 'PNG', x + 2, y + 2, 14, 4);
+  if (logoData) doc.addImage(logoData, 'PNG', x + 3, y + 2, 12, 4);
 
   // Cercle coloré — rayon 10mm, centré dans la partie gauche
-  const cercleX = x + 18;
+  const cercleX = x + 16;
   const cercleY = y + 30;
-  const rayon = 10;
+  const rayon = 9;
   doc.setFillColor(couleur[0], couleur[1], couleur[2]);
   doc.circle(cercleX, cercleY, rayon, 'F');
 
@@ -8086,20 +8086,25 @@ function showLoginScreen() {
   // Ligne séparatrice verticale
   doc.setDrawColor(220, 220, 220);
   doc.setLineWidth(0.3);
-  doc.line(x + 31, y + 2, x + 31, y + etiH - 2);
+  doc.line(x + 28, y + 2, x + 28, y + etiH - 2);
 
   // Infos à droite
-  const xInfo = x + 34;
+  const xInfo = x + 31;
 
   // Code lot
-  doc.setTextColor(120, 120, 120);
-  doc.setFontSize(4.5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Code lot', xInfo, y + 7);
-  doc.setTextColor(26, 26, 46);
-  doc.setFontSize(5.5);
-  doc.setFont('courier', 'bold');
-  doc.text(code, xInfo, y + 12);
+  doc.text('Code lot', xInfo, y + 6);
+  doc.text(code, xInfo, y + 11);
+
+  doc.text('Contenu', xInfo, y + 17);
+  doc.text(cookiesParBac + ' cookies / bac', xInfo, y + 22);
+
+  doc.text('Production', xInfo, y + 28);
+  doc.text(fmtDate(now), xInfo, y + 33);
+  
+  doc.roundedRect(xInfo - 1, y + 36, etiW - xInfo + x - 1, 9, 1, 1, 'F');
+  doc.line(xInfo - 1, y + 36, xInfo - 1, y + 45);
+  doc.text('DLC max +4 mois', xInfo + 1, y + 40);
+  doc.text(fmtDate(dlc), xInfo + 1, y + 45);
 
   // Cookies par bac
   doc.setTextColor(120, 120, 120);
