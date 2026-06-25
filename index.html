@@ -8057,81 +8057,82 @@ function showLoginScreen() {
   const x = marginLeft + col * etiW;
   const y = marginTop + row * etiH;
 
-  // Fond blanc complet
+  // Fond blanc
   doc.setFillColor(255, 255, 255);
   doc.rect(x, y, etiW, etiH, 'F');
 
-  // Partie gauche — logo + cercle
-  // Logo
-  if (logoData) doc.addImage(logoData, 'PNG', x + 4, y + 2, 16, 5);
+  // Logo petit en haut à gauche
+  if (logoData) doc.addImage(logoData, 'PNG', x + 2, y + 2, 14, 4);
 
-  // Cercle coloré avec saveur
+  // Cercle coloré — rayon 10mm, centré dans la partie gauche
   const cercleX = x + 18;
-  const cercleY = y + 27;
-  const rayon = 13;
+  const cercleY = y + 30;
+  const rayon = 10;
   doc.setFillColor(couleur[0], couleur[1], couleur[2]);
   doc.circle(cercleX, cercleY, rayon, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(saveur.length > 5 ? 6 : 7);
-  doc.setFont('helvetica', 'bold');
-  doc.text(saveur, cercleX, cercleY + 2, { align: 'center' });
 
-  // Type bac
+  // Saveur dans le cercle
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(saveur.length > 5 ? 5 : 6);
+  doc.setFont('helvetica', 'bold');
+  doc.text(saveur, cercleX, cercleY + 1.5, { align: 'center' });
+
+  // Type bac sous le cercle
   doc.setTextColor(180, 180, 180);
-  doc.setFontSize(5);
+  doc.setFontSize(4.5);
   doc.setFont('helvetica', 'normal');
-  doc.text(isDouble ? 'Bac double' : 'Bac simple', cercleX, y + etiH - 3, { align: 'center' });
+  doc.text(isDouble ? 'Bac double' : 'Bac simple', cercleX, y + 44, { align: 'center' });
 
   // Ligne séparatrice verticale
   doc.setDrawColor(220, 220, 220);
   doc.setLineWidth(0.3);
-  doc.line(x + 37, y + 2, x + 37, y + etiH - 2);
+  doc.line(x + 31, y + 2, x + 31, y + etiH - 2);
 
-  // Partie droite — infos
-  const xInfo = x + 40;
+  // Infos à droite
+  const xInfo = x + 34;
 
   // Code lot
-  doc.setTextColor(100, 100, 100);
-  doc.setFontSize(5.5);
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(4.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('Code lot', xInfo, y + 8);
+  doc.text('Code lot', xInfo, y + 7);
   doc.setTextColor(26, 26, 46);
-  doc.setFontSize(6.5);
+  doc.setFontSize(5.5);
   doc.setFont('courier', 'bold');
-  doc.text(code, xInfo, y + 14);
+  doc.text(code, xInfo, y + 12);
 
   // Cookies par bac
-  doc.setTextColor(100, 100, 100);
-  doc.setFontSize(5.5);
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(4.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('Contenu', xInfo, y + 21);
+  doc.text('Contenu', xInfo, y + 19);
   doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'bold');
-  doc.text(cookiesParBac + ' cookies / bac', xInfo, y + 27);
-
-  // Date production
-  doc.setTextColor(100, 100, 100);
-  doc.setFontSize(5.5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Production', xInfo, y + 33);
-  doc.setTextColor(26, 26, 46);
   doc.setFontSize(6);
-  doc.text(fmtDate(now), xInfo, y + 38);
+  doc.setFont('helvetica', 'bold');
+  doc.text(cookiesParBac + ' cookies / bac', xInfo, y + 24);
+
+  // Production
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(4.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Production', xInfo, y + 30);
+  doc.setTextColor(26, 26, 46);
+  doc.setFontSize(5);
+  doc.text(fmtDate(now), xInfo, y + 35);
 
   // Bloc DLC
   doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
-  doc.roundedRect(xInfo - 1, y + 40, etiW - xInfo + x, 7, 1, 1, 'F');
+  doc.roundedRect(xInfo - 1, y + 38, etiW - xInfo + x - 1, 9, 1, 1, 'F');
   doc.setDrawColor(couleur[0], couleur[1], couleur[2]);
-  doc.setLineWidth(0.8);
-  doc.line(xInfo - 1, y + 40, xInfo - 1, y + 47);
+  doc.setLineWidth(0.6);
+  doc.line(xInfo - 1, y + 38, xInfo - 1, y + 47);
   doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-  doc.setFontSize(5);
+  doc.setFontSize(4.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('DLC max +4 mois', xInfo + 1, y + 43);
-  doc.setFontSize(7);
+  doc.text('DLC max +4 mois', xInfo + 1, y + 42);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'bold');
-  doc.text(fmtDate(dlc), xInfo + 1, y + 48);
+  doc.text(fmtDate(dlc), xInfo + 1, y + 47);
 };
 
     let index = depart;
