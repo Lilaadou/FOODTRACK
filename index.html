@@ -1168,7 +1168,32 @@
         </div>
       </div>
 
-      <!-- Type de cookies B2B -->
+<!-- Préétape B2B — Grands ou Baby seulement -->
+<div id="b2b-preetape-section" style="display:none;margin-bottom:13px">
+  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
+    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
+      🍪 Le client prend-il des grands cookies ?
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <label id="label-grands-oui" onclick="selectTypeCommande('oui')" style="padding:14px 16px;cursor:pointer;border-right:0.5px solid #e8e8e8">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div id="dot-grands-oui" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:13px;font-weight:700;color:#1a1a2e">Oui — Grands + Baby</span>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-left:22px">Affiche Big ET Small cookies</div>
+      </label>
+      <label id="label-grands-non" onclick="selectTypeCommande('non')" style="padding:14px 16px;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div id="dot-grands-non" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:13px;font-weight:700;color:#1a1a2e">Non — Baby seulement</span>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-left:22px">Uniquement Small cookies</div>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Type de cookies B2B -->
 <div id="type-cookies-section" style="display:none;margin-bottom:13px">
   <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
     <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px">
@@ -2816,6 +2841,7 @@ function loadLotsBlock(id) {
   const type = document.getElementById('sortie-type')?.value || '';
   const isIxelles = type === 'magasin';
   const isB2B = type === 'b2b' || type === 'evenement' || type === 'interne';
+  const b2bSeulementSmall = isB2B && window._b2bTypeCommande === 'non';
   const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
 
   if (!lots.length) {
@@ -2853,7 +2879,7 @@ function loadLotsBlock(id) {
   container.innerHTML = `
     <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B ? '1.2fr' : '1fr'};font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid #efefef;margin-bottom:6px">
       <span>Code lot</span>
-      <span style="text-align:center;color:#d44218">Big (max)</span>
+      ${!b2bSeulementSmall ? '<span style="text-align:center;color:#d44218">Big (max)</span>' : '<span></span>'}
       <span style="text-align:center;color:#0662aa">Small (max)${isB2B ? ' · 📦' : ''}</span>
     </div>
     ${lots.map(l => `
@@ -2863,12 +2889,12 @@ function loadLotsBlock(id) {
           <div style="font-size:10px;color:#aaa">Stock : ${l.big} Big · ${l.small} Small</div>
         </div>
         <div style="text-align:center">
-          <input type="number" min="0" max="${l.big}" placeholder="0"
+          ${!b2bSeulementSmall ? `<input type="number" min="0" max="${l.big}" placeholder="0"
             id="b${id}-big-${l.code}"
             oninput="calcBoites()"
             style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none"
             onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
-          <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.big}</div>
+            <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.big}</div>` : '<div></div>'}
         </div>
         <div style="text-align:center">
           <input type="number" min="0" max="${l.small}" placeholder="0"
@@ -2944,10 +2970,15 @@ function getAllSaveursLots() {
 
 function toggleDestination() {
   const type = document.getElementById('sortie-type').value;
-  document.getElementById('b2b-client-group').style.display      = type === 'b2b'   ? '' : 'none';
+  document.getElementById('b2b-client-group').style.display = type === 'b2b' ? '' : 'none';
+  const preetape = document.getElementById('b2b-preetape-section');
+  if (preetape) preetape.style.display = type === 'b2b' ? '' : 'none';
+  window._b2bTypeCommande = 'oui';
   const autreGroup = document.getElementById('autre-dest-group');
   if (autreGroup) autreGroup.style.display = type === 'autre' ? '' : 'none';
-  document.getElementById('boites-section-b2b').style.display    = type === 'b2b'   ? '' : 'none';
+  document.getElementById('boites-section-b2b').style.display = type === 'b2b' ? '' : 'none';
+  const typeCookiesSection = document.getElementById('type-cookies-section');
+  if (typeCookiesSection) typeCookiesSection.style.display = type === 'b2b' ? '' : 'none';
   document.getElementById('boites-section-opt').style.display    = (type === 'evenement' || type === 'interne') ? '' : 'none';
   document.getElementById('boites-section-ixelles').style.display= (type === 'magasin' || type === 'anderlecht') ? '' : 'none';
   const tog = document.getElementById('boites-opt-toggle');
@@ -8156,6 +8187,39 @@ _logoImg.onload = () => {
   window.LOGO_BASE64 = c.toDataURL('image/png');
 };
 
+  function selectTypeCommande(type) {
+  window._b2bTypeCommande = type;
+  const isOui = type === 'oui';
+
+  const labelOui = document.getElementById('label-grands-oui');
+  const labelNon = document.getElementById('label-grands-non');
+  const dotOui = document.getElementById('dot-grands-oui');
+  const dotNon = document.getElementById('dot-grands-non');
+
+  if (labelOui) {
+    labelOui.style.background = isOui ? '#f0faf4' : '#fff';
+    labelOui.style.borderBottom = isOui ? '2px solid #27ae60' : 'none';
+  }
+  if (labelNon) {
+    labelNon.style.background = !isOui ? '#fef7d6' : '#fff';
+    labelNon.style.borderBottom = !isOui ? '2px solid #e6a800' : 'none';
+  }
+  if (dotOui) {
+    dotOui.style.background = isOui ? '#27ae60' : 'transparent';
+    dotOui.style.borderColor = isOui ? '#27ae60' : '#e8e8e8';
+  }
+  if (dotNon) {
+    dotNon.style.background = !isOui ? '#e6a800' : 'transparent';
+    dotNon.style.borderColor = !isOui ? '#e6a800' : '#e8e8e8';
+  }
+
+  document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
+    const bId = block.id.replace('saveur-block-', '');
+    const saveur = document.getElementById('saveur-sel-' + bId)?.value;
+    if (saveur) loadLotsBlock(bId);
+  });
+}
+  
 addSaveurBlock();
 selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
