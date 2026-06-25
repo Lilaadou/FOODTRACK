@@ -8068,11 +8068,6 @@ function showLoginScreen() {
   const x = marginLeft + col * (etiW + gapH);
   const y = marginTop + row * etiH;
 
-  // Dimensions zones
-  const zoneGauche = 30; // mm
-  const xDroit = x + zoneGauche + 1;
-  const largeurDroite = etiW - zoneGauche - 2;
-
   // Fond blanc
 doc.setFillColor(255, 255, 255);
 doc.rect(x, y, etiW, etiH, 'F');
