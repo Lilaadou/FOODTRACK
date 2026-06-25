@@ -8095,41 +8095,41 @@ const xInfo = x + 31;
 doc.setTextColor(120, 120, 120);
 doc.setFontSize(4.5);
 doc.setFont('helvetica', 'normal');
-doc.text('Code lot', xInfo, y + 6);
+doc.text('Code lot', xInfo, y + 5);
 doc.setTextColor(26, 26, 46);
 doc.setFontSize(5.5);
 doc.setFont('courier', 'bold');
-doc.text(code, xInfo, y + 11);
+doc.text(code, xInfo, y + 9);
 
 // Cookies par bac
 doc.setTextColor(120, 120, 120);
 doc.setFontSize(4.5);
 doc.setFont('helvetica', 'normal');
-doc.text('Contenu', xInfo, y + 17);
+doc.text('Contenu', xInfo, y + 15);
 doc.setTextColor(couleur[0], couleur[1], couleur[2]);
 doc.setFontSize(6);
 doc.setFont('helvetica', 'bold');
-doc.text(cookiesParBac + ' cookies / bac', xInfo, y + 22);
+doc.text(cookiesParBac + ' cookies / bac', xInfo, y + 20);
 
 // Production
 doc.setTextColor(120, 120, 120);
 doc.setFontSize(4.5);
 doc.setFont('helvetica', 'normal');
-doc.text('Production - ' + fmtDate(now), xInfo, y + 28);
+doc.text('Production - ' + fmtDate(now), xInfo, y + 26);
 
 // Bloc DLC
 doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
-doc.roundedRect(xInfo - 1, y + 31, etiW - xInfo + x - 1, 14, 1, 1, 'F');
+doc.roundedRect(xInfo - 1, y + 29, etiW - xInfo + x - 1, 17, 1, 1, 'F');
 doc.setDrawColor(couleur[0], couleur[1], couleur[2]);
 doc.setLineWidth(0.6);
-doc.line(xInfo - 1, y + 36, xInfo - 1, y + 45);
+doc.line(xInfo - 1, y + 34, xInfo - 1, y + 46);
 doc.setTextColor(couleur[0], couleur[1], couleur[2]);
 doc.setFontSize(4.5);
 doc.setFont('helvetica', 'normal');
-doc.text('DLC max +4 mois', xInfo + 1, y + 36);
+doc.text('DLC max +4 mois', xInfo + 1, y + 34);
 doc.setFontSize(7);
 doc.setFont('helvetica', 'bold');
-doc.text(fmtDate(dlc), xInfo + 1, y + 44);
+doc.text(fmtDate(dlc), xInfo + 1, y + 43);
  };
 
     let index = depart;
