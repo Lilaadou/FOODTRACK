@@ -8183,6 +8183,8 @@ window.addEventListener('resize', () => drawChart(currentChartMode));
     const logoData = window.LOGO_BASE64;
 
     const dessinerEtiquetteB2B = (index) => {
+      const info = B2B_CLIENTS[client];
+      if (!info) return;
       const col = index % cols;
       const row = Math.floor(index / cols);
       const x = marginLeft + col * etiW;
