@@ -3148,115 +3148,115 @@ ${content}
   dlcDate.setDate(dlcDate.getDate() + dlcJours);
   const fmtDate = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-  const depart = parseInt(prompt('Combien de cases sont déjà utilisées sur ta feuille APLI ?\n(0 si feuille neuve)', '0')) || 0;
+  const info = B2B_CLIENTS[client] || {};
+
+  // Calculer le nombre de boîtes nécessaires
+  const totalBig   = lots.reduce((s, l) => s + (l.big   || 0), 0);
+  const totalSmall = lots.reduce((s, l) => s + (l.small || 0), 0);
+  const nbBoites   = Math.ceil(totalBig / 12) + Math.ceil(totalSmall / 25);
+  const nbEtiquettes = Math.max(1, nbBoites);
+
+  const depart = parseInt(prompt('Combien de cases sont déjà utilisées sur ta feuille APLI ?\n(0 si feuille neuve)\n\nNombre d\'étiquettes à imprimer : ' + nbEtiquettes, '0')) || 0;
 
   const script = document.createElement('script');
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   script.onload = () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [210, 148.5] });
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
 
-    const marginTop = -2;
-    const marginLeft = 22;
+    const marginTop = 1;
+    const marginLeft = 23;
     const etiW = 82;
     const etiH = 49;
-    const gapV = 10;
     const cols = 2;
+    const logoData = window.LOGO_BASE64;
 
-    const logoData = LOGO_BASE64;
-    (() => {
+    const dessinerEtiquette = (index) => {
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+      const x = marginLeft + col * etiW;
+      const y = marginTop + row * etiH;
 
-      let index = depart;
+      // Fond blanc
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x, y, etiW, etiH, 'F');
 
-      lots.forEach(lot => {
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        const x = marginLeft + col * etiW;
-        const y = marginTop + row * etiH;
+      // Logo
+      if (logoData) doc.addImage(logoData, 'PNG', x + 2, y + 2, 20, 6);
 
-        const couleurDLC = typeCookies === 'crus' ? [6, 98, 170] : [212, 66, 24];
-        const bgDLC = typeCookies === 'crus' ? [230, 241, 251] : [251, 232, 226];
-        const labelDLC = typeCookies === 'crus' ? 'DLC - Crus +3 mois' : 'DLC - Cuits +4 jours';
+      // Ligne sous logo
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.3);
+      doc.line(x + 2, y + 10, x + etiW - 2, y + 10);
 
+      // Nom client
+      doc.setTextColor(26, 26, 46);
+      doc.setFontSize(5);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Client', x + etiW - 2, y + 4, { align: 'right' });
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text(client.toUpperCase(), x + etiW - 2, y + 9, { align: 'right' });
 
-        // Fond blanc
-doc.setFillColor(255, 255, 255);
-doc.rect(x, y, etiW, etiH, 'F');
+      // Adresse
+      doc.setFontSize(5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(120, 120, 120);
+      doc.text(info.adresse || '', x + etiW - 2, y + 13, { align: 'right' });
 
-// Logo centré en haut
-if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 12, y + 2, 24, 7);
+      // Ligne
+      doc.setDrawColor(220, 220, 220);
+      doc.line(x + 2, y + 15, x + etiW - 2, y + 15);
 
-// Ligne sous logo
-doc.setDrawColor(220, 220, 220);
-doc.setLineWidth(0.3);
-doc.line(x + 2, y + 11, x + etiW - 2, y + 11);
-
-// Client centré
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(5.5);
-doc.setFont('helvetica', 'normal');
-doc.text('Client', x + etiW / 2, y + 16, { align: 'center' });
-doc.setFontSize(8);
-doc.setFont('helvetica', 'bold');
-doc.text(client.toUpperCase(), x + etiW / 2, y + 21, { align: 'center' });
-
-// Saveur centrée
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(5.5);
-doc.setFont('helvetica', 'normal');
-doc.text('Saveur', x + etiW / 2, y + 27, { align: 'center' });
-doc.setFontSize(12);
-doc.setFont('helvetica', 'bold');
-doc.text(lot.saveur, x + etiW / 2, y + 33, { align: 'center' });
-
-// Ligne séparatrice
-doc.setDrawColor(220, 220, 220);
-doc.setLineWidth(0.3);
-doc.line(x + 2, y + 36, x + etiW - 2, y + 36);
-
-// Bas — lot, livraison, DLC
-const xL = x + 4;
-const xM = x + etiW / 2;
-const xR = x + etiW - 4;
-
-// Lot
-doc.setTextColor(150, 150, 150);
-doc.setFontSize(5);
-doc.setFont('helvetica', 'normal');
-doc.text('Lot', xL, y + 40);
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(6);
-doc.setFont('courier', 'bold');
-doc.text(lot.code, xL, y + 45);
-
-// Livraison
-doc.setTextColor(150, 150, 150);
-doc.setFontSize(5);
-doc.setFont('helvetica', 'normal');
-doc.text('Livraison', xM, y + 40, { align: 'center' });
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(6);
-doc.setFont('helvetica', 'bold');
-doc.text(fmtDate(now), xM, y + 45, { align: 'center' });
-
-// DLC — encadré à droite
-doc.setDrawColor(26, 26, 46);
-doc.setLineWidth(0.5);
-doc.roundedRect(xR - 22, y + 37, 22, 10, 1, 1, 'S');
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(5);
-doc.setFont('helvetica', 'normal');
-doc.text(typeCookies === 'crus' ? 'DLC · crus' : 'DLC · cuits', xR - 11, y + 41, { align: 'center' });
-doc.setFontSize(7);
-doc.setFont('helvetica', 'bold');
-doc.text(fmtDate(dlcDate), xR - 11, y + 46, { align: 'center' });
-
-        index++;
+      // Saveurs avec codes lots
+      const startY = y + 18;
+      const espacement = Math.min(5, (etiH - 20) / lots.length);
+      lots.forEach((lot, i) => {
+        doc.setTextColor(26, 26, 46);
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.text(lot.saveur, x + 3, startY + i * espacement);
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(80, 80, 80);
+        doc.text(lot.code, x + etiW - 3, startY + i * espacement, { align: 'right' });
       });
 
-      doc.save('etiquettes-' + client + '.pdf');
-    })();
-};
+      // Ligne avant footer
+      const footerY = y + etiH - 12;
+      doc.setDrawColor(220, 220, 220);
+      doc.line(x + 2, footerY, x + etiW - 2, footerY);
+
+      // Livraison
+      doc.setTextColor(120, 120, 120);
+      doc.setFontSize(5);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Livraison', x + 3, footerY + 4);
+      doc.setTextColor(26, 26, 46);
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'bold');
+      doc.text(fmtDate(now), x + 3, footerY + 9);
+
+      // DLC encadré
+      doc.setDrawColor(26, 26, 46);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(x + etiW - 28, footerY + 1, 26, 10, 1, 1, 'S');
+      doc.setTextColor(26, 26, 46);
+      doc.setFontSize(5);
+      doc.setFont('helvetica', 'normal');
+      doc.text(typeCookies === 'crus' ? 'DLC · crus' : 'DLC · cuits', x + etiW - 15, footerY + 5, { align: 'center' });
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.text(fmtDate(dlcDate), x + etiW - 15, footerY + 10, { align: 'center' });
+    };
+
+    for (let i = 0; i < nbEtiquettes; i++) {
+      dessinerEtiquette((depart + i) % 6);
+    }
+
+    doc.save('etiquettes-' + client.replace(/ /g, '-') + '.pdf');
+  };
+
   if (document.querySelector('script[src*="jspdf"]')) {
     script.onload();
   } else {
