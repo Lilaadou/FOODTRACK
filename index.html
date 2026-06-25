@@ -3160,7 +3160,7 @@ ${content}
     const marginLeft = 22;
     const etiW = 82;
     const etiH = 49;
-    const gapV = 0;
+    const gapV = 10;
     const cols = 2;
 
     const logoData = LOGO_BASE64;
@@ -8037,10 +8037,9 @@ function showLoginScreen() {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
 
     const marginTop = 1;
-    const marginLeft = 22;
+    const marginLeft = 23;
     const etiW = 82;
     const etiH = 49;
-    const gapV = 0;
     const gapH = 0;
     const cols = 2;
 
@@ -8054,7 +8053,7 @@ function showLoginScreen() {
 
   const col = index % cols;
   const row = Math.floor(index / cols);
-  const x = marginLeft + col * etiW;
+  const x = marginLeft + col * (etiW + gapH);
   const y = marginTop + row * etiH;
 
   // Dimensions zones
