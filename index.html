@@ -8072,12 +8072,9 @@ function showLoginScreen() {
   // Cercle saveur — centré dans zone gauche
   const cx = x + zoneGauche / 2;
   const cy = y + 32;
-  doc.setFillColor(couleur[0], couleur[1], couleur[2]);
-  doc.circle(cx, cy, 12, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(saveur.length > 5 ? 7 : 9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(saveur, cx, cy + 2, { align: 'center' });
+  doc.setDrawColor(180, 180, 180);
+  doc.setLineWidth(0.3);
+  doc.circle(cx, cy, 12, 'S');
 
   // Type bac
   doc.setTextColor(180, 180, 180);
@@ -8099,7 +8096,7 @@ function showLoginScreen() {
   doc.setTextColor(26, 26, 46);
   doc.setFontSize(7);
   doc.setFont('courier', 'bold');
-  doc.text(code, xDroit, y + 12);
+  doc.text(code + '  ' + saveur, xDroit, y + 12);
   // Contenu
   doc.setTextColor(160, 160, 160);
   doc.setFontSize(6);
