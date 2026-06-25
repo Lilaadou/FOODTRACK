@@ -3187,54 +3187,69 @@ doc.rect(x, y, etiW, etiH, 'F');
 if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 12, y + 2, 24, 7);
 
 // Ligne sous logo
-doc.setDrawColor(240, 240, 240);
+doc.setDrawColor(220, 220, 220);
+doc.setLineWidth(0.3);
 doc.line(x + 2, y + 11, x + etiW - 2, y + 11);
 
-// Client en rouge
-doc.setFillColor(251, 232, 226);
-doc.rect(x, y + 12, etiW, 9, 'F');
-doc.setTextColor(212, 66, 24);
-doc.setFontSize(7);
+// Client centré
+doc.setTextColor(26, 26, 46);
+doc.setFontSize(5.5);
+doc.setFont('helvetica', 'normal');
+doc.text('Client', x + etiW / 2, y + 16, { align: 'center' });
+doc.setFontSize(8);
 doc.setFont('helvetica', 'bold');
-doc.text(client.toUpperCase(), x + etiW / 2, y + 18, { align: 'center' });
+doc.text(client.toUpperCase(), x + etiW / 2, y + 21, { align: 'center' });
 
-// Ligne
-doc.setDrawColor(245, 203, 184);
-doc.line(x + 2, y + 21, x + etiW - 2, y + 21);
-
-// Saveur en bleu
-doc.setFillColor(255, 255, 255);
-doc.setTextColor(6, 98, 170);
+// Saveur centrée
+doc.setTextColor(26, 26, 46);
+doc.setFontSize(5.5);
+doc.setFont('helvetica', 'normal');
+doc.text('Saveur', x + etiW / 2, y + 27, { align: 'center' });
 doc.setFontSize(12);
 doc.setFont('helvetica', 'bold');
-doc.text(lot.saveur, x + etiW / 2, y + 30, { align: 'center' });
+doc.text(lot.saveur, x + etiW / 2, y + 33, { align: 'center' });
 
-// Ligne
-doc.setDrawColor(240, 240, 240);
-doc.line(x + 2, y + 33, x + etiW - 2, y + 33);
+// Ligne séparatrice
+doc.setDrawColor(220, 220, 220);
+doc.setLineWidth(0.3);
+doc.line(x + 2, y + 36, x + etiW - 2, y + 36);
 
-// Code lot
+// Bas — lot, livraison, DLC
+const xL = x + 4;
+const xM = x + etiW / 2;
+const xR = x + etiW - 4;
+
+// Lot
+doc.setTextColor(150, 150, 150);
+doc.setFontSize(5);
+doc.setFont('helvetica', 'normal');
+doc.text('Lot', xL, y + 40);
 doc.setTextColor(26, 26, 46);
 doc.setFontSize(6);
 doc.setFont('courier', 'bold');
-doc.text(lot.code, x + etiW / 2, y + 38, { align: 'center' });
+doc.text(lot.code, xL, y + 45);
 
 // Livraison
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(5);
 doc.setTextColor(150, 150, 150);
-doc.text('Livraison - ' + fmtDate(now), x + etiW / 2, y + 42, { align: 'center' });
-
-// DLC
-doc.setFillColor(bgDLC[0], bgDLC[1], bgDLC[2]);
-doc.roundedRect(x + 2, y + 43, etiW - 4, 5, 0.5, 0.5, 'F');
-doc.setDrawColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
-doc.setLineWidth(0.5);
-doc.line(x + 2, y + 43, x + 2, y + 48);
-doc.setTextColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
 doc.setFontSize(5);
 doc.setFont('helvetica', 'normal');
-doc.text(labelDLC + '  ' + fmtDate(dlcDate), x + etiW / 2, y + 47, { align: 'center' });
+doc.text('Livraison', xM, y + 40, { align: 'center' });
+doc.setTextColor(26, 26, 46);
+doc.setFontSize(6);
+doc.setFont('helvetica', 'bold');
+doc.text(fmtDate(now), xM, y + 45, { align: 'center' });
+
+// DLC — encadré à droite
+doc.setDrawColor(26, 26, 46);
+doc.setLineWidth(0.5);
+doc.roundedRect(xR - 22, y + 37, 22, 10, 1, 1, 'S');
+doc.setTextColor(26, 26, 46);
+doc.setFontSize(5);
+doc.setFont('helvetica', 'normal');
+doc.text(typeCookies === 'crus' ? 'DLC · crus' : 'DLC · cuits', xR - 11, y + 41, { align: 'center' });
+doc.setFontSize(7);
+doc.setFont('helvetica', 'bold');
+doc.text(fmtDate(dlcDate), xR - 11, y + 46, { align: 'center' });
 
         index++;
       });
