@@ -3179,64 +3179,62 @@ ${content}
         const labelDLC = typeCookies === 'crus' ? 'DLC - Crus +3 mois' : 'DLC - Cuits +4 jours';
 
 
-        // Logo
-        doc.setFillColor(255, 255, 255);
-        doc.rect(x, y, etiW, 16, 'F');
-        if (logoData) doc.addImage(logoData, 'PNG', x + 12, y + 5, 25, 7);
+        // Fond blanc
+doc.setFillColor(255, 255, 255);
+doc.rect(x, y, etiW, etiH, 'F');
 
-        // Ligne séparatrice
-        doc.setDrawColor(240, 240, 240);
-        doc.line(x, y + 16, x + etiW, y + 16);
+// Logo centré en haut
+if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 12, y + 2, 24, 7);
 
-        // Client
-        doc.setFillColor(251, 232, 226);
-        doc.rect(x, y + 16, etiW, 12, 'F');
-        doc.setTextColor(212, 66, 24);
-        doc.setFontSize(7);
-        doc.setFont('helvetica', 'bold');
-        doc.text(client.toUpperCase(), x + etiW / 2, y + 23, { align: 'center' });
+// Ligne sous logo
+doc.setDrawColor(240, 240, 240);
+doc.line(x + 2, y + 11, x + etiW - 2, y + 11);
 
-        // Ligne séparatrice
-        doc.setDrawColor(245, 203, 184);
-        doc.line(x, y + 28, x + etiW, y + 28);
+// Client en rouge
+doc.setFillColor(251, 232, 226);
+doc.rect(x, y + 12, etiW, 9, 'F');
+doc.setTextColor(212, 66, 24);
+doc.setFontSize(7);
+doc.setFont('helvetica', 'bold');
+doc.text(client.toUpperCase(), x + etiW / 2, y + 18, { align: 'center' });
 
-        // Saveur
-        doc.setFillColor(255, 255, 255);
-        doc.rect(x, y + 28, etiW, 18, 'F');
-        doc.setTextColor(6, 98, 170);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(lot.saveur, x + etiW / 2, y + 39, { align: 'center' });
+// Ligne
+doc.setDrawColor(245, 203, 184);
+doc.line(x + 2, y + 21, x + etiW - 2, y + 21);
 
-        // Ligne séparatrice
-        doc.setDrawColor(240, 240, 240);
-        doc.line(x, y + 46, x + etiW, y + 46);
+// Saveur en bleu
+doc.setFillColor(255, 255, 255);
+doc.setTextColor(6, 98, 170);
+doc.setFontSize(12);
+doc.setFont('helvetica', 'bold');
+doc.text(lot.saveur, x + etiW / 2, y + 30, { align: 'center' });
 
-        // Code lot
-        doc.setTextColor(26, 26, 46);
-        doc.setFontSize(7);
-        doc.setFont('courier', 'bold');
-        doc.text(lot.code, x + etiW / 2, y + 53, { align: 'center' });
+// Ligne
+doc.setDrawColor(240, 240, 240);
+doc.line(x + 2, y + 33, x + etiW - 2, y + 33);
 
-        // Livraison
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(6);
-        doc.setTextColor(150, 150, 150);
-        doc.text('Livraison - ' + fmtDate(now), x + etiW / 2, y + 59, { align: 'center' });
+// Code lot
+doc.setTextColor(26, 26, 46);
+doc.setFontSize(6);
+doc.setFont('courier', 'bold');
+doc.text(lot.code, x + etiW / 2, y + 38, { align: 'center' });
 
-        // DLC
-        doc.setFillColor(bgDLC[0], bgDLC[1], bgDLC[2]);
-        doc.roundedRect(x + 2, y + 62, etiW - 4, 16, 1, 1, 'F');
-        doc.setDrawColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
-        doc.setLineWidth(0.8);
-        doc.line(x + 2, y + 62, x + 2, y + 78);
-        doc.setTextColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
-        doc.setFontSize(6);
-        doc.setFont('helvetica', 'normal');
-        doc.text(labelDLC, x + etiW / 2, y + 67, { align: 'center' });
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text(fmtDate(dlcDate), x + etiW / 2, y + 75, { align: 'center' });
+// Livraison
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(5);
+doc.setTextColor(150, 150, 150);
+doc.text('Livraison - ' + fmtDate(now), x + etiW / 2, y + 42, { align: 'center' });
+
+// DLC
+doc.setFillColor(bgDLC[0], bgDLC[1], bgDLC[2]);
+doc.roundedRect(x + 2, y + 43, etiW - 4, 5, 0.5, 0.5, 'F');
+doc.setDrawColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
+doc.setLineWidth(0.5);
+doc.line(x + 2, y + 43, x + 2, y + 48);
+doc.setTextColor(couleurDLC[0], couleurDLC[1], couleurDLC[2]);
+doc.setFontSize(5);
+doc.setFont('helvetica', 'normal');
+doc.text(labelDLC + '  ' + fmtDate(dlcDate), x + etiW / 2, y + 47, { align: 'center' });
 
         index++;
       });
