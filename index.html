@@ -8075,7 +8075,7 @@ function showLoginScreen() {
   doc.setFillColor(couleur[0], couleur[1], couleur[2]);
   doc.circle(cx, cy, 12, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(saveur.length > 5 ? 5.5 : 7);
+  doc.setFontSize(saveur.length > 5 ? 7 : 9);
   doc.setFont('helvetica', 'bold');
   doc.text(saveur, cx, cy + 2, { align: 'center' });
 
@@ -8093,43 +8093,40 @@ function showLoginScreen() {
   // === INFOS DROITE ===
   // Code lot
   doc.setTextColor(160, 160, 160);
-  doc.setFontSize(4.5);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
   doc.text('Code lot', xDroit, y + 6);
   doc.setTextColor(26, 26, 46);
-  doc.setFontSize(5.5);
+  doc.setFontSize(7);
   doc.setFont('courier', 'bold');
-  doc.text(code, xDroit, y + 11);
-
+  doc.text(code, xDroit, y + 12);
   // Contenu
   doc.setTextColor(160, 160, 160);
-  doc.setFontSize(4.5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Contenu', xDroit, y + 17);
-  doc.setTextColor(couleur[0], couleur[1], couleur[2]);
   doc.setFontSize(6);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Contenu', xDroit, y + 19);
+  doc.setTextColor(couleur[0], couleur[1], couleur[2]);
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text(cookiesParBac + ' cookies / bac', xDroit, y + 22);
-
+  doc.text(cookiesParBac + ' cookies / bac', xDroit, y + 25);
   // Production
   doc.setTextColor(160, 160, 160);
-  doc.setFontSize(4.5);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
-  doc.text('Production - ' + fmtDate(now), xDroit, y + 28);
-
+  doc.text('Production - ' + fmtDate(now), xDroit, y + 31);
   // Bloc DLC
   doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
-  doc.roundedRect(xDroit - 1, y + 31, largeurDroite, 15, 1, 1, 'F');
+  doc.roundedRect(xDroit - 1, y + 34, largeurDroite, 14, 1, 1, 'F');
   doc.setDrawColor(couleur[0], couleur[1], couleur[2]);
   doc.setLineWidth(0.5);
-  doc.line(xDroit - 1, y + 34, xDroit - 1, y + 46);
+  doc.line(xDroit - 1, y + 34, xDroit - 1, y + 48);
   doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-  doc.setFontSize(4.5);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
-  doc.text('DLC max +4 mois', xDroit + 1, y + 36);
-  doc.setFontSize(7);
+  doc.text('DLC max +4 mois', xDroit + 1, y + 39);
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text(fmtDate(dlc), xDroit + 1, y + 44);
+  doc.text(fmtDate(dlc), xDroit + 1, y + 47);
 };
 
     let index = depart;
