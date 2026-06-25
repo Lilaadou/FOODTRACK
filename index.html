@@ -8057,80 +8057,80 @@ function showLoginScreen() {
   const x = marginLeft + col * etiW;
   const y = marginTop + row * etiH;
 
+  // Dimensions zones
+  const zoneGauche = 30; // mm
+  const xDroit = x + zoneGauche + 1;
+  const largeurDroite = etiW - zoneGauche - 2;
+
   // Fond blanc
   doc.setFillColor(255, 255, 255);
   doc.rect(x, y, etiW, etiH, 'F');
 
-  // Logo petit en haut à gauche
-  if (logoData) doc.addImage(logoData, 'PNG', x + (31/2) - 10, y + 2, 20, 6);
+  // Logo dans zone gauche — centré en haut
+  if (logoData) doc.addImage(logoData, 'PNG', x + 2, y + 2, 26, 8);
 
-  // Cercle coloré — rayon 10mm, centré dans la partie gauche
-  const cercleX = x + 16;
-  const cercleY = y + 30;
-  const rayon = 9;
+  // Cercle saveur — centré dans zone gauche
+  const cx = x + zoneGauche / 2;
+  const cy = y + 32;
   doc.setFillColor(couleur[0], couleur[1], couleur[2]);
-  doc.circle(cercleX, cercleY, rayon, 'F');
-
-  // Saveur dans le cercle
+  doc.circle(cx, cy, 12, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(saveur.length > 5 ? 5 : 6);
+  doc.setFontSize(saveur.length > 5 ? 5.5 : 7);
   doc.setFont('helvetica', 'bold');
-  doc.text(saveur, cercleX, cercleY + 1.5, { align: 'center' });
+  doc.text(saveur, cx, cy + 2, { align: 'center' });
 
-  // Type bac sous le cercle
+  // Type bac
   doc.setTextColor(180, 180, 180);
+  doc.setFontSize(4);
+  doc.setFont('helvetica', 'normal');
+  doc.text(isDouble ? 'Bac double' : 'Bac simple', cx, y + 46, { align: 'center' });
+
+  // Ligne séparatrice verticale fine
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.2);
+  doc.line(x + zoneGauche, y + 1, x + zoneGauche, y + etiH - 1);
+
+  // === INFOS DROITE ===
+  // Code lot
+  doc.setTextColor(160, 160, 160);
   doc.setFontSize(4.5);
   doc.setFont('helvetica', 'normal');
-  doc.text(isDouble ? 'Bac double' : 'Bac simple', cercleX, y + 44, { align: 'center' });
+  doc.text('Code lot', xDroit, y + 6);
+  doc.setTextColor(26, 26, 46);
+  doc.setFontSize(5.5);
+  doc.setFont('courier', 'bold');
+  doc.text(code, xDroit, y + 11);
 
-  // Ligne séparatrice verticale
-  doc.setDrawColor(220, 220, 220);
-  doc.setLineWidth(0.3);
-  doc.line(x + 28, y + 2, x + 28, y + etiH - 2);
+  // Contenu
+  doc.setTextColor(160, 160, 160);
+  doc.setFontSize(4.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Contenu', xDroit, y + 17);
+  doc.setTextColor(couleur[0], couleur[1], couleur[2]);
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'bold');
+  doc.text(cookiesParBac + ' cookies / bac', xDroit, y + 22);
 
-  // Infos à droite
-const xInfo = x + 31;
+  // Production
+  doc.setTextColor(160, 160, 160);
+  doc.setFontSize(4.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Production - ' + fmtDate(now), xDroit, y + 28);
 
-// Code lot
-doc.setTextColor(120, 120, 120);
-doc.setFontSize(4.5);
-doc.setFont('helvetica', 'normal');
-doc.text('Code lot', xInfo, y + 5);
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(5.5);
-doc.setFont('courier', 'bold');
-doc.text(code, xInfo, y + 9);
-
-// Cookies par bac
-doc.setTextColor(120, 120, 120);
-doc.setFontSize(4.5);
-doc.setFont('helvetica', 'normal');
-doc.text('Contenu', xInfo, y + 15);
-doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-doc.setFontSize(6);
-doc.setFont('helvetica', 'bold');
-doc.text(cookiesParBac + ' cookies / bac', xInfo, y + 20);
-
-// Production
-doc.setTextColor(120, 120, 120);
-doc.setFontSize(4.5);
-doc.setFont('helvetica', 'normal');
-doc.text('Production - ' + fmtDate(now), xInfo, y + 26);
-
-// Bloc DLC
-doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
-doc.roundedRect(xInfo - 1, y + 29, etiW - xInfo + x - 1, 17, 1, 1, 'F');
-doc.setDrawColor(couleur[0], couleur[1], couleur[2]);
-doc.setLineWidth(0.6);
-doc.line(xInfo - 1, y + 34, xInfo - 1, y + 46);
-doc.setTextColor(couleur[0], couleur[1], couleur[2]);
-doc.setFontSize(4.5);
-doc.setFont('helvetica', 'normal');
-doc.text('DLC max +4 mois', xInfo + 1, y + 34);
-doc.setFontSize(7);
-doc.setFont('helvetica', 'bold');
-doc.text(fmtDate(dlc), xInfo + 1, y + 43);
- };
+  // Bloc DLC
+  doc.setFillColor(bgCouleur[0], bgCouleur[1], bgCouleur[2]);
+  doc.roundedRect(xDroit - 1, y + 31, largeurDroite, 15, 1, 1, 'F');
+  doc.setDrawColor(couleur[0], couleur[1], couleur[2]);
+  doc.setLineWidth(0.5);
+  doc.line(xDroit - 1, y + 34, xDroit - 1, y + 46);
+  doc.setTextColor(couleur[0], couleur[1], couleur[2]);
+  doc.setFontSize(4.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('DLC max +4 mois', xDroit + 1, y + 36);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'bold');
+  doc.text(fmtDate(dlc), xDroit + 1, y + 44);
+};
 
     let index = depart;
     for (let i = 0; i < (bacsSimple || 0); i++) { dessinerEtiquette(index, 'simple'); index++; }
