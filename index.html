@@ -8341,11 +8341,15 @@ function selectDestCard(dest) {
   });
 
   if (dest === 'b2b') {
-    // Cacher la grille destinations, montrer la grille clients
     document.getElementById('dest-grid').style.display = 'none';
     document.getElementById('b2b-clients-grid').style.display = '';
     document.getElementById('b2b-client-group').style.display = 'none';
+    document.getElementById('boites-section-b2b').style.display = 'none';
+    document.getElementById('type-cookies-section').style.display = 'none';
+    document.getElementById('b2b-preetape-section').style.display = 'none';
+    document.getElementById('b2b-client-preview').style.display = 'none';
   } else {
+    document.getElementById('b2b-clients-grid').style.display = 'none';
     document.getElementById('sortie-type').value = dest;
     toggleDestination();
   }
