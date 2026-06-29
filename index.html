@@ -2468,7 +2468,7 @@ function addFactureRecue(numero, fournisseur, date) {
     const manquants = bacCible === '1' ? (mq1 ? (mq1.manquants||[]).join(', ') : '') : (mq2 ? (mq2.manquants||[]).join(', ') : '');
     const hasMqCible = bacCible === '1' ? hasMq1 : hasMq2;
 
-    return `<div onclick="selectPmxBac('${sav}','${bacCible}',${JSON.stringify(manquants)},${hasMqCible})"
+    return `<div onclick="selectPmxBac('${sav}','${bacCible}')" data-saveur="${sav}" data-bac="${bacCible}" data-manquants="${manquants.replace(/"/g,'').replace(/'/g,'')}" data-hasmq="${hasMqCible}"
       id="pmx-bac-${sav}"
       style="border:0.5px solid ${col.border};border-radius:12px;padding:10px 12px;cursor:pointer;background:${col.bg};transition:all .12s;position:relative">
       ${hasMq1||hasMq2 ? `<div style="position:absolute;top:-6px;right:-6px;background:#E24B4A;color:#fff;border-radius:20px;font-size:9px;font-weight:700;padding:2px 6px;display:flex;align-items:center;gap:3px"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:10px"></i> manquants</div>` : ''}
@@ -2479,24 +2479,26 @@ function addFactureRecue(numero, fournisseur, date) {
   }).join('');
 }
 
-function selectPmxBac(saveur, bac, manquants, hasMq) {
+function selectPmxBac(saveur, bac) {
+  const el = document.getElementById('pmx-bac-' + saveur);
+  const manquants = el?.dataset.manquants || '';
+  const hasMq = el?.dataset.hasmq === 'true';
   const col = SAVEUR_COULEURS_PMX[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
   document.querySelectorAll('[id^="pmx-bac-"]').forEach(b => {
     b.style.boxShadow = '';
     b.style.borderWidth = '0.5px';
     b.style.transform = '';
   });
-  const btn = document.getElementById('pmx-bac-' + saveur);
-  if (btn) {
-    btn.style.boxShadow = '0 0 0 3px ' + col.text + '55';
-    btn.style.borderWidth = '2px';
-    btn.style.transform = 'scale(1.03)';
+  if (el) {
+    el.style.boxShadow = '0 0 0 3px ' + col.text + '55';
+    el.style.borderWidth = '2px';
+    el.style.transform = 'scale(1.03)';
   }
   document.getElementById('pmx-saveur').value = saveur;
   document.getElementById('pmx-sac').value = bac;
   autoFillPmxCode();
   const warn = document.getElementById('prod-pmx-warning');
-  if (hasMq && warn) {
+  if (hasMq && manquants && warn) {
     warn.style.display = '';
     warn.innerHTML = `⚠️ Ingrédients manquants : <b>${manquants}</b>`;
   } else if (warn) {
