@@ -138,6 +138,7 @@
     .form-title{font-size:14px;font-weight:700;margin-bottom:14px;}
     .form-grid{display:grid;gap:11px;margin-bottom:13px;}
     .fg-2{grid-template-columns:repeat(2,1fr);}
+    .fg-2 > .dest-full{grid-column:1/-1;}
     .fg-3{grid-template-columns:repeat(3,1fr);}
     .form-group{display:flex;flex-direction:column;gap:4px;}
     .form-group label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;}
@@ -1091,7 +1092,7 @@
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
       <div>
-  <div style="margin-bottom:13px;grid-column:1/-1">
+  <div style="margin-bottom:13px" class="dest-full">
     <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Type de destination *</label>
     <input type="hidden" id="sortie-type" value="">
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;grid-column:1/-1" id="dest-grid">
