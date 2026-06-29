@@ -1166,6 +1166,69 @@
         </div>
       </div>
 
+      <!-- Grille clients B2B -->
+<div id="b2b-clients-grid" style="display:none;margin-bottom:13px">
+  <div style="background:#E6F1FB;border:2px solid #B5D4F4;border-radius:12px;padding:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:32px;height:32px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center">
+          <i class="ti ti-building-store" style="font-size:18px;color:#0C447C" aria-hidden="true"></i>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:#0C447C">Client B2B</div>
+      </div>
+      <button onclick="resetDestCard()" style="font-size:12px;color:#185FA5;background:rgba(255,255,255,.7);border:0.5px solid #B5D4F4;border-radius:8px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:4px">
+        <i class="ti ti-arrow-left" style="font-size:13px" aria-hidden="true"></i> Changer
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <div class="b2b-client-btn" data-client="Ecocyclo" onclick="selectClientBtn('Ecocyclo')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#0C447C">EC</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Ecocyclo</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Felix Basile</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Galler Ixelles" onclick="selectClientBtn('Galler Ixelles')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#27500A">GI</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Galler Ixelles</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Marie Mayne</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Galler Woluwe" onclick="selectClientBtn('Galler Woluwe')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#27500A">GW</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Galler Woluwe</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Marie Mayne</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="La Fourmilière" onclick="selectClientBtn('La Fourmilière')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#633806">LF</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">La Fourmilière</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Robin Cardoen</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Penta Hotel" onclick="selectClientBtn('Penta Hotel')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#3C3489">PH</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Penta Hotel</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Menno De Richemont</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Café Club" onclick="selectClientBtn('Café Club')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#FAECE7;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#712B13">CC</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Café Club</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nicolas Auffray</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Flippers" onclick="selectClientBtn('Flippers')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#0C447C">FL</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Flippers</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Basile Stein</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Slide Coffee" onclick="selectClientBtn('Slide Coffee')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#27500A">SC</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Slide Coffee</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Sebastien Kunnen</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Petit Mercado" onclick="selectClientBtn('Petit Mercado')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#633806">PM</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Petit Mercado</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Pia & Meno</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="La Belladone" onclick="selectClientBtn('La Belladone')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#FAECE7;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#712B13">LB</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">La Belladone</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Aurelie Alonso</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="JAT Café" onclick="selectClientBtn('JAT Café')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#0C447C">JC</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">JAT Café</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Louise Roobaert</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+      
       <!-- Preview client B2B -->
       <div id="b2b-client-preview" style="display:none;margin-bottom:13px;background:#f7f8fa;border-radius:10px;padding:14px 16px;border:0.5px solid #e8e8e8">
         <div id="b2b-client-nom" style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:6px"></div>
