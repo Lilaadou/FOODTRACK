@@ -405,7 +405,25 @@
       /* Navigation bas */
       .bottom-nav-item{ font-size:12px; }
       .bottom-nav-item .bn-icon{ font-size:26px; }
-      #bottom-nav{ padding:8px 0 16px; }
+      #bottom-nav{ padding:8px 0 16px; transition: transform .2s; }
+      #bottom-nav.hidden { transform: translateY(100%); pointer-events: none; }
+      #btn-show-nav {
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #1a1a2e;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        z-index: 9999;
+        font-size: 14px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
 
       /* Ranking */
       .rank-name{ font-size:17px; }
@@ -592,6 +610,9 @@
 
 <!-- Barre navigation mobile (bas d'écran) -->
 <div id="bottom-nav">
+  <button class="bottom-nav-item" onclick="toggleNav()" id="btn-toggle-nav" title="Plein écran">
+    <span class="bn-icon">⛶</span>Plein écran
+  </button>
   <button class="bottom-nav-item active" onclick="showPage('dashboard',this);closeSidebar()">
     <span class="bn-icon">📊</span>Dashboard
   </button>
@@ -8435,19 +8456,14 @@ function selectClientBtn(clientName) {
   
 function toggleNav() {
   const nav = document.getElementById('bottom-nav');
-  const sidebar = document.querySelector('.sidebar');
-  const btn = document.getElementById('nav-toggle-btn');
+  const btnShow = document.getElementById('btn-show-nav');
   const isHidden = nav.classList.contains('hidden');
   if (isHidden) {
     nav.classList.remove('hidden');
-    if (sidebar) sidebar.classList.remove('hidden');
-    btn.innerHTML = '<i class="ti ti-eye" style="font-size:18px" aria-hidden="true"></i>';
-    document.body.classList.remove('nav-hidden');
+    if (btnShow) btnShow.style.display = 'none';
   } else {
     nav.classList.add('hidden');
-    if (sidebar) sidebar.classList.add('hidden');
-    btn.innerHTML = '<i class="ti ti-eye-off" style="font-size:18px" aria-hidden="true"></i>';
-    document.body.classList.add('nav-hidden');
+    if (btnShow) btnShow.style.display = 'flex';
   }
 }
 
@@ -8905,10 +8921,7 @@ async function flConfirmerAnd() {
 
 </script>
 
-<!-- Bouton toggle navigation -->
-<button id="nav-toggle-btn" onclick="toggleNav()" title="Cacher/montrer la navigation">
-  <i class="ti ti-eye" style="font-size:18px" aria-hidden="true"></i>
-</button>
+<button id="btn-show-nav" onclick="toggleNav()" title="Afficher la navigation">⛶</button>
 
 </body>
 </html>
