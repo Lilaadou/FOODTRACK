@@ -2235,6 +2235,40 @@ const FULL_NAMES = {
   Ixelles:'Magasin Ixelles', Anderlecht:'Magasin Anderlecht'
 };
 
+  function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'reception') { loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); renderPdfList(); }
+  if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
+  if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
+  if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
+  if (name === 'frigoLive') setTimeout(() => { loadFrigoLive(); }, 60);
+  if (name === 'premix' || name === 'production') refreshFactureLists();
+  if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
+  if (name === 'production') setTimeout(async () => { loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
+  if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
+  if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
+  if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
+  if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
+  if (name === 'premix') setTimeout(async () => {
+    const data = await fetchAPI('getPremix');
+    applyPremix(data);
+    const inv = await fetchAPI('getInventairePremix');
+    if (inv && Object.keys(inv).length > 0) {
+      localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
+    }
+    updateInventairePremix();
+    updateManquantsSummary();
+  }, 60);
+  document.querySelectorAll('.bottom-nav-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${name}'`));
+  });
+  closeSidebar();
+}
+
 let currentProfile = 'Lila';
 
 function selectProfile(name) {
