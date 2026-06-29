@@ -937,39 +937,12 @@
     </div>
     <div class="two-col">
       <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">Stock par saveur</div><div class="card-sub">Lots triés par date (FIFO)</div></div>
-          <button onclick="refreshStock()" id="btn-refresh-stock" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;display:flex;align-items:center;gap:6px">
-            🔄 Mettre à jour
-          </button>
-        </div>
-        <table>
-          <thead><tr><th>Code Lot</th><th>Date</th><th>Big</th><th>Small</th></tr></thead>
-          <tbody>
-            <tr class="stock-header-row"><td colspan="2"><span class="tag tag-o">BENNY</span></td><td style="color:#d44218">135</td><td>30</td></tr>
-            <tr class="stock-lot-row"><td>BEN-260606-01</td><td class="sub-text">06/06/2026</td><td><b>135</b></td><td>30</td></tr>
-            <tr class="stock-total-row"><td colspan="2">Total BENNY</td><td style="color:#d44218"><b>135 Big</b></td><td style="color:#0662aa"><b>30 Small</b></td></tr>
-
-            <tr class="stock-header-row"><td colspan="2"><span class="tag tag-o">DAVY</span></td><td style="color:#d44218">135</td><td>60</td></tr>
-            <tr class="stock-lot-row"><td>DAV-260606-01</td><td class="sub-text">06/06/2026</td><td><b>135</b></td><td>60</td></tr>
-            <tr class="stock-total-row"><td colspan="2">Total DAVY</td><td style="color:#d44218"><b>135 Big</b></td><td style="color:#0662aa"><b>60 Small</b></td></tr>
-
-            <tr class="stock-header-row"><td colspan="2"><span class="tag tag-o">JACKY</span></td><td style="color:#d44218">135</td><td>30</td></tr>
-            <tr class="stock-lot-row"><td>JAC-260606-01</td><td class="sub-text">06/06/2026</td><td><b>135</b></td><td>30</td></tr>
-            <tr class="stock-total-row"><td colspan="2">Total JACKY</td><td style="color:#d44218"><b>135 Big</b></td><td style="color:#0662aa"><b>30 Small</b></td></tr>
-
-            <tr class="stock-header-row"><td colspan="2"><span class="tag tag-o">SUZZY</span></td><td style="color:#d44218">425</td><td>5</td></tr>
-            <tr class="stock-lot-row"><td>SUZ-260605-01</td><td class="sub-text">05/06/2026</td><td><b>125</b></td><td>0</td></tr>
-            <tr class="stock-lot-row"><td>SUZ-260605-03</td><td class="sub-text">05/06/2026</td><td><b>300</b></td><td>5</td></tr>
-            <tr class="stock-total-row"><td colspan="2">Total SUZZY</td><td style="color:#d44218"><b>425 Big</b></td><td style="color:#0662aa"><b>5 Small</b></td></tr>
-
-            <tr class="stock-header-row"><td colspan="2"><span class="tag tag-o">WOODY</span></td><td style="color:#d44218">335</td><td>65</td></tr>
-            <tr class="stock-lot-row"><td>WOO-260605-01</td><td class="sub-text">05/06/2026</td><td><b>135</b></td><td>0</td></tr>
-            <tr class="stock-lot-row"><td>WOO-260606-01</td><td class="sub-text">06/06/2026</td><td><b>200</b></td><td>65</td></tr>
-            <tr class="stock-total-row"><td colspan="2">Total WOODY</td><td style="color:#d44218"><b>335 Big</b></td><td style="color:#d44218"><b>65 Small</b></td></tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="card-header" style="margin-bottom:14px">
+    <div><div class="card-title">Stock par saveur</div><div class="card-sub">Lots triés par date (FIFO)</div></div>
+    <button onclick="refreshStock()" id="btn-refresh-stock" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;display:flex;align-items:center;gap:6px">🔄 Mettre à jour</button>
+  </div>
+  <div id="stock-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px"></div>
+</div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">Saveurs hors stock</div><div class="card-sub">À planifier</div></div></div>
         <div class="zero-grid">
@@ -2588,50 +2561,54 @@ function updateStockPage() {
   if (statCards[1]) statCards[1].textContent = totalSmall.toLocaleString('fr-FR');
   if (statCards[2]) statCards[2].textContent = SAVEURS_ZERO.length;
 
-  // Reconstruire le tableau stock
-  const stockTable = document.querySelector('#page-stock tbody');
-  if (!stockTable) return;
-
-  let html = '';
-  saveurs.forEach(sav => {
-    const lots = bySaveur[sav].filter(l => l.big > 0 || l.small > 0);
-    if (!lots.length) return;
-    const isBlue = sav === 'WOODY';
-    const totBig   = lots.reduce((s, l) => s + l.big,   0);
-    const totSmall = lots.reduce((s, l) => s + l.small, 0);
-    const tagClass = 'tag-o';
-    const color    = '#d44218';
-
-    html += `<tr class="stock-header-row">
-      <td colspan="2"><span class="tag ${tagClass}">${sav}</span></td>
-      <td style="color:${color}">${totBig}</td>
-      <td>${totSmall}</td>
-    </tr>`;
-
-    lots.forEach(l => {
-      // Extraire date du code (format SAV-YYMMDD-NN → 20YY/MM/DD)
-      const parts = l.code.split('-');
-      let dateStr = '';
-      if (parts[1] && parts[1].length === 6) {
-        const yy = parts[1].slice(0,2), mm = parts[1].slice(2,4), dd = parts[1].slice(4,6);
-        dateStr = `${dd}/${mm}/20${yy}`;
-      }
-      html += `<tr class="stock-lot-row" data-ref="${l.code}">
-        <td>${l.code}</td>
-        <td class="sub-text">${dateStr}</td>
-        <td><b>${l.big}</b></td>
-        <td>${l.small}</td>
-      </tr>`;
-    });
-
-    html += `<tr class="stock-total-row">
-      <td colspan="2">Total ${sav}</td>
-      <td style="color:${color}"><b>${totBig} Big</b></td>
-      <td style="color:#0662aa"><b>${totSmall} Small</b></td>
-    </tr>`;
-  });
-
-  stockTable.innerHTML = html || '<tr><td colspan="4" class="empty">Aucun stock actuellement.</td></tr>';
+  // Reconstruire la grille stock
+const stockGrid = document.getElementById('stock-grid');
+if (!stockGrid) return;
+let html = '';
+saveurs.forEach(sav => {
+  const lots = bySaveur[sav].filter(l => l.big > 0 || l.small > 0);
+  if (!lots.length) return;
+  const col = SAVEUR_COULEURS_PMX[sav] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
+  const totBig    = lots.reduce((s, l) => s + l.big,   0);
+  const totSmall  = lots.reduce((s, l) => s + l.small, 0);
+  const totSimple = lots.reduce((s, l) => s + (l.bacsSimple||0), 0);
+  const totDouble = lots.reduce((s, l) => s + (l.bacsDouble||0), 0);
+  html += `<div style="background:${col.bg};border:0.5px solid ${col.border};border-radius:12px;padding:14px 16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:700;color:${col.dark}">${sav}</span>
+      <span style="font-size:10px;color:${col.text};background:${col.border};padding:2px 7px;border-radius:20px">${lots.length} lot${lots.length>1?'s':''}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <div><div style="font-size:10px;color:${col.text};margin-bottom:2px">Big</div><div style="font-size:20px;font-weight:700;color:${col.dark}">${totBig}</div></div>
+      <div style="text-align:right"><div style="font-size:10px;color:${col.text};margin-bottom:2px">Small</div><div style="font-size:20px;font-weight:700;color:${col.dark}">${totSmall}</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <div style="flex:1;background:${col.border};border-radius:6px;padding:4px 8px;text-align:center">
+        <div style="font-size:9px;color:${col.text};font-weight:500">Simples</div>
+        <div style="font-size:14px;font-weight:700;color:${col.dark}">${totSimple}</div>
+      </div>
+      <div style="flex:1;background:${col.border};border-radius:6px;padding:4px 8px;text-align:center">
+        <div style="font-size:9px;color:${col.text};font-weight:500">Doubles</div>
+        <div style="font-size:14px;font-weight:700;color:${col.dark}">${totDouble}</div>
+      </div>
+    </div>
+    <div style="border-top:0.5px solid ${col.border};padding-top:8px;display:flex;flex-direction:column;gap:3px">
+      ${lots.map(l => {
+        const parts = l.code.split('-');
+        let dateStr = '';
+        if (parts[1] && parts[1].length === 6) {
+          const yy = parts[1].slice(0,2), mm = parts[1].slice(2,4), dd = parts[1].slice(4,6);
+          dateStr = `${dd}/${mm}/20${yy}`;
+        }
+        return `<div style="display:flex;justify-content:space-between;font-size:10px;color:${col.text}">
+          <span>${l.code}${dateStr ? ' · '+dateStr : ''}</span>
+          <span>${l.big} · ${l.small}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+});
+stockGrid.innerHTML = html || '<div class="empty">Aucun stock actuellement.</div>';
 
   // Mettre à jour saveurs hors stock
   const zeroGrid = document.querySelector('#page-stock .zero-grid');
