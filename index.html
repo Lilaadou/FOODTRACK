@@ -2479,7 +2479,6 @@ function addFactureRecue(numero, fournisseur, date) {
 }
 
 function selectPmxBac(saveur, bac) {
-  console.log('selectPmxBac appelé', saveur, bac);
   const col = SAVEUR_COULEURS_PMX[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
   document.querySelectorAll('[id^="pmx-bac-"]').forEach(b => {
     b.style.boxShadow = '';
@@ -2494,14 +2493,11 @@ function selectPmxBac(saveur, bac) {
   }
   const savEl = document.getElementById('pmx-saveur');
   const sacEl = document.getElementById('pmx-sac');
-  console.log('savEl:', savEl, 'sacEl:', sacEl);
   if (savEl) {
-    savEl.value = saveur;
-    console.log('saveur après assignment:', savEl.value);
+    savEl.innerHTML = `<option value="${saveur}" selected>${saveur}</option>`;
   }
   if (sacEl) {
-    sacEl.value = bac;
-    console.log('sac après assignment:', sacEl.value);
+    sacEl.innerHTML = `<option value="${bac}" selected>${bac}</option>`;
   }
   autoFillPmxCode();
 }
