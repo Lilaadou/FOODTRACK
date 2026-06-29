@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html lang="fr">
 <head> 
-  <meta charset="UTF-8"/> 
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KOOKI — Traçabilité</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -133,36 +133,11 @@
     .stock-lot-row td{padding:7px 0 7px 14px;border-bottom:1px solid #f5f5f5;}
     .stock-total-row td{font-weight:700;font-size:12px;color:#888;padding:7px 0 10px;border-top:1px solid #efefef;border-bottom:2px solid #e0e0e0;}
 
-    /* ── TOGGLE NAV ── */
-    #nav-toggle-btn {
-      position: fixed;
-      bottom: 80px;
-      right: 16px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #1a1a2e;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
-      transition: all .2s;
-    }
-    #nav-toggle-btn:hover { background: #d44218; }
-    #bottom-nav.hidden { display: none !important; }
-    .sidebar.hidden { display: none !important; }
-    body.nav-hidden #nav-toggle-btn { bottom: 16px; }
-
     /* ── FORMS ── */
     .form-section{background:#fff;border-radius:16px;padding:19px 21px;border:1px solid #f0f0f0;margin-bottom:18px;}
     .form-title{font-size:14px;font-weight:700;margin-bottom:14px;}
     .form-grid{display:grid;gap:11px;margin-bottom:13px;}
     .fg-2{grid-template-columns:repeat(2,1fr);}
-    .fg-2 > .dest-full{grid-column:1/-1;}
     .fg-3{grid-template-columns:repeat(3,1fr);}
     .form-group{display:flex;flex-direction:column;gap:4px;}
     .form-group label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;}
@@ -405,25 +380,7 @@
       /* Navigation bas */
       .bottom-nav-item{ font-size:12px; }
       .bottom-nav-item .bn-icon{ font-size:26px; }
-      #bottom-nav{ padding:8px 0 16px; transition: transform .2s; }
-      #bottom-nav.hidden { transform: translateY(100%); pointer-events: none; }
-      #btn-show-nav {
-        position: fixed;
-        bottom: 8px;
-        right: 8px;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #1a1a2e;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        z-index: 9999;
-        font-size: 14px;
-        display: none;
-        align-items: center;
-        justify-content: center;
-      }
+      #bottom-nav{ padding:8px 0 16px; }
 
       /* Ranking */
       .rank-name{ font-size:17px; }
@@ -610,9 +567,6 @@
 
 <!-- Barre navigation mobile (bas d'écran) -->
 <div id="bottom-nav">
-  <button class="bottom-nav-item" onclick="toggleNav()" id="btn-toggle-nav" title="Plein écran">
-    <span class="bn-icon">⛶</span>Plein écran
-  </button>
   <button class="bottom-nav-item active" onclick="showPage('dashboard',this);closeSidebar()">
     <span class="bn-icon">📊</span>Dashboard
   </button>
@@ -631,6 +585,7 @@
   <button class="bottom-nav-item" onclick="showPage('ixelles',this);closeSidebar()">
   <span class="bn-icon">🏪</span>Ixelles
   </button>
+  <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
 </div>
 
 <!-- SIDEBAR -->
@@ -654,6 +609,8 @@
   <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><i class="ti ti-receipt nav-icon" aria-hidden="true"></i> Factures</button>
   <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><i class="ti ti-truck-delivery nav-icon" aria-hidden="true"></i> B2B</button>
   <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
+
+  <div class="sidebar-bottom">
 
   <div class="sidebar-bottom">
     <button class="nav-item" id="nav-alertes" onclick="showPage('alertes',this)">
@@ -1132,11 +1089,12 @@
 
     <!-- Formulaire sortie frigo -->
     <div class="form-section">
-      <div class="form-title">🧊 Enregistrer une sortie frigo</div> 
-      <div style="margin-bottom:13px">
-        <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Type de destination *</label>
-        <input type="hidden" id="sortie-type" value="">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="dest-grid">
+      <div class="form-title">🧊 Enregistrer une sortie frigo</div>
+      <div class="form-grid fg-2">
+        <div style="margin-bottom:13px">
+  <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Type de destination *</label>
+  <input type="hidden" id="sortie-type" value="">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="dest-grid">
 
     <div class="dest-card" data-dest="b2b" onclick="selectDestCard('b2b')" style="border:0.5px solid #e8e8e8;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s">
       <div style="width:40px;height:40px;border-radius:10px;background:#E6F1FB;display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
@@ -2231,42 +2189,8 @@ const FULL_NAMES = {
   Meg:'Meg Dollinger', Alexandre:'Alexandre Michel', DavidC:'David Cohenca',
   Ixelles:'Magasin Ixelles', Anderlecht:'Magasin Anderlecht'
 };
-  let currentProfile = 'Lila';
-  
-  function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  if (btn) btn.classList.add('active');
-  document.getElementById('page-title').textContent = titles[name] || name;
-  if (name === 'reception') { loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); renderPdfList(); }
-  if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
-  if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
-  if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
-  if (name === 'frigoLive') setTimeout(() => { loadFrigoLive(); }, 60);
-  if (name === 'premix' || name === 'production') refreshFactureLists();
-  if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
-  if (name === 'production') setTimeout(async () => { loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
-  if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
-  if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
-  if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
-  if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
-  if (name === 'premix') setTimeout(async () => {
-    const data = await fetchAPI('getPremix');
-    applyPremix(data);
-    const inv = await fetchAPI('getInventairePremix');
-    if (inv && Object.keys(inv).length > 0) {
-      localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
-    }
-    updateInventairePremix();
-    updateManquantsSummary();
-  }, 60);
-  document.querySelectorAll('.bottom-nav-item').forEach(b => {
-    b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${name}'`));
-  });
-  closeSidebar();
-}
 
+let currentProfile = 'Lila';
 
 function selectProfile(name) {
   currentProfile = name;
@@ -2311,6 +2235,42 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) closeSearch();
 });
 
+// ─────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'reception') { 
+  loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); 
+  renderPdfList(); 
+}
+  if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
+  if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
+  if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
+  if (name === 'frigoLive') setTimeout(() => { loadFrigoLive(); }, 60);
+  if (name === 'premix' || name === 'production') refreshFactureLists();
+  if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
+  if (name === 'production') setTimeout(async () => { loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
+  if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
+  if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
+  if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
+  if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
+  if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
+  if (name === 'premix') setTimeout(async () => {
+  const data = await fetchAPI('getPremix');
+  applyPremix(data);
+  const inv = await fetchAPI('getInventairePremix');
+  if (inv && Object.keys(inv).length > 0) {
+    localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
+  }
+  updateInventairePremix();
+  updateManquantsSummary();
+}, 60);
+}
 
 // ─────────────────────────────────────
 // RECHERCHE GLOBALE
@@ -3306,29 +3266,6 @@ function printBon() {
     body { padding: 16px; }
     @page { margin: 1cm; }
   }
-
-  #nav-toggle-btn {
-  position: fixed;
-  bottom: 80px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #1a1a2e;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .2s;
-}
-#nav-toggle-btn:hover { background: #d44218; }
-#bottom-nav.hidden { display: none !important; }
-.sidebar.hidden { display: none !important; }
-body.nav-hidden #nav-toggle-btn { bottom: 16px; }
-
 </style>
 </head><body>
 ${content}
@@ -5716,8 +5653,7 @@ function lierBLFactureOdoo() {
 function renderLiensBL() {
   const container = document.getElementById('liens-bl-liste');
   if (!container) return;
-  const valides = correspondances.filter(c => c && c.bl && c.facture);
-  if (!valides.length) {
+  if (!correspondances.length) {
     container.innerHTML = '<div class="empty" style="padding:12px">Aucun lien enregistré.</div>';
     return;
   }
@@ -5725,17 +5661,17 @@ function renderLiensBL() {
     <table>
       <thead><tr><th>N° BL</th><th>Fournisseur</th><th>N° Facture Odoo</th><th>Date</th><th></th></tr></thead>
       <tbody>
-        ${valides.map(c => `
+        ${correspondances.map(c => `
           <tr>
             <td><span class="bl-tag">${c.bl}</span></td>
             <td>${c.fournisseur || '—'}</td>
             <td><b style="color:#27ae60">✓ ${c.facture}</b></td>
             <td class="sub-text">${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '—'}</td>
-            <td><button onclick="deleteCorrespondance(this.dataset.bl)" data-bl="${c.bl||''}"
-            style="background:none;border:none;cursor:pointer;font-size:13px;color:#ccc;padding:2px 6px;border-radius:6px"
-            onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
-            onmouseout="this.style.color='#ccc';this.style.background='none'"
-            title="Supprimer ce lien">🗑️</button></td>
+            <td><button onclick="deleteCorrespondance('${c.bl.replace(/'/g,"\\'")}') "
+              style="background:none;border:none;cursor:pointer;font-size:13px;color:#ccc;padding:2px 6px;border-radius:6px"
+              onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
+              onmouseout="this.style.color='#ccc';this.style.background='none'"
+              title="Supprimer ce lien">🗑️</button></td>
           </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8403,66 +8339,10 @@ function selectDestCard(dest) {
     c.style.border = sel ? '2px solid ' + col.border : '0.5px solid #e8e8e8';
     c.style.background = sel ? col.bg : '#fff';
   });
-
-  if (dest === 'b2b') {
-    document.getElementById('dest-grid').style.display = 'none';
-    document.getElementById('b2b-clients-grid').style.display = '';
-    document.getElementById('b2b-client-group').style.display = 'none';
-    document.getElementById('boites-section-b2b').style.display = 'none';
-    document.getElementById('type-cookies-section').style.display = 'none';
-    document.getElementById('b2b-preetape-section').style.display = 'none';
-    document.getElementById('b2b-client-preview').style.display = 'none';
-  } else {
-    document.getElementById('b2b-clients-grid').style.display = 'none';
-    document.getElementById('sortie-type').value = dest;
-    toggleDestination();
-  }
-}
-
-function resetDestCard() {
-  document.getElementById('dest-grid').style.display = '';
-  document.getElementById('b2b-clients-grid').style.display = 'none';
-  document.getElementById('b2b-client-preview').style.display = 'none';
-  document.getElementById('b2b-preetape-section').style.display = 'none';
-  document.getElementById('type-cookies-section').style.display = 'none';
-  document.querySelectorAll('.dest-card').forEach(c => {
-    c.style.border = '0.5px solid #e8e8e8';
-    c.style.background = '#fff';
-  });
-  resetSortie();
-}
-
-function selectClientBtn(clientName) {
-  // Highlight le client sélectionné
-  document.querySelectorAll('.b2b-client-btn').forEach(c => {
-    const sel = c.dataset.client === clientName;
-    c.style.border = sel ? '2px solid #B5D4F4' : '0.5px solid #B5D4F4';
-    c.style.background = sel ? '#E6F1FB' : '#fff';
-  });
-
-  // Mettre à jour le select caché et déclencher toggleDestination
-  document.getElementById('sortie-type').value = 'b2b';
-  const select = document.getElementById('sortie-b2b-client');
-  if (select) {
-    select.value = clientName;
-    fillClientInfo();
-  }
+  document.getElementById('sortie-type').value = dest;
   toggleDestination();
 }
   
-function toggleNav() {
-  const nav = document.getElementById('bottom-nav');
-  const btnShow = document.getElementById('btn-show-nav');
-  const isHidden = nav.classList.contains('hidden');
-  if (isHidden) {
-    nav.classList.remove('hidden');
-    if (btnShow) btnShow.style.display = 'none';
-  } else {
-    nav.classList.add('hidden');
-    if (btnShow) btnShow.style.display = 'flex';
-  }
-}
-
 addSaveurBlock();
 selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
@@ -8553,6 +8433,16 @@ function closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
+// Sync barre du bas avec la navigation
+const origShowPage = showPage;
+window.showPage = function(name, btn) {
+  origShowPage(name, btn);
+  // Mettre à jour la bottom nav
+  document.querySelectorAll('.bottom-nav-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${name}'`));
+  });
+  closeSidebar();
+};
 
   // ─────────────────────────────────────
 // FRIGO LIVE
@@ -8757,7 +8647,7 @@ function renderFrigoLive(bacs) {
   });
 
   container.innerHTML = html;
-} 
+}
 
 function flToggleIx(el, qty, lot, saveur, lettre) {
   console.log('flToggleIx appelé', lot, lettre, window.flSelIx);
@@ -8904,10 +8794,6 @@ async function flConfirmerAnd() {
   updateDashboardStockTable();
   toast('sortie', '✓ ' + tot + ' cookies livrés à Anderlecht !', 'ok');
 }
-
 </script>
-
-<button id="btn-show-nav" onclick="toggleNav()" title="Afficher la navigation">⛶</button>
-
 </body>
 </html>
