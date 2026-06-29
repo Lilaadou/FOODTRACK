@@ -935,7 +935,7 @@
     <div class="card">
       <div class="card-header"><div><div class="card-title">Historique de production</div></div></div>
       <table>
-        <thead><tr><th>Code Lot</th><th>Saveur</th><th>Big</th><th>Small</th><th>Stock Big</th><th>Stock Small</th><th>Premix</th><th>Producteur</th><th></th></tr></thead>
+        <thead><tr><th>Code Lot</th><th>Saveur</th><th>Bacs simples</th><th>Bacs doubles</th><th>Total Big</th><th>Total Baby</th><th>Premix</th><th>Producteur</th><th></th></tr></thead>
         <tbody id="prod-table">
           <tr><td colspan="8" class="empty">Chargement…</td></tr>
         </tbody>
@@ -7602,15 +7602,15 @@ function applyProduction(data) {
     }
     const color = '#d44218';
     const dateFormatted = r.date ? new Date(r.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
-    html += `<tr data-prod-code="${r.code}">
-      <td><b>${r.code}</b>${dateFormatted ? `<div class="sub-text">${dateFormatted}</div>` : ''}</td>
-      <td><span class="tag tag-o">${r.saveur}</span></td>
-      <td>${r.big}</td>
-      <td>${r.small}</td>
-      <td style="color:${color};font-weight:700">${r.big}</td>
-      <td>${r.small}</td>
-      <td class="sub-text">${r.pmx}</td>
-      <td>${r.nom}</td>
+   html += `<tr data-prod-code="${r.code}">
+  <td><b>${r.code}</b>${dateFormatted ? `<div class="sub-text">${dateFormatted}</div>` : ''}</td>
+  <td><span class="tag tag-o">${r.saveur}</span></td>
+  <td>${r.bacsSimple || 0}</td>
+  <td>${r.bacsDouble || 0}</td>
+  <td style="color:${color};font-weight:700">${r.big}</td>
+  <td style="color:#0662aa;font-weight:700">${r.small}</td>
+  <td class="sub-text">${r.pmx}</td>
+  <td>${r.nom}</td>
       <td style="display:flex;gap:4px">
   <button onclick="imprimerEtiquettesProduction('${r.code}','${r.saveur}','${r.date}',${r.bacsSimple||0},${r.bacsDouble||0})"
     style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🏷️</button>
