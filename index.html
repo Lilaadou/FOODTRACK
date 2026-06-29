@@ -1091,10 +1091,10 @@
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
       <div>
-  <div style="margin-bottom:13px">
+  <div style="margin-bottom:13px;grid-column:1/-1">
     <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Type de destination *</label>
     <input type="hidden" id="sortie-type" value="">
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="dest-grid">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;grid-column:1/-1" id="dest-grid">
 
     <div class="dest-card" data-dest="b2b" onclick="selectDestCard('b2b')" style="border:0.5px solid #e8e8e8;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s">
       <div style="width:40px;height:40px;border-radius:10px;background:#E6F1FB;display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
