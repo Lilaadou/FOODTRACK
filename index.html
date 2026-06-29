@@ -6239,7 +6239,7 @@ function lierFactureDepuisReception(bl, fournisseur) {
 // ─────────────────────────────────────
 
 // Stockage local des correspondances
-let correspondances = JSON.parse(localStorage.getItem('kooki_correspondances') || '[]');
+let correspondances = JSON.parse(localStorage.getItem('kooki_correspondances') || '[]').filter(c => c && c.bl && c.facture);
 // Format : [{ bl, facture, fournisseur, date }]
 
 function saveCorrespondancesLocal() {
