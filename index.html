@@ -8339,7 +8339,46 @@ function selectDestCard(dest) {
     c.style.border = sel ? '2px solid ' + col.border : '0.5px solid #e8e8e8';
     c.style.background = sel ? col.bg : '#fff';
   });
-  document.getElementById('sortie-type').value = dest;
+
+  if (dest === 'b2b') {
+    // Cacher la grille destinations, montrer la grille clients
+    document.getElementById('dest-grid').style.display = 'none';
+    document.getElementById('b2b-clients-grid').style.display = '';
+    document.getElementById('b2b-client-group').style.display = 'none';
+  } else {
+    document.getElementById('sortie-type').value = dest;
+    toggleDestination();
+  }
+}
+
+function resetDestCard() {
+  document.getElementById('dest-grid').style.display = '';
+  document.getElementById('b2b-clients-grid').style.display = 'none';
+  document.getElementById('b2b-client-preview').style.display = 'none';
+  document.getElementById('b2b-preetape-section').style.display = 'none';
+  document.getElementById('type-cookies-section').style.display = 'none';
+  document.querySelectorAll('.dest-card').forEach(c => {
+    c.style.border = '0.5px solid #e8e8e8';
+    c.style.background = '#fff';
+  });
+  resetSortie();
+}
+
+function selectClientBtn(clientName) {
+  // Highlight le client sélectionné
+  document.querySelectorAll('.b2b-client-btn').forEach(c => {
+    const sel = c.dataset.client === clientName;
+    c.style.border = sel ? '2px solid #B5D4F4' : '0.5px solid #B5D4F4';
+    c.style.background = sel ? '#E6F1FB' : '#fff';
+  });
+
+  // Mettre à jour le select caché et déclencher toggleDestination
+  document.getElementById('sortie-type').value = 'b2b';
+  const select = document.getElementById('sortie-b2b-client');
+  if (select) {
+    select.value = clientName;
+    fillClientInfo();
+  }
   toggleDestination();
 }
   
