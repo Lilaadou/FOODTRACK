@@ -2480,24 +2480,30 @@ function addFactureRecue(numero, fournisseur, date) {
 }
 
 function selectPmxBac(saveur, bac) {
-  const el = document.getElementById('pmx-bac-' + saveur);
-  const manquants = el?.dataset.manquants || '';
-  const hasMq = el?.dataset.hasmq === 'true';
+  console.log('selectPmxBac appelé', saveur, bac);
   const col = SAVEUR_COULEURS_PMX[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
   document.querySelectorAll('[id^="pmx-bac-"]').forEach(b => {
     b.style.boxShadow = '';
     b.style.borderWidth = '0.5px';
     b.style.transform = '';
   });
-  if (el) {
-    el.style.boxShadow = '0 0 0 3px ' + col.text + '55';
-    el.style.borderWidth = '2px';
-    el.style.transform = 'scale(1.03)';
+  const btn = document.getElementById('pmx-bac-' + saveur);
+  if (btn) {
+    btn.style.boxShadow = '0 0 0 3px ' + col.text + '55';
+    btn.style.borderWidth = '2px';
+    btn.style.transform = 'scale(1.03)';
   }
   const savEl = document.getElementById('pmx-saveur');
   const sacEl = document.getElementById('pmx-sac');
-  if (savEl) savEl.value = saveur;
-  if (sacEl) sacEl.value = bac;
+  console.log('savEl:', savEl, 'sacEl:', sacEl);
+  if (savEl) {
+    savEl.value = saveur;
+    console.log('saveur après assignment:', savEl.value);
+  }
+  if (sacEl) {
+    sacEl.value = bac;
+    console.log('sac après assignment:', sacEl.value);
+  }
   autoFillPmxCode();
 }
   
