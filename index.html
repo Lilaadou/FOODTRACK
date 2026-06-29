@@ -567,9 +567,6 @@
 
 <!-- Barre navigation mobile (bas d'écran) -->
 <div id="bottom-nav">
-  <button class="bottom-nav-item active" onclick="showPage('dashboard',this);closeSidebar()">
-    <span class="bn-icon">📊</span>Dashboard
-  </button>
   <button class="bottom-nav-item" onclick="showPage('production',this);closeSidebar()">
     <span class="bn-icon">🏭</span>Production
   </button>
@@ -595,7 +592,6 @@
   </div>
 
   <div class="nav-label">Principal</div>
-  <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard nav-icon" aria-hidden="true"></i> Dashboard</button>
   <button class="nav-item" id="nav-premix" onclick="showPage('premix',this)"><i class="ti ti-flask nav-icon" aria-hidden="true"></i> Premix</button>
   <button class="nav-item" id="nav-production" onclick="showPage('production',this)"><i class="ti ti-building-factory nav-icon" aria-hidden="true"></i> Production</button>
   <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)"><i class="ti ti-package nav-icon" aria-hidden="true"></i> Stock cookies</button>
@@ -708,75 +704,6 @@
     </div>
   </div>
 
-  <!-- ══════════════════ DASHBOARD ══════════════════ -->
-  <div id="page-dashboard" class="page active">
-
-    <!-- Bannière commande Ixelles en attente -->
-    <div id="dashboard-ixelles-banner" style="display:none;margin-bottom:14px"></div>
-
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-      <button class="btn btn-secondary" id="btn-refresh-dashboard" onclick="refreshDashboard()" style="font-size:12px;padding:6px 14px;display:flex;align-items:center;gap:6px">🔄 Actualiser le dashboard</button>
-    </div>
-    <div class="stat-grid" style="grid-template-columns:repeat(2,1fr)">
-  <div class="stat-card"><div class="stat-top"><div class="stat-label">Lots produits aujourd'hui</div><div class="stat-icon ic-o">🏭</div></div><div class="stat-value" id="dash-lots-today">0</div><span class="stat-badge badge-ok" id="dash-lots-badge">—</span></div>
-  <div class="stat-card"><div class="stat-top"><div class="stat-label">Saveurs hors stock</div><div class="stat-icon ic-w">⚠️</div></div><div class="stat-value" id="dash-zeros">0</div><span class="stat-badge badge-warn" id="dash-zeros-badge">—</span></div>
-</div>
-
-    <div class="two-col">
-      <!-- Graphique évolution -->
-      <div class="card" style="overflow:hidden">
-        <div class="card-header" style="flex-wrap:wrap;gap:8px">
-          <div><div class="card-title">Évolution de la production</div><div class="card-sub" id="chart-subtitle">Par semaine · Big (165g)</div></div>
-          <div style="display:flex;gap:5px">
-            <button id="btn-semaine" onclick="switchChart('semaine')" style="font-size:11px;font-weight:700;padding:4px 11px;border-radius:7px;border:none;cursor:pointer;background:#d44218;color:#fff">Par semaine</button>
-            <button id="btn-mois" onclick="switchChart('mois')" style="font-size:11px;font-weight:700;padding:4px 11px;border-radius:7px;border:none;cursor:pointer;background:#f0f0f0;color:#888">Par mois</button>
-          </div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
-          <span style="font-size:11px;color:#888;display:flex;align-items:center;gap:5px"><span style="width:16px;height:3px;background:#d44218;border-radius:2px;display:inline-block"></span>SUZZY</span>
-          <span style="font-size:11px;color:#888;display:flex;align-items:center;gap:5px"><span style="width:16px;height:3px;background:#0662aa;border-radius:2px;display:inline-block"></span>WOODY</span>
-          <span style="font-size:11px;color:#888;display:flex;align-items:center;gap:5px"><span style="width:16px;height:3px;background:#e8956a;border-radius:2px;display:inline-block"></span>JACKY</span>
-          <span style="font-size:11px;color:#888;display:flex;align-items:center;gap:5px"><span style="width:16px;height:3px;background:#3a8fc9;border-radius:2px;display:inline-block"></span>BENNY</span>
-          <span style="font-size:11px;color:#888;display:flex;align-items:center;gap:5px"><span style="width:16px;height:3px;background:#a02e10;border-radius:2px;display:inline-block"></span>DAVY</span>
-        </div>
-        <canvas id="prod-chart" style="width:100%;height:190px;display:block"></canvas>
-      </div>
-
-      <!-- Classement -->
-      <div class="card">
-        <div class="card-header"><div><div class="card-title">🏆 Classement stock</div><div class="card-sub">Total Big en frigo</div></div></div>
-        <div id="dashboard-classement"><div class="empty" style="padding:16px">Chargement…</div></div>
-      </div>
-    </div>
-
-    <!-- Prémix à faire + Mini calendrier -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
-
-      <!-- Prémix à faire aujourd'hui -->
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">🥣 Bacs à préparer</div><div class="card-sub">Bacs vides à refaire</div></div>
-          <button class="view-all" onclick="showPage('premix',document.getElementById('nav-premix'))">Aller au Premix →</button>
-        </div>
-        <div id="dashboard-bacs-vides">
-          <div class="empty" style="padding:12px;font-size:12px">Chargement…</div>
-        </div>
-      </div>
-
-      <!-- Mini calendrier de production -->
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">📅 À produire</div><div class="card-sub">Selon l'urgence du stock</div></div>
-          <button class="view-all" onclick="showPage('production',document.getElementById('nav-production'))">Production →</button>
-        </div>
-        <div id="dashboard-mini-cal" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <div class="empty" style="grid-column:1/-1;padding:12px;font-size:12px">Chargement…</div>
-        </div>
-      </div>
-    </div>
-
-  
-  </div>
 
   <!-- ══════════════════ PREMIX ══════════════════ -->
   <div id="page-premix" class="page">
@@ -2157,7 +2084,7 @@ const API = 'https://script.google.com/macros/s/AKfycby6mYPkatV1kGaGyhR_TNnjY5B3
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles'];
 const ANDERLECHT_PAGES = ['frigo'];
-const ALL_PAGES = ['dashboard','premix','production','stock','ingredients','frigo','frigoLive','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons'];
+const ALL_PAGES = ['premix','production','stock','ingredients','frigo','frigoLive','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons'];
 const PROD_PAGES = ['premix','production','stock','ingredients','frigo','frigoLive','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
@@ -8306,7 +8233,7 @@ function doLogin(name) {
   document.getElementById('loading-overlay').style.display = 'none';
   selectProfile(name);
   const p = PROFILES[name];
-  const firstPage = p.pages[0] || 'dashboard';
+  const firstPage = p.pages[0] === 'dashboard' ? 'premix' : p.pages[0];
   showPage(firstPage, document.getElementById('nav-' + firstPage));
   loadAllData();
 }
