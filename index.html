@@ -133,6 +133,30 @@
     .stock-lot-row td{padding:7px 0 7px 14px;border-bottom:1px solid #f5f5f5;}
     .stock-total-row td{font-weight:700;font-size:12px;color:#888;padding:7px 0 10px;border-top:1px solid #efefef;border-bottom:2px solid #e0e0e0;}
 
+    /* ── TOGGLE NAV ── */
+    #nav-toggle-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      transition: all .2s;
+    }
+    #nav-toggle-btn:hover { background: #d44218; }
+    #bottom-nav.hidden { display: none !important; }
+    .sidebar.hidden { display: none !important; }
+    body.nav-hidden #nav-toggle-btn { bottom: 16px; }
+
     /* ── FORMS ── */
     .form-section{background:#fff;border-radius:16px;padding:19px 21px;border:1px solid #f0f0f0;margin-bottom:18px;}
     .form-title{font-size:14px;font-weight:700;margin-bottom:14px;}
@@ -3266,6 +3290,29 @@ function printBon() {
     body { padding: 16px; }
     @page { margin: 1cm; }
   }
+
+  #nav-toggle-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+#nav-toggle-btn:hover { background: #d44218; }
+#bottom-nav.hidden { display: none !important; }
+.sidebar.hidden { display: none !important; }
+body.nav-hidden #nav-toggle-btn { bottom: 16px; }
+
 </style>
 </head><body>
 ${content}
@@ -8386,6 +8433,24 @@ function selectClientBtn(clientName) {
   toggleDestination();
 }
   
+function toggleNav() {
+  const nav = document.getElementById('bottom-nav');
+  const sidebar = document.querySelector('.sidebar');
+  const btn = document.getElementById('nav-toggle-btn');
+  const isHidden = nav.classList.contains('hidden');
+  if (isHidden) {
+    nav.classList.remove('hidden');
+    if (sidebar) sidebar.classList.remove('hidden');
+    btn.innerHTML = '<i class="ti ti-eye" style="font-size:18px" aria-hidden="true"></i>';
+    document.body.classList.remove('nav-hidden');
+  } else {
+    nav.classList.add('hidden');
+    if (sidebar) sidebar.classList.add('hidden');
+    btn.innerHTML = '<i class="ti ti-eye-off" style="font-size:18px" aria-hidden="true"></i>';
+    document.body.classList.add('nav-hidden');
+  }
+}
+
 addSaveurBlock();
 selectProfile('Lila');
 window.addEventListener('resize', () => drawChart(currentChartMode));
@@ -8837,6 +8902,12 @@ async function flConfirmerAnd() {
   updateDashboardStockTable();
   toast('sortie', '✓ ' + tot + ' cookies livrés à Anderlecht !', 'ok');
 }
+
+<!-- Bouton toggle navigation -->
+<button id="nav-toggle-btn" onclick="toggleNav()" title="Cacher/montrer la navigation">
+  <i class="ti ti-eye" style="font-size:18px" aria-hidden="true"></i>
+</button>
+
 </script>
 </body>
 </html>
