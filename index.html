@@ -2468,7 +2468,7 @@ function addFactureRecue(numero, fournisseur, date) {
     const manquants = bacCible === '1' ? (mq1 ? (mq1.manquants||[]).join(', ') : '') : (mq2 ? (mq2.manquants||[]).join(', ') : '');
     const hasMqCible = bacCible === '1' ? hasMq1 : hasMq2;
 
-    return `<div onclick="selectPmxBac('${sav}','${bacCible}')" data-saveur="${sav}" data-bac="${bacCible}" data-manquants="${manquants.replace(/"/g,'').replace(/'/g,'')}" data-hasmq="${hasMqCible}"
+    return `<div onclick="selectPmxBac('${sav}','${bacCible}')" id="pmx-bac-${sav}" data-saveur="${sav}" data-bac="${bacCible}" data-manquants="${manquants.replace(/"/g,'').replace(/'/g,'')}" data-hasmq="${hasMqCible}"
       id="pmx-bac-${sav}"
       style="border:0.5px solid ${col.border};border-radius:12px;padding:10px 12px;cursor:pointer;background:${col.bg};transition:all .12s;position:relative">
       ${hasMq1||hasMq2 ? `<div style="position:absolute;top:-6px;right:-6px;background:#E24B4A;color:#fff;border-radius:20px;font-size:9px;font-weight:700;padding:2px 6px;display:flex;align-items:center;gap:3px"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:10px"></i> manquants</div>` : ''}
@@ -2494,16 +2494,11 @@ function selectPmxBac(saveur, bac) {
     el.style.borderWidth = '2px';
     el.style.transform = 'scale(1.03)';
   }
-  document.getElementById('pmx-saveur').value = saveur;
-  document.getElementById('pmx-sac').value = bac;
+  const savEl = document.getElementById('pmx-saveur');
+  const sacEl = document.getElementById('pmx-sac');
+  if (savEl) savEl.value = saveur;
+  if (sacEl) sacEl.value = bac;
   autoFillPmxCode();
-  const warn = document.getElementById('prod-pmx-warning');
-  if (hasMq && manquants && warn) {
-    warn.style.display = '';
-    warn.innerHTML = `⚠️ Ingrédients manquants : <b>${manquants}</b>`;
-  } else if (warn) {
-    warn.style.display = 'none';
-  }
 }
   
 function refreshFactureLists() {
