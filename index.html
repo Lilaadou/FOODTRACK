@@ -8093,9 +8093,7 @@ function showLoginScreen() {
 }
 
   function imprimerEtiquettesProduction(code, saveur, date, bacsSimple, bacsDouble) {
-  console.log('bacs:', bacsSimple, bacsDouble);
   const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
-  const cpbDouble = cpb * 2;
   const now = new Date(date || new Date());
   const dlc = new Date(now);
   dlc.setMonth(dlc.getMonth() + 4);
@@ -8109,99 +8107,96 @@ function showLoginScreen() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
 
-    const marginTop = -2;
+    const marginTop = 1;
     const marginLeft = 23;
-    const etiW = 82;
-    const etiH = 49;
-    const gapH = 0;
-    const cols = 2;
-
-    const logoData = window.LOGO_BASE64;
+    const etiW = 63.5;
+    const etiH = 33.9;
+    const cols = 3;
+    const rows = 4;
+    const gapX = (210 - marginLeft * 2 - etiW * cols) / (cols - 1);
+    const gapY = (148.5 - marginTop * 2 - etiH * rows) / (rows - 1);
 
     const dessinerEtiquette = (index, type) => {
-  const isDouble = type === 'double';
-  const couleur = isDouble ? [212, 66, 24] : [6, 98, 170];
-  const bgCouleur = isDouble ? [251, 232, 226] : [230, 241, 251];
-  const cookiesParBac = isDouble ? cpbDouble : cpb;
+      const isDouble = type === 'double';
+      const isBaby = type === 'baby';
+      const col = index % cols;
+      const row = Math.floor(index / cols) % rows;
+      const x = marginLeft + col * (etiW + gapX);
+      const y = marginTop + row * (etiH + gapY);
 
-  const col = index % cols;
-  const row = Math.floor(index / cols);
-  const x = marginLeft + col * (etiW + gapH);
-  const y = marginTop + row * etiH;
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x, y, etiW, etiH, 'F');
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.2);
+      doc.rect(x, y, etiW, etiH, 'S');
 
-  // Fond blanc
-doc.setFillColor(255, 255, 255);
-doc.rect(x, y, etiW, etiH, 'F');
+      doc.setTextColor(212, 66, 24);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.text('KOOKI COMPANY SRL', x + etiW / 2, y + 5, { align: 'center' });
 
-// Logo centré en haut dans zone gauche
-if (logoData) doc.addImage(logoData, 'PNG', x + (31/2) - 10, y + 2, 20, 6);
+      if (isBaby) {
+        doc.setFillColor(250, 238, 218);
+        doc.roundedRect(x + etiW - 14, y + 1, 12, 5, 1, 1, 'F');
+        doc.setTextColor(133, 79, 11);
+        doc.setFontSize(4.5);
+        doc.setFont('helvetica', 'bold');
+        doc.text('BABY', x + etiW - 8, y + 4.5, { align: 'center' });
+      }
 
-// Cercle vide centré dans zone gauche
-const cx = x + 15;
-const cy = y + 32;
-doc.setDrawColor(180, 180, 180);
-doc.setLineWidth(0.3);
-doc.circle(cx, cy, 9.5, 'S');
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.3);
+      doc.line(x + 2, y + 7, x + etiW - 2, y + 7);
 
-// Type bac sous le cercle
-doc.setTextColor(180, 180, 180);
-doc.setFontSize(4);
-doc.setFont('helvetica', 'normal');
-doc.text(isDouble ? 'Bac double' : 'Bac simple', cx, y + 44, { align: 'center' });
+      if (isBaby) {
+        doc.setTextColor(26, 26, 46);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(saveur, x + etiW / 2, y + 14, { align: 'center' });
 
-// Ligne séparatrice verticale fine
-doc.setDrawColor(220, 220, 220);
-doc.setLineWidth(0.2);
-doc.line(x + 31, y + 1, x + 31, y + etiH - 1);
+        const xLabel = x + etiW / 2 - 5;
+        const xVal = x + etiW / 2 - 4;
+        [[`Lot`, code, y + 19, true], [`Prod.`, fmtDate(now), y + 24, false], [`DLC`, fmtDate(dlc), y + 29, false]].forEach(([label, val, yPos, isMono]) => {
+          doc.setTextColor(150, 150, 150);
+          doc.setFontSize(4.5);
+          doc.setFont('helvetica', 'normal');
+          doc.text(label, xLabel, yPos, { align: 'right' });
+          doc.setTextColor(26, 26, 46);
+          doc.setFontSize(isMono ? 6 : 5.5);
+          doc.setFont(isMono ? 'courier' : 'helvetica', 'normal');
+          doc.text(val, xVal, yPos);
+        });
 
-// === INFOS DROITE ===
-const xDroit = x + 34;
-const largeurDroite = etiW - 34 - 1;
+      } else {
+        const gX = x + 10;
+        const gY = y + 20;
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.3);
+        doc.circle(gX, gY, 7.5, 'S');
 
-// Code lot + saveur
-doc.setTextColor(150, 150, 150);
-doc.setFontSize(6);
-doc.setFont('helvetica', 'normal');
-doc.text('Code lot', xDroit, y + 6);
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(7);
-doc.setFont('courier', 'bold');
-doc.text(code + '  ' + saveur, xDroit, y + 12);
+        const xInfo = x + 22;
+        const labelW = 8;
+        const valX = xInfo + labelW + 1;
+        [[`Lot`, code, y + 13, true], [`Prod.`, fmtDate(now), y + 20, false], [`DLC`, fmtDate(dlc), y + 27, false]].forEach(([label, val, yPos, isMono]) => {
+          doc.setTextColor(150, 150, 150);
+          doc.setFontSize(5);
+          doc.setFont('helvetica', 'normal');
+          doc.text(label, xInfo + labelW, yPos, { align: 'right' });
+          doc.setTextColor(26, 26, 46);
+          doc.setFontSize(isMono ? 6.5 : 6);
+          doc.setFont(isMono ? 'courier' : 'helvetica', isMono ? 'bold' : 'normal');
+          doc.text(val, valX, yPos);
+        });
+      }
 
-// Contenu
-doc.setTextColor(150, 150, 150);
-doc.setFontSize(6);
-doc.setFont('helvetica', 'normal');
-doc.text('Contenu', xDroit, y + 19);
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(8);
-doc.setFont('helvetica', 'bold');
-doc.text(cookiesParBac + ' cookies / bac', xDroit, y + 25);
-
-// Production
-doc.setTextColor(150, 150, 150);
-doc.setFontSize(6);
-doc.setFont('helvetica', 'normal');
-doc.text('Production - ' + fmtDate(now), xDroit, y + 31);
-
-// Bloc DLC — encadré noir
-doc.setDrawColor(26, 26, 46);
-doc.setLineWidth(0.5);
-doc.roundedRect(xDroit - 1, y + 34, etiW - xDroit + x - 1, 12, 1, 1, 'S');
-doc.setTextColor(26, 26, 46);
-doc.setFontSize(5.5);
-doc.setFont('helvetica', 'normal');
-doc.text('DLC max · +4 mois', xDroit + 1, y + 39);
-doc.setFontSize(8);
-doc.setFont('helvetica', 'bold');
-doc.text(fmtDate(dlc), xDroit + 1, y + 45);
-
-// Numéro d'entreprise
-doc.setTextColor(180, 180, 180);
-doc.setFontSize(4);
-doc.setFont('helvetica', 'normal');
-doc.text('BE1015746980', x + 15, y + 48, { align: 'center' });
-};
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.2);
+      doc.line(x + 2, y + etiH - 5, x + etiW - 2, y + etiH - 5);
+      doc.setTextColor(180, 180, 180);
+      doc.setFontSize(4);
+      doc.setFont('helvetica', 'normal');
+      doc.text('BE1015746980', x + etiW / 2, y + etiH - 2, { align: 'center' });
+    };
 
     let index = depart;
     for (let i = 0; i < (bacsSimple || 0); i++) { dessinerEtiquette(index, 'simple'); index++; }
@@ -8209,6 +8204,7 @@ doc.text('BE1015746980', x + 15, y + 48, { align: 'center' });
     if (index === depart) { alert('Aucun bac à imprimer'); return; }
     doc.save('etiquettes-production-' + saveur + '.pdf');
   };
+
   if (document.querySelector('script[src*="jspdf"]')) {
     script.onload();
   } else {
