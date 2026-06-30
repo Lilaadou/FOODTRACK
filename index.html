@@ -3326,7 +3326,13 @@ ${content}
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.text(fmtDate(dlcDate), x + etiW - 15, y + 46, { align: 'center' });
-
+      
+      // Numéro d'entreprise
+      doc.setTextColor(180, 180, 180);
+      doc.setFontSize(4.5);
+      doc.setFont('helvetica', 'normal');
+      doc.text('BE1015746980', x + etiW / 2, y + 48, { align: 'center' });
+      
       index++;
     });
 
@@ -8303,6 +8309,12 @@ doc.text('DLC max · +4 mois', xDroit + 1, y + 39);
 doc.setFontSize(8);
 doc.setFont('helvetica', 'bold');
 doc.text(fmtDate(dlc), xDroit + 1, y + 45);
+
+// Numéro d'entreprise
+doc.setTextColor(180, 180, 180);
+doc.setFontSize(4);
+doc.setFont('helvetica', 'normal');
+doc.text('BE1015746980', x + 15, y + 48, { align: 'center' });
 };
 
     let index = depart;
