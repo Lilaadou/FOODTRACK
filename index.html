@@ -8306,7 +8306,16 @@ function imprimerEtiquettesProductionFormulaire() {
   const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
   const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
   if (!saveur || !code) { toast('prod', '⚠️ Remplis la saveur et le code lot d\'abord', 'err'); return; }
-  imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
+
+  const choix = confirm('Quel type d\'étiquettes veux-tu imprimer ?\n\nOK → Étiquettes bacs (usage interne)\nAnnuler → Étiquettes B2B (livraison client)');
+
+  if (choix) {
+    imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
+  } else {
+    const lots = [{ code, saveur, big: nbSimple * (SAVEUR_BAC_CONFIG[saveur]?.cpb || 45), small: 0 }];
+    const client = prompt('Nom du client B2B ?') || 'Client';
+    imprimerEtiquettesLot(lots, client, 'cuits');
+  }
 }
 
 window.LOGO_BASE64 = null;
