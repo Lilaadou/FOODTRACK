@@ -5946,6 +5946,94 @@ async function reimprimerBL(numeroBL) {
   const allLotsAvecSaveur = bl.lots.map(l => ({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small }));
   showBonLivraison({ client: bl.client, saveur: bl.lots.map(l => l.saveur).join(', '), lots: allLotsAvecSaveur, boites: bl.boites || 0, typeBoite: 'plastique', livreur, typeCookies: bl.typeCookies || 'cuits' });
 }
+  function imprimerEtiquettesLot(lots, client, typeCookiesParam) {
+  const now = new Date();
+  const typeCookies = typeCookiesParam || 'cuits';
+  const dlcJours = typeCookies === 'crus' ? 90 : 4;
+  const dlcDate = new Date();
+  dlcDate.setDate(dlcDate.getDate() + dlcJours);
+  const fmtDate = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  const depart = parseInt(prompt('Combien de cases sont déjà utilisées sur ta feuille APLI ?\n(0 si feuille neuve)', '0')) || 0;
+
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  script.onload = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
+
+    const marginTop = 1;
+    const marginLeft = 23;
+    const etiW = 63.5;
+    const etiH = 33.9;
+    const cols = 3;
+    const rows = 4;
+    const gapX = (210 - marginLeft * 2 - etiW * cols) / (cols - 1);
+    const gapY = (148.5 - marginTop * 2 - etiH * rows) / (rows - 1);
+
+    let index = depart;
+    lots.forEach(lot => {
+      const col = index % cols;
+      const row = Math.floor(index / cols) % rows;
+      const x = marginLeft + col * (etiW + gapX);
+      const y = marginTop + row * (etiH + gapY);
+
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x, y, etiW, etiH, 'F');
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.2);
+      doc.rect(x, y, etiW, etiH, 'S');
+
+      doc.setTextColor(212, 66, 24);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.text('KOOKI COMPANY SRL', x + etiW / 2, y + 5, { align: 'center' });
+
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.3);
+      doc.line(x + 2, y + 7, x + etiW - 2, y + 7);
+
+      const gX = x + 10;
+      const gY = y + 20;
+      doc.setDrawColor(180, 180, 180);
+      doc.setLineWidth(0.3);
+      doc.circle(gX, gY, 7.5, 'S');
+
+      const xInfo = x + 22;
+      const labelW = 8;
+      const valX = xInfo + labelW + 1;
+      [[`Lot`, lot.code, y + 13, true], [`Prod.`, fmtDate(now), y + 20, false], [`DLC`, fmtDate(dlcDate), y + 27, false]].forEach(([label, val, yPos, isMono]) => {
+        doc.setTextColor(150, 150, 150);
+        doc.setFontSize(5);
+        doc.setFont('helvetica', 'normal');
+        doc.text(label, xInfo + labelW, yPos, { align: 'right' });
+        doc.setTextColor(26, 26, 46);
+        doc.setFontSize(isMono ? 6.5 : 6);
+        doc.setFont(isMono ? 'courier' : 'helvetica', isMono ? 'bold' : 'normal');
+        doc.text(val, valX, yPos);
+      });
+
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.2);
+      doc.line(x + 2, y + etiH - 5, x + etiW - 2, y + etiH - 5);
+      doc.setTextColor(180, 180, 180);
+      doc.setFontSize(4);
+      doc.setFont('helvetica', 'normal');
+      doc.text('BE1015746980', x + etiW / 2, y + etiH - 2, { align: 'center' });
+
+      index++;
+    });
+
+    doc.save('etiquettes-' + client.replace(/ /g, '-') + '.pdf');
+  };
+
+  if (document.querySelector('script[src*="jspdf"]')) {
+    script.onload();
+  } else {
+    document.head.appendChild(script);
+  }
+}
+  
   function reimprimerEtiquettes(numeroBL) {
   const bl = blData.find(b => b.numeroBL === numeroBL);
   if (!bl) return;
