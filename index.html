@@ -3230,12 +3230,11 @@ ${content}
   win.document.close();
 }
 
-  function imprimerEtiquettesLot(lots, client, typeCookiesParam) {
-  const now = new Date();
-  const typeCookies = typeCookiesParam || document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
-  const dlcJours = typeCookies === 'crus' ? 90 : 4;
-  const dlcDate = new Date();
-  dlcDate.setDate(dlcDate.getDate() + dlcJours);
+  function imprimerEtiquettesProduction(code, saveur, date, bacsSimple, bacsDouble) {
+  const cpb = SAVEUR_BAC_CONFIG[saveur]?.cpb || 45;
+  const now = new Date(date || new Date());
+  const dlc = new Date(now);
+  dlc.setMonth(dlc.getMonth() + 4);
   const fmtDate = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 
   const depart = parseInt(prompt('Combien de cases sont déjà utilisées sur ta feuille APLI ?\n(0 si feuille neuve)', '0')) || 0;
@@ -3248,95 +3247,113 @@ ${content}
 
     const marginTop = 1;
     const marginLeft = 23;
-    const etiW = 82;
-    const etiH = 49;
-    const cols = 2;
+    const etiW = 63.5;
+    const etiH = 33.9;
+    const cols = 3;
+    const rows = 4;
+    const gapX = (210 - marginLeft * 2 - etiW * cols) / (cols - 1);
+    const gapY = (148.5 - marginTop * 2 - etiH * rows) / (rows - 1);
     const logoData = window.LOGO_BASE64;
 
-    let index = depart;
-    lots.forEach(lot => {
+    const dessinerEtiquette = (index, type) => {
+      const isDouble = type === 'double';
+      const isBaby = type === 'baby';
       const col = index % cols;
-      const row = Math.floor(index / cols);
-      const x = marginLeft + col * etiW;
-      const y = marginTop + row * etiH;
+      const row = Math.floor(index / cols) % rows;
+      const x = marginLeft + col * (etiW + gapX);
+      const y = marginTop + row * (etiH + gapY);
 
-      // Fond blanc
+      // Fond blanc + bordure
       doc.setFillColor(255, 255, 255);
       doc.rect(x, y, etiW, etiH, 'F');
-
-      // Logo centré en haut
-      if (logoData) doc.addImage(logoData, 'PNG', x + etiW/2 - 12, y + 2, 24, 7);
-
-      // Ligne sous logo
       doc.setDrawColor(220, 220, 220);
-      doc.setLineWidth(0.3);
-      doc.line(x + 2, y + 11, x + etiW - 2, y + 11);
+      doc.setLineWidth(0.2);
+      doc.rect(x, y, etiW, etiH, 'S');
 
-      // Client centré
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(5.5);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Client', x + etiW / 2, y + 16, { align: 'center' });
-      doc.setFontSize(8);
+      // Logo KOOKI COMPANY SRL centré en haut
+      doc.setTextColor(212, 66, 24);
+      doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
-      doc.text(client.toUpperCase(), x + etiW / 2, y + 21, { align: 'center' });
+      doc.text('KOOKI COMPANY SRL', x + etiW / 2, y + 5, { align: 'center' });
 
-      // Saveur centrée
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(5.5);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Saveur', x + etiW / 2, y + 27, { align: 'center' });
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text(lot.saveur, x + etiW / 2, y + 33, { align: 'center' });
+      // Badge BABY si besoin
+      if (isBaby) {
+        doc.setFillColor(250, 238, 218);
+        doc.roundedRect(x + etiW - 14, y + 1, 12, 5, 1, 1, 'F');
+        doc.setTextColor(133, 79, 11);
+        doc.setFontSize(4.5);
+        doc.setFont('helvetica', 'bold');
+        doc.text('BABY', x + etiW - 8, y + 4.5, { align: 'center' });
+      }
 
       // Ligne séparatrice
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.3);
-      doc.line(x + 2, y + 36, x + etiW - 2, y + 36);
+      doc.line(x + 2, y + 7, x + etiW - 2, y + 7);
 
-      // Lot
-      doc.setTextColor(150, 150, 150);
-      doc.setFontSize(5);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Lot', x + 4, y + 40);
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(6);
-      doc.setFont('courier', 'bold');
-      doc.text(lot.code, x + 4, y + 45);
+      if (isBaby) {
+        // VERSION BABY : saveur en grand, pas de gomette
+        doc.setTextColor(26, 26, 46);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(saveur, x + etiW / 2, y + 14, { align: 'center' });
 
-      // Livraison
-      doc.setTextColor(150, 150, 150);
-      doc.setFontSize(5);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Livraison', x + etiW / 2, y + 40, { align: 'center' });
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(6);
-      doc.setFont('helvetica', 'bold');
-      doc.text(fmtDate(now), x + etiW / 2, y + 45, { align: 'center' });
+        // Lot, Prod., DLC centrés
+        const xLabel = x + etiW / 2 - 5;
+        const xVal = x + etiW / 2 - 4;
 
-      // DLC encadré à droite
-      doc.setDrawColor(26, 26, 46);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(x + etiW - 28, y + 37, 26, 10, 1, 1, 'S');
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(5);
-      doc.setFont('helvetica', 'normal');
-      doc.text(typeCookies === 'crus' ? 'DLC · crus' : 'DLC · cuits', x + etiW - 15, y + 41, { align: 'center' });
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.text(fmtDate(dlcDate), x + etiW - 15, y + 46, { align: 'center' });
-      
-      // Numéro d'entreprise
+        [[`Lot`, code, y + 19], [`Prod.`, fmtDate(now), y + 24], [`DLC`, fmtDate(dlc), y + 29]].forEach(([label, val, yPos]) => {
+          doc.setTextColor(150, 150, 150);
+          doc.setFontSize(4.5);
+          doc.setFont('helvetica', 'normal');
+          doc.text(label, xLabel, yPos, { align: 'right' });
+          doc.setTextColor(26, 26, 46);
+          doc.setFontSize(label === 'Lot' ? 6 : 5.5);
+          doc.setFont(label === 'Lot' ? 'courier' : 'helvetica', 'normal');
+          doc.text(val, xVal, yPos);
+        });
+
+      } else {
+        // VERSION BIG : gomette à gauche (cercle vide)
+        const gX = x + 10;
+        const gY = y + 20;
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.3);
+        doc.circle(gX, gY, 7.5, 'S');
+
+        // Lot, Prod., DLC à droite alignés
+        const xInfo = x + 22;
+        const labelW = 8;
+        const valX = xInfo + labelW + 1;
+
+        [[`Lot`, code, y + 13, true], [`Prod.`, fmtDate(now), y + 20, false], [`DLC`, fmtDate(dlc), y + 27, false]].forEach(([label, val, yPos, isMono]) => {
+          doc.setTextColor(150, 150, 150);
+          doc.setFontSize(5);
+          doc.setFont('helvetica', 'normal');
+          doc.text(label, xInfo + labelW, yPos, { align: 'right' });
+          doc.setTextColor(26, 26, 46);
+          doc.setFontSize(isMono ? 6.5 : 6);
+          doc.setFont(isMono ? 'courier' : 'helvetica', isMono ? 'bold' : 'normal');
+          doc.text(val, valX, yPos);
+        });
+      }
+
+      // Ligne + numéro d'entreprise en bas
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.2);
+      doc.line(x + 2, y + etiH - 5, x + etiW - 2, y + etiH - 5);
       doc.setTextColor(180, 180, 180);
-      doc.setFontSize(4.5);
+      doc.setFontSize(4);
       doc.setFont('helvetica', 'normal');
-      doc.text('BE1015746980', x + etiW / 2, y + 48, { align: 'center' });
-      
-      index++;
-    });
+      doc.text('BE1015746980', x + etiW / 2, y + etiH - 2, { align: 'center' });
+    };
 
-    doc.save('etiquettes-' + client.replace(/ /g, '-') + '.pdf');
+    let index = depart;
+    for (let i = 0; i < (bacsSimple || 0); i++) { dessinerEtiquette(index, 'simple'); index++; }
+    for (let i = 0; i < (bacsDouble || 0); i++) { dessinerEtiquette(index, 'double'); index++; }
+
+    if (index === depart) { alert('Aucun bac à imprimer'); return; }
+    doc.save('etiquettes-production-' + saveur + '.pdf');
   };
 
   if (document.querySelector('script[src*="jspdf"]')) {
