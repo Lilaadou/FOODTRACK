@@ -1213,25 +1213,15 @@
 
 <!-- Préétape B2B — Grands ou Baby seulement -->
 <div id="b2b-preetape-section" style="display:none;margin-bottom:13px">
-  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
-      🍪 Le client prend-il des grands cookies ?
+  <div style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Type de commande</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div id="label-grands-oui" onclick="selectTypeCommande('oui')" style="border:0.5px solid #e8e8e8;border-radius:10px;padding:10px 12px;cursor:pointer">
+      <div style="font-size:12px;font-weight:500;color:#1a1a2e">Grands + Baby</div>
+      <div style="font-size:10px;color:#aaa;margin-top:2px">Big et Small cookies</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr">
-      <label id="label-grands-oui" onclick="selectTypeCommande('oui')" style="padding:14px 16px;cursor:pointer;border-right:0.5px solid #e8e8e8">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <div id="dot-grands-oui" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">Oui — Grands + Baby</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Affiche Big ET Small cookies</div>
-      </label>
-      <label id="label-grands-non" onclick="selectTypeCommande('non')" style="padding:14px 16px;cursor:pointer">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <div id="dot-grands-non" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">Non — Baby seulement</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Uniquement Small cookies</div>
-      </label>
+    <div id="label-grands-non" onclick="selectTypeCommande('non')" style="border:0.5px solid #e8e8e8;border-radius:10px;padding:10px 12px;cursor:pointer">
+      <div style="font-size:12px;font-weight:500;color:#1a1a2e">Baby seulement</div>
+      <div style="font-size:10px;color:#aaa;margin-top:2px">Uniquement Small</div>
     </div>
   </div>
 </div>
@@ -8549,27 +8539,18 @@ _logoImg.onload = () => {
   function selectTypeCommande(type) {
   window._b2bTypeCommande = type;
   const isOui = type === 'oui';
-
   const labelOui = document.getElementById('label-grands-oui');
   const labelNon = document.getElementById('label-grands-non');
-  const dotOui = document.getElementById('dot-grands-oui');
-  const dotNon = document.getElementById('dot-grands-non');
 
   if (labelOui) {
-    labelOui.style.background = isOui ? '#f0faf4' : '#fff';
-    labelOui.style.borderBottom = isOui ? '2px solid #27ae60' : 'none';
+    labelOui.style.border = isOui ? '2px solid #d44218' : '0.5px solid #e8e8e8';
+    labelOui.style.background = isOui ? '#fbe8e2' : '#fff';
+    labelOui.querySelector('div').style.color = isOui ? '#7a1f0a' : '#1a1a2e';
   }
   if (labelNon) {
-    labelNon.style.background = !isOui ? '#fef7d6' : '#fff';
-    labelNon.style.borderBottom = !isOui ? '2px solid #e6a800' : 'none';
-  }
-  if (dotOui) {
-    dotOui.style.background = isOui ? '#27ae60' : 'transparent';
-    dotOui.style.borderColor = isOui ? '#27ae60' : '#e8e8e8';
-  }
-  if (dotNon) {
-    dotNon.style.background = !isOui ? '#e6a800' : 'transparent';
-    dotNon.style.borderColor = !isOui ? '#e6a800' : '#e8e8e8';
+    labelNon.style.border = !isOui ? '2px solid #378ADD' : '0.5px solid #e8e8e8';
+    labelNon.style.background = !isOui ? '#E6F1FB' : '#fff';
+    labelNon.querySelector('div').style.color = !isOui ? '#042C53' : '#1a1a2e';
   }
 
   document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
@@ -8578,15 +8559,6 @@ _logoImg.onload = () => {
     if (saveur) loadLotsBlock(bId);
   });
 }
-
-  const DEST_COLORS = {
-  b2b:        { border:'#B5D4F4', bg:'#E6F1FB' },
-  magasin:    { border:'#C0DD97', bg:'#EAF3DE' },
-  anderlecht: { border:'#F5C4B3', bg:'#FAECE7' },
-  evenement:  { border:'#AFA9EC', bg:'#EEEDFE' },
-  interne:    { border:'#FAC775', bg:'#FAEEDA' },
-  autre:      { border:'#D3D1C7', bg:'#F1EFE8' },
-};
 
 function selectDestCard(dest) {
   document.querySelectorAll('.dest-card').forEach(c => {
