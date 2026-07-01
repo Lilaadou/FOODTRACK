@@ -3331,9 +3331,7 @@ const cmdRef     = document.getElementById('cmd-client-ref')?.value.trim()     |
   document.getElementById('bon-numero').textContent = num;
   document.getElementById('bon-date').textContent   = dateStr;
   document.getElementById('bon-client').textContent = client || cmdNom;
-document.getElementById('bon-client-adresse').textContent = isCommande && !clientInfo.adresse
-  ? 'Retrait sur place — Avenue Emile Gryson 2D, 1070 Anderlecht'
-  : clientInfo.adresse || cmdAdresse || '';
+document.getElementById('bon-client-adresse').textContent = isCommande ? '' : clientInfo.adresse || cmdAdresse || '';
 document.getElementById('bon-client-contact').textContent = clientInfo.contact
   ? '👤 ' + clientInfo.contact + '  📞 ' + clientInfo.tel
   : [cmdTel ? '📞 ' + cmdTel : '', cmdEmail ? '✉️ ' + cmdEmail : '', cmdRef ? '📋 Ref: ' + cmdRef : ''].filter(Boolean).join('  ·  ');
@@ -3397,7 +3395,8 @@ const bonLivreurAdresse = document.getElementById('bon-livreur-adresse');
 if (isCommande) {
   if (bonLivreurLabel)   bonLivreurLabel.textContent   = 'Retrait sur place';
   if (bonLivreurNom)     bonLivreurNom.textContent     = 'Kooki Anderlecht';
-  if (bonLivreurAdresse) bonLivreurAdresse.innerHTML   = 'Avenue Emile Gryson 2D · 1070 Anderlecht<br>anderlecht@kooki.be · 0492 80 10 38';
+  if (bonLivreurAdresse) bonLivreurAdresse.innerHTML = 'Avenue Emile Gryson 2D · 1070 Anderlecht<br>anderlecht@kooki.be · 0492 80 10 38';
+if (bonLivreurNom) bonLivreurNom.textContent = 'Kooki Anderlecht';
 } else {
   if (bonLivreurLabel)   bonLivreurLabel.textContent   = 'Livré par';
   if (bonLivreurNom)     bonLivreurNom.textContent     = 'KOOKI COMPANY SRL';
