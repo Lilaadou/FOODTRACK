@@ -1174,6 +1174,24 @@
   </div>
   </div>
       </div>
+
+      <div id="recap-commande-live" style="display:none;margin-bottom:13px">
+  <div style="background:#EAF3DE;border:1.5px solid #C0DD97;border-radius:12px;padding:14px 16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <i class="ti ti-clipboard-list" style="font-size:15px;color:#27500A" aria-hidden="true"></i>
+        <span style="font-size:12px;font-weight:500;color:#27500A" id="recap-live-client">Récap commande</span>
+      </div>
+      <div style="display:flex;gap:10px">
+        <span style="font-size:12px;font-weight:500;color:#d44218" id="recap-live-big">0 Big</span>
+        <span style="font-size:12px;font-weight:500;color:#378ADD" id="recap-live-small">0 Small</span>
+      </div>
+    </div>
+    <div id="recap-live-lines" style="display:flex;flex-direction:column;gap:4px">
+      <div style="font-size:11px;color:#27500A;opacity:.6;text-align:center;padding:4px 0">Aucune quantité saisie pour l'instant</div>
+    </div>
+  </div>
+</div>
       
       <!-- Boîtes plastiques B2B (auto) -->
       <div id="boites-section-b2b" style="display:none;margin-bottom:13px">
@@ -2892,6 +2910,66 @@ function calcBoites() {
   window._boitesBig   = Math.ceil(totalBigBoxes / 14);
   window._boitesSmall = Math.ceil(totalSmallBoxes / 25);
   window._boitesIx    = totalCookies > 0 ? Math.ceil(totalCookies / 40) : 0;
+}
+
+  // Mise à jour récap live
+updateRecapLive();
+
+  function updateRecapLive() {
+  const type = document.getElementById('sortie-type')?.value;
+  const recapBox = document.getElementById('recap-commande-live');
+  if (!recapBox) return;
+
+  // Afficher seulement pour B2B
+  if (type !== 'b2b') { recapBox.style.display = 'none'; return; }
+
+  const client = document.getElementById('sortie-b2b-client')?.value || '';
+  const clientEl = document.getElementById('recap-live-client');
+  if (clientEl) clientEl.textContent = client ? 'Récap — ' + client : 'Récap commande';
+
+  let totalBig = 0, totalSmall = 0;
+  const lines = {};
+
+  document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
+    const bId = block.id.replace('saveur-block-', '');
+    const saveur = document.getElementById('saveur-sel-' + bId)?.value;
+    if (!saveur) return;
+
+    const stockLocal2 = stockLocal.filter(l => l.saveur === saveur);
+    stockLocal2.forEach(l => {
+      const bigVal = parseInt(document.getElementById('b' + bId + '-big-' + l.code)?.value) || 0;
+      const smallVal = parseInt(document.getElementById('b' + bId + '-small-' + l.code)?.value) || 0;
+      if (bigVal > 0 || smallVal > 0) {
+        if (!lines[saveur]) lines[saveur] = { big: 0, small: 0 };
+        lines[saveur].big += bigVal;
+        lines[saveur].small += smallVal;
+        totalBig += bigVal;
+        totalSmall += smallVal;
+      }
+    });
+  });
+
+  document.getElementById('recap-live-big').textContent = totalBig + ' Big';
+  document.getElementById('recap-live-small').textContent = totalSmall + ' Small';
+
+  const linesEl = document.getElementById('recap-live-lines');
+  if (!Object.keys(lines).length) {
+    linesEl.innerHTML = '<div style="font-size:11px;color:#27500A;opacity:.6;text-align:center;padding:4px 0">Aucune quantité saisie pour l\'instant</div>';
+    recapBox.style.display = '';
+    return;
+  }
+
+  linesEl.innerHTML = Object.entries(lines).map(([saveur, qty]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.6);border-radius:8px">
+      <span style="font-size:12px;font-weight:500;color:#173404">${saveur}</span>
+      <div style="display:flex;gap:8px">
+        ${qty.big > 0 ? `<span style="font-size:11px;font-weight:500;color:#d44218">${qty.big} Big</span>` : ''}
+        ${qty.small > 0 ? `<span style="font-size:11px;font-weight:500;color:#378ADD">${qty.small} Small</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  recapBox.style.display = '';
 }
 
 // ─────────────────────────────────────
@@ -8567,6 +8645,23 @@ _logoImg.onload = () => {
   });
 }
 
+  function fillClientInfo() {
+  const name = document.getElementById('sortie-b2b-client')?.value;
+  const info = B2B_CLIENTS[name];
+  const info2 = document.getElementById('b2b-client-info');
+  if (info2 && info && name) {
+    info2.style.display = '';
+    info2.innerHTML = `
+      <div style="font-weight:500;color:#042C53;margin-bottom:4px">${name}</div>
+      ${info.adresse ? `<div style="color:#378ADD;display:flex;align-items:center;gap:4px"><i class="ti ti-map-pin" style="font-size:12px" aria-hidden="true"></i> ${info.adresse}</div>` : ''}
+      ${info.contact ? `<div style="color:#378ADD;margin-top:2px;display:flex;align-items:center;gap:4px"><i class="ti ti-user" style="font-size:12px" aria-hidden="true"></i> ${info.contact}${info.tel ? ' · ' + info.tel : ''}</div>` : ''}
+    `;
+  } else if (info2) {
+    info2.style.display = 'none';
+  }
+  updateRecapLive();
+}
+  
 function selectDestCard(dest) {
   document.querySelectorAll('.dest-card').forEach(c => {
     const sel = c.dataset.dest === dest;
