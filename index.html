@@ -2985,39 +2985,45 @@ function loadLotsBlock(id) {
   }
 
   container.innerHTML = `
-    <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B ? '1.2fr' : '1fr'};font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid #efefef;margin-bottom:6px">
-      <span>Code lot</span>
-      ${!b2bSeulementSmall ? '<span style="text-align:center;color:#d44218">Big (max)</span>' : '<span></span>'}
-      <span style="text-align:center;color:#0662aa">Small (max)${isB2B ? ' · 📦' : ''}</span>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      ${lots.map(l => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:8px;background:#f9f9f9;border:0.5px solid #e8e8e8">
+          <div style="min-width:0">
+            <div style="font-size:11px;font-weight:600;color:#1a1a2e">${l.code}</div>
+            <div style="font-size:10px;color:#aaa">${l.big} Big · ${l.small} Small</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            ${!b2bSeulementSmall ? `
+            <div style="display:flex;align-items:center;gap:4px">
+              <span style="font-size:9px;font-weight:700;color:#d44218">Big</span>
+              <input type="number" min="0" max="${l.big}" placeholder="0"
+                id="b${id}-big-${l.code}"
+                oninput="calcBoites()"
+                style="width:48px;padding:4px 5px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:12px;text-align:center;background:#fff"
+                onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
+            </div>` : ''}
+            <div style="display:flex;align-items:center;gap:4px">
+              <span style="font-size:9px;font-weight:700;color:#0662aa">Small</span>
+              <input type="number" min="0" max="${l.small}" placeholder="0"
+                id="b${id}-small-${l.code}"
+                oninput="calcBoites()"
+                style="width:48px;padding:4px 5px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:12px;text-align:center;background:#fff${l.small === 0 ? ';opacity:.4' : ''}"
+                onfocus="this.style.borderColor='#0662aa'" onblur="this.style.borderColor='#e8e8e8'"
+                ${l.small === 0 ? 'disabled' : ''}>
+            </div>
+            ${isB2B ? `
+            <div style="background:#E6F1FB;border-radius:6px;padding:3px 6px;min-width:42px;text-align:center">
+              <div style="font-size:8px;font-weight:700;color:#0662aa">boîtes</div>
+              <div id="b${id}-boxes-${l.code}" style="font-size:12px;font-weight:700;color:#0662aa">0</div>
+            </div>` : ''}
+          </div>
+        </div>`).join('')}
     </div>
-    ${lots.map(l => `
-      <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B ? '1.2fr' : '1fr'};align-items:start;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">
-        <div>
-          <div style="font-weight:600;font-size:12px">${l.code}</div>
-          <div style="font-size:10px;color:#aaa">Stock : ${l.big} Big · ${l.small} Small</div>
-        </div>
-        <div style="text-align:center">
-          ${!b2bSeulementSmall ? `<input type="number" min="0" max="${l.big}" placeholder="0"
-            id="b${id}-big-${l.code}"
-            oninput="calcBoites()"
-            style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none"
-            onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
-            <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.big}</div>` : '<div></div>'}
-        </div>
-        <div style="text-align:center">
-          <input type="number" min="0" max="${l.small}" placeholder="0"
-            id="b${id}-small-${l.code}"
-            oninput="calcBoites()"
-            style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none"
-            onfocus="this.style.borderColor='#0662aa'" onblur="this.style.borderColor='#e8e8e8'">
-          <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.small}</div>
-          ${isB2B ? `
-          <div style="margin-top:5px;background:#f0f6fc;border-radius:6px;padding:4px 6px;display:inline-block;min-width:62px">
-            <div style="font-size:8px;font-weight:700;color:#0662aa;text-transform:uppercase">📦 boîtes</div>
-            <div id="b${id}-boxes-${l.code}" style="font-size:13px;font-weight:700;color:#0662aa">0</div>
-          </div>` : ''}
-        </div>
-      </div>`).join('')}`;
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;padding-top:8px;border-top:0.5px solid #efefef">
+      <span style="font-size:11px;color:#aaa">Total :</span>
+      <span style="font-size:11px;font-weight:600;color:#d44218" id="total-big-${id}">0 Big</span>
+      <span style="font-size:11px;font-weight:600;color:#0662aa" id="total-small-${id}">0 Small</span>
+    </div>`;
 }
 
   function changeBacIx(blockId, lotCode, delta, max, cpb) {
