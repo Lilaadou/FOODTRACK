@@ -996,12 +996,12 @@
     </div>
 
     <div class="dest-card" data-dest="autre" onclick="selectDestCard('autre')" style="border:0.5px solid #e8e8e8;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s">
-      <div style="width:40px;height:40px;border-radius:10px;background:#F1EFE8;display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
-        <i class="ti ti-dots" style="font-size:22px;color:#444441" aria-hidden="true"></i>
-      </div>
-      <div style="font-size:13px;font-weight:700;color:#1a1a2e">Autre</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px">Divers</div>
-    </div>
+  <div style="width:40px;height:40px;border-radius:10px;background:#EAF3DE;display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+    <i class="ti ti-shopping-cart" style="font-size:22px;color:#27500A" aria-hidden="true"></i>
+  </div>
+  <div style="font-size:13px;font-weight:700;color:#1a1a2e">Commande client</div>
+  <div style="font-size:11px;color:#aaa;margin-top:2px">Web · Mail</div>
+</div>
 
   </div>
 </div>
@@ -1104,7 +1104,52 @@
   </div>
 </div>
       
-
+<div id="autre-dest-group" style="display:none;margin-bottom:13px">
+  <div style="background:#EAF3DE;border:2px solid #C0DD97;border-radius:12px;padding:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <i class="ti ti-shopping-cart" style="font-size:18px;color:#27500A" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:500;color:#27500A">Infos client</div>
+      </div>
+      <button onclick="toggleCmdClientSave()" id="btn-cmd-save"
+        style="font-size:11px;color:#27500A;background:rgba(255,255,255,.6);border:0.5px solid #C0DD97;border-radius:8px;padding:3px 10px;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="ti ti-bookmark" id="icon-cmd-save" aria-hidden="true" style="font-size:13px"></i>
+        <span id="label-cmd-save">Ne pas sauvegarder</span>
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="form-group">
+        <label>Nom *</label>
+        <input type="text" id="cmd-client-nom" placeholder="Ex: Jean Dupont">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" id="cmd-client-email" placeholder="jean@email.com">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Adresse de livraison</label>
+        <input type="text" id="cmd-client-adresse" placeholder="Ex: Rue de la Paix 12, 1000 Bruxelles">
+      </div>
+      <div class="form-group">
+        <label>Téléphone</label>
+        <input type="text" id="cmd-client-tel" placeholder="Ex: +32 470 00 00 00">
+      </div>
+      <div class="form-group">
+        <label>Ref. commande</label>
+        <input type="text" id="cmd-client-ref" placeholder="Ex: CMD-2026-042">
+      </div>
+    </div>
+    <div id="cmd-info-banner" style="background:rgba(255,255,255,.5);border:0.5px solid #C0DD97;border-radius:8px;padding:8px 12px;font-size:11px;color:#27500A;display:flex;align-items:center;gap:6px">
+      <i class="ti ti-info-circle" style="font-size:14px;flex-shrink:0" aria-hidden="true"></i>
+      <span id="cmd-info-text">Ces informations seront utilisées uniquement pour le bon de livraison et ne seront pas sauvegardées.</span>
+    </div>
+    <div id="cmd-clients-saved" style="display:none;margin-top:12px">
+      <div style="font-size:10px;font-weight:700;color:#27500A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Clients sauvegardés</div>
+      <div id="cmd-clients-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+</div>
+      
       <!-- Boîtes plastiques B2B (auto) -->
       <div id="boites-section-b2b" style="display:none;margin-bottom:13px">
         <div style="background:#e0edf8;border-radius:10px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
@@ -3245,11 +3290,18 @@ function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique',
 
 
   const clientInfo = B2B_CLIENTS[client] || {};
+const cmdNom     = document.getElementById('cmd-client-nom')?.value.trim()     || '';
+const cmdEmail   = document.getElementById('cmd-client-email')?.value.trim()   || '';
+const cmdAdresse = document.getElementById('cmd-client-adresse')?.value.trim() || '';
+const cmdTel     = document.getElementById('cmd-client-tel')?.value.trim()     || '';
+const cmdRef     = document.getElementById('cmd-client-ref')?.value.trim()     || '';
   document.getElementById('bon-numero').textContent = num;
   document.getElementById('bon-date').textContent   = dateStr;
-  document.getElementById('bon-client').textContent = client;
-  document.getElementById('bon-client-adresse').textContent = clientInfo.adresse || '';
-  document.getElementById('bon-client-contact').textContent = clientInfo.contact ? '👤 ' + clientInfo.contact + '  📞 ' + clientInfo.tel : '';
+  document.getElementById('bon-client').textContent = client || cmdNom;
+document.getElementById('bon-client-adresse').textContent = clientInfo.adresse || cmdAdresse || '';
+document.getElementById('bon-client-contact').textContent = clientInfo.contact
+  ? '👤 ' + clientInfo.contact + '  📞 ' + clientInfo.tel
+  : [cmdTel ? '📞 ' + cmdTel : '', cmdEmail ? '✉️ ' + cmdEmail : '', cmdRef ? '📋 Ref: ' + cmdRef : ''].filter(Boolean).join('  ·  ');
 
   // Tableau des lots : masquer les colonnes à 0
   let totalBig = 0, totalSmall = 0;
@@ -3318,6 +3370,93 @@ if (dlcLabel) dlcLabel.textContent = typeCookies === 'crus' ? 'Cookies crus · �
 // Stock local (depuis getStock) — utilisé pour afficher les lots par saveur
 let stockLocal = JSON.parse(localStorage.getItem('kooki_stock_local') || '[]');
 
+  let cmdClientSave = false;
+let cmdClientsStored = JSON.parse(localStorage.getItem('kooki_cmd_clients') || '[]');
+
+function toggleCmdClientSave() {
+  cmdClientSave = !cmdClientSave;
+  const btn   = document.getElementById('btn-cmd-save');
+  const icon  = document.getElementById('icon-cmd-save');
+  const label = document.getElementById('label-cmd-save');
+  const banner = document.getElementById('cmd-info-banner');
+  const text  = document.getElementById('cmd-info-text');
+  const savedDiv = document.getElementById('cmd-clients-saved');
+  if (cmdClientSave) {
+    btn.style.background = '#27500A';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#27500A';
+    icon.className = 'ti ti-bookmark-filled';
+    label.textContent = 'Sauvegarder ce client';
+    text.textContent = 'Ce client sera sauvegardé pour les prochaines commandes.';
+    savedDiv.style.display = '';
+    renderCmdClientsList();
+  } else {
+    btn.style.background = 'rgba(255,255,255,.6)';
+    btn.style.color = '#27500A';
+    btn.style.borderColor = '#C0DD97';
+    icon.className = 'ti ti-bookmark';
+    label.textContent = 'Ne pas sauvegarder';
+    text.textContent = 'Ces informations seront utilisées uniquement pour le bon de livraison et ne seront pas sauvegardées.';
+    savedDiv.style.display = 'none';
+  }
+}
+
+function renderCmdClientsList() {
+  const list = document.getElementById('cmd-clients-list');
+  if (!list) return;
+  if (!cmdClientsStored.length) {
+    list.innerHTML = '<div style="font-size:12px;color:#27500A;opacity:.6;padding:6px 0">Aucun client sauvegardé pour l\'instant.</div>';
+    return;
+  }
+  list.innerHTML = cmdClientsStored.map((c, i) => {
+    const initials = c.nom.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+    return `<div onclick="selectCmdClient(${i})"
+      style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:0.5px solid #C0DD97;cursor:pointer;background:#fff"
+      onmouseover="this.style.background='#f0faf4'" onmouseout="this.style.background='#fff'">
+      <div style="width:32px;height:32px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#27500A;flex-shrink:0">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;color:#173404">${c.nom}</div>
+        <div style="font-size:11px;color:#27500A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.email || ''}${c.tel ? ' · ' + c.tel : ''}</div>
+      </div>
+      <button onclick="event.stopPropagation();deleteCmdClient(${i})"
+        style="background:none;border:none;cursor:pointer;font-size:13px;color:#ccc;padding:2px 6px;border-radius:6px"
+        onmouseover="this.style.color='#d44218';this.style.background='#fbe8e2'"
+        onmouseout="this.style.color='#ccc';this.style.background='none'"
+        title="Supprimer ce client">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+function selectCmdClient(i) {
+  const c = cmdClientsStored[i];
+  if (!c) return;
+  document.getElementById('cmd-client-nom').value     = c.nom     || '';
+  document.getElementById('cmd-client-email').value   = c.email   || '';
+  document.getElementById('cmd-client-adresse').value = c.adresse || '';
+  document.getElementById('cmd-client-tel').value     = c.tel     || '';
+}
+
+function deleteCmdClient(i) {
+  if (!confirm('Supprimer ce client ?')) return;
+  cmdClientsStored.splice(i, 1);
+  localStorage.setItem('kooki_cmd_clients', JSON.stringify(cmdClientsStored));
+  renderCmdClientsList();
+}
+
+function saveCmdClientIfNeeded() {
+  if (!cmdClientSave) return;
+  const nom     = document.getElementById('cmd-client-nom')?.value.trim();
+  const email   = document.getElementById('cmd-client-email')?.value.trim();
+  const adresse = document.getElementById('cmd-client-adresse')?.value.trim();
+  const tel     = document.getElementById('cmd-client-tel')?.value.trim();
+  if (!nom) return;
+  const existe = cmdClientsStored.find(c => c.nom === nom);
+  if (!existe) {
+    cmdClientsStored.unshift({ nom, email, adresse, tel });
+    localStorage.setItem('kooki_cmd_clients', JSON.stringify(cmdClientsStored));
+  }
+}
+
 async function saveSortie() {
   const type      = document.getElementById('sortie-type').value;
   const b2bClient = document.getElementById('sortie-b2b-client')?.value || '';
@@ -3329,7 +3468,10 @@ async function saveSortie() {
   else if (type === 'anderlecht') destination = 'Magasin Anderlecht';
   else if (type === 'evenement') destination = 'Événement';
   else if (type === 'interne')   destination = 'Usage interne';
-  else if (type === 'autre')     destination = custom || 'Autre';
+  else if (type === 'autre') {
+  destination = document.getElementById('cmd-client-nom')?.value.trim() || 'Commande client';
+  saveCmdClientIfNeeded();
+}
 
   if (!destination)                   { toast('sortie','⚠️ Choisissez une destination','err'); return; }
   if (type==='b2b' && !b2bClient)    { toast('sortie','⚠️ Choisissez un client B2B','err');   return; }
