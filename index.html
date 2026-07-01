@@ -1005,9 +1005,15 @@
 
   </div>
 </div>
-        <div class="form-group" id="b2b-client-group" style="display:none">
-          <label>Client B2B *</label>
-          <select id="sortie-b2b-client" onchange="fillClientInfo()">
+        <div id="b2b-client-group" style="display:none;margin-top:12px">
+  <div style="background:#E6F1FB;border:0.5px solid #85B7EB;border-radius:10px;padding:12px">
+    <div style="font-size:10px;font-weight:500;color:#0C447C;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Client B2B</div>
+    <select id="sortie-b2b-client" onchange="fillClientInfo()" style="width:100%;background:#fff;border:0.5px solid #85B7EB;margin-bottom:8px">
+      <option value="">-- Sélectionner --</option>
+    </select>
+    <div id="b2b-client-info" style="display:none;padding:8px 10px;background:#fff;border-radius:8px;border:0.5px solid #85B7EB;font-size:11px;color:#0C447C"></div>
+  </div>
+</div>
             <option value="">-- Sélectionner --</option>
             <option>Ecocyclo</option>
             <option>Galler Ixelles</option>
@@ -2515,20 +2521,18 @@ function fillClientInfo() {
   const name = document.getElementById('sortie-b2b-client').value;
   const info = B2B_CLIENTS[name];
   const preview = document.getElementById('b2b-client-preview');
-  if (!preview) return;
-  if (info && name) {
-    document.getElementById('b2b-client-nom').textContent = name;
-    document.querySelector('#b2b-client-adresse-preview span').textContent = info.adresse;
-    const contactSpans = document.querySelectorAll('#b2b-client-contact-preview span');
-    if (contactSpans[0]) contactSpans[0].textContent = info.contact;
-    if (contactSpans[1]) contactSpans[1].textContent = info.tel;
-    preview.style.display = 'block';
-    // Déplacer le preview juste après le select
-    const clientGroup = document.getElementById('b2b-client-group');
-    if (clientGroup) clientGroup.after(preview);
-  } else {
-    preview.style.display = 'none';
-  }
+if (preview) preview.style.display = 'none';
+const info2 = document.getElementById('b2b-client-info');
+if (info2 && info && name) {
+  info2.style.display = '';
+  info2.innerHTML = `
+    <div style="font-weight:500;color:#042C53;margin-bottom:4px">${name}</div>
+    ${info.adresse ? `<div style="color:#378ADD;display:flex;align-items:center;gap:4px"><i class="ti ti-map-pin" style="font-size:12px" aria-hidden="true"></i> ${info.adresse}</div>` : ''}
+    ${info.contact ? `<div style="color:#378ADD;margin-top:2px;display:flex;align-items:center;gap:4px"><i class="ti ti-user" style="font-size:12px" aria-hidden="true"></i> ${info.contact}${info.tel ? ' · ' + info.tel : ''}</div>` : ''}
+  `;
+} else if (info2) {
+  info2.style.display = 'none';
+}
 }
 
 // ─────────────────────────────────────
