@@ -1370,8 +1370,13 @@
             <div id="bon-client-contact" style="font-size:11px;color:#888;margin-top:2px"></div>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Livré par</div>
-            <div style="font-size:13px;font-weight:700;color:#1a1a2e">KOOKI COMPANY SRL</div>
+            <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px" id="bon-livreur-label">Livré par</div>
+<div style="font-size:13px;font-weight:700;color:#1a1a2e" id="bon-livreur-nom">KOOKI COMPANY SRL</div>
+<div style="font-size:11px;color:#888;line-height:1.6;margin-top:2px" id="bon-livreur-adresse">
+  Avenue Emile Gryson 2D · 1070 Bruxelles<br>
+  anderlecht@kooki.be · 0492 80 10 38<br>
+  N° TVA : BE1015746980
+</div>
             <div style="font-size:11px;color:#888;line-height:1.6;margin-top:2px">
               Avenue Emile Gryson 2D · 1070 Bruxelles<br>
               anderlecht@kooki.be · 0492 80 10 38<br>
@@ -3384,6 +3389,18 @@ const bonTitreDoc = document.getElementById('bon-titre-doc');
 if (bonTitreDoc) bonTitreDoc.textContent = titreDoc;
 const bonLivreLabel = document.getElementById('bon-livre-label');
 if (bonLivreLabel) bonLivreLabel.textContent = libelleClient;
+  const bonLivreurLabel   = document.getElementById('bon-livreur-label');
+const bonLivreurNom     = document.getElementById('bon-livreur-nom');
+const bonLivreurAdresse = document.getElementById('bon-livreur-adresse');
+if (isCommande) {
+  if (bonLivreurLabel)   bonLivreurLabel.textContent   = 'Retrait sur place';
+  if (bonLivreurNom)     bonLivreurNom.textContent     = 'Kooki Anderlecht';
+  if (bonLivreurAdresse) bonLivreurAdresse.innerHTML   = 'Avenue Emile Gryson 2D · 1070 Anderlecht<br>anderlecht@kooki.be · 0492 80 10 38';
+} else {
+  if (bonLivreurLabel)   bonLivreurLabel.textContent   = 'Livré par';
+  if (bonLivreurNom)     bonLivreurNom.textContent     = 'KOOKI COMPANY SRL';
+  if (bonLivreurAdresse) bonLivreurAdresse.innerHTML   = 'Avenue Emile Gryson 2D · 1070 Bruxelles<br>anderlecht@kooki.be · 0492 80 10 38<br>N° TVA : BE1015746980';
+}
   document.getElementById('bon-overlay').style.display = 'flex';
 
 const typeCookies = _typeCookies || document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
