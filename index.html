@@ -8536,6 +8536,15 @@ _logoImg.onload = () => {
   window.LOGO_BASE64 = c.toDataURL('image/png');
 };
 
+  const DEST_COLORS = {
+  b2b:        { border:'#B5D4F4', bg:'#E6F1FB' },
+  magasin:    { border:'#C0DD97', bg:'#EAF3DE' },
+  anderlecht: { border:'#F5C4B3', bg:'#FAECE7' },
+  evenement:  { border:'#AFA9EC', bg:'#EEEDFE' },
+  interne:    { border:'#FAC775', bg:'#FAEEDA' },
+  autre:      { border:'#C0DD97', bg:'#EAF3DE' },
+};
+  
   function selectTypeCommande(type) {
   window._b2bTypeCommande = type;
   const isOui = type === 'oui';
