@@ -3423,16 +3423,16 @@ function selectDocType(type) {
   const retrait = document.getElementById('cmd-retrait-banner');
   const infoText = document.getElementById('cmd-info-text');
   if (type === 'livraison') {
-    optLiv.style.background = '#27500A';
-optLiv.style.color = '#fff';
+    optLiv.style.background = '#C0DD97';
+optLiv.style.color = '#173404';
 optCmd.style.background = '#fff';
 optCmd.style.color = '#173404';
     if (adresse) adresse.style.display = '';
     if (retrait) retrait.style.display = 'none';
     if (infoText) infoText.textContent = 'Ces informations seront utilisées uniquement pour le bon de livraison et ne seront pas sauvegardées.';
   } else {
-    optCmd.style.background = '#27500A';
-optCmd.style.color = '#fff';
+    optCmd.style.background = '#C0DD97';
+optCmd.style.color = '#173404';
 optLiv.style.background = '#fff';
 optLiv.style.color = '#173404';
     if (adresse) adresse.style.display = 'none';
