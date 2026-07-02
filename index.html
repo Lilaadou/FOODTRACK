@@ -2375,10 +2375,10 @@ function addFactureRecue(numero, fournisseur, date) {
     const col = SAVEUR_COULEURS_PMX[sav] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
     const s1 = inv[sav]?.['1'];
     const s2 = inv[sav]?.['2'];
-    const libre1 = !s1 || s1.statut !== 'dispo';
-    const libre2 = !s2 || s2.statut !== 'dispo';
-    const mq1 = s1?.statut === 'dispo' ? premixs.find(p => p.codePremix === s1.codePremix) : null;
-    const mq2 = s2?.statut === 'dispo' ? premixs.find(p => p.codePremix === s2.codePremix) : null;
+    const libre1 = !s1 || s1.statut === 'libre';
+const libre2 = !s2 || s2.statut === 'libre';
+    const mq1 = s1?.statut === 'occupe' ? premixs.find(p => p.codePremix === s1.codePremix) : null;
+    const mq2 = s2?.statut === 'occupe' ? premixs.find(p => p.codePremix === s2.codePremix) : null;
     const hasMq1 = mq1 && (mq1.manquants||[]).length > 0 && !mq1.manquantsResolus;
     const hasMq2 = mq2 && (mq2.manquants||[]).length > 0 && !mq2.manquantsResolus;
     const toutPris = !libre1 && !libre2;
@@ -5239,7 +5239,7 @@ function saveInventairePremix(inv) {
 function marquerSacDisponible(saveur, sac, codePremix) {
   const inv = getInventairePremix();
   if (!inv[saveur]) inv[saveur] = {};
-  inv[saveur][sac] = { statut: 'dispo', codePremix, date: new Date().toISOString() };
+  inv[saveur][sac] = { statut: 'occupe', codePremix, date: new Date().toISOString() };
   saveInventairePremix(inv);
   updateInventairePremix();
 }
@@ -5249,7 +5249,7 @@ function marquerSacVide(codePremix) {
   // Chercher quel sac correspond à ce code premix
   for (const sav of Object.keys(inv)) {
     for (const sac of ['1','2']) {
-      if (inv[sav][sac]?.codePremix === codePremix && inv[sav][sac]?.statut === 'dispo') {
+      if (inv[sav][sac]?.codePremix === codePremix && inv[sav][sac]?.statut === 'occupe') {
         inv[sav][sac].statut = 'vide';
         inv[sav][sac].dateVide = new Date().toISOString();
         saveInventairePremix(inv);
@@ -5299,7 +5299,7 @@ function updateInventairePremix() {
                        : (state1==='dispo'||state2==='dispo') ? 'dispo' : 'vide';
 
     const sacHTML = (data, num, state) => {
-      const label = data.statut === 'dispo' ? (data.codePremix || '—') : 'Vide';
+      const label = data.statut === 'occupe' ? (data.codePremix || '—') : 'Vide';
       return `<div style="display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer" onclick="toggleSacManuel('${sav}','${num}')">
         <div style="width:7px;height:7px;border-radius:50%;background:${DOTCOL[state]};flex-shrink:0"></div>
         <div>
@@ -5753,7 +5753,7 @@ toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
   ALL_SAVEURS_PMX.forEach(sav => {
     ['1','2'].forEach(num => {
       const sac = inv[sav]?.[num];
-      if (sac?.statut === 'dispo' && sac.codePremix && sac.codePremix !== '—') {
+      if (sac?.statut === 'occupe' && sac.codePremix && sac.codePremix !== '—') {
         const pmx = premixs.find(p => p.codePremix === sac.codePremix);
         disponibles.push({
           code: sac.codePremix,
@@ -7891,8 +7891,8 @@ function applyPremix(data) {
       const inv = getInventairePremix();
       const sacData = r.saveur && r.sac ? inv[r.saveur]?.[r.sac] : null;
       const hasMq = (r.manquants || []).length > 0 && !r.manquantsResolus;
-      const statut = hasMq ? 'Incomplet' : sacData?.statut === 'dispo' ? 'Disponible' : sacData?.statut === 'vide' ? 'Utilisé' : 'Enregistré';
-      const statusClass = hasMq ? 's-warn' : sacData?.statut === 'dispo' ? 's-ok' : sacData?.statut === 'vide' ? 's-zero' : 's-ok';
+      const statut = hasMq ? 'Incomplet' : sacData?.statut === 'occupe' ? 'Disponible' : sacData?.statut === 'vide' ? 'Utilisé' : 'Enregistré';
+      const statusClass = hasMq ? 's-warn' : sacData?.statut === 'occupe' ? 's-ok' : sacData?.statut === 'vide' ? 's-zero' : 's-ok';
       tbody.innerHTML += `<tr data-code="${r.codePremix}">
         <td><b>${r.codePremix}</b></td>
         <td>${savSac}</td>
