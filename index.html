@@ -2441,12 +2441,8 @@ function selectPmxBac(saveur, bac) {
   }
   const savEl = document.getElementById('pmx-saveur');
   const sacEl = document.getElementById('pmx-sac');
-  if (savEl) {
-    savEl.innerHTML = `<option value="${saveur}" selected>${saveur}</option>`;
-  }
-  if (sacEl) {
-    sacEl.innerHTML = `<option value="${bac}" selected>${bac}</option>`;
-  }
+if (savEl) savEl.value = saveur;
+if (sacEl) sacEl.value = bac;
   autoFillPmxCode();
 }
   
