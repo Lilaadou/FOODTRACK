@@ -5281,7 +5281,7 @@ function updateInventairePremix() {
     const s2 = inv[sav]?.['2'] || { statut: 'vide' };
 
     const sacState = (data) => {
-      if (data.statut !== 'dispo') return 'vide';
+      if (data.statut !== 'occupe') return 'vide';
       const mq = mqMap[data.codePremix];
       if (mq && mq.manquants.length > 0 && !mq.resolus) return 'manquant';
       return 'dispo';
