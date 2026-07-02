@@ -8698,7 +8698,7 @@ window.showPage = function(name, btn) {
   document.querySelectorAll('.bottom-nav-item').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${name}'`));
   });
-  closeSidebar();
+  closeSidebar(); 
 };
 
   // ─────────────────────────────────────
