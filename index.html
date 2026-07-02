@@ -2193,7 +2193,6 @@ function showPage(name, btn) {
   if (name === 'bl') setTimeout(() => { loadBL(); }, 60);
   if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
   if (name === 'premix') setTimeout(async () => {
-  buildPmxBacGrid();
   const data = await fetchAPI('getPremix');
   applyPremix(data);
   const inv = await fetchAPI('getInventairePremix');
