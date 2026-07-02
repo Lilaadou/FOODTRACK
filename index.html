@@ -737,8 +737,17 @@
         <div style="grid-column:1/-1">
   <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Choisir une saveur et un bac *</label>
   <div id="pmx-bac-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:8px"></div>
-  <select id="pmx-saveur" style="display:none"></select>
-  <select id="pmx-sac" style="display:none"></select>
+  <select id="pmx-saveur" style="display:none">
+  <option value="">--</option>
+  <option>SUZZY</option><option>JACKY</option><option>BENNY</option><option>DAVY</option>
+  <option>MOLLY</option><option>WALLY</option><option>CHARLY</option><option>LENI</option>
+  <option>EMMY</option><option>WOODY</option><option>DANNY</option>
+</select>
+<select id="pmx-sac" style="display:none">
+  <option value="">--</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+</select>
 </div>
         <div></div>
         <div></div>
@@ -2428,21 +2437,29 @@ ${bacHTML('2', libre2, hasMq2, s2?.codePremix || '', sav)}
 
 function selectPmxBac(saveur, bac) {
   const col = SAVEUR_COULEURS_PMX[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
+  
+  // Reset toutes les cartes
   document.querySelectorAll('[id^="pmx-bac-"]').forEach(b => {
     b.style.boxShadow = '';
     b.style.borderWidth = '0.5px';
     b.style.transform = '';
   });
+  
+  // Highlight la carte sélectionnée
   const btn = document.getElementById('pmx-bac-' + saveur);
   if (btn) {
     btn.style.boxShadow = '0 0 0 3px ' + col.text + '55';
     btn.style.borderWidth = '2px';
     btn.style.transform = 'scale(1.03)';
   }
+  
+  // Mettre à jour les selects cachés
   const savEl = document.getElementById('pmx-saveur');
   const sacEl = document.getElementById('pmx-sac');
-if (savEl) savEl.value = saveur;
-if (sacEl) sacEl.value = bac;
+  if (savEl) savEl.value = saveur;
+  if (sacEl) sacEl.value = bac;
+  
+  // Générer le code automatiquement
   autoFillPmxCode();
 }
   
