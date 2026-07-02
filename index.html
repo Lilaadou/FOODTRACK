@@ -2435,31 +2435,29 @@ ${bacHTML('2', libre2, hasMq2, s2?.codePremix || '', sav)}
 }).join('');
 }
 
+let _pmxSaveurSelecee = '';
+let _pmxSacSelectionne = '';
+
 function selectPmxBac(saveur, bac) {
-  const col = SAVEUR_COULEURS_PMX[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
+  _pmxSaveurSelecee = saveur;
+  _pmxSacSelectionne = bac;
   
-  // Reset toutes les cartes
+  const col = SAVEUR_COULEURS_PMX[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
   document.querySelectorAll('[id^="pmx-bac-"]').forEach(b => {
     b.style.boxShadow = '';
     b.style.borderWidth = '0.5px';
     b.style.transform = '';
   });
-  
-  // Highlight la carte sélectionnée
   const btn = document.getElementById('pmx-bac-' + saveur);
   if (btn) {
     btn.style.boxShadow = '0 0 0 3px ' + col.text + '55';
     btn.style.borderWidth = '2px';
     btn.style.transform = 'scale(1.03)';
   }
-  
-  // Mettre à jour les selects cachés
   const savEl = document.getElementById('pmx-saveur');
   const sacEl = document.getElementById('pmx-sac');
   if (savEl) savEl.value = saveur;
   if (sacEl) sacEl.value = bac;
-  
-  // Générer le code automatiquement
   autoFillPmxCode();
 }
   
@@ -5478,8 +5476,8 @@ function toggleSacManuel(saveur, num) {
 }
 
 function autoFillPmxCode() {
-  const sav = document.getElementById('pmx-saveur')?.value;
-  const sac = document.getElementById('pmx-sac')?.value;
+  const sav = _pmxSaveurSelecee || document.getElementById('pmx-saveur')?.value;
+const sac = _pmxSacSelectionne || document.getElementById('pmx-sac')?.value;
   const codeEl = document.getElementById('pmx-code');
   if (!sav || !sac || !codeEl) return;
   const prefix = sav.slice(0,3).toUpperCase();
@@ -5507,6 +5505,8 @@ function getManquantsFromForm() {
 }
 
 function resetPmx() {
+  _pmxSaveurSelecee = '';
+  _pmxSacSelectionne = '';
   document.getElementById('pmx-code').value = '';
   const savEl = document.getElementById('pmx-saveur'); if (savEl) savEl.selectedIndex = 0;
   const sacEl = document.getElementById('pmx-sac');    if (sacEl) sacEl.selectedIndex = 0;
@@ -5605,8 +5605,8 @@ function resetFac() { ['fac-numero','fac-code'].forEach(id=>document.getElementB
 
 function savePremix() {
   const code   = val('pmx-code'), nom = val('pmx-nom');
-  const saveur = document.getElementById('pmx-saveur')?.value || '';
-  const sac    = document.getElementById('pmx-sac')?.value || '';
+  const saveur = _pmxSaveurSelecee || document.getElementById('pmx-saveur')?.value || '';
+const sac    = _pmxSacSelectionne || document.getElementById('pmx-sac')?.value || '';
   if (!code||!nom)      { toast('pmx','⚠️ Code et producteur requis','err'); return; }
   if (!saveur)          { toast('pmx','⚠️ Choisissez une saveur','err');      return; }
   if (!sac)             { toast('pmx','⚠️ Choisissez un numéro de sac','err'); return; }
