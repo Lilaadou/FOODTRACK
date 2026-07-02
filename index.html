@@ -2383,28 +2383,28 @@ const mq2 = s2?.statut === 'occupe' ? premixs.find(p => p.codePremix === s2.code
     const hasMq2 = mq2 && (mq2.manquants||[]).length > 0 && !mq2.manquantsResolus;
     const toutPris = !libre1 && !libre2;
 
-    const bacHTML = (num, libre, hasMq, codePremix) => {
-  const dotColor = hasMq ? '#E24B4A' : libre ? '#27ae60' : '#ccc';
+    const bacHTML = (num, libre, hasMq, codePremix, sav) => {
+  const dotColor = hasMq ? '#E24B4A' : !libre ? '#27ae60' : '#ccc';
   if (libre) {
-    return `<div style="display:flex;align-items:center;gap:4px">
+    return `<div onclick="event.stopPropagation();selectPmxBac('${sav}','${num}')"
+      style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:3px 6px;border-radius:6px;transition:background .1s"
+      onmouseover="this.style.background='rgba(0,0,0,.06)'" onmouseout="this.style.background='transparent'">
       <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0"></span>
       <div style="font-size:10px;color:${col.text};font-weight:500">Bac ${num} · libre</div>
     </div>`;
   }
   const codeColor = hasMq ? '#E24B4A' : col.text;
-  const codeOpacity = hasMq ? '1' : '.75';
-  const codeFontWeight = hasMq ? '500' : '400';
-  return `<div style="display:flex;align-items:flex-start;gap:4px">
+  return `<div style="display:flex;align-items:flex-start;gap:4px;padding:3px 6px">
     <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;margin-top:2px"></span>
-    <div style="font-size:9px;color:${codeColor};font-family:monospace;font-weight:${codeFontWeight};opacity:${codeOpacity}">${codePremix || ''}</div>
+    <div style="font-size:9px;color:${codeColor};font-family:monospace;opacity:.75">${codePremix || ''}</div>
   </div>`;
 };
 
     if (toutPris) {
       return `<div style="border:0.5px solid var(--border);border-radius:12px;padding:10px 12px;background:var(--surface-1);opacity:.45;cursor:not-allowed">
         <div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">${sav}</div>
-      ${bacHTML('1', false, false, s1?.codePremix || '')}
-      ${bacHTML('2', false, false, s2?.codePremix || '')}
+      ${bacHTML('1', libre1, hasMq1, s1?.codePremix || '', sav)}
+${bacHTML('2', libre2, hasMq2, s2?.codePremix || '', sav)}
       </div>`;
     }
 
@@ -2412,7 +2412,7 @@ const mq2 = s2?.statut === 'occupe' ? premixs.find(p => p.codePremix === s2.code
     const manquants = bacCible === '1' ? (mq1 ? (mq1.manquants||[]).join(', ') : '') : (mq2 ? (mq2.manquants||[]).join(', ') : '');
     const hasMqCible = bacCible === '1' ? hasMq1 : hasMq2;
 
-    return `<div onclick="selectPmxBac('${sav}','${bacCible}')" id="pmx-bac-${sav}" data-saveur="${sav}" data-bac="${bacCible}" data-manquants="${manquants.replace(/"/g,'').replace(/'/g,'')}" data-hasmq="${hasMqCible}"
+    return `<div id="pmx-bac-${sav}" data-bac="${bacCible}" data-manquants="${manquants.replace(/"/g,'').replace(/'/g,'')}" data-hasmq="${hasMqCible}"
       style="border:0.5px solid ${col.border};border-radius:12px;padding:10px 12px;cursor:pointer;background:${col.bg};transition:all .12s;position:relative">
      ${hasMq1||hasMq2 ? `<div style="position:absolute;top:-5px;right:-5px;background:#E24B4A;color:#fff;border-radius:20px;font-size:9px;font-weight:500;padding:1px 5px">!</div>` : ''}
       <div style="font-size:13px;font-weight:700;color:${col.dark};margin-bottom:6px">${sav}</div>
