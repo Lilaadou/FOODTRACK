@@ -5685,20 +5685,20 @@ toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
   const container = document.getElementById('prod-pmx-grid');
   const select = document.getElementById('prod-pmx');
 
-  // Garder le select caché pour compatibilité
   if (select) select.innerHTML = '<option value="">-- Choisir --</option>';
   if (!container) return;
 
-  const disponibles = [];
+  // Regrouper les bacs disponibles par saveur
+  const parSaveur = {};
   ALL_SAVEURS_PMX.forEach(sav => {
     ['1','2'].forEach(num => {
       const sac = inv[sav]?.[num];
       if (sac?.statut === 'dispo' && sac.codePremix && sac.codePremix !== '—') {
         const pmx = premixs.find(p => p.codePremix === sac.codePremix);
-        disponibles.push({
+        if (!parSaveur[sav]) parSaveur[sav] = [];
+        parSaveur[sav].push({
           code: sac.codePremix,
-          saveur: sav,
-          sac: num,
+          bac: num,
           manquants: pmx?.manquants || [],
           manquantsResolus: pmx?.manquantsResolus || false
         });
@@ -5712,51 +5712,71 @@ toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
     });
   });
 
-  if (!disponibles.length) {
+  const saveurs = Object.keys(parSaveur).sort();
+  if (!saveurs.length) {
     container.innerHTML = '<div style="color:#aaa;font-size:12px;padding:10px 0">Aucun premix disponible</div>';
     return;
   }
 
-  container.innerHTML = disponibles.map(p => {
-    const col = SAVEUR_COULEURS[p.saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
-    const hasMq = p.manquants.length > 0 && !p.manquantsResolus;
-    const icon = hasMq ? 'ti-alert-triangle' : 'ti-circle-check';
-    const label = hasMq ? 'Manquants ⚠️' : 'Bac ' + p.sac;
-    return `<div onclick="selectPremixBtn('${p.code}','${p.saveur}',${JSON.stringify(p.manquants)},${p.manquantsResolus})"
-      id="pmx-btn-${p.code}"
-      style="border:0.5px solid ${col.border};border-radius:12px;padding:12px 14px;cursor:pointer;background:${col.bg};transition:all .12s">
-      <div style="font-size:10px;font-weight:700;color:${col.text};margin-bottom:4px;display:flex;align-items:center;gap:4px">
-        <i class="ti ${icon}" aria-hidden="true" style="font-size:13px"></i> ${label}
-      </div>
-      <div style="font-size:14px;font-weight:700;color:${col.dark}">${p.saveur}</div>
-      <div style="font-size:10px;color:${col.text};font-family:monospace;margin-top:3px;opacity:.8">${p.code}</div>
+  container.innerHTML = saveurs.map(sav => {
+    const bacs = parSaveur[sav].sort((a,b) => a.bac.localeCompare(b.bac));
+    const bacsHTML = bacs.map(b => {
+      const hasMq   = b.manquants.length > 0 && !b.manquantsResolus;
+      const icon    = hasMq ? 'ti-alert-triangle' : 'ti-circle-check';
+      const iconCol = hasMq ? '#d44218' : '#27ae60';
+      const labelCol= hasMq ? '#d44218' : '#666';
+      const label   = hasMq ? 'Bac ' + b.bac + ' · manquants' : 'Bac ' + b.bac;
+      const bg      = hasMq ? '#fdf0ec' : '#fff';
+      const bd      = hasMq ? '#f5cbb8' : '#e8e8e8';
+      return `<div onclick="selectPremixBtn('${b.code}','${sav}')" id="pmx-btn-${b.code}"
+        style="border:1px solid ${bd};background:${bg};border-radius:8px;padding:6px 8px;margin-bottom:5px;cursor:pointer;transition:all .12s">
+        <div style="font-size:11px;font-weight:600;color:${labelCol};display:flex;align-items:center;gap:4px">
+          <i class="ti ${icon}" aria-hidden="true" style="font-size:12px;color:${iconCol}"></i> ${label}
+        </div>
+        <div style="font-size:10px;font-family:monospace;color:#888;margin-top:1px">${b.code}</div>
+      </div>`;
+    }).join('');
+    return `<div style="border:1.5px solid #e8e8e8;background:#fff;border-radius:12px;padding:10px 12px">
+      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:8px">${sav}</div>
+      ${bacsHTML}
     </div>`;
   }).join('');
 }
 
-function selectPremixBtn(code, saveur, manquants, manquantsResolus) {
-  const col = SAVEUR_COULEURS[saveur] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
+function selectPremixBtn(code, saveur) {
+  const premixs = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
+  const pmx = premixs.find(p => p.codePremix === code);
+  const manquants = pmx?.manquants || [];
+  const hasMq = manquants.length > 0 && !pmx?.manquantsResolus;
+
+  // Réinitialiser toutes les cartes-bac (blanc, ou rosé si manquants)
   document.querySelectorAll('[id^="pmx-btn-"]').forEach(b => {
+    const wasMq = b.querySelector('.ti-alert-triangle');
+    b.style.border = wasMq ? '1px solid #f5cbb8' : '1px solid #e8e8e8';
+    b.style.background = wasMq ? '#fdf0ec' : '#fff';
     b.style.boxShadow = '';
-    b.style.borderWidth = '0.5px';
-    b.style.transform = '';
   });
+
+  // Mettre en avant le bac sélectionné (orange Kooki)
   const btn = document.getElementById('pmx-btn-' + code);
   if (btn) {
-    btn.style.boxShadow = '0 0 0 3px ' + col.text + '55';
-    btn.style.borderWidth = '2px';
-    btn.style.transform = 'scale(1.03)';
+    btn.style.border = '2px solid #d44218';
+    btn.style.background = '#fdf0ec';
+    btn.style.boxShadow = '0 0 0 1px #d44218';
   }
+
   const select = document.getElementById('prod-pmx');
   if (select) select.value = code;
   const saveurEl = document.getElementById('prod-saveur');
-  if (saveurEl) { saveurEl.value = saveur; }
+  if (saveurEl) saveurEl.value = saveur;
+
   const warn = document.getElementById('prod-pmx-warning');
-  if (manquants.length > 0 && !manquantsResolus) {
+  if (hasMq) {
     if (warn) { warn.style.display = ''; warn.innerHTML = `⚠️ Ingrédients manquants : <b>${manquants.join(', ')}</b>`; }
   } else {
     if (warn) warn.style.display = 'none';
   }
+
   calcProdTotaux();
   autoGenCodeLot();
 }
