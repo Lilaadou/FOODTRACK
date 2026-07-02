@@ -2378,7 +2378,7 @@ function addFactureRecue(numero, fournisseur, date) {
     const libre1 = !s1 || s1.statut !== 'occupe';
 const libre2 = !s2 || s2.statut !== 'occupe';
     const mq1 = s1?.statut === 'occupe' ? premixs.find(p => p.codePremix === s1.codePremix) : null;
-    const mq2 = s2?.statut === 'occupe' ? premixs.find(p => p.codePremix === s2.codePremix) : null;
+const mq2 = s2?.statut === 'occupe' ? premixs.find(p => p.codePremix === s2.codePremix) : null;
     const hasMq1 = mq1 && (mq1.manquants||[]).length > 0 && !mq1.manquantsResolus;
     const hasMq2 = mq2 && (mq2.manquants||[]).length > 0 && !mq2.manquantsResolus;
     const toutPris = !libre1 && !libre2;
