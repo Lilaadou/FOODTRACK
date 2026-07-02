@@ -2374,7 +2374,7 @@ function addFactureRecue(numero, fournisseur, date) {
   const inv = getInventairePremix();
   const premixs = JSON.parse(localStorage.getItem('kooki_premix') || '[]');
 
-  const bacLigne = (num, libre, hasMq) => {
+  const bacLigne = (num, libre, hasMq) => { 
     if (libre) {
       return `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#1a7a3a;line-height:1.9">
         <i class="ti ti-circle-check" style="font-size:13px" aria-hidden="true"></i> Bac ${num} · libre
