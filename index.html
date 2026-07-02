@@ -2216,7 +2216,7 @@ function showPage(name, btn) {
   const data = await fetchAPI('getPremix');
   applyPremix(data);
   const inv = await fetchAPI('getInventairePremix');
-  if (inv && Object.keys(inv).length > 0) {
+  if (inv && typeof inv === 'object' && !inv.error && Object.keys(inv).length > 0) {
     localStorage.setItem('kooki_inventaire_premix', JSON.stringify(inv));
   }
   buildPmxBacGrid();
