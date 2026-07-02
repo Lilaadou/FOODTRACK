@@ -2377,7 +2377,7 @@ function addFactureRecue(numero, fournisseur, date) {
     const s2 = inv[sav]?.['2'];
     const libre1 = !s1 || s1.statut !== 'occupe';
 const libre2 = !s2 || s2.statut !== 'occupe';
-    const mq1 = s1?.statut === 'occupe' ? premixs.find(p => p.codePremix === s1.codePremix) : null;
+const mq1 = s1?.statut === 'occupe' ? premixs.find(p => p.codePremix === s1.codePremix) : null;
 const mq2 = s2?.statut === 'occupe' ? premixs.find(p => p.codePremix === s2.codePremix) : null;
     const hasMq1 = mq1 && (mq1.manquants||[]).length > 0 && !mq1.manquantsResolus;
     const hasMq2 = mq2 && (mq2.manquants||[]).length > 0 && !mq2.manquantsResolus;
@@ -2412,14 +2412,18 @@ ${bacHTML('2', libre2, hasMq2, s2?.codePremix || '', sav)}
     const manquants = bacCible === '1' ? (mq1 ? (mq1.manquants||[]).join(', ') : '') : (mq2 ? (mq2.manquants||[]).join(', ') : '');
     const hasMqCible = bacCible === '1' ? hasMq1 : hasMq2;
 
-    return `<div id="pmx-bac-${sav}" data-bac="${bacCible}" data-manquants="${manquants.replace(/"/g,'').replace(/'/g,'')}" data-hasmq="${hasMqCible}"
-      style="border:0.5px solid ${col.border};border-radius:12px;padding:10px 12px;cursor:pointer;background:${col.bg};transition:all .12s;position:relative">
-     ${hasMq1||hasMq2 ? `<div style="position:absolute;top:-5px;right:-5px;background:#E24B4A;color:#fff;border-radius:20px;font-size:9px;font-weight:500;padding:1px 5px">!</div>` : ''}
-      <div style="font-size:13px;font-weight:700;color:${col.dark};margin-bottom:6px">${sav}</div>
-      ${bacHTML('1', libre1, hasMq1, s1?.codePremix || '')}
-      ${bacHTML('2', libre2, hasMq2, s2?.codePremix || '')}
-    </div>`;
-  }).join('');
+    return `<div id="pmx-bac-${sav}"
+  style="border:0.5px solid ${col.border};border-radius:12px;padding:10px 12px;background:${col.bg};transition:all .12s;position:relative">
+  ${hasMq1||hasMq2 ? `<div style="position:absolute;top:-5px;right:-5px;background:#E24B4A;color:#fff;border-radius:20px;font-size:9px;font-weight:500;padding:1px 5px">!</div>` : ''}
+  <div style="font-size:13px;font-weight:700;color:${col.dark};margin-bottom:6px">${sav}</div>
+  <div onclick="${libre1 ? `selectPmxBac('${sav}','1')` : ''}" style="cursor:${libre1 ? 'pointer' : 'default'};padding:2px 0;border-radius:6px" onmouseover="this.style.background='${libre1 ? 'rgba(0,0,0,.05)' : 'transparent'}'" onmouseout="this.style.background='transparent'">
+    ${bacHTML('1', libre1, hasMq1, s1?.codePremix || '')}
+  </div>
+  <div onclick="${libre2 ? `selectPmxBac('${sav}','2')` : ''}" style="cursor:${libre2 ? 'pointer' : 'default'};padding:2px 0;border-radius:6px" onmouseover="this.style.background='${libre2 ? 'rgba(0,0,0,.05)' : 'transparent'}'" onmouseout="this.style.background='transparent'">
+    ${bacHTML('2', libre2, hasMq2, s2?.codePremix || '')}
+  </div>
+</div>`;
+}).join('');
 }
 
 function selectPmxBac(saveur, bac) {
@@ -5453,9 +5457,9 @@ function toggleSacManuel(saveur, num) {
   const inv = getInventairePremix();
   if (!inv[saveur]) inv[saveur] = {};
   const current = inv[saveur][num]?.statut || 'vide';
-  inv[saveur][num] = current === 'dispo'
+  inv[saveur][num] = current === 'occupe'
     ? { statut: 'vide', dateVide: new Date().toISOString() }
-    : { statut: 'dispo', codePremix: '—', date: new Date().toISOString() };
+    : { statut: 'occupe', codePremix: '—', date: new Date().toISOString() };
   saveInventairePremix(inv);
   updateInventairePremix();
 }
