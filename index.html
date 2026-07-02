@@ -6242,23 +6242,22 @@ async function reimprimerBL(numeroBL) {
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   script.onload = () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
-
-    const marginTop = 1;
-    const marginLeft = 23;
-    const etiW = 63.5;
-    const etiH = 33.9;
-    const cols = 3;
-    const rows = 4;
-    const gapX = (210 - marginLeft * 2 - etiW * cols) / (cols - 1);
-    const gapY = (148.5 - marginTop * 2 - etiH * rows) / (rows - 1);
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+const marginTop  = 13;
+const marginLeft = 8;
+const etiW = 63.5;
+const etiH = 33.9;
+const cols = 3;
+const rows = 8;
+const gapX = 3;
+const gapY = 0;
 
     let index = depart;
     lots.forEach(lot => {
       const col = index % cols;
-      const row = Math.floor(index / cols) % rows;
-      const x = marginLeft + col * (etiW + gapX);
-      const y = marginTop + row * (etiH + gapY);
+const row = Math.floor(index / cols) % rows;
+const x = marginLeft + col * (etiW + gapX);
+const y = marginTop  + row * etiH;
 
       doc.setFillColor(255, 255, 255);
       doc.rect(x, y, etiW, etiH, 'F');
@@ -8475,24 +8474,23 @@ function showLoginScreen() {
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   script.onload = () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [148.5, 210] });
-
-    const marginTop = 1;
-    const marginLeft = 23;
-    const etiW = 63.5;
-    const etiH = 33.9;
-    const cols = 3;
-    const rows = 4;
-    const gapX = (210 - marginLeft * 2 - etiW * cols) / (cols - 1);
-    const gapY = (148.5 - marginTop * 2 - etiH * rows) / (rows - 1);
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+const marginTop  = 13;
+const marginLeft = 8;
+const etiW = 63.5;
+const etiH = 33.9;
+const cols = 3;
+const rows = 8;
+const gapX = 3;
+const gapY = 0;
 
     const dessinerEtiquette = (index, type) => {
       const isDouble = type === 'double';
       const isBaby = type === 'baby';
       const col = index % cols;
-      const row = Math.floor(index / cols) % rows;
-      const x = marginLeft + col * (etiW + gapX);
-      const y = marginTop + row * (etiH + gapY);
+const row = Math.floor(index / cols) % rows;
+const x = marginLeft + col * (etiW + gapX);
+const y = marginTop  + row * etiH;
 
       doc.setFillColor(255, 255, 255);
       doc.rect(x, y, etiW, etiH, 'F');
