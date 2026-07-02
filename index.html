@@ -800,10 +800,6 @@
         <span class="toast" id="toast-pmx"></span>
       </div>
     </div>
-    <div class="card" style="margin-bottom:18px">
-  <div class="card-header">
-    <div>
-      <div class="card-title">🧊 Étagère Premix</div>
       <div class="card-sub">Vert = occupé · Rouge = manquant · Gris = vide</div>
     </div>
   </div>
@@ -5305,7 +5301,7 @@ function updateInventairePremix() {
     const s2 = inv[sav]?.['2'] || { statut: 'vide' };
 
     const sacState = (data) => {
-      if (data.statut !== 'occupe') return 'vide';
+      if (data.statut !== 'occupe' && data.statut !== 'dispo') return 'vide';
       const mq = mqMap[data.codePremix];
       if (mq && mq.manquants.length > 0 && !mq.resolus) return 'manquant';
       return 'dispo';
