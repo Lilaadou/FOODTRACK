@@ -605,6 +605,7 @@
   <button class="nav-item" id="nav-reception" onclick="showPage('reception',this)"><i class="ti ti-file-download nav-icon" aria-hidden="true"></i> Réception facture</button>
   <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><i class="ti ti-receipt nav-icon" aria-hidden="true"></i> Factures</button>
   <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><i class="ti ti-truck-delivery nav-icon" aria-hidden="true"></i> B2B</button>
+  <button class="nav-item" id="nav-recap-mois" onclick="showPage('recap-mois',this)"><i class="ti ti-calendar-stats nav-icon" aria-hidden="true"></i> Récap mensuel</button>
   <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
 
   <div class="sidebar-bottom">
@@ -2065,6 +2066,95 @@
 </div>
 
   <!-- ══════════════════ LIVRAISONS IXELLES ══════════════════ -->
+  <!-- ══════════════════ RÉCAP MENSUEL B2B ══════════════════ -->
+  <div id="page-recap-mois" class="page">
+    <style>
+      #page-recap-mois .rm-card{background:#fff;border-radius:16px;padding:20px 22px;border:1px solid #f0f0f0;margin-bottom:16px}
+      #page-recap-mois .rm-label{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8c8c8c;margin-bottom:12px}
+      #page-recap-mois .rm-arrow{width:34px;height:34px;border-radius:9px;border:1.5px solid #efefef;background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+      #page-recap-mois .rm-arrow:hover{border-color:#d44218;color:#d44218}
+      #page-recap-mois .rm-monthlabel{font-size:17px;font-weight:700;min-width:150px;text-align:center}
+      #page-recap-mois .rm-today{font-size:12px;color:#d44218;font-weight:600;background:none;border:none;cursor:pointer}
+      #page-recap-mois .rm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+      #page-recap-mois .rm-stat{background:#f7f8fa;border-radius:12px;padding:12px 14px;text-align:center}
+      #page-recap-mois .rm-stat .n{font-size:22px;font-weight:700;color:#0c447c}
+      #page-recap-mois .rm-stat .l{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+      #page-recap-mois .rm-row{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+      #page-recap-mois .rm-rank{width:26px;text-align:center;flex-shrink:0;font-size:15px}
+      #page-recap-mois .rm-rank .num{font-weight:700;color:#bbb;font-size:13px}
+      #page-recap-mois .rm-barwrap{flex:1;min-width:0}
+      #page-recap-mois .rm-barhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+      #page-recap-mois .rm-cname{font-size:13px;font-weight:700}
+      #page-recap-mois .rm-cval{font-size:12px;color:#888}
+      #page-recap-mois .rm-cval b{color:#1a1a2e;font-size:14px}
+      #page-recap-mois .rm-track{height:14px;background:#f0f2f5;border-radius:8px;overflow:hidden}
+      #page-recap-mois .rm-bar{height:100%;border-radius:8px}
+      #page-recap-mois .rm-gold{background:#d44218}
+      #page-recap-mois .rm-silver{background:#e07a56}
+      #page-recap-mois .rm-bronze{background:#eaa085}
+      #page-recap-mois .rm-other{background:#0662aa;opacity:.75}
+      #page-recap-mois .rm-totalband{background:#fbe8e2;border:1.5px solid #f5cbb8;border-radius:14px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+      #page-recap-mois .rm-totalband .lbl{font-size:13px;font-weight:700;color:#d44218}
+      #page-recap-mois .rm-pills{display:flex;gap:10px}
+      #page-recap-mois .rm-pill{background:#fff;border-radius:10px;padding:6px 14px;text-align:center}
+      #page-recap-mois .rm-pill .n{font-size:17px;font-weight:700;color:#d44218}
+      #page-recap-mois .rm-pill .l{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+      #page-recap-mois .rm-client{border:1px solid #eef0f2;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.15s}
+      #page-recap-mois .rm-client:hover{border-color:#d44218;background:#fffaf8}
+      #page-recap-mois .rm-chead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+      #page-recap-mois .rm-cn{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+      #page-recap-mois .rm-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+      #page-recap-mois .rm-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+      #page-recap-mois .rm-bBig{background:#fbe8e2;color:#d44218}
+      #page-recap-mois .rm-bSmall{background:#e0edf8;color:#0662aa}
+      #page-recap-mois .rm-bBox{background:#f0f0f0;color:#555}
+      #page-recap-mois .rm-chev{color:#d44218;font-weight:700;font-size:13px}
+      #page-recap-mois .rm-cbls{font-size:11px;color:#999;margin-top:6px}
+      #page-recap-mois .rm-empty{text-align:center;color:#aaa;padding:30px;font-size:13px}
+    </style>
+
+    <div class="rm-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="rm-arrow" onclick="recapMoisChangeMonth(-1)">◀</button>
+          <div class="rm-monthlabel" id="rm-month-label">—</div>
+          <button class="rm-arrow" onclick="recapMoisChangeMonth(1)">▶</button>
+        </div>
+        <button class="rm-today" onclick="recapMoisGoToday()">Mois en cours</button>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <div class="rm-label">🏆 Meilleurs clients du mois</div>
+      <div class="rm-stats" id="rm-stats"></div>
+      <div id="rm-chart"></div>
+    </div>
+
+    <div class="rm-totalband">
+      <div class="lbl" id="rm-total-label">—</div>
+      <div class="rm-pills" id="rm-total-pills"></div>
+    </div>
+
+    <div class="rm-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div class="rm-label" style="margin-bottom:0">Détail par client — clique pour ouvrir le récap</div>
+        <button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="imprimerRecapMoisGlobal()">🖨️ Imprimer le récap global</button>
+      </div>
+      <div id="rm-client-list"></div>
+    </div>
+  </div>
+
+  <!-- Modale récap client (mensuel) -->
+  <div id="rm-client-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto">
+    <div style="background:#fff;border-radius:16px;width:min(96vw,680px);position:relative">
+      <div style="position:sticky;top:0;display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;background:rgba(255,255,255,.95);border-bottom:1px solid #f0f0f0;border-radius:16px 16px 0 0;z-index:2">
+        <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" id="rm-client-pdf">📄 Imprimer / PDF</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px" onclick="document.getElementById('rm-client-overlay').style.display='none'">✕</button>
+      </div>
+      <div id="rm-client-body" style="padding:0 0 26px"></div>
+    </div>
+  </div>
+
 <div id="page-ixelles-livraisons" class="page">
   <div class="card">
     <div class="card-header" style="flex-wrap:wrap;gap:8px">
@@ -2130,7 +2220,7 @@ const PROFILES = {
   Anderlecht:{ color:'#0662aa', initial:'AN', role:'Magasin Anderlecht', pages: ANDERLECHT_PAGES },
 };
 
-const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'ixelles-livraisons':'Livraisons Ixelles' };
+const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'ixelles-livraisons':'Livraisons Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder',
@@ -2198,6 +2288,7 @@ function showPage(name, btn) {
   }
   if (name === 'frigo') setTimeout(() => { renderRecapB2b(currentRecapOffset); }, 60);
   if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
+  if (name === 'recap-mois') setTimeout(() => { renderRecapMois(); }, 60);
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
   if (name === 'frigoLive') setTimeout(() => { loadFrigoLive(); }, 60);
   if (name === 'premix' || name === 'production') refreshFactureLists();
@@ -9114,6 +9205,208 @@ async function flConfirmerAnd() {
   updateDashboardStockTable();
   toast('sortie', '✓ ' + tot + ' cookies livrés à Anderlecht !', 'ok');
 }
+
+/* ═══════════ RÉCAP MENSUEL B2B ═══════════ */
+function _rmClient(bl){ return (bl.client || bl.clientNom || bl.destinataire || bl.nom || '').trim(); }
+function _rmNumero(bl){ return bl.numeroBL || bl.numero || bl.bl || ''; }
+function _rmBoites(bl){ return Number(bl.boites || bl.boxes || 0) || 0; }
+function _rmLots(bl){
+  var L = bl.lots;
+  if (typeof L === 'string') { try { L = JSON.parse(L); } catch(e){ L = []; } }
+  return (L || []).map(function(x){
+    return { saveur:String(x.saveur || x.flavor || x.nom || '').toUpperCase(),
+             big:Number(x.big || 0) || 0, small:Number(x.small || 0) || 0 };
+  });
+}
+function _rmParseDate(v){
+  if (!v) return null;
+  if (v instanceof Date) return isNaN(v) ? null : v;
+  var s = String(v).trim();
+  var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2]-1, +iso[3]);
+  var fr = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+  if (fr) return new Date(+fr[3], +fr[2]-1, +fr[1]);
+  var d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+var _rmState = { y:new Date().getFullYear(), m:new Date().getMonth() };
+var _rmCache = null;
+function recapMoisChangeMonth(delta){
+  _rmState.m += delta;
+  if (_rmState.m < 0){ _rmState.m = 11; _rmState.y--; }
+  if (_rmState.m > 11){ _rmState.m = 0; _rmState.y++; }
+  renderRecapMois();
+}
+function recapMoisGoToday(){ var d=new Date(); _rmState.y=d.getFullYear(); _rmState.m=d.getMonth(); renderRecapMois(); }
+function _rmMonthName(){
+  return ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][_rmState.m] + ' ' + _rmState.y;
+}
+function _rmDayLabel(d){
+  var mois=['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+  return d.getDate() + ' ' + mois[d.getMonth()];
+}
+async function renderRecapMois(){
+  var lbl = document.getElementById('rm-month-label');
+  if (lbl) lbl.textContent = _rmMonthName();
+
+  var all = (typeof blData !== 'undefined' && Array.isArray(blData) && blData.length) ? blData : [];
+  if (!all.length) { try { all = await fetchAPI('getBL') || []; } catch(e){ all = []; } }
+
+  var doB = all.filter(function(bl){
+    var name = _rmClient(bl); if (!name) return false;
+    var d = _rmParseDate(bl.date);
+    return d && d.getFullYear()===_rmState.y && d.getMonth()===_rmState.m;
+  });
+
+  var byClient = {};
+  doB.forEach(function(bl){
+    var name = _rmClient(bl);
+    if (!byClient[name]) byClient[name] = { name:name, big:0, small:0, boxes:0, flavors:{}, bls:[] };
+    var c = byClient[name];
+    var d = _rmParseDate(bl.date);
+    var lots = _rmLots(bl);
+    c.bls.push({ n:_rmNumero(bl), d:d?_rmDayLabel(d):'', lots:lots });
+    c.boxes += _rmBoites(bl);
+    lots.forEach(function(l){
+      c.big += l.big; c.small += l.small;
+      if(!c.flavors[l.saveur]) c.flavors[l.saveur]=[0,0];
+      c.flavors[l.saveur][0]+=l.big; c.flavors[l.saveur][1]+=l.small;
+    });
+  });
+
+  var list = Object.keys(byClient).map(function(k){ var c=byClient[k]; c.total=c.big+c.small; return c; })
+                   .sort(function(a,b){ return b.total-a.total; });
+  _rmCache = list;
+
+  var mBig=0,mSmall=0,mBox=0,mBL=0;
+  list.forEach(function(c){ mBig+=c.big; mSmall+=c.small; mBox+=c.boxes; mBL+=c.bls.length; });
+  var mTot=mBig+mSmall, maxTot=list.length?list[0].total:1;
+
+  document.getElementById('rm-stats').innerHTML =
+    '<div class="rm-stat"><div class="n">'+mTot+'</div><div class="l">Cookies livrés</div></div>'+
+    '<div class="rm-stat"><div class="n">'+list.length+'</div><div class="l">Clients actifs</div></div>'+
+    '<div class="rm-stat"><div class="n">'+(list.length?Math.round(mTot/list.length):0)+'</div><div class="l">Moyenne / client</div></div>';
+
+  var medals=['🥇','🥈','🥉'], barcls=['rm-gold','rm-silver','rm-bronze'];
+  document.getElementById('rm-chart').innerHTML = list.length ? list.map(function(c,i){
+    var rank = i<3 ? medals[i] : '<span class="num">'+(i+1)+'</span>';
+    var cls = i<3 ? barcls[i] : 'rm-other';
+    var w = maxTot ? (c.total/maxTot*100).toFixed(1) : 0;
+    return '<div class="rm-row"><div class="rm-rank">'+rank+'</div>'+
+      '<div class="rm-barwrap"><div class="rm-barhead"><span class="rm-cname">'+c.name+'</span>'+
+      '<span class="rm-cval"><b>'+c.total+'</b> cookies · '+c.bls.length+' BL</span></div>'+
+      '<div class="rm-track"><div class="rm-bar '+cls+'" style="width:'+w+'%"></div></div></div></div>';
+  }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
+
+  document.getElementById('rm-total-label').textContent =
+    'Total '+_rmMonthName()+' — '+list.length+' clients · '+mBL+' bons de livraison';
+  document.getElementById('rm-total-pills').innerHTML =
+    '<div class="rm-pill"><div class="n">'+mBig+'</div><div class="l">Big</div></div>'+
+    '<div class="rm-pill"><div class="n">'+mSmall+'</div><div class="l">Small</div></div>'+
+    '<div class="rm-pill"><div class="n">'+mBox+'</div><div class="l">Boîtes</div></div>';
+
+  document.getElementById('rm-client-list').innerHTML = list.length ? list.map(function(c,i){
+    return '<div class="rm-client" onclick="openRecapMoisClient('+i+')"><div class="rm-chead">'+
+      '<div class="rm-cn">🏪 '+c.name+'</div><div class="rm-badges">'+
+      '<span class="rm-badge rm-bBig">'+c.big+' Big</span>'+
+      '<span class="rm-badge rm-bSmall">'+c.small+' Small</span>'+
+      '<span class="rm-badge rm-bBox">'+c.boxes+' boîtes</span>'+
+      '<span class="rm-chev">Voir le récap →</span></div></div>'+
+      '<div class="rm-cbls">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>';
+  }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
+}
+function _rmClientHTML(c, forPrint){
+  var detail = c.bls.map(function(bl){
+    return bl.lots.map(function(lot,j){
+      return '<tr><td style="color:#999;font-size:12px;padding:7px;border-bottom:1px solid #f4f4f4">'+(j===0?bl.d:'')+'</td>'+
+        '<td style="font-weight:700;color:#0662aa;font-size:12px;padding:7px;border-bottom:1px solid #f4f4f4">'+(j===0?bl.n:'')+'</td>'+
+        '<td style="padding:7px;border-bottom:1px solid #f4f4f4"><span style="display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;background:#e0edf8;color:#0662aa">'+lot.saveur+'</span></td>'+
+        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(lot.big||'—')+'</td>'+
+        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(lot.small||'—')+'</td></tr>';
+    }).join('');
+  }).join('');
+  var flav = Object.keys(c.flavors).map(function(f){ var e=c.flavors[f];
+    return '<tr><td style="font-weight:700;padding:7px;border-bottom:1px solid #f4f4f4">'+f+'</td>'+
+      '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(e[0]||'—')+'</td>'+
+      '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(e[1]||'—')+'</td></tr>';
+  }).join('');
+  var th='text-align:left;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:7px;border-bottom:1px solid #d9e7f4';
+  var thn=th+';text-align:right';
+  var pad = forPrint ? '26px 34px' : '20px 26px';
+  return ''+
+   '<div style="background:#e6f1fb;padding:18px 26px"><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:44px" alt="Kooki"><div style="font-size:11px;font-weight:800;letter-spacing:.16em;color:#d44218;margin-top:2px">BAKED WITH LOVE</div></div>'+
+   '<div style="padding:'+pad+'">'+
+   '<div style="font-size:20px;font-weight:400;color:#0c447c">Récapitulatif mensuel des livraisons</div>'+
+   '<div style="font-size:13px;font-weight:700;color:#d44218;margin-top:1px">'+_rmMonthName()+'</div>'+
+   '<div style="background:#eef5fc;border-radius:10px;padding:13px 18px;margin:14px 0 18px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">'+
+     '<div><div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.06em">Client</div>'+
+     '<div style="font-size:15px;font-weight:700">'+c.name+'</div></div>'+
+     '<div style="text-align:right"><div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.06em">Total du mois</div>'+
+     '<div style="font-size:20px;font-weight:700;color:#0c447c">'+c.total+'</div><div style="font-size:11px;color:#888">cookies · '+c.bls.length+' livraison'+(c.bls.length>1?'s':'')+'</div></div>'+
+   '</div>'+
+   '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8c8c8c;margin:16px 0 6px">Détail des livraisons</div>'+
+   '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Date</th><th style="'+th+'">N° BL</th><th style="'+th+'">Saveur</th><th style="'+thn+'">Big</th><th style="'+thn+'">Small</th></tr></thead><tbody>'+detail+'</tbody></table>'+
+   '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8c8c8c;margin:16px 0 6px">Total du mois par saveur</div>'+
+   '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Big (165g)</th><th style="'+thn+'">Small (80g)</th></tr></thead><tbody>'+flav+'</tbody></table>'+
+   '<div style="margin-top:16px;background:#fbe8e2;border-radius:10px;padding:4px 18px">'+
+     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f3d3c6"><span>Total Big (165g)</span><span style="font-weight:700;color:#0c447c">'+c.big+'</span></div>'+
+     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f3d3c6"><span>Total Small (80g)</span><span style="font-weight:700;color:#0c447c">'+c.small+'</span></div>'+
+     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f3d3c6"><span>📦 Boîtes plastiques envoyées</span><span style="font-weight:700;color:#0c447c">'+c.boxes+'</span></div>'+
+     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#d44218">Total à facturer</span><span style="color:#d44218">'+c.total+' cookies</span></div>'+
+   '</div></div>';
+}
+function openRecapMoisClient(i){
+  var c = _rmCache[i];
+  document.getElementById('rm-client-body').innerHTML = _rmClientHTML(c, false);
+  document.getElementById('rm-client-pdf').onclick = function(){ _rmPrint(_rmClientHTML(c, true)); };
+  document.getElementById('rm-client-overlay').style.display = 'flex';
+}
+function _rmPrint(innerHTML){
+  var w = window.open('', '_blank', 'width=820,height=1100');
+  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><base href="https://lilaadou.github.io/FOODTRACK/"><title>Récap B2B</title>'+
+    '<style>*{margin:0;padding:0;box-sizing:border-box}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+    'body{font-family:\'Segoe UI\',system-ui,Arial,sans-serif;color:#1f1f29}.client{page-break-inside:avoid}'+
+    '@page{size:A4;margin:12mm 0}</style></head><body>'+innerHTML+
+    '<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print()},300)}</scr'+'ipt></body></html>');
+  w.document.close();
+}
+function imprimerRecapMoisGlobal(){
+  if (!_rmCache || !_rmCache.length){ alert('Aucune donnée à imprimer pour ce mois.'); return; }
+  var mBig=0,mSmall=0,mBox=0,mBL=0;
+  _rmCache.forEach(function(c){ mBig+=c.big; mSmall+=c.small; mBox+=c.boxes; mBL+=c.bls.length; });
+  var th='text-align:left;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:7px 8px';
+  var thn=th+';text-align:right';
+  var head =
+   '<div style="background:#e6f1fb;padding:22px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">'+
+   '<div><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:56px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#d44218;margin-top:4px">BAKED WITH LOVE</div></div>'+
+   '<div style="text-align:right;font-size:12px;line-height:1.8;color:#5f5f5f"><b style="color:#3a3a3a">KOOKI COMPANY SRL</b><br>Avenue Emile Gryson 2D<br>1070 Anderlecht<br>TVA: BE1015746980</div></div>'+
+   '<div style="padding:20px 34px"><div style="font-size:23px;color:#0c447c">Récapitulatif mensuel B2B</div>'+
+   '<div style="font-size:15px;font-weight:700;color:#d44218;margin-top:2px">'+_rmMonthName()+'</div>'+
+   '<div style="background:#eef5fc;border-radius:10px;padding:12px 18px;margin:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
+   '<div style="font-size:13px;font-weight:700;color:#0662aa">'+_rmCache.length+' clients · '+mBL+' bons de livraison</div>'+
+   '<div style="display:flex;gap:20px"><div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#0c447c">'+mBig+'</div><div style="font-size:10px;color:#888">BIG</div></div>'+
+   '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#0c447c">'+mSmall+'</div><div style="font-size:10px;color:#888">SMALL</div></div>'+
+   '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#0c447c">'+mBox+'</div><div style="font-size:10px;color:#888">BOÎTES</div></div></div></div>';
+  var body = _rmCache.map(function(c){
+    var flav = Object.keys(c.flavors).map(function(f){ var e=c.flavors[f];
+      return '<tr><td style="font-weight:700;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+f+'</td>'+
+        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+(e[0]||'—')+'</td>'+
+        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+(e[1]||'—')+'</td></tr>';
+    }).join('');
+    return '<div class="client" style="margin-bottom:20px">'+
+      '<div style="display:flex;justify-content:space-between;border-bottom:2px solid #d9e7f4;padding-bottom:6px;margin-bottom:4px;flex-wrap:wrap;gap:6px">'+
+      '<div style="font-size:15px;font-weight:700">'+c.name+'</div>'+
+      '<div style="font-size:11px;color:#8c8c8c">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Big (165g)</th><th style="'+thn+'">Small (80g)</th></tr></thead><tbody>'+flav+
+      '<tr><td style="border-top:1.5px solid #e8e8e8;padding-top:8px;font-size:11px;color:#888;text-transform:uppercase">Total client</td>'+
+      '<td style="text-align:right;border-top:1.5px solid #e8e8e8;padding-top:8px;font-weight:700;color:#d44218">'+c.big+'</td>'+
+      '<td style="text-align:right;border-top:1.5px solid #e8e8e8;padding-top:8px;font-weight:700;color:#d44218">'+c.small+'</td></tr></tbody></table>'+
+      '<div style="font-size:11px;color:#5f7f9c;margin-top:5px">📦 Boîtes plastiques envoyées : '+c.boxes+'</div></div>';
+  }).join('');
+  _rmPrint(head + body + '</div>');
+}
+/* ═══════════ FIN RÉCAP MENSUEL B2B ═══════════ */
+
 </script>
 </body>
 </html>
