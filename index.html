@@ -3293,7 +3293,7 @@ async function loadBoites() {
 
 function printBon() {
   const content = document.getElementById('bon-content').innerHTML;
-  const win = window.open('', '_blank', 'width=800,height=1000');
+  const win = window.open('', '_blank', 'width=820,height=1160');
   win.document.write(`<!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8">
@@ -3301,15 +3301,38 @@ function printBon() {
 <title>Bon de livraison — Kooki</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff;}
   body{font-family:'Segoe UI',system-ui,-apple-system,Helvetica,Arial,sans-serif;color:#1f1f29;font-size:13px;}
   img{max-width:100%;}
   table{width:100%;border-collapse:collapse;}
-  @media print{ @page{size:A4;margin:0;} }
+  #sheet{width:210mm;height:296mm;overflow:hidden;}
+  #fit{width:210mm;transform-origin:top center;}
+  @page{size:A4;margin:0;}
 </style>
 </head><body>
-${content}
-<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<\/script>
+<div id="sheet"><div id="fit">${content}</div></div>
+<script>
+(function(){
+  var ran = false;
+  function run(){
+    if (ran) return; ran = true;
+    var sheet = document.getElementById('sheet'), fit = document.getElementById('fit');
+    var needed = fit.scrollHeight, avail = sheet.clientHeight;
+    var scale = Math.min(1, (avail / needed) * 0.99);
+    if (scale < 1) { fit.style.transform = 'scale(' + scale + ')'; }
+    setTimeout(function(){ window.focus(); window.print(); window.onafterprint = function(){ window.close(); }; }, 120);
+  }
+  var imgs = [].slice.call(document.images);
+  var left = imgs.filter(function(i){ return !i.complete; }).length;
+  if (left === 0) { run(); }
+  else imgs.forEach(function(i){
+    if (i.complete) return;
+    var d = function(){ if (--left <= 0) run(); };
+    i.addEventListener('load', d); i.addEventListener('error', d);
+  });
+  setTimeout(run, 1500); // filet de sécurité
+})();
+<\/script>
 </body></html>`);
   win.document.close();
 }
