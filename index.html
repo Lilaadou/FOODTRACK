@@ -1341,104 +1341,113 @@
 </div>
   
   <!-- ══════════════════ BON DE LIVRAISON (modal print) ══════════════════ -->
-  <div id="bon-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
-    <div style="background:#fff;border-radius:16px;padding:32px;width:580px;max-height:90vh;overflow-y:auto;position:relative">
-      <button onclick="document.getElementById('bon-overlay').style.display='none'" style="position:absolute;top:14px;right:16px;border:none;background:none;font-size:18px;cursor:pointer;color:#aaa">✕</button>
-      <button onclick="printBon()" class="btn btn-primary" style="position:absolute;top:14px;right:50px;font-size:12px;padding:6px 14px">🖨️ Imprimer</button>
-      <button onclick="imprimerEtiquettesLot(currentBonLots, currentBonClient)" class="btn btn-secondary" style="position:absolute;top:14px;right:160px;font-size:12px;padding:6px 14px">🏷️ Étiquettes</button>
+<div id="bon-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:14px;width:min(94vw,760px);max-height:92vh;overflow-y:auto;position:relative">
 
-      <div id="bon-content">
-        <!-- En-tête -->
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-          <div>
-            <img src="https://lilaadou.github.io/FOODTRACK/logo.png" alt="Kooki" style="height:44px;margin-bottom:6px;display:block">
-            <div style="font-size:10px;color:#888;line-height:1.7">
-              <b style="color:#1a1a2e">KOOKI COMPANY SRL</b><br>
-              N° TVA : BE1015746980<br>
-              Avenue Emile Gryson 2D · 1070 Bruxelles<br>
-              anderlecht@kooki.be · www.kooki.be<br>
-              0492 80 10 38
-            </div>
+    <div style="position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border-bottom:1px solid #f0f0f0">
+      <button onclick="imprimerEtiquettesLot(currentBonLots, currentBonClient)" class="btn btn-secondary" style="font-size:12px;padding:6px 14px">🏷️ Étiquettes</button>
+      <button onclick="printBon()" class="btn btn-primary" style="font-size:12px;padding:6px 14px">🖨️ Imprimer</button>
+      <button onclick="document.getElementById('bon-overlay').style.display='none'" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">✕</button>
+    </div>
+
+    <div id="bon-content">
+
+      <div style="background:#f8e8e0;padding:32px 40px 28px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <img src="https://lilaadou.github.io/FOODTRACK/logo.png" alt="Kooki" style="height:54px;width:auto;object-fit:contain;display:block">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#d44218">BAKED WITH LOVE</div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:18px;font-weight:700;color:#d44218" id="bon-titre-doc">BON DE LIVRAISON</div>
-            <div id="bon-numero" style="font-size:12px;color:#888;margin-top:2px"></div>
-            <div id="bon-date"   style="font-size:12px;color:#888"></div>
+          <div style="text-align:right;font-size:12px;line-height:1.9;color:#5f5f5f">
+            <div style="font-weight:700;color:#3a3a3a">KOOKI COMPANY SRL</div>
+            BE1015746980<br>
+            Avenue Emile Gryson 2D<br>
+            1070 Anderlecht<br>
+            Belgique
+            <div style="margin-top:12px">TVA: BE1015746980</div>
           </div>
-        </div>
-        <div style="border-top:2px solid #f0f0f0;margin-bottom:20px"></div>
-
-        <!-- Client -->
-        <div style="background:#f7f8fa;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px" id="bon-livre-label">Livré à</div>
-            <div id="bon-client" style="font-size:15px;font-weight:700;margin-bottom:3px"></div>
-            <div id="bon-client-adresse" style="font-size:11px;color:#888;line-height:1.5"></div>
-            <div id="bon-client-contact" style="font-size:11px;color:#888;margin-top:2px"></div>
-          </div>
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px" id="bon-livreur-label">Livré par</div>
-<div style="font-size:13px;font-weight:700;color:#1a1a2e" id="bon-livreur-nom">KOOKI COMPANY SRL</div>
-<div style="font-size:11px;color:#888;line-height:1.6;margin-top:2px" id="bon-livreur-adresse">Avenue Emile Gryson 2D · 1070 Bruxelles<br>anderlecht@kooki.be · 0492 80 10 38<br>N° TVA : BE1015746980</div>
-          </div>
-        </div>
-
-  
-      
-        <!-- Détail produits -->
-        <div style="margin-bottom:20px">
-          <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Détail de la livraison</div>
-          <table style="width:100%;border-collapse:collapse;font-size:13px" id="bon-lots-table">
-            <thead id="bon-lots-head">
-              <tr style="background:#f7f8fa">
-                <th style="padding:8px 10px;text-align:left;font-size:11px;color:#888;font-weight:600;border-radius:6px 0 0 6px">Code lot</th>
-                <th style="padding:8px 10px;text-align:left;font-size:11px;color:#888;font-weight:600">Saveur</th>
-                <th style="padding:8px 10px;text-align:center;font-size:11px;color:#888;font-weight:600">Big (165g)</th>
-                <th style="padding:8px 10px;text-align:center;font-size:11px;color:#888;font-weight:600;border-radius:0 6px 6px 0">Small (80g)</th>
-              </tr>
-            </thead>
-            <tbody id="bon-lots-body"></tbody>
-          </table>
-        </div>
-
-        <!-- Totaux -->
-        <div id="bon-totaux-section" style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap"></div>
-
-
-        <!-- Boîtes -->
-        <div id="bon-boites-section" style="display:none;background:#f7f8fa;border-radius:10px;padding:14px 16px;margin-bottom:24px"></div>
-
-        <!-- DLC -->
-        <div style="background:#fbe8e2;border:0.5px solid #f5cbb8;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#d44218">📅 Date Limite de Consommation (DLC)</div>
-            <div class="dlc-subtitle" style="font-size:11px;color:#b85d3a;margin-top:2px">Cookies cuits · À consommer avant le :</div>
-          </div>
-          <div id="bon-dlc" style="font-size:22px;font-weight:700;color:#d44218"></div>
-        </div>
-
-        <!-- Avertissement chaleur -->
-        <div style="background:#fff;border:2px solid #1a1a2e;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
-          <div style="font-size:20px">🌡️</div>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#1a1a2e;margin-bottom:3px">Information importante — Cookies Jacky & Benny</div>
-            <div style="font-size:11px;color:#555;line-height:1.6">En raison des fortes chaleurs de la semaine passée, le chocolat a légèrement fondu pendant la production. Vos cookies Jacky & Benny peuvent apparaître plus foncés que d'habitude. Leur qualité gustative n'est pas affectée — ils restent délicieux ! 🍪</div>
-          </div>
-        </div>
-        
-        <!-- Mentions légales -->
-        <div style="background:#f7f8fa;border-radius:10px;padding:14px 16px;margin-top:20px;font-size:11px;color:#555;line-height:1.6;border:1px solid #f0f0f0">
-          <i>Madame, Monsieur, veuillez trouver ci-dessus le détail de votre livraison. Nous vous remercions de bien vouloir vérifier les quantités reçues et de nous signaler tout produit endommagé ou manquant dans les <b>24h</b> à <b>anderlecht@kooki.be</b> ou au <b>0492 80 10 38</b>. Ce document mentionne les références de lots produits livrés à des fins de traçabilité alimentaire (AFSCA). Tout retard de paiement pourra entraîner la suspension des livraisons suivantes. L'équipe KOOKI 🍪</i>
-        </div>
-
-        <!-- Footer bon de livraison -->
-        <div style="border-top:1.5px solid #f0f0f0;margin-top:24px;padding-top:18px;display:flex;flex-direction:column;align-items:center;gap:8px">
-          <img src="https://lilaadou.github.io/FOODTRACK/logo-k-kooki.png" alt="Kooki" style="height:48px;opacity:.9">
-          <div style="font-size:12px;color:#aaa;font-style:italic;letter-spacing:.03em">Handmade with Love in BXL ❤️</div>
         </div>
       </div>
+      <svg viewBox="0 0 794 26" preserveAspectRatio="none" style="display:block;width:100%;height:24px;margin-top:-1px" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 L794,0 L794,11 C635,30 476,4 317,15 C198,23 99,7 0,16 Z" fill="#f8e8e0"/>
+      </svg>
+
+      <div style="padding:26px 40px 4px">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:4px">
+          <div>
+            <div id="bon-livre-label" style="font-size:10px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Livré à</div>
+            <div id="bon-client" style="font-size:15px;font-weight:700;color:#2a2a2a;margin-bottom:3px"></div>
+            <div id="bon-client-adresse" style="font-size:12px;color:#7a7a7a;line-height:1.6"></div>
+            <div id="bon-client-contact" style="font-size:12px;color:#7a7a7a;margin-top:3px"></div>
+          </div>
+          <div>
+            <div id="bon-livreur-label" style="font-size:10px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Livré par</div>
+            <div id="bon-livreur-nom" style="font-size:14px;font-weight:700;color:#2a2a2a">KOOKI COMPANY SRL</div>
+            <div id="bon-livreur-adresse" style="font-size:12px;color:#7a7a7a;line-height:1.6;margin-top:3px">Avenue Emile Gryson 2D · 1070 Bruxelles<br>anderlecht@kooki.be · 0492 80 10 38<br>N° TVA : BE1015746980</div>
+          </div>
+        </div>
+
+        <h1 id="bon-titre-doc" style="font-size:30px;font-weight:400;color:#33454d;margin:26px 0 20px;letter-spacing:.01em">BON DE LIVRAISON</h1>
+
+        <div style="background:#fbeee8;border-radius:10px;padding:18px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px">
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#d44218;margin-bottom:4px">N° du bon</div>
+            <div id="bon-numero" style="font-size:13px;color:#3a3a3a"></div>
+          </div>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#d44218;margin-bottom:4px">Date de livraison</div>
+            <div id="bon-date" style="font-size:13px;color:#3a3a3a"></div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8c8c8c;margin-bottom:6px">Détail de la livraison</div>
+        <table style="width:100%;border-collapse:collapse" id="bon-lots-table">
+          <thead id="bon-lots-head"></thead>
+          <tbody id="bon-lots-body"></tbody>
+        </table>
+
+        <div id="bon-totaux-section" style="display:flex;justify-content:flex-end;margin-top:22px;margin-bottom:26px"></div>
+
+        <div id="bon-boites-section" style="display:none;border-radius:10px;padding:16px 22px;margin-bottom:26px"></div>
+
+        <div style="background:#fbeee8;border-radius:10px;padding:16px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#d44218">📅 Date Limite de Consommation (DLC)</div>
+            <div class="dlc-subtitle" style="font-size:12px;color:#9a7a70;margin-top:2px">Cookies cuits · À consommer avant le :</div>
+          </div>
+          <div id="bon-dlc" style="font-size:24px;font-weight:700;color:#d44218"></div>
+        </div>
+
+        <div style="border:1px solid #f1e2db;border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:20px;line-height:1;flex-shrink:0;margin-top:1px">🌡️</div>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#33454d;margin-bottom:4px">Information importante — Cookies Jacky &amp; Benny</div>
+            <div style="font-size:11.5px;color:#666;line-height:1.65">En raison des fortes chaleurs de la semaine passée, le chocolat a légèrement fondu pendant la production. Vos cookies Jacky &amp; Benny peuvent apparaître plus foncés que d'habitude. Leur qualité gustative n'est pas affectée — ils restent délicieux ! 🍪</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:#8a8a8a;line-height:1.7;font-style:italic;margin:20px 0 30px">
+          Madame, Monsieur, veuillez trouver ci-dessus le détail de votre livraison. Nous vous remercions de bien vouloir vérifier les quantités reçues et de nous signaler tout produit endommagé ou manquant dans les <b style="color:#6a6a6a">24h</b> à <b style="color:#6a6a6a">anderlecht@kooki.be</b> ou au <b style="color:#6a6a6a">0492 80 10 38</b>. Ce document mentionne les références de lots produits livrés à des fins de traçabilité alimentaire (AFSCA). Tout retard de paiement pourra entraîner la suspension des livraisons suivantes. L'équipe KOOKI 🍪
+        </div>
+      </div>
+
+      <div style="position:relative">
+        <svg viewBox="0 0 794 26" preserveAspectRatio="none" style="display:block;width:100%;height:24px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,26 L794,26 L794,15 C635,-4 476,22 317,11 C198,3 99,19 0,10 Z" fill="#f8e8e0"/>
+        </svg>
+        <div style="background:#f8e8e0;padding:20px 40px 28px;text-align:center;font-size:12px;color:#5a5a5a;line-height:1.9">
+          <img src="https://lilaadou.github.io/FOODTRACK/logo-k-kooki.png" alt="Kooki" style="height:42px;opacity:.9;margin-bottom:6px">
+          <div style="font-style:italic;color:#8a8a8a;font-size:12px;margin-bottom:12px">Handmade with Love in BXL ❤️</div>
+          anderlecht@kooki.be<br>
+          <a href="http://kooki.be" style="color:#d44218;text-decoration:none">www.kooki.be</a><br>
+          0492 80 10 38
+        </div>
+      </div>
+
     </div>
   </div>
+</div>
 
   <!-- ══════════════════ STOCK INGRÉDIENTS ══════════════════ -->
   <div id="page-ingredients" class="page">
@@ -3284,31 +3293,23 @@ async function loadBoites() {
 
 function printBon() {
   const content = document.getElementById('bon-content').innerHTML;
-  const win = window.open('', '_blank', 'width=700,height=900');
+  const win = window.open('', '_blank', 'width=800,height=1000');
   win.document.write(`<!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8">
 <base href="https://lilaadou.github.io/FOODTRACK/">
 <title>Bon de livraison — Kooki</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Segoe UI',system-ui,sans-serif; color:#1a1a2e; padding:32px; font-size:13px; }
-  * { color:#1a1a2e !important; }
-  [style*="color:#888"],[style*="color:#aaa"],[style*="color:#bbb"],[style*="color:#ccc"] { color:#1a1a2e !important; }
-  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; font-weight:600; }
-  .tag-o { background:#fbe8e2; color:#d44218 !important; }
-  .tag-b { background:#e0edf8; color:#0662aa !important; }
-  table { width:100%; border-collapse:collapse; }
-  th { text-align:left; font-size:11px; color:#1a1a2e !important; font-weight:600; text-transform:uppercase; padding:7px 10px; }
-  td { padding:8px 10px; border-bottom:1px solid #f5f5f5; }
-  @media print {
-    body { padding: 16px; }
-    @page { margin: 1cm; }
-  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Helvetica,Arial,sans-serif;color:#1f1f29;font-size:13px;}
+  img{max-width:100%;}
+  table{width:100%;border-collapse:collapse;}
+  @media print{ @page{size:A4;margin:0;} }
 </style>
 </head><body>
 ${content}
-<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); }; }<\/script>
+<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<\/script>
 </body></html>`);
   win.document.close();
 }
@@ -3354,42 +3355,46 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   // Mettre à jour le header en fonction des colonnes réelles
   const bonHead = document.getElementById('bon-lots-head');
   if (bonHead) {
-    bonHead.innerHTML = '<tr style="background:#f7f8fa">'
-      + '<th style="padding:8px 10px;text-align:left;font-size:11px;color:#888;font-weight:600;border-radius:6px 0 0 6px">Code lot</th>'
-      + '<th style="padding:8px 10px;text-align:left;font-size:11px;color:#888;font-weight:600">Saveur</th>'
-      + (showBig   ? '<th style="padding:8px 10px;text-align:center;font-size:11px;color:#d44218;font-weight:600">Big (165g)</th>'   : '')
-      + (showSmall ? '<th style="padding:8px 10px;text-align:center;font-size:11px;color:#0662aa;font-weight:600;border-radius:0 6px 6px 0">Small (80g)</th>' : '')
+    const thBase = 'padding:10px 14px;font-size:12px;font-weight:600;color:#8c8c8c;border-bottom:1px solid #eee6e1;';
+    bonHead.innerHTML = '<tr>'
+      + '<th style="'+thBase+'text-align:left">Code lot</th>'
+      + '<th style="'+thBase+'text-align:left">Saveur</th>'
+      + (showBig   ? '<th style="'+thBase+'text-align:right">Big (165g)</th>'   : '')
+      + (showSmall ? '<th style="'+thBase+'text-align:right">Small (80g)</th>' : '')
       + '</tr>';
   }
 
   document.getElementById('bon-lots-body').innerHTML = lots.map(l => {
     const saveurLot = l.saveur || saveur;
+    const tdBase = 'padding:15px 14px;border-bottom:1px solid #eee6e1;';
     return '<tr>'
-      + '<td style="padding:8px 10px;border-bottom:1px solid #f5f5f5;font-weight:600">' + l.code + '</td>'
-      + '<td style="padding:8px 10px;border-bottom:1px solid #f5f5f5"><span class="tag ' + ('tag-o') + '">' + saveurLot + '</span></td>'
-      + (showBig   ? '<td style="padding:8px 10px;border-bottom:1px solid #f5f5f5;text-align:center;font-weight:700;color:#d44218">' + (l.big||0)   + '</td>' : '')
-      + (showSmall ? '<td style="padding:8px 10px;border-bottom:1px solid #f5f5f5;text-align:center;font-weight:700;color:#0662aa">' + (l.small||0) + '</td>' : '')
+      + '<td style="'+tdBase+'font-weight:700;color:#2a2a2a">' + l.code + '</td>'
+      + '<td style="'+tdBase+'"><span style="display:inline-block;background:#fbe8e2;color:#d44218;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">' + saveurLot + '</span></td>'
+      + (showBig   ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#33454d">' + (l.big||0)   + '</td>' : '')
+      + (showSmall ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#33454d">' + (l.small||0) + '</td>' : '')
       + '</tr>';
   }).join('');
 
   // Totaux : afficher uniquement ce qui est > 0
   const totauxEl = document.getElementById('bon-totaux-section');
   if (totauxEl) {
-    totauxEl.innerHTML = ''
-      + (showBig   ? '<div style="background:#fbe8e2;border-radius:10px;padding:12px 16px;flex:1"><div style="font-size:10px;font-weight:700;color:#d44218;text-transform:uppercase;margin-bottom:2px">Total Big (165g)</div><div style="font-size:22px;font-weight:700;color:#d44218">' + totalBig + '</div></div>' : '')
-      + (showSmall ? '<div style="background:#e0edf8;border-radius:10px;padding:12px 16px;flex:1"><div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;margin-bottom:2px">Total Small (80g)</div><div style="font-size:22px;font-weight:700;color:#0662aa">' + totalSmall + '</div></div>' : '');
+    const line = 'display:flex;justify-content:space-between;align-items:center;padding:11px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f1e2db;';
+    totauxEl.innerHTML = '<div style="width:300px;max-width:100%;background:#fbeee8;border-radius:10px;padding:6px 20px">'
+      + (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span style="font-weight:700;color:#33454d">' + totalBig + '</span></div>' : '')
+      + (showSmall ? '<div style="'+line+'"><span>Total Small (80g)</span><span style="font-weight:700;color:#33454d">' + totalSmall + '</span></div>' : '')
+      + '<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;font-size:15px;font-weight:700"><span style="color:#d44218">Total</span><span style="color:#d44218">' + (totalBig + totalSmall) + ' cookies</span></div>'
+      + '</div>';
   }
 
   // Boîtes : juste la quantité totale
   const bonBoitesSection = document.getElementById('bon-boites-section');
   if (boites > 0) {
     bonBoitesSection.style.display = '';
+    bonBoitesSection.style.background = '#fbeee8';
     if (typeBoite === 'blanche') {
-      bonBoitesSection.style.background = '#f0f7f0';
-      bonBoitesSection.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12px;font-weight:700;color:#1a7a3a">🗃️ Boîtes blanches envoyées</div><div style="font-size:11px;color:#888;margin-top:1px">1 boîte = 40 Big (165g)</div></div><div style="font-size:32px;font-weight:700;color:#1a7a3a">' + boites + '</div></div>';
+      bonBoitesSection.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12px;font-weight:700;color:#d44218">🗃️ Boîtes blanches envoyées</div><div style="font-size:11px;color:#9a7a70;margin-top:1px">1 boîte = 40 Big (165g)</div></div><div style="font-size:30px;font-weight:700;color:#d44218">' + boites + '</div></div>';
     } else {
-      bonBoitesSection.style.background = '#f7f8fa';
-      bonBoitesSection.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12px;font-weight:700;color:#888">📦 Boîtes plastiques envoyées</div></div><div style="font-size:32px;font-weight:700;color:#1a1a2e">' + boites + '</div></div>';
+      bonBoitesSection.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12px;font-weight:700;color:#33454d">📦 Boîtes plastiques envoyées</div></div><div style="font-size:30px;font-weight:700;color:#33454d">' + boites + '</div></div>';
     }
   } else {
     bonBoitesSection.style.display = 'none';
