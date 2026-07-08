@@ -3314,11 +3314,11 @@ function printBon() {
       var needed = fit.scrollHeight;
       if (needed > A4H) { fit.style.transform = "scale(" + (A4H / needed) + ")"; }
 
-      html2canvas(box, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false, width: A4W, height: A4H, windowWidth: A4W, windowHeight: A4H, scrollX: 0, scrollY: 0 })
+      html2canvas(box, { scale: 3, backgroundColor: "#ffffff", useCORS: true, logging: false, width: A4W, height: A4H, windowWidth: A4W, windowHeight: A4H, scrollX: 0, scrollY: 0 })
         .then(function(canvas) {
           var jsPDF = window.jspdf.jsPDF;
           var pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-          pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 210, 297);
+          pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
           var num = (document.getElementById("bon-numero").textContent || "BL").trim().replace(/[^a-zA-Z0-9\-]/g, "");
           pdf.save("Bon-livraison-" + num + ".pdf");
           document.body.removeChild(box);
