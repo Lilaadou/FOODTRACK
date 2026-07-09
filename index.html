@@ -9628,6 +9628,7 @@ function _cdPrint(inner, filename){
     document.body.appendChild(box);
     var ran=false;
     function go(){ if(ran)return; ran=true;
+      var A4Hpx=Math.round(A4W*297/210); var _wrap=box.firstElementChild; if(_wrap){ _wrap.style.display="flex"; _wrap.style.flexDirection="column"; _wrap.style.minHeight="0px"; var _fw=_wrap.children[_wrap.children.length-2]; if(_fw)_fw.style.marginTop="auto"; var _nat=_wrap.scrollHeight; var _pg=Math.max(1,Math.ceil(_nat/A4Hpx)); _wrap.style.minHeight=(_pg*A4Hpx)+"px"; }
       html2canvas(box,{scale:2,backgroundColor:"#ffffff",useCORS:true,width:A4W,windowWidth:A4W}).then(function(canvas){
         var jsPDF=window.jspdf.jsPDF; var pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
         var pageH=Math.floor(canvas.width*297/210); var total=canvas.height; var y=0, first=true;
@@ -9687,7 +9688,7 @@ function imprimerProductionSemaine(k){
     '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a06a2c;margin:20px 0 6px">Total de la semaine par saveur</div>'+
     '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Big</th><th style="'+thn+'">Small</th></tr></thead><tbody>'+flavHTML+
     '<tr><td style="border-top:1.5px solid #ece0c6;padding-top:9px;font-weight:700">TOTAL</td><td style="text-align:right;border-top:1.5px solid #ece0c6;padding-top:9px;font-weight:700;color:#a06a2c">'+big+'</td><td style="text-align:right;border-top:1.5px solid #ece0c6;padding-top:9px;font-weight:700;color:#a06a2c">'+small+'</td></tr></tbody></table>'+
-    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:18px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#4a3524"/></svg><div style="background:#4a3524;padding:14px 40px 18px;text-align:center;font-size:11px;color:#e9dcc6;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne de production (traçabilité AFSCA)</div></div>';
+    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#4a3524"/></svg><div style="background:#4a3524;padding:24px 40px 32px;text-align:center;font-size:12px;color:#e9dcc6;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne de production (traçabilité AFSCA)</div></div>';
   _cdPrint(html, 'Production-S'+_cdWNum(s)+'-'+s.getFullYear()+'.pdf');
 }
 
@@ -9721,7 +9722,7 @@ function imprimerIxellesSemaine(k){
     '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#000;margin:20px 0 6px">Total de la semaine par saveur</div>'+
     '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Cookies</th></tr></thead><tbody>'+flavHTML+
     '<tr><td style="border-top:1.5px solid #ccc;padding-top:9px;font-weight:700">TOTAL</td><td style="text-align:right;border-top:1.5px solid #ccc;padding-top:9px;font-weight:700">'+ck+'</td></tr></tbody></table>'+
-    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:18px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#f2f2f2"/></svg><div style="background:#f2f2f2;padding:14px 40px 18px;text-align:center;font-size:11px;color:#000;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Récap hebdomadaire des livraisons Ixelles</div></div>';
+    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#f2f2f2"/></svg><div style="background:#f2f2f2;padding:24px 40px 32px;text-align:center;font-size:12px;color:#000;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Récap hebdomadaire des livraisons Ixelles</div></div>';
   _cdPrint(html, 'Ixelles-S'+_cdWNum(s)+'-'+s.getFullYear()+'.pdf');
 }
 
@@ -9759,7 +9760,7 @@ function imprimerRapportLivreur(livreur){
     '<tr><td colspan="3" style="border-top:1.5px solid #d9e7f4;padding-top:9px;font-weight:700">TOTAL — '+list.length+' livraisons</td>'+
     '<td style="text-align:right;border-top:1.5px solid #d9e7f4;padding-top:9px;font-weight:700;color:#d44218">'+totCk+'</td>'+
     '<td style="text-align:right;border-top:1.5px solid #d9e7f4;padding-top:9px;font-weight:700;color:#d44218">'+totBox+'</td></tr></tbody></table>'+
-    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:18px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#e6f1fb"/></svg><div style="background:#e6f1fb;padding:14px 40px 18px;text-align:center;font-size:11px;color:#000;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne — suivi livreur</div></div>';
+    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#e6f1fb"/></svg><div style="background:#e6f1fb;padding:24px 40px 32px;text-align:center;font-size:12px;color:#000;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne — suivi livreur</div></div>';
   _cdPrint(html, 'Rapport-'+livreur+'-'+_MOISFR[m]+'-'+y+'.pdf');
 }
 /* ═══════════ FIN CENTRE DE DOCUMENTS ═══════════ */
