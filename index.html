@@ -9680,30 +9680,30 @@ function imprimerProductionSemaine(k){
   var th='text-align:left;font-size:10px;color:#000;text-transform:uppercase;letter-spacing:.04em;font-weight:700;padding:7px 8px;border-bottom:1px solid #ece0c6';
   var thn=th+';text-align:right';
   var daysHTML=days.map(function(kk){ var g=byDay[kk];
-    var rws=g.rows.map(function(r){ return '<tr><td style="font-weight:700;padding:8px;border-bottom:1px solid #f2ecdf">'+r.code+'</td>'+
-      '<td style="padding:8px;border-bottom:1px solid #f2ecdf"><span style="display:inline-block;font-size:11px;padding:3px 11px;border-radius:20px;font-weight:700;background:#efe4cd;color:#8a6a3f">'+r.saveur+'</span></td>'+
-      '<td style="padding:8px;border-bottom:1px solid #f2ecdf">'+r.pmx+'</td>'+
-      '<td style="text-align:right;font-weight:700;color:#4a3524;padding:8px;border-bottom:1px solid #f2ecdf">'+(r.big||'—')+'</td>'+
-      '<td style="text-align:right;font-weight:700;color:#4a3524;padding:8px;border-bottom:1px solid #f2ecdf">'+(r.small||'—')+'</td>'+
-      '<td style="padding:8px;border-bottom:1px solid #f2ecdf">'+r.nom+'</td></tr>'; }).join('');
-    return '<div class="pgbrk"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a06a2c;margin:16px 0 6px">'+_cdDayFull(g.d)+'</div>'+
+    var rws=g.rows.map(function(r){ return '<tr><td style="font-weight:700;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+r.code+'</td>'+
+      '<td style="padding:11px 8px;border-bottom:1px solid #f2ecdf"><span style="display:inline-block;font-size:11px;padding:3px 11px;border-radius:20px;font-weight:700;background:#efe4cd;color:#8a6a3f">'+r.saveur+'</span></td>'+
+      '<td style="padding:11px 8px;border-bottom:1px solid #f2ecdf">'+r.pmx+'</td>'+
+      '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(r.big||'—')+'</td>'+
+      '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(r.small||'—')+'</td>'+
+      '<td style="padding:11px 8px;border-bottom:1px solid #f2ecdf">'+r.nom+'</td></tr>'; }).join('');
+    return '<div class="pgbrk"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a06a2c;margin:32px 0 12px">'+_cdDayFull(g.d)+'</div>'+
       '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Code lot</th><th style="'+th+'">Saveur</th><th style="'+th+'">Premix</th><th style="'+thn+'">Big</th><th style="'+thn+'">Small</th><th style="'+th+'">Producteur</th></tr></thead><tbody>'+rws+'</tbody></table></div>'; }).join('');
-  var flavHTML=Object.keys(flav).map(function(fn){ var e=flav[fn]; return '<tr><td style="font-weight:700;padding:8px;border-bottom:1px solid #f2ecdf">'+fn+'</td>'+
-    '<td style="text-align:right;font-weight:700;color:#4a3524;padding:8px;border-bottom:1px solid #f2ecdf">'+(e[0]||'—')+'</td>'+
-    '<td style="text-align:right;font-weight:700;color:#4a3524;padding:8px;border-bottom:1px solid #f2ecdf">'+(e[1]||'—')+'</td></tr>'; }).join('');
+  var flavHTML=Object.keys(flav).map(function(fn){ var e=flav[fn]; return '<tr><td style="font-weight:700;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+fn+'</td>'+
+    '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(e[0]||'—')+'</td>'+
+    '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(e[1]||'—')+'</td></tr>'; }).join('');
+  var _maxT=1; Object.keys(flav).forEach(function(fn){ var e=flav[fn]; if((e[0]+e[1])>_maxT)_maxT=(e[0]+e[1]); });
+  var chartHTML=Object.keys(flav).map(function(fn){ var e=flav[fn]; var bp=(e[0]/_maxT*100).toFixed(1),sp=(e[1]/_maxT*100).toFixed(1); return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">'+'<div style="width:78px;font-size:12px;font-weight:700;color:#4a3524">'+fn+'</div>'+'<div style="flex:1;display:flex;align-items:center;height:16px;background:#f6efdd;border-radius:4px;overflow:hidden">'+'<div style="width:'+bp+'%;background:#8a6a3f;height:100%"></div>'+'<div style="width:'+sp+'%;background:#c9a878;height:100%"></div>'+'</div>'+'<div style="width:118px;text-align:right;font-size:11px;font-weight:700;color:#4a3524">'+(e[0]||0)+' big · '+(e[1]||0)+' small</div>'+'</div>'; }).join('');
   var html='<div style="background:#fffdf8"><div style="background:#4a3524;padding:22px 40px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">'+
     '<div><img src="'+_cdLogoCreme+'" style="height:52px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#f2e9d8;margin-top:6px">BAKED WITH LOVE</div></div>'+
     '<div style="text-align:right;font-size:12px;line-height:1.8;color:#e9dcc6"><b style="color:#fff">KOOKI COMPANY SRL</b><br>Avenue Emile Gryson 2D<br>1070 Anderlecht</div></div>'+
     '<svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:18px;margin-top:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L794,0 L794,9 C635,24 476,3 317,12 C198,18 99,5 0,13 Z" fill="#4a3524"/></svg><div style="padding:20px 40px 24px"><div style="font-size:23px;color:#4a3524">Production de la semaine</div>'+
     '<div style="font-size:14px;font-weight:700;color:#a06a2c;margin-top:2px">'+_cdWLbl(s)+'</div>'+
-    '<div style="background:#f6efdd;border:1px solid #ece0c6;border-radius:10px;padding:12px 18px;margin:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
+    '<div style="background:#f6efdd;border:1px solid #ece0c6;border-radius:10px;padding:15px 20px;margin:22px 0 30px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
     '<div style="font-size:13px;font-weight:700;color:#8a6a3f">'+arr.length+' lots · '+Object.keys(flav).length+' saveurs</div>'+
     '<div style="display:flex;gap:20px"><div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#4a3524">'+big+'</div><div style="font-size:10px">BIG</div></div>'+
     '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#4a3524">'+small+'</div><div style="font-size:10px">SMALL</div></div></div></div>'+
     daysHTML+
-    '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a06a2c;margin:20px 0 6px">Total de la semaine par saveur</div>'+
-    '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Big</th><th style="'+thn+'">Small</th></tr></thead><tbody>'+flavHTML+
-    '<tr><td style="border-top:1.5px solid #ece0c6;padding-top:9px;font-weight:700">TOTAL</td><td style="text-align:right;border-top:1.5px solid #ece0c6;padding-top:9px;font-weight:700;color:#a06a2c">'+big+'</td><td style="text-align:right;border-top:1.5px solid #ece0c6;padding-top:9px;font-weight:700;color:#a06a2c">'+small+'</td></tr></tbody></table>'+
+    
     '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#4a3524"/></svg><div style="background:#4a3524;padding:24px 40px 32px;text-align:center;font-size:12px;color:#e9dcc6;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne de production (traçabilité AFSCA)</div></div>';
   _cdPrint(html, 'Production-S'+_cdWNum(s)+'-'+s.getFullYear()+'.pdf');
 }
