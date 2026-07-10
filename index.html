@@ -818,8 +818,8 @@
 
     <!-- ═══ SÉLECTEUR FAMILLE : Cookie / Gâteau ═══ -->
     <div style="display:inline-flex;background:#f1f1f4;border-radius:11px;padding:4px;margin-bottom:18px;gap:4px">
-      <button id="famtab-cookie" onclick="setProdFamily('cookie')" style="border:none;cursor:pointer;font-size:13.5px;font-weight:700;padding:8px 20px;border-radius:8px;background:#fff;color:#d44218;box-shadow:0 1px 2px rgba(0,0,0,.06)">🍪 Cookies</button>
-      <button id="famtab-gateau" onclick="setProdFamily('gateau')" style="border:none;cursor:pointer;font-size:13.5px;font-weight:700;padding:8px 20px;border-radius:8px;background:transparent;color:#888;box-shadow:none">🧁 Gâteaux</button>
+      <button id="famtab-cookie" onclick="setProdFamily('cookie')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:#fff;color:#d44218;box-shadow:0 1px 2px rgba(0,0,0,.06)">Cookies</button>
+      <button id="famtab-gateau" onclick="setProdFamily('gateau')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none">Gâteaux</button>
     </div>
 
     <div id="prod-cookie-wrap">
@@ -960,8 +960,10 @@
           <div class="form-group"><label>Quantité produite * <span style="font-weight:400;color:#bbb">(pièces / cakes)</span></label>
             <input type="number" id="gat-qte" min="1" placeholder="0">
           </div>
-          <div class="form-group" style="grid-column:1/-1"><label>Remarque / allergènes <span style="font-weight:400;color:#bbb">(optionnel)</span></label>
-            <input type="text" id="gat-remarque" placeholder="Ex : contient gluten, œuf, fruits à coque…">
+          <div class="form-group" style="grid-column:1/-1;margin-bottom:0"><label>Bons de livraison (BL) * <span style="font-weight:400;color:#bbb">(cocher au moins 1)</span></label>
+            <div class="fac-list" id="gat-fac-list">
+              <div class="fac-empty">Aucun BL disponible — réceptionnez-en dans l'onglet Réception facture</div>
+            </div>
           </div>
         </div>
         <div class="form-footer">
@@ -983,7 +985,7 @@
       <div class="card">
         <div class="card-header"><div><div class="card-title">Historique de production — Gâteaux</div></div></div>
         <table>
-          <thead><tr><th>Code Lot</th><th>Produit</th><th>Qté</th><th>Date</th><th>Remarque</th><th></th></tr></thead>
+          <thead><tr><th>Code Lot</th><th>Produit</th><th>Qté</th><th>Date</th><th>BL liés</th><th></th></tr></thead>
           <tbody id="gat-table"><tr><td colspan="6" class="empty">Aucune production gâteau</td></tr></tbody>
         </table>
       </div>
@@ -2691,7 +2693,7 @@ function selectPmxBac(saveur, bac) {
 }
   
 function refreshFactureLists() {
-  ['pmx-fac-list','prod-fac-list'].forEach(id => {
+  ['pmx-fac-list','prod-fac-list','gat-fac-list'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (!facturesRecues.length) {
@@ -9865,9 +9867,9 @@ function imprimerRapportLivreur(livreur){
   const readG  = () => { try { return JSON.parse(localStorage.getItem(LSKEY) || '[]'); } catch(e){ return []; } };
   const writeG = a  => localStorage.setItem(LSKEY, JSON.stringify(a));
 
-  const BASE = 'border:none;cursor:pointer;font-size:13.5px;font-weight:700;padding:8px 20px;border-radius:8px;';
+  const BASE = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;';
   const ON   = 'background:#fff;color:#d44218;box-shadow:0 1px 2px rgba(0,0,0,.06)';
-  const OFF  = 'background:transparent;color:#888;box-shadow:none';
+  const OFF  = 'background:transparent;color:#999;box-shadow:none';
 
   window.setProdFamily = function(fam){
     const cw = g('prod-cookie-wrap'), gw = g('prod-gateau-wrap');
@@ -9876,6 +9878,7 @@ function imprimerRapportLivreur(livreur){
     if(fam === 'gateau'){
       cw.style.display = 'none'; gw.style.display = '';
       bg.style.cssText = BASE + ON; bc.style.cssText = BASE + OFF;
+      if(typeof refreshFactureLists === 'function') refreshFactureLists();
       renderGateau();
     } else {
       gw.style.display = 'none'; cw.style.display = '';
@@ -9911,9 +9914,11 @@ function imprimerRapportLivreur(livreur){
     const qte = parseInt(g('gat-qte').value) || 0;
     if(!code || !codeLot){ toast(t, '⚠️ Choisis un produit'); return; }
     if(qte <= 0){ toast(t, '⚠️ Indique une quantité'); return; }
+    const factures = (typeof getCheckedFactures === 'function') ? getCheckedFactures('gat-fac-list') : [];
+    if(!factures.length){ toast(t, '⚠️ Coche au moins 1 BL'); return; }
     const nom = (GATEAUX.find(x => x.code === code) || {}).nom || code;
     const arr = readG();
-    arr.push({ code, nom, codeLot, qte, remarque: (g('gat-remarque').value || '').trim(), date: new Date().toISOString() });
+    arr.push({ code, nom, codeLot, qte, factures, date: new Date().toISOString() });
     writeG(arr);
     toast(t, '✅ ' + codeLot + ' enregistré');
     resetGateau();
@@ -9921,8 +9926,9 @@ function imprimerRapportLivreur(livreur){
   };
 
   window.resetGateau = function(){
-    ['gat-qte','gat-remarque','gat-code'].forEach(id => { if(g(id)) g(id).value = ''; });
+    ['gat-qte','gat-code'].forEach(id => { if(g(id)) g(id).value = ''; });
     if(g('gat-produit')) g('gat-produit').selectedIndex = 0;
+    document.querySelectorAll('#gat-fac-list input[type=checkbox]').forEach(c => c.checked = false);
   };
 
   window.deleteGateau = function(codeLot, iso){
@@ -9956,7 +9962,7 @@ function imprimerRapportLivreur(livreur){
       tb.innerHTML = arr.length ? arr.map(p =>
         '<tr><td style="font-weight:700">'+esc(p.codeLot)+'</td><td>'+esc(p.nom)+'</td>'+
         '<td style="text-align:center">'+p.qte+'</td><td>'+fmtDate(p.date)+'</td>'+
-        '<td style="color:#888">'+esc(p.remarque)+'</td>'+
+        '<td style="color:#888">'+esc((p.factures||[]).join(', '))+'</td>'+
         '<td><button onclick="deleteGateau(\''+esc(p.codeLot)+'\',\''+p.date+'\')" style="background:none;border:none;color:#c0392b;cursor:pointer;font-size:14px" title="Supprimer">🗑️</button></td></tr>'
       ).join('') : '<tr><td colspan="6" class="empty">Aucune production gâteau</td></tr>';
     }
