@@ -3471,9 +3471,9 @@ function printBon() {
     var A4W = 794, A4H = 1123;
 
     var box = document.createElement("div");
-    box.style.cssText = "position:fixed;left:-10000px;top:0;width:"+A4W+"px;height:"+A4H+"px;background:#fff;overflow:hidden;";
+    box.style.cssText = "position:fixed;left:-10000px;top:0;width:"+A4W+"px;background:#fff;overflow:hidden;";
     var fit = document.createElement("div");
-    fit.style.cssText = "width:"+A4W+"px;min-height:"+A4H+"px;display:flex;flex-direction:column;transform-origin:top left;background:#fff;font-family:Calibri,Carlito,'Segoe UI',Arial,sans-serif;";
+    fit.style.cssText = "width:"+A4W+"px;background:#fff;font-family:Calibri,Carlito,'Segoe UI',Arial,sans-serif;";
     fit.innerHTML = document.getElementById("bon-content").innerHTML;
     fit.style.width = A4W + "px";
     [].slice.call(fit.children).forEach(function(el){ el.style.width = "100%"; el.style.marginLeft = "0"; el.style.marginRight = "0"; });
@@ -3485,14 +3485,25 @@ function printBon() {
     var ran = false;
     function render() {
       if (ran) return; ran = true;
-      var needed = fit.scrollHeight;
-      if (needed > A4H) { fit.style.transform = "scale(" + (A4H / needed) + ")"; }
 
-      html2canvas(box, { scale: 3, backgroundColor: "#ffffff", useCORS: true, logging: false, width: A4W, height: A4H, windowWidth: A4W, windowHeight: A4H, scrollX: 0, scrollY: 0 })
+      html2canvas(box, { scale: 3, backgroundColor: "#ffffff", useCORS: true, logging: false, width: A4W, windowWidth: A4W })
         .then(function(canvas) {
           var jsPDF = window.jspdf.jsPDF;
           var pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-          pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
+
+          var pdfW = 210;                                  // largeur A4 en mm
+          var imgH = canvas.height * pdfW / canvas.width;  // hauteur proportionnelle
+          var pageH = 297;                                 // hauteur A4 en mm
+
+          if (imgH <= pageH) {
+            // Le contenu tient sur une page : on le place en haut, à sa taille réelle
+            pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pdfW, imgH);
+          } else {
+            // Contenu plus grand qu'une page : on le réduit pour tout faire tenir sur 1 page A4
+            var scaled = pageH;
+            pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pdfW, scaled);
+          }
+
           var num = (document.getElementById("bon-numero").textContent || "BL").trim().replace(/[^a-zA-Z0-9\-]/g, "");
           pdf.save("Bon-livraison-" + num + ".pdf");
           document.body.removeChild(box);
