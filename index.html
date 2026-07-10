@@ -815,6 +815,14 @@
 
   <!-- ══════════════════ PRODUCTION ══════════════════ -->
   <div id="page-production" class="page">
+
+    <!-- ═══ SÉLECTEUR FAMILLE : Cookie / Gâteau ═══ -->
+    <div style="display:inline-flex;background:#f1f1f4;border-radius:11px;padding:4px;margin-bottom:18px;gap:4px">
+      <button id="famtab-cookie" onclick="setProdFamily('cookie')" style="border:none;cursor:pointer;font-size:13.5px;font-weight:700;padding:8px 20px;border-radius:8px;background:#fff;color:#d44218;box-shadow:0 1px 2px rgba(0,0,0,.06)">🍪 Cookies</button>
+      <button id="famtab-gateau" onclick="setProdFamily('gateau')" style="border:none;cursor:pointer;font-size:13.5px;font-weight:700;padding:8px 20px;border-radius:8px;background:transparent;color:#888;box-shadow:none">🧁 Gâteaux</button>
+    </div>
+
+    <div id="prod-cookie-wrap">
     <div class="form-section">
       <div class="form-title">🏭 Enregistrer une production</div>
       <div class="form-grid fg-3">
@@ -933,6 +941,52 @@
           <tr><td colspan="8" class="empty">Chargement…</td></tr>
         </tbody>
       </table>
+    </div>
+    </div><!-- /prod-cookie-wrap -->
+
+    <!-- ═══════════ PRODUCTION GÂTEAUX ═══════════ -->
+    <div id="prod-gateau-wrap" style="display:none">
+      <div class="form-section">
+        <div class="form-title">🧁 Enregistrer une production — Gâteaux</div>
+        <div class="form-grid fg-3">
+          <div class="form-group"><label>Produit *</label>
+            <select id="gat-produit" onchange="autoGenCodeGateau()">
+              <option value="">-- Choisir --</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Code Lot *</label>
+            <input type="text" id="gat-code" placeholder="Ex: CIT-260606-01" readonly style="background:#f0f0f0;color:#555;cursor:default;border-color:#e8e8e8">
+          </div>
+          <div class="form-group"><label>Quantité produite * <span style="font-weight:400;color:#bbb">(pièces / cakes)</span></label>
+            <input type="number" id="gat-qte" min="1" placeholder="0">
+          </div>
+          <div class="form-group" style="grid-column:1/-1"><label>Remarque / allergènes <span style="font-weight:400;color:#bbb">(optionnel)</span></label>
+            <input type="text" id="gat-remarque" placeholder="Ex : contient gluten, œuf, fruits à coque…">
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-primary" onclick="saveGateau()">💾 Enregistrer</button>
+          <button class="btn btn-secondary" onclick="resetGateau()">↺ Réinitialiser</button>
+          <span class="toast" id="toast-gat"></span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-header" style="margin-bottom:10px">
+          <div><div class="card-title">📦 Gâteaux produits aujourd'hui</div><div class="card-sub" id="gat-lots-date">—</div></div>
+        </div>
+        <div id="gat-lots-jour" style="display:flex;flex-direction:column;gap:6px">
+          <div class="empty" style="padding:12px;font-size:12px">Aucune production ce jour</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Historique de production — Gâteaux</div></div></div>
+        <table>
+          <thead><tr><th>Code Lot</th><th>Produit</th><th>Qté</th><th>Date</th><th>Remarque</th><th></th></tr></thead>
+          <tbody id="gat-table"><tr><td colspan="6" class="empty">Aucune production gâteau</td></tr></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -9791,6 +9845,127 @@ function imprimerRapportLivreur(livreur){
   _cdPrint(html, 'Rapport-'+livreur+'-'+_MOISFR[m]+'-'+y+'.pdf');
 }
 /* ═══════════ FIN CENTRE DE DOCUMENTS ═══════════ */
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   MODULE GÂTEAUX — production + code + historique (isolé du flux cookie)
+   Stockage : localStorage['kooki_productions_gateaux']
+   Code lot : PREFIX-AAMMJJ-NN  (même logique que les cookies)
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  const GATEAUX = [
+    { code:'BRW', nom:'Brownie' },
+    { code:'BAN', nom:'Banana bread' },
+    { code:'CAR', nom:'Carrot cake' },
+    { code:'MUF', nom:'Muffin myrtille' },
+    { code:'CIT', nom:'Cake citron' },
+  ];
+  const LSKEY = 'kooki_productions_gateaux';
+  const g = id => document.getElementById(id);
+  const readG  = () => { try { return JSON.parse(localStorage.getItem(LSKEY) || '[]'); } catch(e){ return []; } };
+  const writeG = a  => localStorage.setItem(LSKEY, JSON.stringify(a));
+
+  const BASE = 'border:none;cursor:pointer;font-size:13.5px;font-weight:700;padding:8px 20px;border-radius:8px;';
+  const ON   = 'background:#fff;color:#d44218;box-shadow:0 1px 2px rgba(0,0,0,.06)';
+  const OFF  = 'background:transparent;color:#888;box-shadow:none';
+
+  window.setProdFamily = function(fam){
+    const cw = g('prod-cookie-wrap'), gw = g('prod-gateau-wrap');
+    const bc = g('famtab-cookie'),   bg = g('famtab-gateau');
+    if(!cw || !gw) return;
+    if(fam === 'gateau'){
+      cw.style.display = 'none'; gw.style.display = '';
+      bg.style.cssText = BASE + ON; bc.style.cssText = BASE + OFF;
+      renderGateau();
+    } else {
+      gw.style.display = 'none'; cw.style.display = '';
+      bc.style.cssText = BASE + ON; bg.style.cssText = BASE + OFF;
+    }
+  };
+
+  function fillSelect(){
+    const s = g('gat-produit'); if(!s) return;
+    s.innerHTML = '<option value="">-- Choisir --</option>' +
+      GATEAUX.map(x => '<option value="'+x.code+'">'+x.nom+'</option>').join('');
+  }
+
+  window.autoGenCodeGateau = function(){
+    const code = g('gat-produit') ? g('gat-produit').value : '';
+    if(!code){ if(g('gat-code')) g('gat-code').value = ''; return; }
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const dd = String(now.getDate()).padStart(2,'0');
+    const today = now.toDateString();
+    const dejaAuj = readG().filter(p => p.code === code && p.date && new Date(p.date).toDateString() === today);
+    const num = String(dejaAuj.length + 1).padStart(2,'0');
+    g('gat-code').value = code + '-' + yy + mm + dd + '-' + num;
+  };
+
+  function toast(el, msg){ if(!el) return; el.textContent = msg; el.style.opacity = '1'; setTimeout(() => { el.style.opacity = '0'; }, 2600); }
+
+  window.saveGateau = function(){
+    const t = g('toast-gat');
+    const code = g('gat-produit').value;
+    const codeLot = g('gat-code').value;
+    const qte = parseInt(g('gat-qte').value) || 0;
+    if(!code || !codeLot){ toast(t, '⚠️ Choisis un produit'); return; }
+    if(qte <= 0){ toast(t, '⚠️ Indique une quantité'); return; }
+    const nom = (GATEAUX.find(x => x.code === code) || {}).nom || code;
+    const arr = readG();
+    arr.push({ code, nom, codeLot, qte, remarque: (g('gat-remarque').value || '').trim(), date: new Date().toISOString() });
+    writeG(arr);
+    toast(t, '✅ ' + codeLot + ' enregistré');
+    resetGateau();
+    renderGateau();
+  };
+
+  window.resetGateau = function(){
+    ['gat-qte','gat-remarque','gat-code'].forEach(id => { if(g(id)) g(id).value = ''; });
+    if(g('gat-produit')) g('gat-produit').selectedIndex = 0;
+  };
+
+  window.deleteGateau = function(codeLot, iso){
+    if(!confirm('Supprimer le lot ' + codeLot + ' ?')) return;
+    writeG(readG().filter(p => !(p.codeLot === codeLot && p.date === iso)));
+    renderGateau();
+  };
+
+  function fmtDate(iso){ const d = new Date(iso); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  function renderGateau(){
+    const arr = readG().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+    const today = new Date().toDateString();
+
+    const auj = arr.filter(p => p.date && new Date(p.date).toDateString() === today);
+    const ldj = g('gat-lots-jour');
+    if(ldj){
+      ldj.innerHTML = auj.length ? auj.map(p =>
+        '<div style="display:flex;justify-content:space-between;align-items:center;background:#f9f9f9;border:1px solid #eee;border-radius:9px;padding:8px 12px">'+
+          '<div><div style="font-weight:700;font-size:13px">'+esc(p.codeLot)+'</div><div style="font-size:11px;color:#888">'+esc(p.nom)+'</div></div>'+
+          '<div style="font-weight:700;color:#d44218">'+p.qte+'</div>'+
+        '</div>').join('')
+        : '<div class="empty" style="padding:12px;font-size:12px">Aucune production ce jour</div>';
+    }
+    const dateEl = g('gat-lots-date');
+    if(dateEl) dateEl.textContent = new Date().toLocaleDateString('fr-BE', {weekday:'long', day:'numeric', month:'long'});
+
+    const tb = g('gat-table');
+    if(tb){
+      tb.innerHTML = arr.length ? arr.map(p =>
+        '<tr><td style="font-weight:700">'+esc(p.codeLot)+'</td><td>'+esc(p.nom)+'</td>'+
+        '<td style="text-align:center">'+p.qte+'</td><td>'+fmtDate(p.date)+'</td>'+
+        '<td style="color:#888">'+esc(p.remarque)+'</td>'+
+        '<td><button onclick="deleteGateau(\''+esc(p.codeLot)+'\',\''+p.date+'\')" style="background:none;border:none;color:#c0392b;cursor:pointer;font-size:14px" title="Supprimer">🗑️</button></td></tr>'
+      ).join('') : '<tr><td colspan="6" class="empty">Aucune production gâteau</td></tr>';
+    }
+  }
+
+  function initGateau(){ fillSelect(); renderGateau(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initGateau);
+  else initGateau();
+})();
 </script>
 </body>
 </html>
