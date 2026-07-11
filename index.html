@@ -9451,7 +9451,7 @@ async function renderRecapMois(){
     var c = byClient[name];
     var d = _rmParseDate(bl.date);
     var lots = _rmLots(bl);
-    c.bls.push({ n:_rmNumero(bl), d:d?_rmDayLabel(d):'', lots:lots });
+    c.bls.push({ n:_rmNumero(bl), d:d?_rmDayLabel(d):'', dt:d||null, lots:lots });
     c.boxes += _rmBoites(bl);
     lots.forEach(function(l){
       c.big += l.big; c.small += l.small;
@@ -9502,95 +9502,177 @@ async function renderRecapMois(){
   }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
 }
 function _rmClientHTML(c, forPrint){
-  var detail = c.bls.map(function(bl){
-    return bl.lots.map(function(lot,j){
-      return '<tr><td style="color:#999;font-size:12px;padding:7px;border-bottom:1px solid #f4f4f4">'+(j===0?bl.d:'')+'</td>'+
-        '<td style="font-weight:700;color:#0662aa;font-size:12px;padding:7px;border-bottom:1px solid #f4f4f4">'+(j===0?bl.n:'')+'</td>'+
-        '<td style="padding:7px;border-bottom:1px solid #f4f4f4"><span style="display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;background:#e0edf8;color:#0662aa">'+lot.saveur+'</span></td>'+
-        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(lot.big||'—')+'</td>'+
-        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(lot.small||'—')+'</td></tr>';
-    }).join('');
+  var BLUE='#0c447c', RED='#d44218', BAND='#e6f1fb', SOFT='#eef5fc', GREY='#f0f0f0';
+  function p2(n){ return String(n).padStart(2,'0'); }
+  function fdate(dt){ return dt ? p2(dt.getDate())+'/'+p2(dt.getMonth()+1)+'/'+dt.getFullYear() : ''; }
+
+  /* Regrouper les livraisons par jour (somme Big/Small) */
+  var map={};
+  c.bls.forEach(function(bl){
+    var key = bl.dt ? bl.dt.toISOString().slice(0,10) : (bl.d||('x'+Math.random()));
+    if(!map[key]) map[key]={ dt: bl.dt||null, big:0, small:0 };
+    (bl.lots||[]).forEach(function(l){ map[key].big+=(l.big||0); map[key].small+=(l.small||0); });
+  });
+  var jours=Object.keys(map).map(function(k){return map[k];})
+            .sort(function(a,b){ return (a.dt?a.dt:0)-(b.dt?b.dt:0); });
+
+  var tdD='background:#fff;font-weight:700;font-style:italic;font-size:12.5px;padding:12px 12px 5px;color:#333';
+  var tdP='background:'+GREY+';padding:6px 12px 4px;font-size:13px';
+  var tdQ=tdP+';text-align:right;font-weight:600;color:'+BLUE;
+  var rows=jours.map(function(j){
+    var r='<tr><td colspan="2" style="'+tdD+'">'+fdate(j.dt)+'</td></tr>';
+    if(j.big)   r+='<tr><td style="'+tdP+'">1 GIANT SIZE</td><td style="'+tdQ+'">'+j.big+'</td></tr>';
+    if(j.small) r+='<tr><td style="'+tdP+'">1 BABY SIZE</td><td style="'+tdQ+'">'+j.small+'</td></tr>';
+    return r;
   }).join('');
-  var flav = Object.keys(c.flavors).map(function(f){ var e=c.flavors[f];
-    return '<tr><td style="font-weight:700;padding:7px;border-bottom:1px solid #f4f4f4">'+f+'</td>'+
-      '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(e[0]||'—')+'</td>'+
-      '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px;border-bottom:1px solid #f4f4f4">'+(e[1]||'—')+'</td></tr>';
-  }).join('');
-  var th='text-align:left;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:7px;border-bottom:1px solid #d9e7f4';
-  var thn=th+';text-align:right';
-  var pad = forPrint ? '26px 34px' : '20px 26px';
+
+  var y=_rmState.y, m=_rmState.m, dernier=new Date(y,m+1,0).getDate();
+  var periode='01/'+p2(m+1)+'/'+y+' &rarr; '+p2(dernier)+'/'+p2(m+1)+'/'+y;
+  var pad = forPrint ? '30px 42px 10px' : '24px 30px 10px';
+  var total=c.big+c.small;
+  var font="font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif";
+  var wrap = forPrint ? 'min-height:297mm;display:flex;flex-direction:column;' : '';
+  var bodyFlex = forPrint ? 'flex:1;' : '';
+  var footMargin = forPrint ? '0' : '30px';
+
   return ''+
-   '<div style="background:#e6f1fb;padding:18px 26px"><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:44px" alt="Kooki"><div style="font-size:11px;font-weight:800;letter-spacing:.16em;color:#d44218;margin-top:2px">BAKED WITH LOVE</div></div>'+
-   '<div style="padding:'+pad+'">'+
-   '<div style="font-size:20px;font-weight:400;color:#0c447c">Récapitulatif mensuel des livraisons</div>'+
-   '<div style="font-size:13px;font-weight:700;color:#d44218;margin-top:1px">'+_rmMonthName()+'</div>'+
-   '<div style="background:#eef5fc;border-radius:10px;padding:13px 18px;margin:14px 0 18px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">'+
-     '<div><div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.06em">Client</div>'+
-     '<div style="font-size:15px;font-weight:700">'+c.name+'</div></div>'+
-     '<div style="text-align:right"><div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.06em">Total du mois</div>'+
-     '<div style="font-size:20px;font-weight:700;color:#0c447c">'+c.total+'</div><div style="font-size:11px;color:#888">cookies · '+c.bls.length+' livraison'+(c.bls.length>1?'s':'')+'</div></div>'+
-   '</div>'+
-   '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8c8c8c;margin:16px 0 6px">Détail des livraisons</div>'+
-   '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Date</th><th style="'+th+'">N° BL</th><th style="'+th+'">Saveur</th><th style="'+thn+'">Big</th><th style="'+thn+'">Small</th></tr></thead><tbody>'+detail+'</tbody></table>'+
-   '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8c8c8c;margin:16px 0 6px">Total du mois par saveur</div>'+
-   '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Big (165g)</th><th style="'+thn+'">Small (80g)</th></tr></thead><tbody>'+flav+'</tbody></table>'+
-   '<div style="margin-top:16px;background:#fbe8e2;border-radius:10px;padding:4px 18px">'+
-     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f3d3c6"><span>Total Big (165g)</span><span style="font-weight:700;color:#0c447c">'+c.big+'</span></div>'+
-     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f3d3c6"><span>Total Small (80g)</span><span style="font-weight:700;color:#0c447c">'+c.small+'</span></div>'+
-     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#4a4a4a;border-bottom:1px solid #f3d3c6"><span>📦 Boîtes plastiques envoyées</span><span style="font-weight:700;color:#0c447c">'+c.boxes+'</span></div>'+
-     '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#d44218">Total à facturer</span><span style="color:#d44218">'+c.total+' cookies</span></div>'+
-   '</div></div>';
+  "<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');</style>"+
+  '<div style="'+font+';'+wrap+'">'+
+    '<div style="background:'+BAND+';padding:30px 42px;border-radius:0 0 18px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">'+
+      '<div><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:46px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:'+RED+';margin-top:4px">BAKED WITH LOVE</div></div>'+
+      '<div style="text-align:right;font-size:12px;line-height:1.7;color:#4a4a4a"><b style="color:'+BLUE+'">KOOKI COMPANY SRL</b><br>BE1015746980<br>Avenue Emile Gryson 2D<br>1070 Anderlecht<br>Belgique<br><span style="display:inline-block;margin-top:6px">TVA: BE1015746980</span></div>'+
+    '</div>'+
+    '<div style="padding:'+pad+';'+bodyFlex+'">'+
+      
+      '<div style="font-size:28px;font-weight:600;color:'+BLUE+';margin:6px 0 2px">Relev&eacute; mensuel B2B</div>'+
+      '<div style="font-size:15px;font-weight:700;color:'+RED+';margin-bottom:18px">'+c.name+' &middot; '+_rmMonthName()+'</div>'+
+      '<div style="background:'+SOFT+';border-radius:6px;display:flex;padding:14px 20px;margin-bottom:22px">'+
+        '<div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:'+BLUE+';margin-bottom:3px">P&eacute;riode</div><div style="font-size:13px">'+periode+'</div></div>'+
+        '<div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:'+BLUE+';margin-bottom:3px">Nombre de livraisons</div><div style="font-size:13px">'+jours.length+'</div></div>'+
+      '</div>'+
+      '<table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr>'+
+          '<th style="text-align:left;font-size:12.5px;font-weight:600;color:#555;padding:0 12px 12px;border-bottom:2px solid '+BLUE+'">Description</th>'+
+          '<th style="text-align:right;font-size:12.5px;font-weight:600;color:#555;padding:0 12px 12px;border-bottom:2px solid '+BLUE+'">Quantit&eacute;</th>'+
+        '</tr></thead><tbody>'+rows+'</tbody>'+
+      '</table>'+
+      '<div style="display:flex;justify-content:space-between;gap:30px;margin-top:24px">'+
+        '<div style="flex:1;font-size:12.5px;line-height:1.9;padding-top:6px">Bo&icirc;tes plastiques envoy&eacute;es : <b style="color:'+BLUE+'">'+c.boxes+'</b></div>'+
+        '<div style="width:270px">'+
+          '<div style="display:flex;justify-content:space-between;background:'+SOFT+';padding:11px 16px;font-size:13px;margin-bottom:2px"><span>Total Baby (80g)</span><span style="font-weight:600;color:'+BLUE+'">'+c.small+'</span></div>'+
+          '<div style="display:flex;justify-content:space-between;background:'+SOFT+';padding:11px 16px;font-size:13px;margin-bottom:2px"><span>Total Giant (165g)</span><span style="font-weight:600;color:'+BLUE+'">'+c.big+'</span></div>'+
+          '<div style="display:flex;justify-content:space-between;padding:14px 16px 0;font-size:15px"><span style="color:'+BLUE+';font-weight:600">Total cookies</span><span style="color:'+BLUE+';font-weight:700">'+total+'</span></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:'+BAND+';padding:22px 42px;margin-top:'+footMargin+';text-align:center;border-radius:18px 18px 0 0">'+
+      '<div style="font-size:12.5px;color:#3f5a78;line-height:1.9">anderlecht@kooki.be</div>'+
+      '<div style="font-size:12.5px;color:#3f5a78;line-height:1.9"><a href="http://kooki.be" style="color:'+BLUE+';text-decoration:none;font-weight:600">www.kooki.be</a></div>'+
+      '<div style="font-size:12.5px;color:#3f5a78;line-height:1.9">0492 80 10 38</div>'+
+    '</div>'+
+  '</div>';
 }
 function openRecapMoisClient(i){
   var c = _rmCache[i];
   document.getElementById('rm-client-body').innerHTML = _rmClientHTML(c, false);
-  document.getElementById('rm-client-pdf').onclick = function(){ _rmPrint(_rmClientHTML(c, true)); };
+  document.getElementById('rm-client-pdf').onclick = function(){ _rmClientPDF(c); };
   document.getElementById('rm-client-overlay').style.display = 'flex';
 }
-function _rmPrint(innerHTML){
+function _rmPrint(innerHTML, full){
   var w = window.open('', '_blank', 'width=820,height=1100');
+  var pageCss = full ? '@page{size:A4;margin:0}' : '@page{size:A4;margin:12mm 0}';
   w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><base href="https://lilaadou.github.io/FOODTRACK/"><title>Récap B2B</title>'+
     '<style>*{margin:0;padding:0;box-sizing:border-box}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
     'body{font-family:\'Segoe UI\',system-ui,Arial,sans-serif;color:#1f1f29}.client{page-break-inside:avoid}'+
-    '@page{size:A4;margin:12mm 0}</style></head><body>'+innerHTML+
+    pageCss+'</style></head><body>'+innerHTML+
     '<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print()},300)}</scr'+'ipt></body></html>');
   w.document.close();
 }
-function imprimerRecapMoisGlobal(){
-  if (!_rmCache || !_rmCache.length){ alert('Aucune donnée à imprimer pour ce mois.'); return; }
-  var mBig=0,mSmall=0,mBox=0,mBL=0;
-  _rmCache.forEach(function(c){ mBig+=c.big; mSmall+=c.small; mBox+=c.boxes; mBL+=c.bls.length; });
-  var th='text-align:left;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:7px 8px';
-  var thn=th+';text-align:right';
-  var head =
-   '<div style="background:#e6f1fb;padding:22px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">'+
-   '<div><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:56px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#d44218;margin-top:4px">BAKED WITH LOVE</div></div>'+
-   '<div style="text-align:right;font-size:12px;line-height:1.8;color:#5f5f5f"><b style="color:#3a3a3a">KOOKI COMPANY SRL</b><br>Avenue Emile Gryson 2D<br>1070 Anderlecht<br>TVA: BE1015746980</div></div>'+
-   '<div style="padding:20px 34px"><div style="font-size:23px;color:#0c447c">Récapitulatif mensuel B2B</div>'+
-   '<div style="font-size:15px;font-weight:700;color:#d44218;margin-top:2px">'+_rmMonthName()+'</div>'+
-   '<div style="background:#eef5fc;border-radius:10px;padding:12px 18px;margin:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
-   '<div style="font-size:13px;font-weight:700;color:#0662aa">'+_rmCache.length+' clients · '+mBL+' bons de livraison</div>'+
-   '<div style="display:flex;gap:20px"><div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#0c447c">'+mBig+'</div><div style="font-size:10px;color:#888">BIG</div></div>'+
-   '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#0c447c">'+mSmall+'</div><div style="font-size:10px;color:#888">SMALL</div></div>'+
-   '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#0c447c">'+mBox+'</div><div style="font-size:10px;color:#888">BOÎTES</div></div></div></div>';
-  var body = _rmCache.map(function(c){
-    var flav = Object.keys(c.flavors).map(function(f){ var e=c.flavors[f];
-      return '<tr><td style="font-weight:700;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+f+'</td>'+
-        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+(e[0]||'—')+'</td>'+
-        '<td style="text-align:right;font-weight:700;color:#0c447c;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+(e[1]||'—')+'</td></tr>';
-    }).join('');
-    return '<div class="client" style="margin-bottom:20px">'+
-      '<div style="display:flex;justify-content:space-between;border-bottom:2px solid #d9e7f4;padding-bottom:6px;margin-bottom:4px;flex-wrap:wrap;gap:6px">'+
-      '<div style="font-size:15px;font-weight:700">'+c.name+'</div>'+
-      '<div style="font-size:11px;color:#8c8c8c">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>'+
-      '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Big (165g)</th><th style="'+thn+'">Small (80g)</th></tr></thead><tbody>'+flav+
-      '<tr><td style="border-top:1.5px solid #e8e8e8;padding-top:8px;font-size:11px;color:#888;text-transform:uppercase">Total client</td>'+
-      '<td style="text-align:right;border-top:1.5px solid #e8e8e8;padding-top:8px;font-weight:700;color:#d44218">'+c.big+'</td>'+
-      '<td style="text-align:right;border-top:1.5px solid #e8e8e8;padding-top:8px;font-weight:700;color:#d44218">'+c.small+'</td></tr></tbody></table>'+
-      '<div style="font-size:11px;color:#5f7f9c;margin-top:5px">📦 Boîtes plastiques envoyées : '+c.boxes+'</div></div>';
-  }).join('');
-  _rmPrint(head + body + '</div>');
+function _rmClientPDF(c){
+  var inner=_rmClientHTML(c, true);
+  function ls(src,cb){ if([].slice.call(document.scripts).some(function(s){return s.src===src;})){cb();return;} var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=function(){alert('Impossible de charger '+src);}; document.head.appendChild(s); }
+  ls('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',function(){
+  ls('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',function(){
+    var A4W=794, A4Hpx=Math.round(A4W*297/210);
+    var box=document.createElement('div');
+    box.style.cssText='position:fixed;left:-10000px;top:0;width:'+A4W+'px;background:#fff;';
+    box.innerHTML=inner;
+    document.body.appendChild(box);
+    var wrap=box.querySelector('div');
+    var ran=false;
+    function go(){ if(ran)return; ran=true;
+      if(wrap){ wrap.style.minHeight='0px'; var nat=wrap.scrollHeight; var pages=Math.max(1,Math.ceil(nat/A4Hpx)); wrap.style.minHeight=(pages*A4Hpx)+'px'; }
+      html2canvas(box,{scale:2,backgroundColor:'#ffffff',useCORS:true,width:A4W,windowWidth:A4W}).then(function(canvas){
+        var jsPDF=window.jspdf.jsPDF; var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+        var pageH=Math.floor(canvas.width*297/210); var total=canvas.height; var y=0, first=true;
+        while(y<total){
+          var slice=Math.min(pageH,total-y);
+          var tmp=document.createElement('canvas'); tmp.width=canvas.width; tmp.height=slice;
+          var ctx=tmp.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,tmp.width,tmp.height);
+          ctx.drawImage(canvas,0,y,canvas.width,slice,0,0,canvas.width,slice);
+          var mmH=slice*210/canvas.width;
+          if(!first)pdf.addPage();
+          pdf.addImage(tmp.toDataURL('image/jpeg',0.95),'JPEG',0,0,210,mmH);
+          first=false; y+=slice;
+        }
+        var fn='Releve-'+String(c.name||'client').replace(/[^a-z0-9]+/gi,'-')+'-'+_rmMonthName().replace(/\s+/g,'-')+'.pdf';
+        pdf.save(fn); if(box.parentNode)document.body.removeChild(box);
+      }).catch(function(e){ if(box.parentNode)document.body.removeChild(box); alert('Erreur PDF : '+e.message); });
+    }
+    var imgs=[].slice.call(box.querySelectorAll('img'));
+    var left=imgs.filter(function(i){return !i.complete;}).length;
+    if(left===0) setTimeout(go,60);
+    else imgs.forEach(function(i){ if(i.complete)return; var d=function(){ if(--left<=0)go(); }; i.addEventListener('load',d); i.addEventListener('error',d); });
+    setTimeout(go,2500);
+  }); });
 }
+
+function imprimerRecapMoisGlobal(){
+  if(!_rmCache || !_rmCache.length){ alert('Aucune donnée à imprimer pour ce mois.'); return; }
+  var clients=_rmCache.slice();
+  function ls(src,cb){ if([].slice.call(document.scripts).some(function(s){return s.src===src;})){cb();return;} var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=function(){alert('Impossible de charger '+src);}; document.head.appendChild(s); }
+  ls('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',function(){
+  ls('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',function(){
+    var A4W=794, A4Hpx=Math.round(A4W*297/210);
+    var jsPDF=window.jspdf.jsPDF; var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    var first=true, i=0;
+    function renderNext(){
+      if(i>=clients.length){ pdf.save('Releve-B2B-'+_rmMonthName().replace(/\s+/g,'-')+'.pdf'); return; }
+      var c=clients[i];
+      var box=document.createElement('div');
+      box.style.cssText='position:fixed;left:-10000px;top:0;width:'+A4W+'px;background:#fff;';
+      box.innerHTML=_rmClientHTML(c, true);
+      document.body.appendChild(box);
+      var wrap=box.querySelector('div');
+      var ran=false;
+      function go(){ if(ran)return; ran=true;
+        if(wrap){ wrap.style.minHeight='0px'; var nat=wrap.scrollHeight; var pages=Math.max(1,Math.ceil(nat/A4Hpx)); wrap.style.minHeight=(pages*A4Hpx)+'px'; }
+        html2canvas(box,{scale:2,backgroundColor:'#ffffff',useCORS:true,width:A4W,windowWidth:A4W}).then(function(canvas){
+          var pageH=Math.floor(canvas.width*297/210); var total=canvas.height; var y=0;
+          while(y<total){
+            var slice=Math.min(pageH,total-y);
+            var tmp=document.createElement('canvas'); tmp.width=canvas.width; tmp.height=slice;
+            var ctx=tmp.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,tmp.width,tmp.height);
+            ctx.drawImage(canvas,0,y,canvas.width,slice,0,0,canvas.width,slice);
+            var mmH=slice*210/canvas.width;
+            if(!first)pdf.addPage(); first=false;
+            pdf.addImage(tmp.toDataURL('image/jpeg',0.95),'JPEG',0,0,210,mmH);
+            y+=slice;
+          }
+          if(box.parentNode)document.body.removeChild(box);
+          i++; renderNext();
+        }).catch(function(e){ if(box.parentNode)document.body.removeChild(box); alert('Erreur PDF : '+e.message); });
+      }
+      var imgs=[].slice.call(box.querySelectorAll('img'));
+      var left=imgs.filter(function(x){return !x.complete;}).length;
+      if(left===0) setTimeout(go,60);
+      else imgs.forEach(function(x){ if(x.complete)return; var d=function(){ if(--left<=0)go(); }; x.addEventListener('load',d); x.addEventListener('error',d); });
+      setTimeout(go,2500);
+    }
+    renderNext();
+  }); });
+}
+
 /* ═══════════ FIN RÉCAP MENSUEL B2B ═══════════ */
 
 
