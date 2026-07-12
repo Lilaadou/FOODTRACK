@@ -656,6 +656,10 @@
           <span style="font-size:16px">🔄</span>
           <span style="font-size:13px;font-weight:700;color:#d44218">Changer de profil</span>
         </div>
+        <div id="switch-mode-btn" onclick="openModeChoice()" style="display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;background:#e4eefb;margin-bottom:8px" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <span style="font-size:16px">🔀</span>
+          <span style="font-size:13px;font-weight:700;color:#0662aa">Changer de mode</span>
+        </div>
         <div style="font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;padding:0 8px 6px">Passer à</div>
 
         <div style="font-size:9px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.06em;padding:2px 10px 4px">Administration</div>
@@ -2328,7 +2332,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxEnV3vD9bDgExbHB-Jx3_TONpF9Bvi8Pg8-c5aRRHT0nB6Iy1wlD6BO3ftDA_vU05fOg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbyqUwcS-MyEUyhkbiqeEpgqch_lTxG6-GumzSppReGsz5kQ1UDpxz3AnRePiJRzBHrDmA/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -2366,6 +2370,67 @@ const FULL_NAMES = {
 
 let currentProfile = 'Lila';
 
+// ─────────────────────────────────────
+// MODES (Production / Delivery) — surcouche de navigation
+// ─────────────────────────────────────
+const MODE_PAGES = {
+  production: ['premix','production','stock','ingredients','reception','factures','centre-docs'],
+  delivery:   ['frigo','frigoLive','bl','recap-mois','ixelles-livraisons','centre-docs']
+};
+const MODE_NAV_IDS = ['premix','production','stock','ingredients','frigo','frigoLive','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons'];
+let currentMode = null; // 'production' | 'delivery' | null (aucun filtre de mode)
+
+// Un profil « dual » = accès aux deux univers → il voit l'écran de choix
+function profileIsDual(name){ return ((PROFILES[name] || {}).pages || []).includes('bl'); }
+
+function applyMode(){
+  if(!currentMode) return; // pas de mode actif : on laisse la visibilité gérée par le profil
+  MODE_NAV_IDS.forEach(function(id){
+    const el = document.getElementById('nav-' + id);
+    if(!el) return;
+    const inMode = MODE_PAGES[currentMode].includes(id);
+    const okProfile = ALL_PAGES.includes(id) ? (PROFILES[currentProfile].pages || []).includes(id) : true;
+    el.classList.toggle('hidden', !(inMode && okProfile));
+  });
+  // Si la page active n'est plus visible dans ce mode, aller à la première visible
+  const activePage = document.querySelector('.page.active');
+  const activeId = activePage ? activePage.id.replace('page-', '') : '';
+  const navActive = activeId ? document.getElementById('nav-' + activeId) : null;
+  if(navActive && navActive.classList.contains('hidden')){
+    const first = MODE_PAGES[currentMode].find(function(id){ const e = document.getElementById('nav-' + id); return e && !e.classList.contains('hidden'); });
+    if(first) showPage(first, document.getElementById('nav-' + first));
+  }
+}
+
+function chooseMode(mode){
+  currentMode = mode;
+  const scr = document.getElementById('mode-screen'); if(scr) scr.style.display = 'none';
+  applyMode();
+  const first = MODE_PAGES[mode].find(function(id){ const e = document.getElementById('nav-' + id); return e && !e.classList.contains('hidden'); });
+  if(first) showPage(first, document.getElementById('nav-' + first));
+  updateModeUI();
+}
+
+function openModeChoice(){
+  document.getElementById('profile-dropdown')?.classList.remove('open');
+  const scr = document.getElementById('mode-screen'); if(scr) scr.style.display = 'flex';
+}
+
+function enterModeAfterLogin(name){
+  if(profileIsDual(name)){
+    openModeChoice();            // profils complets → on demande le mode
+  } else {
+    currentMode = null;          // profils mono-univers → navigation inchangée
+  }
+  updateModeUI();
+}
+
+function updateModeUI(){
+  const btn = document.getElementById('switch-mode-btn');
+  if(btn) btn.style.display = profileIsDual(currentProfile) ? 'flex' : 'none';
+}
+
+
 function selectProfile(name) {
   currentProfile = name;
   const p = PROFILES[name];
@@ -2395,6 +2460,10 @@ function selectProfile(name) {
     if (el) el.value = fullName;
   });
   document.getElementById('profile-dropdown').classList.remove('open');
+  if(!profileIsDual(name)) currentMode = null;
+  else if(currentMode && !['production','delivery'].includes(currentMode)) currentMode = null;
+  applyMode();
+  updateModeUI();
   // Rafraîchir la bannière Ixelles selon le nouveau profil
   updateDashboardIxellesBanner();
   // Rafraîchir les commandes Ixelles si l'onglet est ouvert
@@ -8727,6 +8796,7 @@ function doLogin(name) {
   const firstPage = p.pages[0] === 'dashboard' ? 'premix' : p.pages[0];
   showPage(firstPage, document.getElementById('nav-' + firstPage));
   loadAllData();
+  enterModeAfterLogin(name);
 }
 
 // Bouton "Changer de profil" — réaffiche l'écran de connexion
@@ -9933,7 +10003,7 @@ function imprimerRapportLivreur(livreur){
 <script>
 /* ═══════════════════════════════════════════════════════════════
    MODULE GÂTEAUX — production + code + historique (isolé du flux cookie)
-   Stockage : localStorage['kooki_productions_gateaux']
+   Stockage : Google Sheets (feuille 'ProductionsGateaux' via fetchAPI/POST)
    Code lot : PREFIX-AAMMJJ-NN  (même logique que les cookies)
    ═══════════════════════════════════════════════════════════════ */
 (function(){
@@ -9944,10 +10014,36 @@ function imprimerRapportLivreur(livreur){
     { code:'MUF', nom:'Muffin myrtille' },
     { code:'CIT', nom:'Cake citron' },
   ];
-  const LSKEY = 'kooki_productions_gateaux';
   const g = id => document.getElementById(id);
-  const readG  = () => { try { return JSON.parse(localStorage.getItem(LSKEY) || '[]'); } catch(e){ return []; } };
-  const writeG = a  => localStorage.setItem(LSKEY, JSON.stringify(a));
+  let GDATA = [];
+  function parseGDate(s){
+    if(!s) return null;
+    if(s instanceof Date) return isNaN(s)?null:s;
+    s = String(s).trim();
+    var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+    if(m) return new Date(+m[3], +m[2]-1, +m[1], +(m[4]||0), +(m[5]||0));
+    if(/^(\d{4})-(\d{2})-(\d{2})/.test(s)){ var d0=new Date(s); return isNaN(d0)?null:d0; }
+    var d=new Date(s); return isNaN(d)?null:d;
+  }
+  const readG = () => GDATA;
+  async function loadGateaux(){
+    try {
+      const data = await fetchAPI('getGateaux');
+      GDATA = (Array.isArray(data)?data:[]).map(function(p){
+        var lot = p.codeLot || p.code || '';
+        return {
+          codeLot: lot,
+          nom:  p.produit || p.nom || '',
+          code: (lot.split('-')[0] || ''),
+          qte:  Number(p.qte) || 0,
+          factures: Array.isArray(p.factures) ? p.factures : (p.factures ? String(p.factures).split(',').map(function(x){return x.trim();}).filter(Boolean) : []),
+          date: p.date || ''
+        };
+      });
+    } catch(e){ GDATA = []; }
+    renderGateau();
+  }
+  window.loadGateaux = loadGateaux;
 
   const BASE = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;';
   const ON   = 'background:#fff;color:#d44218;box-shadow:0 1px 2px rgba(0,0,0,.06)';
@@ -9961,7 +10057,7 @@ function imprimerRapportLivreur(livreur){
       cw.style.display = 'none'; gw.style.display = '';
       bg.style.cssText = BASE + ON; bc.style.cssText = BASE + OFF;
       if(typeof refreshFactureLists === 'function') refreshFactureLists();
-      renderGateau();
+      loadGateaux();
     } else {
       gw.style.display = 'none'; cw.style.display = '';
       bc.style.cssText = BASE + ON; bg.style.cssText = BASE + OFF;
@@ -9982,7 +10078,7 @@ function imprimerRapportLivreur(livreur){
     const mm = String(now.getMonth()+1).padStart(2,'0');
     const dd = String(now.getDate()).padStart(2,'0');
     const today = now.toDateString();
-    const dejaAuj = readG().filter(p => p.code === code && p.date && new Date(p.date).toDateString() === today);
+    const dejaAuj = readG().filter(p => p.code === code && p.date && parseGDate(p.date) && parseGDate(p.date).toDateString() === today);
     const num = String(dejaAuj.length + 1).padStart(2,'0');
     g('gat-code').value = code + '-' + yy + mm + dd + '-' + num;
   };
@@ -9999,12 +10095,11 @@ function imprimerRapportLivreur(livreur){
     const factures = (typeof getCheckedFactures === 'function') ? getCheckedFactures('gat-fac-list') : [];
     if(!factures.length){ toast(t, '⚠️ Coche au moins 1 BL'); return; }
     const nom = (GATEAUX.find(x => x.code === code) || {}).nom || code;
-    const arr = readG();
-    arr.push({ code, nom, codeLot, qte, factures, date: new Date().toISOString() });
-    writeG(arr);
-    toast(t, '✅ ' + codeLot + ' enregistré');
-    resetGateau();
-    renderGateau();
+    const producteur = (typeof currentProfile !== 'undefined' && typeof FULL_NAMES !== 'undefined') ? (FULL_NAMES[currentProfile] || currentProfile) : '';
+    toast(t, '⏳ Enregistrement…');
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'saveGateau', codeLot, produit: nom, qte, factures, producteur }) })
+      .then(function(){ toast(t, '✅ ' + codeLot + ' enregistré'); resetGateau(); return loadGateaux(); })
+      .catch(function(){ toast(t, '❌ Erreur réseau, réessaie'); });
   };
 
   window.resetGateau = function(){
@@ -10015,18 +10110,19 @@ function imprimerRapportLivreur(livreur){
 
   window.deleteGateau = function(codeLot, iso){
     if(!confirm('Supprimer le lot ' + codeLot + ' ?')) return;
-    writeG(readG().filter(p => !(p.codeLot === codeLot && p.date === iso)));
-    renderGateau();
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerGateau', codeLot }) })
+      .then(function(){ return loadGateaux(); })
+      .catch(function(){ alert('Erreur réseau lors de la suppression'); });
   };
 
-  function fmtDate(iso){ const d = new Date(iso); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+  function fmtDate(iso){ const d = parseGDate(iso) || new Date(iso); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
   const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
   function renderGateau(){
-    const arr = readG().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+    const arr = readG().slice().sort((a,b) => (parseGDate(b.date)||0) - (parseGDate(a.date)||0));
     const today = new Date().toDateString();
 
-    const auj = arr.filter(p => p.date && new Date(p.date).toDateString() === today);
+    const auj = arr.filter(p => { var d = parseGDate(p.date); return d && d.toDateString() === today; });
     const ldj = g('gat-lots-jour');
     if(ldj){
       ldj.innerHTML = auj.length ? auj.map(p =>
@@ -10050,10 +10146,25 @@ function imprimerRapportLivreur(livreur){
     }
   }
 
-  function initGateau(){ fillSelect(); renderGateau(); }
+  function initGateau(){ fillSelect(); loadGateaux(); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initGateau);
   else initGateau();
 })();
 </script>
+<!-- ÉCRAN DE CHOIX DU MODE -->
+<div id="mode-screen" style="position:fixed;inset:0;background:#eef2f6;z-index:10001;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
+  <img src="logo.png" alt="Kooki" style="height:56px;width:auto;object-fit:contain;margin-bottom:6px">
+  <div style="font-size:23px;font-weight:700;color:#26303a;margin:14px 0 26px;text-align:center">Que veux-tu gérer&nbsp;?</div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+    <button onclick="chooseMode('production')" style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1.5px solid #e4e9ef;border-left:4px solid #d44218;border-radius:12px;padding:13px 22px;font-family:inherit;font-size:15px;font-weight:600;color:#26303a;cursor:pointer;box-shadow:0 3px 10px rgba(20,40,70,.05)" onmouseover="this.style.background='#faf6f4'" onmouseout="this.style.background='#fff'">
+      <span style="font-size:20px">🏭</span> Production
+    </button>
+    <button onclick="chooseMode('delivery')" style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1.5px solid #e4e9ef;border-left:4px solid #0662aa;border-radius:12px;padding:13px 22px;font-family:inherit;font-size:15px;font-weight:600;color:#26303a;cursor:pointer;box-shadow:0 3px 10px rgba(20,40,70,.05)" onmouseover="this.style.background='#f5f9fd'" onmouseout="this.style.background='#fff'">
+      <span style="font-size:20px">🚚</span> Delivery
+    </button>
+  </div>
+  <div style="font-size:12px;color:#9aa4b0;margin-top:24px;text-align:center">Tu pourras changer de mode à tout moment via le menu profil.</div>
+</div>
+
 </body>
 </html>
