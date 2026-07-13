@@ -1490,7 +1490,7 @@
       <button onclick="document.getElementById('bon-overlay').style.display='none'" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">✕</button>
     </div>
 
-    <div id="bon-content" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased">
+    <div id="bon-content" style="font-family:Calibri,Carlito,Arial,sans-serif;-webkit-font-smoothing:antialiased">
 
       <div style="background:#e6f1fb;padding:20px 40px 16px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px">
@@ -3938,7 +3938,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
 
   // ── Section COOKIES ──
   if (hasCookiesInLots) {
-    bonHtml += '<tr><td colspan="'+colCount+'" style="'+sectionTh+'">🍪 Cookies</td></tr>';
+    bonHtml += '<tr><td colspan="'+colCount+'" style="'+sectionTh+'">Cookies</td></tr>';
     bonHtml += cookieLots.map(l => {
       const saveurLot = l.saveur || saveur;
       return '<tr>'
@@ -3953,7 +3953,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
 
   // ── Section CAKES ──
   if (cakeLotsBon.length) {
-    bonHtml += '<tr><td colspan="'+colCount+'" style="'+sectionTh+'">🧁 Cakes</td></tr>';
+    bonHtml += '<tr><td colspan="'+colCount+'" style="'+sectionTh+'">Cakes</td></tr>';
     bonHtml += cakeLotsBon.map(function(l){
       return '<tr>'
         +'<td style="'+tdBase+'">'+l.code+'</td>'
