@@ -502,25 +502,15 @@
     <div>
       <div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Équipe production</div>
       <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-        <div class="login-card" onclick="loginAs('Meg')">
-          <div class="login-av" style="background:#e8956a">MD</div>
-          <div class="login-name">Meg Dollinger</div>
-          <div class="login-role">Production</div>
-        </div>
-        <div class="login-card" onclick="loginAs('Alexandre')">
-          <div class="login-av" style="background:#3a8fc9">AM</div>
-          <div class="login-name">Alexandre Michel</div>
-          <div class="login-role">Production</div>
-        </div>
-        <div class="login-card" onclick="loginAs('DavidC')">
-          <div class="login-av" style="background:#a02e10">DC</div>
-          <div class="login-name">David Cohenca</div>
-          <div class="login-role">Production</div>
+        <div class="login-card" onclick="loginAs('Production')">
+          <div class="login-av" style="background:#0662aa">PR</div>
+          <div class="login-name">Production</div>
+          <div class="login-role">Équipe partagée</div>
         </div>
         <div class="login-card" onclick="loginAs('Lila')">
           <div class="login-av" style="background:#c0392b">LD</div>
           <div class="login-name">Lila Doudou</div>
-          <div class="login-role">Production</div>
+          <div class="login-role">Administrateur</div>
         </div>
       </div>
     </div>
@@ -685,17 +675,9 @@
         </div>
 
         <div style="font-size:9px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px 4px">Équipe production</div>
-        <div class="profile-option" onclick="selectProfile('Meg')">
-          <div class="p-av" style="background:#e8956a">MD</div>
-          <div class="p-info"><div class="p-name">Meg Dollinger</div><div class="p-role">Production</div></div>
-        </div>
-        <div class="profile-option" onclick="selectProfile('Alexandre')">
-          <div class="p-av" style="background:#3a8fc9">AM</div>
-          <div class="p-info"><div class="p-name">Alexandre Michel</div><div class="p-role">Production</div></div>
-        </div>
-        <div class="profile-option" onclick="selectProfile('DavidC')">
-          <div class="p-av" style="background:#a02e10">DC</div>
-          <div class="p-info"><div class="p-name">David Cohenca</div><div class="p-role">Production</div></div>
+        <div class="profile-option" onclick="selectProfile('Production')">
+          <div class="p-av" style="background:#0662aa">PR</div>
+          <div class="p-info"><div class="p-name">Production</div><div class="p-role">Équipe partagée</div></div>
         </div>
 
         <div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px 4px">Opérations frigo</div>
@@ -738,8 +720,15 @@
       <div class="form-grid fg-3">
         <div class="form-group"><label>Code Premix *</label><input type="text" id="pmx-code" placeholder="Ex: PMX-260606-05"></div>
         <div class="form-group">
-          <label>Producteur</label>
-          <input type="text" id="pmx-nom" readonly style="background:#f0f0f0;color:#888;cursor:default;border-color:#e8e8e8;">
+          <label>Producteur *</label>
+          <select id="pmx-nom" onchange="setLastProducteur(this.value)">
+            <option value="">— Choisir le producteur —</option>
+            <option>Meg Dollinger</option>
+            <option>Alexandre Michel</option>
+            <option>David Cohenca</option>
+            <option>Lila Doudou</option>
+            <option>Virginia Kunnen</option>
+          </select>
         </div>
         <div style="grid-column:1/-1">
   <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Choisir une saveur et un bac *</label>
@@ -831,8 +820,15 @@
       <div class="form-title">🏭 Enregistrer une production</div>
       <div class="form-grid fg-3">
         <div class="form-group">
-          <label>Producteur</label>
-          <input type="text" id="prod-nom" readonly style="background:#f0f0f0;color:#888;cursor:default;border-color:#e8e8e8;">
+          <label>Producteur *</label>
+          <select id="prod-nom" onchange="setLastProducteur(this.value)">
+            <option value="">— Choisir le producteur —</option>
+            <option>Meg Dollinger</option>
+            <option>Alexandre Michel</option>
+            <option>David Cohenca</option>
+            <option>Lila Doudou</option>
+            <option>Virginia Kunnen</option>
+          </select>
         </div>
        <div style="grid-column:1/-1">
   <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Code Premix *</label>
@@ -953,6 +949,16 @@
       <div class="form-section">
         <div class="form-title">🧁 Enregistrer une production — Gâteaux</div>
         <div class="form-grid fg-3">
+          <div class="form-group"><label>Producteur *</label>
+            <select id="gat-producteur" onchange="setLastProducteur(this.value)">
+            <option value="">— Choisir le producteur —</option>
+            <option>Meg Dollinger</option>
+            <option>Alexandre Michel</option>
+            <option>David Cohenca</option>
+            <option>Lila Doudou</option>
+            <option>Virginia Kunnen</option>
+            </select>
+          </div>
           <div class="form-group"><label>Produit *</label>
             <select id="gat-produit" onchange="autoGenCodeGateau()">
               <option value="">-- Choisir --</option>
@@ -2351,6 +2357,7 @@ const PROFILES = {
   Abenazer:  { color:'#d44218', initial:'AH', role:'Patron',         pages: ALL_PAGES },
   Sebastien: { color:'#0662aa', initial:'SK', role:'Associé',        pages: ALL_PAGES },
   DavidD:    { color:'#2c7a3a', initial:'DD', role:'Magasin Ixelles', pages: DAVID_PAGES },
+  Production:{ color:'#0662aa', initial:'PR', role:'Équipe production', pages: ['premix','production','stock'] },
   // ── Production (sans réception & factures) ──
   Meg:       { color:'#e8956a', initial:'MD', role:'Production',     pages: PROD_PAGES },
   Alexandre: { color:'#3a8fc9', initial:'AM', role:'Production',     pages: PROD_PAGES },
@@ -2363,10 +2370,29 @@ const PROFILES = {
 const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
-  Sebastien:'Sebastien Kunnen', DavidD:'David Deridder',
+  Sebastien:'Sebastien Kunnen', DavidD:'David Deridder', Production:'Production',
   Meg:'Meg Dollinger', Alexandre:'Alexandre Michel', DavidC:'David Cohenca',
   Ixelles:'Magasin Ixelles', Anderlecht:'Magasin Anderlecht'
 };
+
+// Liste des producteurs sélectionnables (Premix / Production / Cake)
+const PRODUCTEURS = ['Meg Dollinger','Alexandre Michel','David Cohenca','Lila Doudou','Virginia Kunnen'];
+function setLastProducteur(v){
+  try { localStorage.setItem('kooki_last_producteur', v || ''); } catch(e){}
+  ['pmx-nom','prod-nom','gat-producteur'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.value !== v) el.value = v;
+  });
+}
+function applyLastProducteur(){
+  var last = '';
+  try { last = localStorage.getItem('kooki_last_producteur') || ''; } catch(e){}
+  if (!last) return;
+  ['pmx-nom','prod-nom','gat-producteur'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = last;
+  });
+}
 
 let currentProfile = 'Lila';
 
@@ -2454,11 +2480,8 @@ function selectProfile(name) {
     showPage(first, document.getElementById('nav-' + first));
   }
 
-  // Auto-remplir le producteur (toujours le profil actif)
-  ['pmx-nom','prod-nom'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = fullName;
-  });
+  // Producteur : sélecteur mémorisé (indépendant du profil connecté)
+  if (typeof applyLastProducteur === 'function') applyLastProducteur();
   document.getElementById('profile-dropdown').classList.remove('open');
   if(!profileIsDual(name)) currentMode = null;
   else if(currentMode && !['production','delivery'].includes(currentMode)) currentMode = null;
@@ -10095,7 +10118,8 @@ function imprimerRapportLivreur(livreur){
     const factures = (typeof getCheckedFactures === 'function') ? getCheckedFactures('gat-fac-list') : [];
     if(!factures.length){ toast(t, '⚠️ Coche au moins 1 BL'); return; }
     const nom = (GATEAUX.find(x => x.code === code) || {}).nom || code;
-    const producteur = (typeof currentProfile !== 'undefined' && typeof FULL_NAMES !== 'undefined') ? (FULL_NAMES[currentProfile] || currentProfile) : '';
+    const producteur = g('gat-producteur') ? g('gat-producteur').value : '';
+    if(!producteur){ toast(t, '⚠️ Choisis le producteur'); return; }
     toast(t, '⏳ Enregistrement…');
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'saveGateau', codeLot, produit: nom, qte, factures, producteur }) })
       .then(function(){ toast(t, '✅ ' + codeLot + ' enregistré'); resetGateau(); return loadGateaux(); })
@@ -10146,7 +10170,7 @@ function imprimerRapportLivreur(livreur){
     }
   }
 
-  function initGateau(){ fillSelect(); loadGateaux(); }
+  function initGateau(){ fillSelect(); loadGateaux(); if(typeof applyLastProducteur==='function') applyLastProducteur(); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initGateau);
   else initGateau();
 })();
