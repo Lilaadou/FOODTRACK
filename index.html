@@ -4273,9 +4273,9 @@ if (type === 'autre') {
       livreurB2B,
       typeCookies: typeCookiesSave
     })}).catch(() => {});
-    // Décrémentation stock cake
+    // Décrémentation stock cake (décrément partiel, ne supprime pas la production)
     cakeLots.forEach(function(cl){
-      fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerGateau', codeLot: cl.code }) }).catch(()=>{});
+      fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortirGateau', codeLot: cl.code, qte: cl.qte }) }).catch(()=>{});
       if(Array.isArray(window._gdataGlobal)){
         var idx = window._gdataGlobal.findIndex(function(d){ return (d.codeLot||d.code)===cl.code; });
         if(idx >= 0){ window._gdataGlobal[idx].qte = Math.max(0,(window._gdataGlobal[idx].qte||0)-cl.qte); }
