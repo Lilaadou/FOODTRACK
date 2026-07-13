@@ -3913,6 +3913,11 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   const bonHead = document.getElementById('bon-lots-head');
   const hasCakesInLots = lots.some(function(l){ return l.isCake; });
   const hasCookiesInLots = lots.some(function(l){ return !l.isCake; });
+  // Nombre total de colonnes du tableau (pour les bandeaux de section)
+  let colCount = 2; // Code lot + Saveur
+  if (showBig)   colCount++;
+  if (showSmall) colCount++;
+  if (hasCakesInLots) colCount++; // colonne Qté (cakes)
   if (bonHead) {
     const thBase = 'padding:8px 14px;font-size:12px;font-weight:600;color:#000;border-bottom:1px solid #d9e7f4;';
     bonHead.innerHTML = '<tr>'
@@ -3920,32 +3925,42 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
       + '<th style="'+thBase+'text-align:left">Saveur</th>'
       + (showBig   ? '<th style="'+thBase+'text-align:right">Big (165g)</th>'   : '')
       + (showSmall ? '<th style="'+thBase+'text-align:right">Small (80g)</th>' : '')
-      + (hasCakesInLots && !hasCookiesInLots ? '<th style="'+thBase+'text-align:right;color:#a07000">Qté</th>' : '')
-      + (hasCakesInLots && hasCookiesInLots  ? '<th style="'+thBase+'text-align:right;color:#a07000">Qté cake</th>' : '')
+      + (hasCakesInLots ? '<th style="'+thBase+'text-align:right">Qté</th>' : '')
       + '</tr>';
   }
 
   const cookieLots = lots.filter(function(l){ return !l.isCake; });
   const cakeLotsBon = lots.filter(function(l){ return l.isCake; });
-  let bonHtml = cookieLots.map(l => {
-    const saveurLot = l.saveur || saveur;
-    const tdBase = 'padding:9px 14px;border-bottom:1px solid #d9e7f4;';
-    return '<tr>'
-      + '<td style="'+tdBase+'font-weight:700;color:#000">' + l.code + '</td>'
-      + '<td style="'+tdBase+'"><span style="font-size:12px;font-weight:700;color:#0c447c;letter-spacing:.02em">' + String(saveurLot).toUpperCase() + '</span></td>'
-      + (showBig   ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#0c447c">' + (l.big||0)   + '</td>' : '')
-      + (showSmall ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#0c447c">' + (l.small||0) + '</td>' : '')
-      + '</tr>';
-  }).join('');
-  if(cakeLotsBon.length){
-    const tdBase2='padding:9px 14px;border-bottom:1px solid #f5e9d0;';
+  const tdBase = 'padding:9px 14px;border-bottom:1px solid #eee;color:#000;';
+  const sectionTh = 'padding:9px 14px 6px;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#000;border-bottom:1px solid #d9d9d9;';
+
+  let bonHtml = '';
+
+  // ── Section COOKIES ──
+  if (hasCookiesInLots) {
+    bonHtml += '<tr><td colspan="'+colCount+'" style="'+sectionTh+'">🍪 Cookies</td></tr>';
+    bonHtml += cookieLots.map(l => {
+      const saveurLot = l.saveur || saveur;
+      return '<tr>'
+        + '<td style="'+tdBase+'font-weight:700">' + l.code + '</td>'
+        + '<td style="'+tdBase+'"><span style="font-size:12px;font-weight:700;color:#000;letter-spacing:.02em">' + String(saveurLot).toUpperCase() + '</span></td>'
+        + (showBig   ? '<td style="'+tdBase+'text-align:right;font-weight:700">' + (l.big||0)   + '</td>' : '')
+        + (showSmall ? '<td style="'+tdBase+'text-align:right;font-weight:700">' + (l.small||0) + '</td>' : '')
+        + (hasCakesInLots ? '<td style="'+tdBase+'text-align:right;color:#aaa">—</td>' : '')
+        + '</tr>';
+    }).join('');
+  }
+
+  // ── Section CAKES ──
+  if (cakeLotsBon.length) {
+    bonHtml += '<tr><td colspan="'+colCount+'" style="'+sectionTh+'">🧁 Cakes</td></tr>';
     bonHtml += cakeLotsBon.map(function(l){
-      return '<tr style="background:#fffdf5">'
-        +'<td style="'+tdBase2+'font-weight:700;color:#000">'+l.code+'</td>'
-        +'<td style="'+tdBase2+'"><span style="font-size:12px;font-weight:700;color:#a07000;letter-spacing:.02em">'+String(l.saveur).toUpperCase()+'</span></td>'
-        +(showBig   ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
-        +(showSmall ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
-        +'<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>'
+      return '<tr>'
+        +'<td style="'+tdBase+'font-weight:700">'+l.code+'</td>'
+        +'<td style="'+tdBase+'"><span style="font-size:12px;font-weight:700;color:#000;letter-spacing:.02em">'+String(l.saveur).toUpperCase()+'</span></td>'
+        +(showBig   ? '<td style="'+tdBase+'text-align:right;color:#aaa">—</td>' : '')
+        +(showSmall ? '<td style="'+tdBase+'text-align:right;color:#aaa">—</td>' : '')
+        +'<td style="'+tdBase+'text-align:right;font-weight:700">'+l.qte+'</td>'
         +'</tr>';
     }).join('');
   }
@@ -3956,18 +3971,23 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   if (totauxEl) {
     const totalCakeQte = cakeLotsBon.reduce(function(a,l){ return a+(l.qte||0); }, 0);
     const totCookies = totalBig + totalSmall;
-    const line = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;color:#000;border-bottom:1px solid #d6e6f5;';
-    const lineCake = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;color:#000;border-bottom:1px solid #f5e9d0;';
-    let html = '<div style="width:300px;max-width:100%;background:#eef5fc;border-radius:10px;padding:4px 18px;margin-bottom:' + (totalCakeQte>0?'8px':'0') + '">';
+    const line     = 'display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;color:#000;border-bottom:1px solid #eee;';
+    const lineTot  = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700;color:#000;';
+    const secTitle = 'font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#000;padding:6px 0 2px;';
+    const boxStyle = 'width:300px;max-width:100%;background:#f7f7f7;border:1px solid #e6e6e6;border-radius:10px;padding:6px 18px;';
+    let html = '';
     if(hasCookiesInLots){
-      html += (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span style="font-weight:700;color:#0c447c">' + totalBig + '</span></div>' : '');
-      html += (showSmall ? '<div style="'+line+'"><span>Total Baby (80g)</span><span style="font-weight:700;color:#0c447c">' + totalSmall + '</span></div>' : '');
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#0662aa">Total cookies</span><span style="color:#0662aa">' + totCookies + ' cookie' + (totCookies > 1 ? 's' : '') + '</span></div>';
+      html += '<div style="'+boxStyle+'margin-bottom:' + (totalCakeQte>0?'8px':'0') + '">';
+      html += '<div style="'+secTitle+'">🍪 Cookies</div>';
+      html += (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span style="font-weight:700">' + totalBig + '</span></div>' : '');
+      html += (showSmall ? '<div style="'+line+'"><span>Total Baby (80g)</span><span style="font-weight:700">' + totalSmall + '</span></div>' : '');
+      html += '<div style="'+lineTot+'"><span>Total cookies</span><span>' + totCookies + ' cookie' + (totCookies > 1 ? 's' : '') + '</span></div>';
+      html += '</div>';
     }
-    html += '</div>';
     if(totalCakeQte > 0){
-      html += '<div style="width:300px;max-width:100%;background:#fffbf0;border:0.5px solid #f5e9d0;border-radius:10px;padding:4px 18px">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#a07000">Total cakes</span><span style="color:#a07000">' + totalCakeQte + ' cake' + (totalCakeQte > 1 ? 's' : '') + '</span></div>';
+      html += '<div style="'+boxStyle+'">';
+      html += '<div style="'+secTitle+'">🧁 Cakes</div>';
+      html += '<div style="'+lineTot+'"><span>Total cakes</span><span>' + totalCakeQte + ' cake' + (totalCakeQte > 1 ? 's' : '') + '</span></div>';
       html += '</div>';
     }
     totauxEl.innerHTML = html;
