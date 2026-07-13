@@ -589,7 +589,6 @@
   <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)"><i class="ti ti-package nav-icon" aria-hidden="true"></i> Stock cookies</button>
   <button class="nav-item" id="nav-ingredients" onclick="showPage('ingredients',this)"><i class="ti ti-salt nav-icon" aria-hidden="true"></i> Stock ingrédients</button>
   <button class="nav-item" id="nav-frigo" onclick="showPage('frigo',this)"><i class="ti ti-snowflake nav-icon" aria-hidden="true"></i> Sorties frigo</button>
-  <button class="nav-item" id="nav-frigoLive" onclick="showPage('frigoLive',this)"><i class="ti ti-live-view nav-icon" aria-hidden="true"></i> Frigo live</button>
   
 
   <div class="nav-label" id="nav-label-gestion" style="margin-top:12px">Gestion</div>
@@ -2028,56 +2027,6 @@
     </div>
   </div>
 
-  <!-- ══════════════════ FRIGO LIVE ══════════════════ -->
-<div id="page-frigoLive" class="page">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-    <div style="display:flex;align-items:center;gap:8px">
-      <i class="ti ti-snowflake" style="font-size:18px;color:#0662aa" aria-hidden="true"></i>
-      <div style="font-size:14px;font-weight:700">Frigo live — bacs en temps réel</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span id="frigo-live-sync" style="font-size:10px;background:#e0edf8;color:#0662aa;padding:3px 10px;border-radius:20px;font-weight:700">--:--</span>
-      <button class="btn btn-secondary" onclick="loadFrigoLive()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
-    </div>
-  </div>
-
-  <!-- Barre Ixelles -->
-  <div id="fl-bar-ix" style="display:none;background:#e0edf8;border:0.5px solid #b5d4f4;border-radius:10px;padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-    <div>
-      <div style="font-size:12px;color:#0662aa;font-weight:700" id="fl-ix-info">0 bacs</div>
-      <div style="font-size:13px;font-weight:700;color:#0662aa" id="fl-ix-total">0 cookies → Ixelles</div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" onclick="flClearIx()">Annuler</button>
-      <button class="btn btn-secondary" style="background:#0662aa;color:#fff;border-color:#0662aa" onclick="flConfirmerIx()">🏪 Confirmer Ixelles</button>
-    </div>
-  </div>
-
-  <!-- Barre Anderlecht -->
-  <div id="fl-bar-and" style="display:none;background:#fbe8e2;border:0.5px solid #f5cbb8;border-radius:10px;padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-    <div style="flex:1">
-      <div style="font-size:12px;color:#d44218;font-weight:700;margin-bottom:4px">Sorties Anderlecht en cours</div>
-      <div id="fl-and-recap" style="display:flex;flex-direction:column;gap:3px"></div>
-      <div style="font-size:13px;font-weight:700;color:#d44218;margin-top:6px" id="fl-and-total">Total : 0 cookies → Anderlecht</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-shrink:0">
-      <button class="btn" onclick="flClearAnd()">Annuler</button>
-      <button class="btn btn-primary" onclick="flConfirmerAnd()">🏬 Confirmer Anderlecht</button>
-    </div>
-  </div>
-
-  <!-- Contenu frigo -->
-  <div id="frigo-live-content">
-    <div class="empty" style="padding:40px">Chargement du frigo…</div>
-  </div>
-
-  <!-- Légende -->
-  <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
-    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888"><div style="width:14px;height:10px;border-radius:2px;background:#0662aa"></div>Bac simple — Ixelles</div>
-    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888"><div style="width:14px;height:10px;border-radius:2px;background:#d44218"></div>Bac double — Anderlecht</div>
-  </div>
-</div>
-  
   <!-- ══════════════════ BONS DE LIVRAISON ══════════════════ -->
 <div id="page-bl" class="page">
 <!-- Cadre clients B2B -->
@@ -2463,8 +2412,8 @@ const API = 'https://script.google.com/macros/s/AKfycbxFTndaHMiPMx7CUK66Ix4R3WWL
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles'];
 const ANDERLECHT_PAGES = ['frigo'];
-const ALL_PAGES = ['premix','production','stock','ingredients','frigo','frigoLive','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons'];
-const PROD_PAGES = ['premix','production','stock','ingredients','frigo','frigoLive','ixelles'];
+const ALL_PAGES = ['premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons'];
+const PROD_PAGES = ['premix','production','stock','ingredients','frigo','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
 
@@ -2557,9 +2506,9 @@ let currentProfile = 'Lila';
 // ─────────────────────────────────────
 const MODE_PAGES = {
   production: ['premix','production','stock','ingredients','reception','factures','centre-docs'],
-  delivery:   ['frigo','frigoLive','bl','recap-mois','ixelles-livraisons','centre-docs']
+  delivery:   ['frigo','bl','recap-mois','ixelles-livraisons','centre-docs']
 };
-const MODE_NAV_IDS = ['premix','production','stock','ingredients','frigo','frigoLive','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons'];
+const MODE_NAV_IDS = ['premix','production','stock','ingredients','frigo','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons'];
 let currentMode = null; // 'production' | 'delivery' | null (aucun filtre de mode)
 
 // Un profil « dual » = accès aux deux univers → il voit l'écran de choix
@@ -2675,7 +2624,7 @@ function showPage(name, btn) {
   if (name === 'recap-mois') setTimeout(() => { renderRecapMois(); }, 60);
   if (name === 'centre-docs') setTimeout(() => { renderCentreDocs(); }, 60);
   if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
-  if (name === 'frigoLive') setTimeout(() => { loadFrigoLive(); }, 60);
+  
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
   if (name === 'production') setTimeout(async () => { loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
