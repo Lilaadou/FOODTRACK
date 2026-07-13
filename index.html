@@ -1004,6 +1004,11 @@
 
   <!-- ══════════════════ STOCK ══════════════════ -->
   <div id="page-stock" class="page">
+    <div style="display:inline-flex;gap:4px;background:#f2f2f2;border-radius:10px;padding:4px;margin-bottom:16px">
+      <button id="stock-famtab-cookie" onclick="setStockFamily('cookie')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:#fff;color:#0662aa;box-shadow:0 1px 2px rgba(0,0,0,.06)">Cookies</button>
+      <button id="stock-famtab-gateau" onclick="setStockFamily('gateau')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none">Gâteaux</button>
+    </div>
+    <div id="stock-cookie-wrap">
     <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="stat-card"><div class="stat-top"><div class="stat-label">Total Big</div><div class="stat-icon ic-o">🍪</div></div><div class="stat-value">1 165</div><span class="stat-badge badge-ok">5 saveurs</span></div>
       <div class="stat-card"><div class="stat-top"><div class="stat-label">Total Small</div><div class="stat-icon ic-b">🍪</div></div><div class="stat-value">190</div><span class="stat-badge badge-ok">5 saveurs</span></div>
@@ -1016,6 +1021,16 @@
   </div>
   <div id="stock-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
 </div>
+    </div><!-- /stock-cookie-wrap -->
+    <div id="stock-gateau-wrap" style="display:none">
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-header" style="margin-bottom:14px">
+          <div><div class="card-title">Stock cakes par produit</div><div class="card-sub">Quantité disponible par variété</div></div>
+          <button onclick="loadStockGateaux()" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;display:flex;align-items:center;gap:6px">🔄 Mettre à jour</button>
+        </div>
+        <div id="stock-gateau-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px"></div>
+      </div>
+    </div>
   </div>
   <!-- ══════════════════ FRIGO ══════════════════ -->
   <div id="page-frigo" class="page">
@@ -2338,7 +2353,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxEnV3vD9bDgExbHB-Jx3_TONpF9Bvi8Pg8-c5aRRHT0nB6Iy1wlD6BO3ftDA_vU05fOg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxXb3Ko9aEVggjHDTrJaW4HCp2quIxxxcblFQTdvAggG7H5VG_aHcp8NbwQxWiqxiXbAg/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -2393,6 +2408,44 @@ function applyLastProducteur(){
     if (el) el.value = last;
   });
 }
+
+// Stock cakes (feuille StockGateaux)
+const CAKE_VARIETES = ['Brownie','Banana bread','Carrot cake','Muffin myrtille','Cake citron'];
+function setStockFamily(fam){
+  var cw=document.getElementById('stock-cookie-wrap'), gw=document.getElementById('stock-gateau-wrap');
+  var bc=document.getElementById('stock-famtab-cookie'), bg=document.getElementById('stock-famtab-gateau');
+  if(!cw||!gw) return;
+  var BASE='border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;';
+  var ON='background:#fff;color:#0662aa;box-shadow:0 1px 2px rgba(0,0,0,.06)';
+  var OFF='background:transparent;color:#999;box-shadow:none';
+  if(fam==='gateau'){ cw.style.display='none'; gw.style.display=''; if(bg)bg.style.cssText=BASE+ON; if(bc)bc.style.cssText=BASE+OFF; loadStockGateaux(); }
+  else { gw.style.display='none'; cw.style.display=''; if(bc)bc.style.cssText=BASE+ON; if(bg)bg.style.cssText=BASE+OFF; }
+}
+async function loadStockGateaux(){
+  var grid=document.getElementById('stock-gateau-grid');
+  if(grid && !grid.innerHTML.trim()) grid.innerHTML='<div style="color:#999;font-size:13px;padding:10px">Chargement…</div>';
+  var totals={}; CAKE_VARIETES.forEach(function(v){ totals[v]=0; });
+  try {
+    var data=await fetchAPI('getStockGateaux');
+    (Array.isArray(data)?data:[]).forEach(function(r){
+      var prod=String(r.produit||'').trim(); var q=Number(r.qte)||0;
+      if(!prod) return; if(!(prod in totals)) totals[prod]=0; totals[prod]+=q;
+    });
+  } catch(e){}
+  renderStockGateaux(totals);
+}
+function renderStockGateaux(totals){
+  var grid=document.getElementById('stock-gateau-grid'); if(!grid) return;
+  grid.innerHTML=Object.keys(totals).map(function(v){
+    var q=totals[v]||0; var col=q>0?'#0662aa':'#c4c4c4';
+    return '<div style="border:1px solid #eee;border-radius:12px;padding:14px 12px;text-align:center;background:#fff">'+
+      '<div style="font-size:12.5px;font-weight:600;color:#444;margin-bottom:6px">'+v+'</div>'+
+      '<div style="font-size:28px;font-weight:800;color:'+col+'">'+q+'</div>'+
+      '<div style="font-size:10px;color:#999;margin-top:2px;text-transform:uppercase;letter-spacing:.05em">en stock</div>'+
+    '</div>';
+  }).join('');
+}
+
 
 let currentProfile = 'Lila';
 
