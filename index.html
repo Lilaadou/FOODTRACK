@@ -3570,8 +3570,22 @@ function selectProduitB2B(type) {
 function loadCakeLots() {
   var container = document.getElementById('cake-lots-container');
   if(!container) return;
-  // GDATA = données cakes chargées depuis Sheets (via loadGateaux)
-  var data = (typeof GDATA !== 'undefined') ? GDATA : [];
+  container.innerHTML = '<div style="text-align:center;color:#bbb;font-size:12px;padding:10px 0">Chargement des lots cakes…</div>';
+  // Charger depuis Sheets en direct pour avoir les données fraîches
+  fetchAPI('getStockGateaux').then(function(stockData){
+    // Construire la liste depuis le stock réel (feuille StockGateaux)
+    var data = Array.isArray(stockData) ? stockData : [];
+    _renderCakeLots(container, data.map(function(d){
+      return { codeLot: d.codeLot||d.code||'', nom: d.produit||d.nom||'', qte: Number(d.qte)||0 };
+    }));
+  }).catch(function(){
+    // Fallback sur GDATA si l'API échoue
+    var data = window._gdataGlobal || [];
+    _renderCakeLots(container, data);
+  });
+}
+function _renderCakeLots(container, stockItems) {
+  var data = stockItems || [];
   // agrégat par lot : un même code lot peut avoir plusieurs lignes (cas rare)
   var map = {};
   data.forEach(function(d){
@@ -4162,10 +4176,11 @@ async function saveSortie() {
   // Collecter cakes
   const cakeLots = type === 'b2b' && wantCakes ? getCakeLots() : [];
   if (wantCakes && !cakeLots.length) { toast('sortie','⚠️ Entrez au moins une quantité de cake','err'); return; }
-  // Vérifier stock cakes
+  // Vérifier stock cakes via window._gdataGlobal (mis à jour par loadGateaux/loadCakeLots)
   for (const cl of cakeLots) {
-    const stockEntry = (typeof GDATA !== 'undefined' ? GDATA : []).filter(d => d.codeLot === cl.code).reduce((a,d) => a + (Number(d.qte)||0), 0);
-    if (cl.qte > stockEntry) { toast('sortie','⚠️ Quantité dépasse le stock pour ' + cl.code, 'err'); return; }
+    const stockItems = Array.isArray(window._gdataGlobal) ? window._gdataGlobal : [];
+    const stockEntry = stockItems.filter(d => (d.codeLot||d.code) === cl.code).reduce((a,d) => a + (Number(d.qte)||0), 0);
+    if (cl.qte > stockEntry && stockEntry > 0) { toast('sortie','⚠️ Quantité dépasse le stock pour ' + cl.code, 'err'); return; }
   }
 
   // Vérifier les stocks
@@ -4238,9 +4253,9 @@ if (type === 'autre') {
     // Décrémentation stock cake
     cakeLots.forEach(function(cl){
       fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerGateau', codeLot: cl.code }) }).catch(()=>{});
-      if(typeof GDATA !== 'undefined'){
-        var idx = GDATA.findIndex(function(d){ return d.codeLot===cl.code; });
-        if(idx >= 0){ GDATA[idx].qte = Math.max(0,(GDATA[idx].qte||0)-cl.qte); }
+      if(Array.isArray(window._gdataGlobal)){
+        var idx = window._gdataGlobal.findIndex(function(d){ return (d.codeLot||d.code)===cl.code; });
+        if(idx >= 0){ window._gdataGlobal[idx].qte = Math.max(0,(window._gdataGlobal[idx].qte||0)-cl.qte); }
       }
     });
     blData.unshift({
@@ -10313,7 +10328,8 @@ function imprimerRapportLivreur(livreur){
           date: p.date || ''
         };
       });
-    } catch(e){ GDATA = []; }
+      window._gdataGlobal = GDATA; // exposition globale pour loadCakeLots
+    } catch(e){ GDATA = []; window._gdataGlobal = []; }
     renderGateau();
   }
   window.loadGateaux = loadGateaux;
