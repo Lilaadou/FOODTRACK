@@ -3971,25 +3971,18 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   if (totauxEl) {
     const totalCakeQte = cakeLotsBon.reduce(function(a,l){ return a+(l.qte||0); }, 0);
     const totCookies = totalBig + totalSmall;
-    const line     = 'display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;color:#000;border-bottom:1px solid #eee;';
-    const lineTot  = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px;color:#000;';
-    const secTitle = 'font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#444;padding:6px 0 2px;';
-    const boxStyle = 'width:300px;max-width:100%;background:#f7f7f7;border:1px solid #e6e6e6;border-radius:10px;padding:6px 18px;';
-    let html = '';
+    const sub  = 'display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;color:#555;';
+    const tot  = 'display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:14px;color:#000;border-top:1px solid #e6e6e6;';
+    let html = '<div style="width:280px;max-width:100%">';
     if(hasCookiesInLots){
-      html += '<div style="'+boxStyle+'margin-bottom:' + (totalCakeQte>0?'8px':'0') + '">';
-      html += '<div style="'+secTitle+'">🍪 Cookies</div>';
-      html += (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span>' + totalBig + '</span></div>' : '');
-      html += (showSmall ? '<div style="'+line+'"><span>Total Baby (80g)</span><span>' + totalSmall + '</span></div>' : '');
-      html += '<div style="'+lineTot+'"><span>Total cookies</span><span>' + totCookies + ' cookie' + (totCookies > 1 ? 's' : '') + '</span></div>';
-      html += '</div>';
+      html += (showBig   ? '<div style="'+sub+'"><span>Total Big (165g)</span><span style="color:#000">' + totalBig + '</span></div>' : '');
+      html += (showSmall ? '<div style="'+sub+'"><span>Total Baby (80g)</span><span style="color:#000">' + totalSmall + '</span></div>' : '');
+      html += '<div style="'+tot+'"><span>Total cookies</span><span>' + totCookies + ' cookie' + (totCookies > 1 ? 's' : '') + '</span></div>';
     }
     if(totalCakeQte > 0){
-      html += '<div style="'+boxStyle+'">';
-      html += '<div style="'+secTitle+'">🧁 Cakes</div>';
-      html += '<div style="'+lineTot+'"><span>Total cakes</span><span>' + totalCakeQte + ' cake' + (totalCakeQte > 1 ? 's' : '') + '</span></div>';
-      html += '</div>';
+      html += '<div style="'+tot+'"><span>Total cakes</span><span>' + totalCakeQte + ' cake' + (totalCakeQte > 1 ? 's' : '') + '</span></div>';
     }
+    html += '</div>';
     totauxEl.innerHTML = html;
   }
 
