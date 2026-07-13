@@ -1279,10 +1279,12 @@
       <div id="boites-section-b2b" style="display:none;margin-bottom:13px">
         <div style="background:#e0edf8;border-radius:10px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
           <div>
-            <div style="font-size:13px;font-weight:700;color:#0662aa">📦 Boîtes plastiques — calculé automatiquement</div>
-            <div style="font-size:11px;color:#888;margin-top:2px">Big : 1 boîte = 12 cookies · Small : 1 boîte = 25 cookies · À retourner à la prochaine livraison</div>
+            <div style="font-size:13px;font-weight:700;color:#0662aa">📦 Boîtes plastiques envoyées</div>
+            <div style="font-size:11px;color:#888;margin-top:2px">Suggestion auto : <span id="boites-suggestion-b2b">0</span> · ajustez si besoin (boîtes à plat, etc.)</div>
           </div>
-          <div style="font-size:28px;font-weight:700;color:#0662aa" id="boites-total-display">0</div>
+          <input type="number" id="boites-input-b2b" min="0" data-touched="0"
+            oninput="this.dataset.touched='1'"
+            style="width:78px;font-size:24px;font-weight:700;color:#0662aa;text-align:center;border:1.5px solid #b7d3ee;border-radius:9px;padding:6px 4px;background:#fff">
         </div>
       </div>
 
@@ -3332,13 +3334,13 @@ function calcBoites() {
   // Résumé B2B
 
   // Résumé B2B
-  const elB2B = document.getElementById('boites-total-display');
   const boitesBigDisplay   = Math.ceil(totalBigBoxes / 14);
   const boitesSmallDisplay = Math.ceil(totalSmallBoxes / 25);
-  if (elB2B) elB2B.innerHTML =
-    `<span style="color:#d44218">${boitesBigDisplay} <span style="font-size:13px;font-weight:500">Big</span></span>` +
-    `<span style="color:#ccc;font-size:18px;margin:0 6px">+</span>` +
-    `<span style="color:#0662aa">${boitesSmallDisplay} <span style="font-size:13px;font-weight:500">Small</span></span>`;
+  const suggestionB2B = boitesBigDisplay + boitesSmallDisplay;
+  const sugEl = document.getElementById('boites-suggestion-b2b');
+  if (sugEl) sugEl.textContent = suggestionB2B;
+  const inpEl = document.getElementById('boites-input-b2b');
+  if (inpEl && inpEl.dataset.touched !== '1') inpEl.value = suggestionB2B;
 
   // Résumé optionnel
   const elOpt = document.getElementById('boites-total-display-opt');
@@ -3606,10 +3608,10 @@ function _renderCakeLots(container, stockItems) {
 }
 
 function updateCakeDLC() {
-  var d = new Date(); d.setDate(d.getDate()+4);
+  var d = new Date(); d.setDate(d.getDate()+3);
   var dlc = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
   var el = document.getElementById('cake-dlc-display');
-  if(el) el.textContent = dlc + ' · + 4 jours';
+  if(el) el.textContent = dlc + ' · + 3 jours';
 }
 
 function getCakeLots() {
@@ -3622,7 +3624,7 @@ function getCakeLots() {
 }
 
 function getCakeDLCStr() {
-  var d = new Date(); d.setDate(d.getDate()+4);
+  var d = new Date(); d.setDate(d.getDate()+3);
   return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
 
@@ -4035,7 +4037,7 @@ const dlcCakeRow = document.getElementById('bon-dlc-cake-row');
 const dlcCakeVal = document.getElementById('bon-dlc-cake');
 if(dlcCakeRow && dlcCakeVal){
   if(hasCakesBon){
-    var dlcCakeDate = new Date(); dlcCakeDate.setDate(dlcCakeDate.getDate()+4);
+    var dlcCakeDate = new Date(); dlcCakeDate.setDate(dlcCakeDate.getDate()+3);
     dlcCakeVal.textContent = dlcCakeDate.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
     dlcCakeRow.style.display = 'flex';
   } else {
@@ -4212,7 +4214,12 @@ async function saveSortie() {
   // Boîtes
   let boites = 0, typeBoite = 'plastique';
   if (type === 'b2b' || ((type==='evenement'||type==='interne') && document.getElementById('boites-opt-toggle')?.checked)) {
-    boites    = (window._boitesBig||0) + (window._boitesSmall||0);
+    var inpB2B = document.getElementById('boites-input-b2b');
+    if (type === 'b2b' && inpB2B && inpB2B.value !== '') {
+      boites = parseInt(inpB2B.value, 10) || 0;
+    } else {
+      boites = (window._boitesBig||0) + (window._boitesSmall||0);
+    }
     typeBoite = 'plastique';
   } else if (type === 'magasin' || type === 'anderlecht') {
     boites    = window._boitesIx || 0;
@@ -4378,6 +4385,8 @@ function resetSortie() {
   document.getElementById('saveurs-blocks').innerHTML = '';
   addSaveurBlock();
   window._boitesBig = 0; window._boitesSmall = 0; window._boitesIx = 0;
+  var inpB2Breset = document.getElementById('boites-input-b2b');
+  if (inpB2Breset) { inpB2Breset.dataset.touched = '0'; inpB2Breset.value = ''; }
 }
 
 // ─────────────────────────────────────
