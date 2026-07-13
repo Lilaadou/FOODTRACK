@@ -3938,7 +3938,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
     bonHtml += cakeLotsBon.map(function(l){
       return '<tr style="background:#fffdf5">'
         +'<td style="'+tdBase2+'font-weight:700;color:#000">'+l.code+'</td>'
-        +'<td style="'+tdBase2+'"><span style="display:inline-block;background:#fff3cc;color:#a07000;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">🧁 '+l.saveur+'</span></td>'
+        +'<td style="'+tdBase2+'"><span style="display:inline-block;background:#fff3cc;color:#a07000;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">'+l.saveur.toUpperCase()+'</span></td>'
         +(showBig   ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
         +(showSmall ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
         +'<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>'
