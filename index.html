@@ -2029,91 +2029,13 @@
 
   <!-- ══════════════════ BONS DE LIVRAISON ══════════════════ -->
 <div id="page-bl" class="page">
-<!-- Cadre clients B2B -->
-<div class="card" style="margin-bottom:18px">
-  <div class="card-header">
-    <div><div class="card-title">🤝 Clients B2B</div><div class="card-sub">Imprimer les étiquettes boîtes</div></div>
+
+  <div style="display:inline-flex;gap:4px;background:#f2f2f2;border-radius:10px;padding:4px;margin-bottom:16px">
+    <button id="bl-subtab-livraisons" onclick="setBlSub('livraisons')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:#fff;color:#0662aa;box-shadow:0 1px 2px rgba(0,0,0,.06)">Livraisons</button>
+    <button id="bl-subtab-tarik" onclick="setBlSub('tarik')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none">🚗 Suivi Tarik</button>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Ecocyclo</div>
-        <div style="font-size:11px;color:#888">Felix Basile · 047 205 79 97</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Ecocyclo')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Galler Ixelles</div>
-        <div style="font-size:11px;color:#888">Marie Mayne · 047 734 96 32</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Galler Ixelles')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Galler Woluwe</div>
-        <div style="font-size:11px;color:#888">Marie Mayne · 047 734 96 32</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Galler Woluwe')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">La Fourmilière</div>
-        <div style="font-size:11px;color:#888">Robin Cardoen · 049 805 41 68</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('La Fourmilière')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Penta Hotel</div>
-        <div style="font-size:11px;color:#888">Menno De Richemont · 047 010 12 48</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Penta Hotel')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Café Club</div>
-        <div style="font-size:11px;color:#888">Nicolas Auffray · +32 484 69 44 25</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Café Club')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Flippers</div>
-        <div style="font-size:11px;color:#888">Basile Stein · 047 293 06 07</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Flippers')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Slide Coffee</div>
-        <div style="font-size:11px;color:#888">Sebastien Kunnen · +32 489 39 65 16</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Slide Coffee')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">Petit Mercado</div>
-        <div style="font-size:11px;color:#888">Pia & Meno · 0487 30 09 69</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('Petit Mercado')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">La Belladone</div>
-        <div style="font-size:11px;color:#888">Aurelie Alonso · +32 489 32 18 26</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('La Belladone')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-    <div style="background:#f9f9f9;border:1px solid #f0f0f0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a1a2e">JAT Café</div>
-        <div style="font-size:11px;color:#888">Louise Roobaert · +32 495 21 01 96</div>
-      </div>
-      <button onclick="imprimerEtiquettesB2B('JAT Café')" style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">🏷️</button>
-    </div>
-  </div>
-</div>
+
+  <div id="bl-sub-livraisons">
   
   <!-- Stats -->
   <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
@@ -2208,9 +2130,54 @@
       </div>
     </div>
   </div>
-</div>
+  </div><!-- /bl-sub-livraisons -->
 
-  <!-- ══════════════════ LIVRAISONS IXELLES ══════════════════ -->
+  <div id="bl-sub-tarik" style="display:none">
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header" style="flex-wrap:wrap;gap:10px">
+        <div><div class="card-title">🚗 Suivi des livraisons Tarik</div><div class="card-sub">Coût cumulé du mois — 1 livraison B2B = 1 point</div></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="tarikPrevMonth()" style="font-size:12px;padding:6px 10px">‹</button>
+          <span id="tarik-month-label" style="font-size:13px;font-weight:700;min-width:130px;text-align:center">—</span>
+          <button class="btn btn-secondary" onclick="tarikNextMonth()" style="font-size:12px;padding:6px 10px">›</button>
+          <button class="btn btn-secondary" onclick="renderTarikTracker()" style="font-size:12px;padding:6px 12px">🔄 Actualiser</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+        <div class="form-group" style="max-width:170px">
+          <label>Prix par livraison (HTVA)</label>
+          <input type="number" id="tarik-prix" value="8" min="0" step="0.5" oninput="renderTarikTracker()">
+        </div>
+        <div class="form-group" style="max-width:190px">
+          <label>Ajustement du mois (± €)</label>
+          <input type="number" id="tarik-ajust" value="0" step="0.5" oninput="renderTarikTracker()" placeholder="dépannage, retour…">
+        </div>
+        <div class="form-group" style="max-width:120px">
+          <label>TVA</label>
+          <input type="text" value="21 %" disabled style="background:#f0f0f0;color:#888">
+        </div>
+      </div>
+
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:4px">
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Livraisons (points)</div><div class="stat-icon ic-b">🚗</div></div><div class="stat-value" id="tarik-nb">0</div><span class="stat-badge badge-ok" id="tarik-nb-sub">ce mois</span></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Montant HTVA</div><div class="stat-icon ic-o">💶</div></div><div class="stat-value" id="tarik-htva" style="color:#0c447c">0 €</div><span class="stat-badge badge-ok">à payer HT</span></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">TVA 21 %</div><div class="stat-icon ic-b">🧾</div></div><div class="stat-value" id="tarik-tva" style="color:#0662aa">0 €</div><span class="stat-badge badge-ok">+ TVA</span></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Total TTC</div><div class="stat-icon ic-o">💰</div></div><div class="stat-value" id="tarik-ttc" style="color:#d44218">0 €</div><span class="stat-badge badge-warn">à payer TTC</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">🗓️ Détail par tournée</div><div class="card-sub">Nombre de points livrés par jour</div></div></div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Date</th><th style="text-align:right">Points</th><th style="text-align:right">Prix unit.</th><th style="text-align:right">HTVA</th></tr></thead>
+          <tbody id="tarik-detail-table"><tr><td colspan="4" class="empty">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /bl-sub-tarik -->
+</div>
   <!-- ══════════════════ RÉCAP MENSUEL B2B ══════════════════ -->
   <div id="page-recap-mois" class="page">
     <style>
@@ -6764,6 +6731,8 @@ async function loadBL() {
   } catch {}
   renderBLTable(blData);
   updateBLStats(blData);
+  var _tarikWrap=document.getElementById('bl-sub-tarik');
+  if(_tarikWrap && _tarikWrap.style.display!=='none' && typeof renderTarikTracker==='function') renderTarikTracker();
 }
 
 function updateBLStats(data) {
@@ -10425,6 +10394,90 @@ function imprimerRapportLivreur(livreur){
     '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#e6f1fb"/></svg><div style="background:#e6f1fb;padding:24px 40px 32px;text-align:center;font-size:12px;color:#000;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne — suivi livreur</div></div>';
   _cdPrint(html, 'Rapport-'+livreur+'-'+_MOISFR[m]+'-'+y+'.pdf');
 }
+
+/* ═══════════ SUIVI TARIK (sous-onglet B2B) ═══════════ */
+var _tarikState = { y: new Date().getFullYear(), m: new Date().getMonth() };
+
+function setBlSub(sub){
+  var liv = document.getElementById('bl-sub-livraisons');
+  var tar = document.getElementById('bl-sub-tarik');
+  var bL  = document.getElementById('bl-subtab-livraisons');
+  var bT  = document.getElementById('bl-subtab-tarik');
+  var ON  = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:#fff;color:#0662aa;box-shadow:0 1px 2px rgba(0,0,0,.06)';
+  var OFF = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none';
+  if(!liv||!tar) return;
+  if(sub==='tarik'){
+    liv.style.display='none'; tar.style.display='';
+    if(bT)bT.style.cssText=ON; if(bL)bL.style.cssText=OFF;
+    renderTarikTracker();
+  } else {
+    tar.style.display='none'; liv.style.display='';
+    if(bL)bL.style.cssText=ON; if(bT)bT.style.cssText=OFF;
+  }
+}
+
+function tarikPrevMonth(){ _tarikState.m--; if(_tarikState.m<0){_tarikState.m=11;_tarikState.y--;} renderTarikTracker(); }
+function tarikNextMonth(){ _tarikState.m++; if(_tarikState.m>11){_tarikState.m=0;_tarikState.y++;} renderTarikTracker(); }
+
+function renderTarikTracker(){
+  var y=_tarikState.y, m=_tarikState.m;
+  var lab=document.getElementById('tarik-month-label');
+  if(lab) lab.textContent=(typeof _MOISFR!=='undefined'?_MOISFR[m]:(m+1))+' '+y;
+
+  var bls=(typeof blData!=='undefined'&&Array.isArray(blData))?blData:[];
+  var list=bls.filter(function(bl){
+    if(typeof _cdMasque==='function' && _cdMasque(bl)) return false;
+    if((bl.livreurB2B||'')!=='Tarik') return false;
+    var d=(typeof _cdD==='function')?_cdD(bl.date):new Date(bl.date);
+    return d && d.getFullYear()===y && d.getMonth()===m;
+  });
+
+  var prix=parseFloat((document.getElementById('tarik-prix')||{}).value)||0;
+  var ajust=parseFloat((document.getElementById('tarik-ajust')||{}).value)||0;
+
+  var nb=list.length;
+  var htva=nb*prix + ajust;
+  var tva=htva*0.21;
+  var ttc=htva+tva;
+  var fmt=function(n){ return n.toLocaleString('fr-BE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
+
+  var set=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+  set('tarik-nb', nb);
+  set('tarik-htva', fmt(htva));
+  set('tarik-tva', fmt(tva));
+  set('tarik-ttc', fmt(ttc));
+  var sub=document.getElementById('tarik-nb-sub'); if(sub) sub.textContent=(typeof _MOISFR!=='undefined'?_MOISFR[m]:'')+' '+y;
+
+  // Regrouper par jour
+  var parJour={};
+  list.forEach(function(bl){
+    var d=(typeof _cdD==='function')?_cdD(bl.date):new Date(bl.date);
+    var key=d?d.toISOString().slice(0,10):'?';
+    if(!parJour[key]) parJour[key]={ d:d, n:0 };
+    parJour[key].n++;
+  });
+  var jours=Object.keys(parJour).sort();
+  var tb=document.getElementById('tarik-detail-table');
+  if(tb){
+    if(!jours.length){
+      tb.innerHTML='<tr><td colspan="4" class="empty">Aucune livraison Tarik ce mois-ci.</td></tr>';
+    } else {
+      tb.innerHTML=jours.map(function(k){
+        var j=parJour[k];
+        var dStr=(typeof _cdDayFull==='function' && j.d)?_cdDayFull(j.d):k;
+        var ligne=j.n*prix;
+        return '<tr>'+
+          '<td>'+dStr+'</td>'+
+          '<td style="text-align:right;font-weight:700">'+j.n+'</td>'+
+          '<td style="text-align:right;color:#888">'+fmt(prix)+'</td>'+
+          '<td style="text-align:right;font-weight:700;color:#0c447c">'+fmt(ligne)+'</td>'+
+        '</tr>';
+      }).join('')
+      + (ajust!==0 ? '<tr><td colspan="3" style="text-align:right;color:#888;padding-top:8px">Ajustement (dépannage / retour)</td><td style="text-align:right;font-weight:700;color:#d44218;padding-top:8px">'+fmt(ajust)+'</td></tr>' : '');
+    }
+  }
+}
+/* ═══════════ FIN SUIVI TARIK ═══════════ */
 /* ═══════════ FIN CENTRE DE DOCUMENTS ═══════════ */
 </script>
 <script>
