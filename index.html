@@ -832,7 +832,7 @@
         </div>
        <div style="grid-column:1/-1">
   <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Code Premix *</label>
-  <div id="prod-pmx-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:8px;align-items:start"></div>
+  <div id="prod-pmx-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:8px;align-items:start"></div>
   <select id="prod-pmx" style="display:none"></select>
 </div>
        <div id="prod-pmx-warning" style="display:none;background:#fdf0ec;border:1.5px solid #f5cbb8;border-radius:9px;padding:10px 14px;font-size:12px;color:#d44218;font-weight:600;grid-column:1/-1"></div>
@@ -1904,6 +1904,12 @@
   <!-- ══════════════════ FACTURES ══════════════════ -->
   <div id="page-factures" class="page">
 
+    <div style="display:inline-flex;gap:4px;background:#f2f2f2;border-radius:10px;padding:4px;margin-bottom:16px">
+      <button id="fac-famtab-cookie" onclick="setFacFamily('cookie')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:#fff;color:#0662aa;box-shadow:0 1px 2px rgba(0,0,0,.06)">Cookies</button>
+      <button id="fac-famtab-gateau" onclick="setFacFamily('gateau')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none">Gâteaux</button>
+    </div>
+
+    <div id="fac-cookie-wrap">
     <!-- ── RECHERCHE TRAÇABILITÉ AFSCA ── -->
     <div class="card" style="margin-bottom:18px">
       <div class="card-header" style="margin-bottom:14px">
@@ -1951,6 +1957,56 @@
             <tr><td colspan="6" class="empty">Chargement…</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    </div><!-- /fac-cookie-wrap -->
+
+    <div id="fac-gateau-wrap" style="display:none">
+      <!-- ── RECHERCHE TRAÇABILITÉ GÂTEAUX ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-header" style="margin-bottom:14px">
+          <div>
+            <div class="card-title">🔎 Recherche traçabilité gâteaux</div>
+            <div class="card-sub">Code lot, produit ou N° Facture</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <input id="traca-gateau-input" type="text" placeholder="Ex : BAN-260713-01  ou  Banana bread  ou  FAC-2026-001"
+            style="flex:1;min-width:220px;padding:10px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:14px;outline:none;font-family:inherit"
+            onfocus="this.style.borderColor='#0662aa'" onblur="this.style.borderColor='#e8e8e8'"
+            oninput="tracaSearchGateaux(this.value)" onkeydown="if(event.key==='Enter')tracaSearchGateaux(this.value)">
+          <button class="btn btn-primary" onclick="tracaSearchGateaux(document.getElementById('traca-gateau-input').value)" style="padding:10px 18px">Rechercher</button>
+        </div>
+        <div id="traca-gateau-result" style="margin-top:16px"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="card-title">🧾 Récapitulatif gâteaux par lot</div>
+            <div class="card-sub">Codes lot, produits et factures associées</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="buildFacturesRecapGateaux()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Code lot</th>
+                <th>Produit</th>
+                <th>Producteur</th>
+                <th>Date</th>
+                <th>N° Factures</th>
+              </tr>
+            </thead>
+            <tbody id="fac-recap-gateau-table">
+              <tr><td colspan="5" class="empty">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -6381,21 +6437,22 @@ toast('pmx', `✓ Premix ${codePremix} supprimé`, 'ok');
       const hasMq   = b.manquants.length > 0 && !b.manquantsResolus;
       const icon    = hasMq ? 'ti-alert-triangle' : 'ti-circle-check';
       const iconCol = hasMq ? '#d44218' : '#27ae60';
-      const labelCol= hasMq ? '#d44218' : '#666';
+      const labelCol= hasMq ? '#d44218' : '#444';
       const label   = hasMq ? 'Bac ' + b.bac + ' · manquants' : 'Bac ' + b.bac;
       const bg      = hasMq ? '#fdf0ec' : '#fff';
       const bd      = hasMq ? '#f5cbb8' : '#e8e8e8';
       return `<div onclick="selectPremixBtn('${b.code}','${sav}')" id="pmx-btn-${b.code}"
-        style="border:1px solid ${bd};background:${bg};border-radius:8px;padding:6px 8px;margin-bottom:5px;cursor:pointer;transition:all .12s">
-        <div style="font-size:11px;font-weight:600;color:${labelCol};display:flex;align-items:center;gap:4px">
-          <i class="ti ${icon}" aria-hidden="true" style="font-size:12px;color:${iconCol}"></i> ${label}
+        style="border:1px solid ${bd};background:${bg};border-radius:9px;padding:8px 11px;cursor:pointer;transition:all .12s">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:11.5px;font-weight:600;color:${labelCol}">${label}</span>
+          <i class="ti ${icon}" aria-hidden="true" style="font-size:13px;color:${iconCol}"></i>
         </div>
-        <div style="font-size:10px;font-family:monospace;color:#888;margin-top:1px">${b.code}</div>
+        <div style="font-size:10px;color:#aaa">${b.code}</div>
       </div>`;
     }).join('');
-    return `<div style="border:1.5px solid #e8e8e8;background:#fff;border-radius:12px;padding:10px 12px">
-      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:8px">${sav}</div>
-      ${bacsHTML}
+    return `<div style="border:1px solid #e8e8e8;background:#fafafa;border-radius:12px;padding:12px">
+      <div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:10px;letter-spacing:.01em">${sav}</div>
+      <div style="display:flex;flex-direction:column;gap:7px">${bacsHTML}</div>
     </div>`;
   }).join('');
 }
@@ -6412,14 +6469,18 @@ function selectPremixBtn(code, saveur) {
     b.style.border = wasMq ? '1px solid #f5cbb8' : '1px solid #e8e8e8';
     b.style.background = wasMq ? '#fdf0ec' : '#fff';
     b.style.boxShadow = '';
+    const lbl = b.querySelector('span'); if(lbl) lbl.style.color = wasMq ? '#d44218' : '#444';
+    const codeLine = b.lastElementChild; if(codeLine) codeLine.style.color = '#aaa';
   });
 
-  // Mettre en avant le bac sélectionné (orange Kooki)
+  // Mettre en avant le bac sélectionné (bleu)
   const btn = document.getElementById('pmx-btn-' + code);
   if (btn) {
-    btn.style.border = '2px solid #d44218';
-    btn.style.background = '#fdf0ec';
-    btn.style.boxShadow = '0 0 0 1px #d44218';
+    btn.style.border = '1.5px solid #0662aa';
+    btn.style.background = '#e6f1fb';
+    btn.style.boxShadow = 'none';
+    const lbl = btn.querySelector('span'); if(lbl) lbl.style.color = '#0662aa';
+    const codeLine = btn.lastElementChild; if(codeLine) codeLine.style.color = '#0662aa';
   }
 
   const select = document.getElementById('prod-pmx');
@@ -7301,6 +7362,123 @@ function buildFacturesRecap() {
       <td>${pmxEntry ? (pmxEntry.nom || '—') : '<span style="color:#ccc">—</span>'}</td>
       <td style="min-width:220px">${factures}</td>
     </tr>`;
+  }).join('');
+}
+
+function setFacFamily(fam){
+  var cw=document.getElementById('fac-cookie-wrap'), gw=document.getElementById('fac-gateau-wrap');
+  var bc=document.getElementById('fac-famtab-cookie'), bg=document.getElementById('fac-famtab-gateau');
+  if(!cw||!gw) return;
+  var ON  = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:#fff;color:#0662aa;box-shadow:0 1px 2px rgba(0,0,0,.06)';
+  var OFF = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none';
+  if(fam==='gateau'){
+    cw.style.display='none'; gw.style.display='';
+    if(bg)bg.style.cssText=ON; if(bc)bc.style.cssText=OFF;
+    if((!Array.isArray(window._gdataGlobal) || !window._gdataGlobal.length) && typeof loadGateaux==='function'){
+      var t=document.getElementById('fac-recap-gateau-table');
+      if(t) t.innerHTML='<tr><td colspan="5" class="empty">Chargement…</td></tr>';
+      Promise.resolve(loadGateaux()).then(buildFacturesRecapGateaux).catch(buildFacturesRecapGateaux);
+    } else {
+      buildFacturesRecapGateaux();
+    }
+  } else {
+    gw.style.display='none'; cw.style.display='';
+    if(bc)bc.style.cssText=ON; if(bg)bg.style.cssText=OFF;
+  }
+}
+
+function buildFacturesRecapGateaux(){
+  var tbody = document.getElementById('fac-recap-gateau-table');
+  if(!tbody) return;
+  var data = Array.isArray(window._gdataGlobal) ? window._gdataGlobal : [];
+  if(!data.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Aucune production gâteau enregistrée.</td></tr>';
+    return;
+  }
+  var rows = data.slice().sort(function(a,b){ return String(b.codeLot).localeCompare(String(a.codeLot)); });
+  tbody.innerHTML = rows.map(function(g){
+    var bls = Array.isArray(g.factures) ? g.factures : [];
+    var factures = bls.map(function(bl){
+      var c = (typeof getFacturePourBL==='function') ? getFacturePourBL(bl) : null;
+      return c
+        ? '<span style="display:block;color:#27ae60;font-weight:700;font-size:13px;margin-bottom:3px">'+c.facture+'</span>'
+        : '<span style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><span class="bl-tag" style="font-size:10px">'+bl+'</span><span style="color:#d44218;font-size:11px;font-weight:600">Non lié</span></span>';
+    }).join('') || '<span style="color:#ccc;font-size:12px">—</span>';
+    var dateStr = '';
+    if(g.date){ try{ dateStr = new Date(g.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}); }catch(e){ dateStr=''; } }
+    return '<tr>'
+      + '<td><b>'+(g.codeLot||'—')+'</b></td>'
+      + '<td>'+(g.nom||'—')+'</td>'
+      + '<td>'+(g.producteur||'<span style="color:#ccc">—</span>')+'</td>'
+      + '<td>'+(dateStr||'<span style="color:#ccc">—</span>')+'</td>'
+      + '<td style="min-width:220px">'+factures+'</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function tracaSearchGateaux(q){
+  var container = document.getElementById('traca-gateau-result');
+  if(!container) return;
+  q = (q||'').trim().toUpperCase();
+  if(!q){ container.innerHTML=''; return; }
+
+  var data = Array.isArray(window._gdataGlobal) ? window._gdataGlobal : [];
+  var matched = data.filter(function(g){
+    if(String(g.codeLot||'').toUpperCase().includes(q)) return true;
+    if(String(g.nom||'').toUpperCase().includes(q)) return true;
+    var bls = Array.isArray(g.factures) ? g.factures : [];
+    if(bls.some(function(bl){ return String(bl).toUpperCase().includes(q); })) return true;
+    var facs = bls.map(function(bl){ var c=(typeof getFacturePourBL==='function')?getFacturePourBL(bl):null; return c?String(c.facture).toUpperCase():''; });
+    if(facs.some(function(f){ return f.includes(q); })) return true;
+    return false;
+  });
+
+  if(!matched.length){
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;font-size:14px">Aucun résultat pour <b>'+q+'</b></div>';
+    return;
+  }
+
+  container.innerHTML = matched.map(function(g){
+    var bls = Array.isArray(g.factures) ? g.factures : [];
+    var facRows = bls.length ? bls.map(function(bl){
+      var c = (typeof getFacturePourBL==='function') ? getFacturePourBL(bl) : null;
+      return c
+        ? '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f5f5f5">'
+            +'<span style="font-size:11px;color:#888;width:90px;flex-shrink:0">BL reçu</span>'
+            +'<span class="bl-tag">'+bl+'</span>'
+            +'<span style="color:#ccc;font-size:12px">→</span>'
+            +'<span style="color:#27ae60;font-weight:700;font-size:13px">'+c.facture+'</span>'
+            +(c.fournisseur?'<span style="color:#888;font-size:11px">· '+c.fournisseur+'</span>':'')
+            +'<span style="margin-left:auto;background:#e8f5e9;color:#27ae60;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">✓ Lié</span>'
+          +'</div>'
+        : '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f5f5f5">'
+            +'<span style="font-size:11px;color:#888;width:90px;flex-shrink:0">BL reçu</span>'
+            +'<span class="bl-tag">'+bl+'</span>'
+            +'<span style="margin-left:auto;background:#fbe8e2;color:#d44218;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">⚠️ Non lié</span>'
+          +'</div>';
+    }).join('') : '<div style="color:#aaa;font-size:12px;padding:6px 0">Aucun bon de livraison enregistré</div>';
+
+    var linked = bls.filter(function(bl){ return (typeof getFacturePourBL==='function') && getFacturePourBL(bl); });
+    var allLinked = bls.length>0 && linked.length===bls.length;
+    var noneLinked = linked.length===0;
+    var statusColor = allLinked ? '#27ae60' : noneLinked ? '#d44218' : '#e67e22';
+    var statusLabel = allLinked ? '✓ Traçabilité complète' : noneLinked ? '⚠️ Factures manquantes' : '⚡ Traçabilité partielle';
+    var dateStr = '—';
+    if(g.date){ try{ dateStr = new Date(g.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(e){ dateStr='—'; } }
+
+    return '<div style="border:1.5px solid #e8e8e8;border-radius:14px;overflow:hidden;margin-bottom:14px">'
+      +'<div style="background:#f7f8fa;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">'
+        +'<div>'
+          +'<div style="font-size:16px;font-weight:800;color:#1a1a2e">'+(g.codeLot||'—')+'</div>'
+          +'<div style="font-size:12px;color:#888;margin-top:2px">Lot de production gâteau · '+dateStr+'</div>'
+        +'</div>'
+        +'<span style="background:#e6f1fb;color:#0662aa;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">'+(g.nom||'—')+'</span>'
+        +'<span style="background:#f7f8fa;border:1px solid #e0e0e0;color:#555;font-size:11px;padding:3px 10px;border-radius:20px">👤 '+(g.producteur||'—')+'</span>'
+        +(g.qte?'<span style="font-size:12px;color:#555;margin-left:4px"><b>'+g.qte+'</b> pièce'+(g.qte>1?'s':'')+'</span>':'')
+        +'<span style="margin-left:auto;background:'+(allLinked?'#e8f5e9':noneLinked?'#fbe8e2':'#fff8e1')+';color:'+statusColor+';font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px">'+statusLabel+'</span>'
+      +'</div>'
+      +'<div style="padding:12px 18px">'+facRows+'</div>'
+    +'</div>';
   }).join('');
 }
 
@@ -10333,6 +10511,7 @@ function imprimerRapportLivreur(livreur){
         return {
           codeLot: lot,
           nom:  p.produit || p.nom || '',
+          producteur: p.producteur || p.nom || '',
           code: (lot.split('-')[0] || ''),
           qte:  Number(p.qte) || 0,
           factures: Array.isArray(p.factures) ? p.factures : (p.factures ? String(p.factures).split(',').map(function(x){return x.trim();}).filter(Boolean) : []),
