@@ -9866,7 +9866,8 @@ function _rmLots(bl){
   if (typeof L === 'string') { try { L = JSON.parse(L); } catch(e){ L = []; } }
   return (L || []).map(function(x){
     return { saveur:String(x.saveur || x.flavor || x.nom || '').toUpperCase(),
-             big:Number(x.big || 0) || 0, small:Number(x.small || 0) || 0 };
+             big:Number(x.big || 0) || 0, small:Number(x.small || 0) || 0,
+             isCake: !!x.isCake, qte:Number(x.qte || 0) || 0 };
   });
 }
 function _rmParseDate(v){
@@ -9912,16 +9913,22 @@ async function renderRecapMois(){
   var byClient = {};
   doB.forEach(function(bl){
     var name = _rmClient(bl);
-    if (!byClient[name]) byClient[name] = { name:name, big:0, small:0, boxes:0, flavors:{}, bls:[] };
+    if (!byClient[name]) byClient[name] = { name:name, big:0, small:0, cakes:0, boxes:0, flavors:{}, cakeFlavors:{}, bls:[] };
     var c = byClient[name];
     var d = _rmParseDate(bl.date);
     var lots = _rmLots(bl);
     c.bls.push({ n:_rmNumero(bl), d:d?_rmDayLabel(d):'', dt:d||null, lots:lots });
     c.boxes += _rmBoites(bl);
     lots.forEach(function(l){
-      c.big += l.big; c.small += l.small;
-      if(!c.flavors[l.saveur]) c.flavors[l.saveur]=[0,0];
-      c.flavors[l.saveur][0]+=l.big; c.flavors[l.saveur][1]+=l.small;
+      if(l.isCake){
+        c.cakes += l.qte;
+        if(!c.cakeFlavors[l.saveur]) c.cakeFlavors[l.saveur]=0;
+        c.cakeFlavors[l.saveur]+=l.qte;
+      } else {
+        c.big += l.big; c.small += l.small;
+        if(!c.flavors[l.saveur]) c.flavors[l.saveur]=[0,0];
+        c.flavors[l.saveur][0]+=l.big; c.flavors[l.saveur][1]+=l.small;
+      }
     });
   });
 
@@ -9961,6 +9968,7 @@ async function renderRecapMois(){
       '<div class="rm-cn">🏪 '+c.name+'</div><div class="rm-badges">'+
       '<span class="rm-badge rm-bBig">'+c.big+' Big</span>'+
       '<span class="rm-badge rm-bSmall">'+c.small+' Small</span>'+
+      (c.cakes>0 ? '<span class="rm-badge" style="background:#fff3cc;color:#a07000">'+c.cakes+' cake'+(c.cakes>1?'s':'')+'</span>' : '')+
       '<span class="rm-badge rm-bBox">'+c.boxes+' boîtes</span>'+
       '<span class="rm-chev">Voir le récap →</span></div></div>'+
       '<div class="rm-cbls">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>';
@@ -9971,12 +9979,19 @@ function _rmClientHTML(c, forPrint){
   function p2(n){ return String(n).padStart(2,'0'); }
   function fdate(dt){ return dt ? p2(dt.getDate())+'/'+p2(dt.getMonth()+1)+'/'+dt.getFullYear() : ''; }
 
-  /* Regrouper les livraisons par jour (somme Big/Small) */
+  /* Regrouper les livraisons par jour (somme Big/Small/Cakes) */
   var map={};
   c.bls.forEach(function(bl){
     var key = bl.dt ? bl.dt.toISOString().slice(0,10) : (bl.d||('x'+Math.random()));
-    if(!map[key]) map[key]={ dt: bl.dt||null, big:0, small:0 };
-    (bl.lots||[]).forEach(function(l){ map[key].big+=(l.big||0); map[key].small+=(l.small||0); });
+    if(!map[key]) map[key]={ dt: bl.dt||null, big:0, small:0, cakes:{} };
+    (bl.lots||[]).forEach(function(l){
+      if(l.isCake){
+        var nm = l.saveur || 'CAKE';
+        map[key].cakes[nm] = (map[key].cakes[nm]||0) + (l.qte||0);
+      } else {
+        map[key].big+=(l.big||0); map[key].small+=(l.small||0);
+      }
+    });
   });
   var jours=Object.keys(map).map(function(k){return map[k];})
             .sort(function(a,b){ return (a.dt?a.dt:0)-(b.dt?b.dt:0); });
@@ -9984,10 +9999,15 @@ function _rmClientHTML(c, forPrint){
   var tdD='background:#fff;font-weight:700;font-style:italic;font-size:12.5px;padding:12px 12px 5px;color:#333';
   var tdP='background:'+GREY+';padding:6px 12px 4px;font-size:13px';
   var tdQ=tdP+';text-align:right;font-weight:600;color:'+BLUE;
+  var tdPk='background:#fffbf0;padding:6px 12px 4px;font-size:13px';
+  var tdQk=tdPk+';text-align:right;font-weight:600;color:#a07000';
   var rows=jours.map(function(j){
     var r='<tr><td colspan="2" style="'+tdD+'">'+fdate(j.dt)+'</td></tr>';
     if(j.big)   r+='<tr><td style="'+tdP+'">1 GIANT SIZE</td><td style="'+tdQ+'">'+j.big+'</td></tr>';
     if(j.small) r+='<tr><td style="'+tdP+'">1 BABY SIZE</td><td style="'+tdQ+'">'+j.small+'</td></tr>';
+    Object.keys(j.cakes).forEach(function(nm){
+      if(j.cakes[nm]>0) r+='<tr><td style="'+tdPk+'">'+nm+'</td><td style="'+tdQk+'">'+j.cakes[nm]+'</td></tr>';
+    });
     return r;
   }).join('');
 
@@ -10027,6 +10047,7 @@ function _rmClientHTML(c, forPrint){
           '<div style="display:flex;justify-content:space-between;background:'+SOFT+';padding:11px 16px;font-size:13px;margin-bottom:2px"><span>Total Baby (80g)</span><span style="font-weight:600;color:'+BLUE+'">'+c.small+'</span></div>'+
           '<div style="display:flex;justify-content:space-between;background:'+SOFT+';padding:11px 16px;font-size:13px;margin-bottom:2px"><span>Total Giant (165g)</span><span style="font-weight:600;color:'+BLUE+'">'+c.big+'</span></div>'+
           '<div style="display:flex;justify-content:space-between;padding:14px 16px 0;font-size:15px"><span style="color:'+BLUE+';font-weight:600">Total cookies</span><span style="color:'+BLUE+';font-weight:700">'+total+'</span></div>'+
+          ((c.cakes||0)>0 ? '<div style="display:flex;justify-content:space-between;background:#fffbf0;padding:11px 16px;font-size:13px;margin-top:10px;margin-bottom:2px"><span>Total cakes</span><span style="font-weight:700;color:#a07000">'+c.cakes+'</span></div>' : '')+
         '</div>'+
       '</div>'+
     '</div>'+
