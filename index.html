@@ -1009,11 +1009,6 @@
       <button id="stock-famtab-gateau" onclick="setStockFamily('gateau')" style="border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 22px;border-radius:8px;background:transparent;color:#999;box-shadow:none">Gâteaux</button>
     </div>
     <div id="stock-cookie-wrap">
-    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Total Big</div><div class="stat-icon ic-o">🍪</div></div><div class="stat-value">1 165</div><span class="stat-badge badge-ok">5 saveurs</span></div>
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Total Small</div><div class="stat-icon ic-b">🍪</div></div><div class="stat-value">190</div><span class="stat-badge badge-ok">5 saveurs</span></div>
-      <div class="stat-card"><div class="stat-top"><div class="stat-label">Hors stock</div><div class="stat-icon ic-w">⚠️</div></div><div class="stat-value">6</div><span class="stat-badge badge-warn">À planifier</span></div>
-    </div>
     <div class="card" style="margin-bottom:18px">
   <div class="card-header" style="margin-bottom:14px">
     <div><div class="card-title">Stock par saveur</div><div class="card-sub">Lots triés par date (FIFO)</div></div>
@@ -3062,63 +3057,54 @@ let html = '';
 saveurs.forEach(sav => {
   const lots = bySaveur[sav].filter(l => l.big > 0 || l.small > 0);
   if (!lots.length) return;
-  const col = SAVEUR_COULEURS_PMX[sav] || { bg:'#f0f0f0', border:'#ccc', text:'#888', dark:'#555' };
   const totBig    = lots.reduce((s, l) => s + l.big,   0);
   const totSmall  = lots.reduce((s, l) => s + l.small, 0);
-  const totSimple = lots.reduce((s, l) => s + (l.bacsSimple||0), 0);
-  const totDouble = lots.reduce((s, l) => s + (l.bacsDouble||0), 0);
-  html += `<div style="background:${col.bg};border:0.5px solid ${col.border};border-radius:12px;padding:14px 16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:13px;font-weight:700;color:${col.dark}">${sav}</span>
-      <span style="font-size:10px;color:${col.text};background:${col.border};padding:2px 7px;border-radius:20px">${lots.length} lot${lots.length>1?'s':''}</span>
+  const bigColor   = totBig   < 150 ? '#c0392b' : '#0662aa';
+  const smallColor = totSmall <=  50 ? '#c0392b' : '#0662aa';
+  const gid = 'lots-' + sav.replace(/[^A-Za-z0-9]/g,'');
+  const lotsHtml = lots.map(l => {
+    const parts = l.code.split('-');
+    let dateStr = '';
+    if (parts[1] && parts[1].length === 6) {
+      const yy = parts[1].slice(0,2), mm = parts[1].slice(2,4), dd = parts[1].slice(4,6);
+      dateStr = `${dd}/${mm}/20${yy}`;
+    }
+    return `<div style="display:flex;justify-content:space-between;font-size:10.5px;color:#666">
+      <span>${l.code}${dateStr ? ' · '+dateStr : ''}</span>
+      <span style="color:#1a1a2e">${l.big} · ${l.small}</span>
+    </div>`;
+  }).join('');
+  html += `<div style="border:1px solid #eee;border-radius:12px;padding:14px 16px;background:#fff">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:13px;font-weight:700;color:#0662aa">${sav}</span>
+      <span style="font-size:10px;color:#0662aa;background:#e6f1fb;padding:2px 8px;border-radius:20px">${lots.length} lot${lots.length>1?'s':''}</span>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <div><div style="font-size:10px;color:${col.text};margin-bottom:2px">Big</div><div style="font-size:20px;font-weight:700;color:${col.dark}">${totBig}</div></div>
-      <div style="text-align:right"><div style="font-size:10px;color:${col.text};margin-bottom:2px">Small</div><div style="font-size:20px;font-weight:700;color:${col.dark}">${totSmall}</div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <div><div style="font-size:10px;color:#888;margin-bottom:2px">Big</div><div style="font-size:22px;font-weight:800;color:${bigColor}">${totBig}</div></div>
+      <div style="text-align:right"><div style="font-size:10px;color:#888;margin-bottom:2px">Small</div><div style="font-size:22px;font-weight:800;color:${smallColor}">${totSmall}</div></div>
     </div>
-    <div style="display:flex;gap:6px;margin-bottom:8px">
-      <div style="flex:1;background:${col.border};border-radius:6px;padding:4px 8px;text-align:center">
-        <div style="font-size:9px;color:${col.text};font-weight:500">Simples</div>
-        <div style="font-size:14px;font-weight:700;color:${col.dark}">${totSimple}</div>
+    <div style="border-top:1px solid #eee;padding-top:8px">
+      <div onclick="toggleStockLots('${gid}', this)" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#0662aa;font-size:11px;font-weight:600;user-select:none">
+        <span class="lbl">Voir les lots</span><span class="arw" style="transition:transform .2s;display:inline-block">▸</span>
       </div>
-      <div style="flex:1;background:${col.border};border-radius:6px;padding:4px 8px;text-align:center">
-        <div style="font-size:9px;color:${col.text};font-weight:500">Doubles</div>
-        <div style="font-size:14px;font-weight:700;color:${col.dark}">${totDouble}</div>
-      </div>
-    </div>
-    <div style="border-top:0.5px solid ${col.border};padding-top:8px;display:flex;flex-direction:column;gap:3px">
-      ${lots.map(l => {
-        const parts = l.code.split('-');
-        let dateStr = '';
-        if (parts[1] && parts[1].length === 6) {
-          const yy = parts[1].slice(0,2), mm = parts[1].slice(2,4), dd = parts[1].slice(4,6);
-          dateStr = `${dd}/${mm}/20${yy}`;
-        }
-        return `<div style="display:flex;justify-content:space-between;font-size:10px;color:${col.text}">
-          <span>${l.code}${dateStr ? ' · '+dateStr : ''}</span>
-          <span>${l.big} · ${l.small}</span>
-        </div>`;
-      }).join('')}
+      <div id="${gid}" style="display:none;flex-direction:column;gap:5px;margin-top:8px">${lotsHtml}</div>
     </div>
   </div>`;
 });
 stockGrid.innerHTML = html || '<div class="empty">Aucun stock actuellement.</div>';
+}
 
-  // Mettre à jour saveurs hors stock
-  const zeroGrid = document.querySelector('#page-stock .zero-grid');
-  if (zeroGrid) {
-    zeroGrid.innerHTML = SAVEURS_ZERO.length
-      ? SAVEURS_ZERO.map(s => {
-          const bigStock   = stockLocal.filter(l => l.saveur === s).reduce((a, l) => a + l.big,   0);
-          const smallStock = stockLocal.filter(l => l.saveur === s).reduce((a, l) => a + l.small, 0);
-          const bigLabel   = bigStock   > 0 ? `<span style="font-size:10px;color:#d44218;font-weight:700">${bigStock} Big</span>` : `<span style="font-size:10px;color:#ccc">0 Big</span>`;
-          const smallLabel = smallStock > 0 ? `<span style="font-size:10px;color:#0662aa;font-weight:700">${smallStock} Small</span>` : `<span style="font-size:10px;color:#ccc">0 Small</span>`;
-          return `<div class="zero-card" style="flex-direction:column;align-items:flex-start;gap:3px">
-            <b>${s}</b>
-            <div style="display:flex;gap:8px">${bigLabel}${smallLabel}</div>
-          </div>`;
-        }).join('')
-      : '<div style="padding:12px;color:#0662aa;font-size:13px;font-weight:600">✓ Toutes les saveurs sont en stock</div>';
+// Déplier / replier les lots d'une saveur dans le stock cookies
+function toggleStockLots(gid, headerEl){
+  var box = document.getElementById(gid);
+  if(!box) return;
+  var open = box.style.display === 'none' || box.style.display === '';
+  box.style.display = open ? 'flex' : 'none';
+  if(headerEl){
+    var arw = headerEl.querySelector('.arw');
+    var lbl = headerEl.querySelector('.lbl');
+    if(arw) arw.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+    if(lbl) lbl.textContent = open ? 'Masquer les lots' : 'Voir les lots';
   }
 }
 
