@@ -1544,12 +1544,16 @@
 
         <div id="bon-boites-section" style="display:none;border-radius:10px;padding:12px 18px;margin-bottom:14px"></div>
 
-        <div style="background:#fbe8e2;border-radius:10px;padding:12px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:#d44218">📅 Date Limite de Consommation (DLC)</div>
-            <div class="dlc-subtitle" style="font-size:12px;color:#b06a52;margin-top:2px">Cookies cuits · À consommer avant le :</div>
+        <div style="background:#fbe8e2;border-radius:10px;padding:12px 18px;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:#d44218;margin-bottom:8px">📅 Date Limite de Consommation (DLC)</div>
+          <div id="bon-dlc-cookies-row" style="display:flex;align-items:center;justify-content:space-between">
+            <div class="dlc-subtitle" style="font-size:12px;color:#b06a52">Cookies cuits · À consommer avant le :</div>
+            <div id="bon-dlc" style="font-size:20px;font-weight:700;color:#d44218"></div>
           </div>
-          <div id="bon-dlc" style="font-size:20px;font-weight:700;color:#d44218"></div>
+          <div id="bon-dlc-cake-row" style="display:none;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #f3cdbf">
+            <div class="dlc-cake-subtitle" style="font-size:12px;color:#b06a52">Cakes · À consommer avant le :</div>
+            <div id="bon-dlc-cake" style="font-size:20px;font-weight:700;color:#d44218"></div>
+          </div>
         </div>
 
         <div style="border:1px solid #d6e6f5;border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start">
@@ -3928,7 +3932,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
     const tdBase = 'padding:9px 14px;border-bottom:1px solid #d9e7f4;';
     return '<tr>'
       + '<td style="'+tdBase+'font-weight:700;color:#000">' + l.code + '</td>'
-      + '<td style="'+tdBase+'"><span style="display:inline-block;background:#e0edf8;color:#0662aa;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">' + saveurLot + '</span></td>'
+      + '<td style="'+tdBase+'"><span style="font-size:12px;font-weight:700;color:#0c447c;letter-spacing:.02em">' + String(saveurLot).toUpperCase() + '</span></td>'
       + (showBig   ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#0c447c">' + (l.big||0)   + '</td>' : '')
       + (showSmall ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#0c447c">' + (l.small||0) + '</td>' : '')
       + '</tr>';
@@ -3938,7 +3942,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
     bonHtml += cakeLotsBon.map(function(l){
       return '<tr style="background:#fffdf5">'
         +'<td style="'+tdBase2+'font-weight:700;color:#000">'+l.code+'</td>'
-        +'<td style="'+tdBase2+'"><span style="display:inline-block;background:#fff3cc;color:#a07000;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">'+l.saveur.toUpperCase()+'</span></td>'
+        +'<td style="'+tdBase2+'"><span style="font-size:12px;font-weight:700;color:#a07000;letter-spacing:.02em">'+String(l.saveur).toUpperCase()+'</span></td>'
         +(showBig   ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
         +(showSmall ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
         +'<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>'
@@ -3957,7 +3961,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
     let html = '<div style="width:300px;max-width:100%;background:#eef5fc;border-radius:10px;padding:4px 18px;margin-bottom:' + (totalCakeQte>0?'8px':'0') + '">';
     if(hasCookiesInLots){
       html += (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span style="font-weight:700;color:#0c447c">' + totalBig + '</span></div>' : '');
-      html += (showSmall ? '<div style="'+line+'"><span>Total Small (80g)</span><span style="font-weight:700;color:#0c447c">' + totalSmall + '</span></div>' : '');
+      html += (showSmall ? '<div style="'+line+'"><span>Total Baby (80g)</span><span style="font-weight:700;color:#0c447c">' + totalSmall + '</span></div>' : '');
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#0662aa">Total cookies</span><span style="color:#0662aa">' + totCookies + ' cookie' + (totCookies > 1 ? 's' : '') + '</span></div>';
     }
     html += '</div>';
@@ -4012,23 +4016,19 @@ const dlcEl = document.getElementById('bon-dlc');
 if (dlcEl) dlcEl.textContent = dlcStr;
 const dlcLabel = document.querySelector('.dlc-subtitle');
 if (dlcLabel) dlcLabel.textContent = typeCookies === 'crus' ? 'Cookies crus · À consommer avant le :' : 'Cookies cuits · À consommer avant le :';
-// DLC cakes : afficher un 2ème bloc DLC si cakes présents
+// DLC cakes : afficher la 2ème ligne DLC dans le même cadre rouge si cakes présents
 const hasCakesBon = lots.some(function(l){ return l.isCake; });
-const dlcCakeSection = document.getElementById('bon-dlc-cake-section');
-if(hasCakesBon){
-  if(!dlcCakeSection){
-    var dlcMain = document.getElementById('bon-dlc')?.closest('div');
-    if(dlcMain){
-      var dlcCakeDiv = document.createElement('div');
-      dlcCakeDiv.id = 'bon-dlc-cake-section';
-      dlcCakeDiv.style.cssText = 'background:#fffdf5;border:1px solid #f5e9d0;border-radius:10px;padding:12px 16px;margin-top:8px;display:flex;justify-content:space-between;align-items:center';
-      var dlcCakeDate = new Date(); dlcCakeDate.setDate(dlcCakeDate.getDate()+4);
-      var dlcCakeStr = dlcCakeDate.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
-      dlcCakeDiv.innerHTML = '<div><div style="font-size:11px;font-weight:700;color:#a07000">🧁 Date Limite — Cakes</div><div class="dlc-cake-subtitle" style="font-size:10px;color:#b8860b;margin-top:2px">Cakes · À consommer avant le :</div></div><div style="font-size:20px;font-weight:700;color:#a07000">'+dlcCakeStr+'</div>';
-      dlcMain.parentNode.insertBefore(dlcCakeDiv, dlcMain.nextSibling);
-    }
+const dlcCakeRow = document.getElementById('bon-dlc-cake-row');
+const dlcCakeVal = document.getElementById('bon-dlc-cake');
+if(dlcCakeRow && dlcCakeVal){
+  if(hasCakesBon){
+    var dlcCakeDate = new Date(); dlcCakeDate.setDate(dlcCakeDate.getDate()+4);
+    dlcCakeVal.textContent = dlcCakeDate.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    dlcCakeRow.style.display = 'flex';
+  } else {
+    dlcCakeRow.style.display = 'none';
   }
-} else if(dlcCakeSection){ dlcCakeSection.remove(); }
+}
 
 } // fermeture de showBonLivraison
 
