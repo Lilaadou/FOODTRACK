@@ -3907,6 +3907,8 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
 
   // Mettre à jour le header en fonction des colonnes réelles
   const bonHead = document.getElementById('bon-lots-head');
+  const hasCakesInLots = lots.some(function(l){ return l.isCake; });
+  const hasCookiesInLots = lots.some(function(l){ return !l.isCake; });
   if (bonHead) {
     const thBase = 'padding:8px 14px;font-size:12px;font-weight:600;color:#000;border-bottom:1px solid #d9e7f4;';
     bonHead.innerHTML = '<tr>'
@@ -3914,6 +3916,8 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
       + '<th style="'+thBase+'text-align:left">Saveur</th>'
       + (showBig   ? '<th style="'+thBase+'text-align:right">Big (165g)</th>'   : '')
       + (showSmall ? '<th style="'+thBase+'text-align:right">Small (80g)</th>' : '')
+      + (hasCakesInLots && !hasCookiesInLots ? '<th style="'+thBase+'text-align:right;color:#a07000">Qté</th>' : '')
+      + (hasCakesInLots && hasCookiesInLots  ? '<th style="'+thBase+'text-align:right;color:#a07000">Qté cake</th>' : '')
       + '</tr>';
   }
 
@@ -3936,7 +3940,8 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
         +'<td style="'+tdBase2+'font-weight:700;color:#000">'+l.code+'</td>'
         +'<td style="'+tdBase2+'"><span style="display:inline-block;background:#fff3cc;color:#a07000;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">🧁 '+l.saveur+'</span></td>'
         +(showBig   ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
-        +(showSmall ? '<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>' : '<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>')
+        +(showSmall ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
+        +'<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>'
         +'</tr>';
     }).join('');
   }
@@ -3945,18 +3950,30 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   // Totaux : afficher uniquement ce qui est > 0
   const totauxEl = document.getElementById('bon-totaux-section');
   if (totauxEl) {
-    const tot = totalBig + totalSmall;
+    const totalCakeQte = cakeLotsBon.reduce(function(a,l){ return a+(l.qte||0); }, 0);
+    const totCookies = totalBig + totalSmall;
     const line = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;color:#000;border-bottom:1px solid #d6e6f5;';
-    totauxEl.innerHTML = '<div style="width:300px;max-width:100%;background:#eef5fc;border-radius:10px;padding:4px 18px">'
-      + (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span style="font-weight:700;color:#0c447c">' + totalBig + '</span></div>' : '')
-      + (showSmall ? '<div style="'+line+'"><span>Total Small (80g)</span><span style="font-weight:700;color:#0c447c">' + totalSmall + '</span></div>' : '')
-      + '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#0662aa">Total</span><span style="color:#0662aa">' + tot + ' cookie' + (tot > 1 ? 's' : '') + '</span></div>'
-      + '</div>';
+    const lineCake = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;color:#000;border-bottom:1px solid #f5e9d0;';
+    let html = '<div style="width:300px;max-width:100%;background:#eef5fc;border-radius:10px;padding:4px 18px;margin-bottom:' + (totalCakeQte>0?'8px':'0') + '">';
+    if(hasCookiesInLots){
+      html += (showBig   ? '<div style="'+line+'"><span>Total Big (165g)</span><span style="font-weight:700;color:#0c447c">' + totalBig + '</span></div>' : '');
+      html += (showSmall ? '<div style="'+line+'"><span>Total Small (80g)</span><span style="font-weight:700;color:#0c447c">' + totalSmall + '</span></div>' : '');
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#0662aa">Total cookies</span><span style="color:#0662aa">' + totCookies + ' cookie' + (totCookies > 1 ? 's' : '') + '</span></div>';
+    }
+    html += '</div>';
+    if(totalCakeQte > 0){
+      html += '<div style="width:300px;max-width:100%;background:#fffbf0;border:0.5px solid #f5e9d0;border-radius:10px;padding:4px 18px">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:15px;font-weight:700"><span style="color:#a07000">Total cakes</span><span style="color:#a07000">' + totalCakeQte + ' cake' + (totalCakeQte > 1 ? 's' : '') + '</span></div>';
+      html += '</div>';
+    }
+    totauxEl.innerHTML = html;
   }
 
   // Boîtes : juste la quantité totale
   const bonBoitesSection = document.getElementById('bon-boites-section');
-  if (boites > 0) {
+  const boitesCookiesSeulement = hasCookiesInLots ? boites : 0;
+  if (boitesCookiesSeulement > 0) {
+    boites = boitesCookiesSeulement;
     bonBoitesSection.style.display = '';
     bonBoitesSection.style.background = '#eef5fc';
     if (typeBoite === 'blanche') {
