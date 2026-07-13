@@ -587,7 +587,7 @@
   <button class="nav-item" id="nav-production" onclick="showPage('production',this)"><i class="ti ti-building-factory nav-icon" aria-hidden="true"></i> Production</button>
   <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)"><i class="ti ti-package nav-icon" aria-hidden="true"></i> Stock cookies</button>
   <button class="nav-item" id="nav-ingredients" onclick="showPage('ingredients',this)"><i class="ti ti-salt nav-icon" aria-hidden="true"></i> Stock ingrédients</button>
-  <button class="nav-item" id="nav-frigo" onclick="showPage('frigo',this)"><i class="ti ti-snowflake nav-icon" aria-hidden="true"></i> Frigo / Sorties</button>
+  <button class="nav-item" id="nav-frigo" onclick="showPage('frigo',this)"><i class="ti ti-snowflake nav-icon" aria-hidden="true"></i> Sorties frigo</button>
   <button class="nav-item" id="nav-frigoLive" onclick="showPage('frigoLive',this)"><i class="ti ti-live-view nav-icon" aria-hidden="true"></i> Frigo live</button>
   
 
@@ -1273,6 +1273,7 @@
         <div style="display:inline-flex;border:1.5px solid #e6e6e6;border-radius:10px;overflow:hidden">
           <button type="button" id="livreur-opt-tarik" onclick="setLivreurB2B('Tarik')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#d44218;color:#fff">🚗 Tarik</button>
           <button type="button" id="livreur-opt-shippr" onclick="setLivreurB2B('Shippr')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;background:#fff;color:#666">📦 Shippr</button>
+          <button type="button" id="livreur-opt-interne" onclick="setLivreurB2B('Livreur interne')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;background:#fff;color:#666">🏠 Livreur interne</button>
         </div>
       </div>
       <div id="boites-section-b2b" style="display:none;margin-bottom:13px">
@@ -1309,6 +1310,54 @@
           <div style="font-size:28px;font-weight:700;color:#1a7a3a" id="boites-ixelles-display">0</div>
         </div>
       </div>
+
+<!-- Sélecteur produit B2B : Cookie / Cake / Les deux -->
+<div id="b2b-produit-section" style="display:none;margin-bottom:13px">
+  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
+    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
+      🛒 Que commande le client ?
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
+      <label id="label-prod-cookie" onclick="selectProduitB2B('cookie')" style="padding:14px 12px;cursor:pointer;border-right:0.5px solid #e8e8e8;background:#fbe8e2;border-bottom:2px solid #d44218">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div id="dot-prod-cookie" style="width:14px;height:14px;border-radius:50%;border:2px solid #d44218;background:#d44218;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:5px;height:5px;border-radius:50%;background:#fff"></div></div>
+          <span style="font-size:13px;font-weight:700;color:#712b13">🍪 Cookies</span>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-left:22px">Big & Small</div>
+      </label>
+      <label id="label-prod-cake" onclick="selectProduitB2B('cake')" style="padding:14px 12px;cursor:pointer;border-right:0.5px solid #e8e8e8">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div id="dot-prod-cake" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:13px;font-weight:700;color:#1a1a2e">🧁 Cakes</span>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-left:22px">Format unique</div>
+      </label>
+      <label id="label-prod-both" onclick="selectProduitB2B('both')" style="padding:14px 12px;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div id="dot-prod-both" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:13px;font-weight:700;color:#1a1a2e">🍪🧁 Les deux</span>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-left:22px">Cookies & Cakes</div>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Bloc cakes B2B -->
+<div id="b2b-cake-section" style="display:none;margin-bottom:13px">
+  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
+    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
+      🧁 Cakes — Choisir les lots
+    </div>
+    <div style="padding:10px 14px" id="cake-lots-container">
+      <div style="text-align:center;color:#bbb;font-size:12px;padding:10px 0">Chargement des lots cakes…</div>
+    </div>
+    <div style="padding:10px 14px;border-top:0.5px solid #f0f0f0;background:#fffdf7">
+      <div style="font-size:12px;font-weight:700;color:#a07000;margin-bottom:4px">📅 DLC cakes</div>
+      <div id="cake-dlc-display" style="font-size:14px;font-weight:700;color:#a07000">— · + 4 jours</div>
+    </div>
+  </div>
+</div>
 
 <!-- Préétape B2B — Grands ou Baby seulement -->
 <div id="b2b-preetape-section" style="display:none;margin-bottom:13px">
@@ -2353,7 +2402,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxUT8g1ArpDU_vV3LKDVudST_0jM3X7DZa4CCdFK7fG0fqLjHHbJENDEZoGQ8K9uZCOPg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxXb3Ko9aEVggjHDTrJaW4HCp2quIxxxcblFQTdvAggG7H5VG_aHcp8NbwQxWiqxiXbAg/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -2382,7 +2431,7 @@ const PROFILES = {
   Anderlecht:{ color:'#0662aa', initial:'AN', role:'Magasin Anderlecht', pages: ANDERLECHT_PAGES },
 };
 
-const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Frigo / Sorties', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles' };
+const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Sorties frigo', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder', Production:'Production',
@@ -3487,6 +3536,92 @@ function getAllSaveursLots() {
   return result;
 }
 
+// Noms des variétés cake (pour correspondance avec GDATA)
+var CAKE_VAR_NAMES = ['Brownie','Banana bread','Carrot cake','Muffin myrtille','Cake citron'];
+
+function selectProduitB2B(type) {
+  window._b2bProduit = type;
+  var cookieSection  = document.getElementById('b2b-preetape-section');
+  var cookieType     = document.getElementById('type-cookies-section');
+  var cookieSaveurs  = document.querySelector('.saveurs-blocks-wrapper') || document.getElementById('saveurs-blocks')?.parentElement;
+  var cakeSection    = document.getElementById('b2b-cake-section');
+  var preetape       = document.getElementById('b2b-preetape-section');
+  var cols = ['cookie','cake','both'];
+  var lblOn  = {cookie:'#fbe8e2',cake:'#fffff0',both:'#f0f7f0'};
+  var brdOn  = {cookie:'#d44218',cake:'#a07000',both:'#2e7d46'};
+  var clrOn  = {cookie:'#712b13',cake:'#5a4000',both:'#173404'};
+  cols.forEach(function(c){
+    var lbl=document.getElementById('label-prod-'+c), dot=document.getElementById('dot-prod-'+c);
+    var active=(c===type);
+    if(lbl){ lbl.style.background=active?lblOn[type]:''; lbl.style.borderBottom=active?'2px solid '+brdOn[type]:'none'; }
+    if(dot){ dot.style.border='2px solid '+(active?brdOn[type]:'#e8e8e8'); dot.style.background=active?brdOn[type]:''; dot.innerHTML=active?'<div style="width:5px;height:5px;border-radius:50%;background:#fff"></div>':''; }
+  });
+  var showCookies = (type==='cookie'||type==='both');
+  var showCakes   = (type==='cake'  ||type==='both');
+  if(preetape)   preetape.style.display    = showCookies ? '' : 'none';
+  if(cookieType) cookieType.style.display  = showCookies ? '' : 'none';
+  if(cakeSection){ cakeSection.style.display = showCakes ? '' : 'none'; if(showCakes) loadCakeLots(); }
+  // masquer bloc saveurs cookies si cake seul
+  var saveursRow = document.getElementById('saveurs-blocks-row');
+  if(!saveursRow){ saveursRow=document.getElementById('saveurs-blocks')?.closest('div[style*="margin-bottom:13px"]'); }
+  if(saveursRow) saveursRow.style.display = showCookies ? '' : 'none';
+}
+
+function loadCakeLots() {
+  var container = document.getElementById('cake-lots-container');
+  if(!container) return;
+  // GDATA = données cakes chargées depuis Sheets (via loadGateaux)
+  var data = (typeof GDATA !== 'undefined') ? GDATA : [];
+  // agrégat par lot : un même code lot peut avoir plusieurs lignes (cas rare)
+  var map = {};
+  data.forEach(function(d){
+    if(!d.codeLot) return;
+    if(!map[d.codeLot]) map[d.codeLot]={ codeLot:d.codeLot, nom:d.nom||d.produit||d.code||'', qte:0, date:d.date||'' };
+    map[d.codeLot].qte += Number(d.qte)||0;
+  });
+  var lots = Object.values(map).filter(function(l){ return l.qte > 0; }).sort(function(a,b){
+    return String(a.codeLot).localeCompare(String(b.codeLot));
+  });
+  if(!lots.length){
+    container.innerHTML = '<div style="text-align:center;color:#d44218;font-size:12px;padding:10px 0">⚠️ Aucun lot cake en stock — produisez des cakes avant la livraison.</div>';
+    return;
+  }
+  var html = '<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid #efefef;margin-bottom:6px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px"><span>Code lot</span><span style="text-align:center">Stock</span><span style="text-align:center;color:#a07000">Quantité</span></div>';
+  lots.forEach(function(l){
+    var sid = 'cake-qty-'+l.codeLot.replace(/[^a-zA-Z0-9]/g,'_');
+    html += '<div style="display:grid;grid-template-columns:2fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">'+
+      '<div><div style="font-weight:600;font-size:12px">'+l.codeLot+'</div><div style="font-size:10px;color:#888">'+l.nom+'</div></div>'+
+      '<div style="text-align:center;font-size:12px;color:#888">'+l.qte+'</div>'+
+      '<div style="text-align:center"><input type="number" id="'+sid+'" data-lot="'+l.codeLot+'" data-nom="'+l.nom+'" data-max="'+l.qte+'" min="0" max="'+l.qte+'" placeholder="0" '+
+        'style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none" '+
+        'onfocus="this.style.borderColor=&quot;#a07000&quot;" onblur="this.style.borderColor=&quot;#e8e8e8&quot;" oninput="updateCakeDLC()"></div>'+
+    '</div>';
+  });
+  container.innerHTML = html;
+  updateCakeDLC();
+}
+
+function updateCakeDLC() {
+  var d = new Date(); d.setDate(d.getDate()+4);
+  var dlc = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var el = document.getElementById('cake-dlc-display');
+  if(el) el.textContent = dlc + ' · + 4 jours';
+}
+
+function getCakeLots() {
+  var result = [];
+  document.querySelectorAll('#cake-lots-container input[type=number]').forEach(function(inp){
+    var qty = parseInt(inp.value)||0;
+    if(qty > 0) result.push({ code: inp.dataset.lot, saveur: inp.dataset.nom, big:0, small:0, qte:qty, isCake:true });
+  });
+  return result;
+}
+
+function getCakeDLCStr() {
+  var d = new Date(); d.setDate(d.getDate()+4);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
 function toggleDestination() {
   const type = document.getElementById('sortie-type').value;
   document.getElementById('b2b-client-group').style.display = type === 'b2b' ? '' : 'none';
@@ -3497,6 +3632,10 @@ function toggleDestination() {
   if (autreGroup) autreGroup.style.display = type === 'autre' ? '' : 'none';
   document.getElementById('boites-section-b2b').style.display = type === 'b2b' ? '' : 'none';
   { var _lg=document.getElementById('b2b-livreur-group'); if(_lg)_lg.style.display = type === 'b2b' ? '' : 'none'; }
+  var _ps=document.getElementById('b2b-produit-section');
+  if(_ps){ _ps.style.display = type === 'b2b' ? '' : 'none';
+    if(type === 'b2b'){ if(!window._b2bProduit) selectProduitB2B('cookie'); else selectProduitB2B(window._b2bProduit); }
+  }
   const typeCookiesSection = document.getElementById('type-cookies-section');
   if (typeCookiesSection) {
     typeCookiesSection.style.display = type === 'b2b' ? '' : 'none';
@@ -3778,7 +3917,9 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
       + '</tr>';
   }
 
-  document.getElementById('bon-lots-body').innerHTML = lots.map(l => {
+  const cookieLots = lots.filter(function(l){ return !l.isCake; });
+  const cakeLotsBon = lots.filter(function(l){ return l.isCake; });
+  let bonHtml = cookieLots.map(l => {
     const saveurLot = l.saveur || saveur;
     const tdBase = 'padding:9px 14px;border-bottom:1px solid #d9e7f4;';
     return '<tr>'
@@ -3788,6 +3929,18 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
       + (showSmall ? '<td style="'+tdBase+'text-align:right;font-weight:700;color:#0c447c">' + (l.small||0) + '</td>' : '')
       + '</tr>';
   }).join('');
+  if(cakeLotsBon.length){
+    const tdBase2='padding:9px 14px;border-bottom:1px solid #f5e9d0;';
+    bonHtml += cakeLotsBon.map(function(l){
+      return '<tr style="background:#fffdf5">'
+        +'<td style="'+tdBase2+'font-weight:700;color:#000">'+l.code+'</td>'
+        +'<td style="'+tdBase2+'"><span style="display:inline-block;background:#fff3cc;color:#a07000;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:20px">🧁 '+l.saveur+'</span></td>'
+        +(showBig   ? '<td style="'+tdBase2+'text-align:right;color:#aaa">—</td>' : '')
+        +(showSmall ? '<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>' : '<td style="'+tdBase2+'text-align:right;font-weight:700;color:#a07000">'+l.qte+'</td>')
+        +'</tr>';
+    }).join('');
+  }
+  document.getElementById('bon-lots-body').innerHTML = bonHtml;
 
   // Totaux : afficher uniquement ce qui est > 0
   const totauxEl = document.getElementById('bon-totaux-section');
@@ -3842,6 +3995,23 @@ const dlcEl = document.getElementById('bon-dlc');
 if (dlcEl) dlcEl.textContent = dlcStr;
 const dlcLabel = document.querySelector('.dlc-subtitle');
 if (dlcLabel) dlcLabel.textContent = typeCookies === 'crus' ? 'Cookies crus · À consommer avant le :' : 'Cookies cuits · À consommer avant le :';
+// DLC cakes : afficher un 2ème bloc DLC si cakes présents
+const hasCakesBon = lots.some(function(l){ return l.isCake; });
+const dlcCakeSection = document.getElementById('bon-dlc-cake-section');
+if(hasCakesBon){
+  if(!dlcCakeSection){
+    var dlcMain = document.getElementById('bon-dlc')?.closest('div');
+    if(dlcMain){
+      var dlcCakeDiv = document.createElement('div');
+      dlcCakeDiv.id = 'bon-dlc-cake-section';
+      dlcCakeDiv.style.cssText = 'background:#fffdf5;border:1px solid #f5e9d0;border-radius:10px;padding:12px 16px;margin-top:8px;display:flex;justify-content:space-between;align-items:center';
+      var dlcCakeDate = new Date(); dlcCakeDate.setDate(dlcCakeDate.getDate()+4);
+      var dlcCakeStr = dlcCakeDate.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      dlcCakeDiv.innerHTML = '<div><div style="font-size:11px;font-weight:700;color:#a07000">🧁 Date Limite — Cakes</div><div class="dlc-cake-subtitle" style="font-size:10px;color:#b8860b;margin-top:2px">Cakes · À consommer avant le :</div></div><div style="font-size:20px;font-weight:700;color:#a07000">'+dlcCakeStr+'</div>';
+      dlcMain.parentNode.insertBefore(dlcCakeDiv, dlcMain.nextSibling);
+    }
+  }
+} else if(dlcCakeSection){ dlcCakeSection.remove(); }
 
 } // fermeture de showBonLivraison
 
@@ -3983,9 +4153,20 @@ async function saveSortie() {
   if (!destination)                   { toast('sortie','⚠️ Choisissez une destination','err'); return; }
   if (type==='b2b' && !b2bClient)    { toast('sortie','⚠️ Choisissez un client B2B','err');   return; }
 
-  // Collecter toutes les saveurs et leurs lots
-  const saveursLots = getAllSaveursLots();
-  if (!saveursLots.length) { toast('sortie','⚠️ Ajoutez au moins une saveur avec des quantités','err'); return; }
+  // Collecter cookies
+  const produitB2B = window._b2bProduit || 'cookie';
+  const wantCookies = (produitB2B === 'cookie' || produitB2B === 'both');
+  const wantCakes   = (produitB2B === 'cake'   || produitB2B === 'both');
+  const saveursLots = wantCookies ? getAllSaveursLots() : [];
+  if (wantCookies && !saveursLots.length) { toast('sortie','⚠️ Ajoutez au moins une saveur avec des quantités','err'); return; }
+  // Collecter cakes
+  const cakeLots = type === 'b2b' && wantCakes ? getCakeLots() : [];
+  if (wantCakes && !cakeLots.length) { toast('sortie','⚠️ Entrez au moins une quantité de cake','err'); return; }
+  // Vérifier stock cakes
+  for (const cl of cakeLots) {
+    const stockEntry = (typeof GDATA !== 'undefined' ? GDATA : []).filter(d => d.codeLot === cl.code).reduce((a,d) => a + (Number(d.qte)||0), 0);
+    if (cl.qte > stockEntry) { toast('sortie','⚠️ Quantité dépasse le stock pour ' + cl.code, 'err'); return; }
+  }
 
   // Vérifier les stocks
   for (const { lots } of saveursLots) {
@@ -4040,21 +4221,33 @@ if (type === 'autre') {
   const typeCookiesSave = document.querySelector('input[name="type-cookies"]:checked')?.value || 'cuits';
   const livreurB2B = (type === 'b2b') ? (document.getElementById('sortie-livreur-b2b')?.value || 'Tarik') : '';
   if (type === 'b2b' && numeroBL) {
+    const allLotsBL = [
+      ...allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big||0, small: l.small||0, qte: null })),
+      ...cakeLots.map(cl => ({ saveur: cl.saveur, lot: cl.code, big: 0, small: 0, qte: cl.qte, isCake: true }))
+    ];
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
       action: 'sauverBL',
       numeroBL,
       client: destination,
-      lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
+      lots: allLotsBL,
       boites,
       sortiPar: livreur,
       livreurB2B,
       typeCookies: typeCookiesSave
     })}).catch(() => {});
+    // Décrémentation stock cake
+    cakeLots.forEach(function(cl){
+      fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerGateau', codeLot: cl.code }) }).catch(()=>{});
+      if(typeof GDATA !== 'undefined'){
+        var idx = GDATA.findIndex(function(d){ return d.codeLot===cl.code; });
+        if(idx >= 0){ GDATA[idx].qte = Math.max(0,(GDATA[idx].qte||0)-cl.qte); }
+      }
+    });
     blData.unshift({
       numeroBL,
       date: new Date().toISOString(),
       client: destination,
-      lots: allLotsAvecSaveur.map(l => ({ saveur: l.saveur, lot: l.code, big: l.big, small: l.small })),
+      lots: allLotsBL,
       boites,
       sortiPar: livreur,
       livreurB2B,
@@ -4118,7 +4311,8 @@ if (type === 'autre') {
       toast('sortie','✓ Sortie enregistrée !','ok');
       // Bon de livraison avec tous les lots
       if (type !== 'magasin' && type !== 'anderlecht') {
-        showBonLivraison({ client: destination, saveur: allSaveur, lots: allLotsAvecSaveur, boites, typeBoite, livreur, numeroBL, typeCookies: typeCookiesSave });
+        const allLotsForBon = [...allLotsAvecSaveur, ...cakeLots];
+showBonLivraison({ client: destination, saveur: allSaveur, lots: allLotsForBon, boites, typeBoite, livreur, numeroBL, typeCookies: typeCookiesSave });
       }
       resetSortie();
     } else {
@@ -9824,10 +10018,13 @@ function imprimerRecapMoisGlobal(){
 
 function setLivreurB2B(v){
   var inp=document.getElementById('sortie-livreur-b2b'); if(inp) inp.value=v;
-  var t=document.getElementById('livreur-opt-tarik'), s=document.getElementById('livreur-opt-shippr');
+  var t=document.getElementById('livreur-opt-tarik'), s=document.getElementById('livreur-opt-shippr'), i=document.getElementById('livreur-opt-interne');
+  var base='padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;';
+  var baseL='padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;';
   var on='background:#d44218;color:#fff', off='background:#fff;color:#666';
-  if(t) t.style.cssText='padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;'+(v==='Tarik'?on:off);
-  if(s) s.style.cssText='padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;'+(v==='Shippr'?on:off);
+  if(t) t.style.cssText=base +(v==='Tarik'?on:off);
+  if(s) s.style.cssText=baseL+(v==='Shippr'?on:off);
+  if(i) i.style.cssText=baseL+(v==='Livreur interne'?on:off);
 }
 
 /* ═══════════ CENTRE DE DOCUMENTS ═══════════ */
