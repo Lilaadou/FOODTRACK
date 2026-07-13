@@ -1312,6 +1312,7 @@
       </div>
 
 <!-- Sélecteur produit B2B : Cookie / Cake / Les deux -->
+<!-- Sélecteur produit B2B -->
 <div id="b2b-produit-section" style="display:none;margin-bottom:13px">
   <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
     <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
@@ -1343,90 +1344,85 @@
   </div>
 </div>
 
-<!-- Bloc cakes B2B -->
-<div id="b2b-cake-section" style="display:none;margin-bottom:13px">
-  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
-      🧁 Cakes — Choisir les lots
-    </div>
-    <div style="padding:10px 14px" id="cake-lots-container">
-      <div style="text-align:center;color:#bbb;font-size:12px;padding:10px 0">Chargement des lots cakes…</div>
-    </div>
-    <div style="padding:10px 14px;border-top:0.5px solid #f0f0f0;background:#fffdf7">
-      <div style="font-size:12px;font-weight:700;color:#a07000;margin-bottom:4px">📅 DLC cakes</div>
-      <div id="cake-dlc-display" style="font-size:14px;font-weight:700;color:#a07000">— · + 4 jours</div>
-    </div>
+<!-- Carte Cookies B2B (regroupée) -->
+<div id="b2b-cookie-card" style="display:none;margin-bottom:13px;border:0.5px solid #e8d8d8;border-top:2.5px solid #d44218;border-radius:12px;overflow:hidden">
+  <div style="padding:9px 14px;background:#fdf3f0;border-bottom:0.5px solid #f0d8d0;font-size:11px;font-weight:700;color:#8a3010;text-transform:uppercase;letter-spacing:.06em">
+    🍪 Cookies
   </div>
-</div>
-
-<!-- Préétape B2B — Grands ou Baby seulement -->
-<div id="b2b-preetape-section" style="display:none;margin-bottom:13px">
-  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
-      🍪 Le client prend-il des grands cookies ?
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr">
-      <label id="label-grands-oui" onclick="selectTypeCommande('oui')" style="padding:14px 16px;cursor:pointer;border-right:0.5px solid #e8e8e8">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <div id="dot-grands-oui" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">Oui — Grands + Baby</span>
+  <div style="padding:13px 14px">
+    <!-- Grand/Baby -->
+    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Le client prend-il des grands cookies ?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <label id="label-grands-oui" onclick="selectTypeCommande('oui')" style="padding:10px 12px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <div id="dot-grands-oui" style="width:13px;height:13px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:12.5px;font-weight:700;color:#1a1a2e">Oui — Grands + Baby</span>
         </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Affiche Big ET Small cookies</div>
+        <div style="font-size:11px;color:#aaa;margin-left:21px">Big ET Small cookies</div>
       </label>
-      <label id="label-grands-non" onclick="selectTypeCommande('non')" style="padding:14px 16px;cursor:pointer">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <div id="dot-grands-non" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">Non — Baby seulement</span>
+      <label id="label-grands-non" onclick="selectTypeCommande('non')" style="padding:10px 12px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <div id="dot-grands-non" style="width:13px;height:13px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:12.5px;font-weight:700;color:#1a1a2e">Non — Baby seulement</span>
         </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Uniquement Small cookies</div>
+        <div style="font-size:11px;color:#aaa;margin-left:21px">Uniquement Small cookies</div>
       </label>
     </div>
-  </div>
-</div>
-
-<!-- Type de cookies B2B -->
-<div id="type-cookies-section" style="display:none;margin-bottom:13px">
-  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px">
-      🕐 Type de livraison · DLC
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr">
-      <label id="label-cuits" style="padding:14px 16px;cursor:pointer;border-right:0.5px solid #e8e8e8;background:#fbe8e2;border-bottom:2px solid #d44218">
+    <!-- Type + DLC -->
+    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Type de livraison · DLC</div>
+    <div id="type-cookies-section" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <label id="label-cuits" style="padding:12px 14px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px;background:#fbe8e2;border-bottom:2px solid #d44218">
         <input type="radio" name="type-cookies" value="cuits" id="cookies-cuits" onchange="updateTypeCookies()" style="display:none">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div id="dot-cuits" style="width:14px;height:14px;border-radius:50%;border:2px solid #d44218;background:#d44218;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <div style="width:5px;height:5px;border-radius:50%;background:#fff"></div>
-          </div>
-          <span style="font-size:13px;font-weight:700;color:#712b13">🔥 Cookies cuits</span>
+          <div id="dot-cuits" style="width:13px;height:13px;border-radius:50%;border:2px solid #d44218;background:#d44218;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:4px;height:4px;border-radius:50%;background:#fff"></div></div>
+          <span style="font-size:12.5px;font-weight:700;color:#712b13">🔥 Cookies cuits</span>
         </div>
-        <div style="padding:8px 10px;background:#fff;border-radius:9px;text-align:center">
+        <div style="padding:7px 10px;background:#fff;border-radius:8px;text-align:center">
           <div style="font-size:10px;color:#993c1d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">DLC</div>
-          <div id="dlc-cuits-display" style="font-size:15px;font-weight:700;color:#712b13">—</div>
+          <div id="dlc-cuits-display" style="font-size:14px;font-weight:700;color:#712b13">—</div>
           <div style="font-size:10px;color:#b85d3a;margin-top:1px">+ 4 jours</div>
         </div>
       </label>
-      <label id="label-crus" style="padding:14px 16px;cursor:pointer">
+      <label id="label-crus" style="padding:12px 14px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px">
         <input type="radio" name="type-cookies" value="crus" id="cookies-crus" onchange="updateTypeCookies()" style="display:none">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div id="dot-crus" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">❄️ Cookies crus</span>
+          <div id="dot-crus" style="width:13px;height:13px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
+          <span style="font-size:12.5px;font-weight:700;color:#1a1a2e">❄️ Cookies crus</span>
         </div>
-        <div style="padding:8px 10px;background:#f7f8fa;border-radius:9px;text-align:center">
+        <div style="padding:7px 10px;background:#f7f8fa;border-radius:8px;text-align:center">
           <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">DLC</div>
-          <div id="dlc-crus-display" style="font-size:15px;font-weight:700;color:#aaa">—</div>
+          <div id="dlc-crus-display" style="font-size:14px;font-weight:700;color:#aaa">—</div>
           <div style="font-size:10px;color:#aaa;margin-top:1px">+ 3 mois</div>
         </div>
       </label>
     </div>
+    <!-- Saveurs -->
+    <div id="saveurs-blocks-row">
+      <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Saveurs & lots à sortir *</div>
+      <div id="saveurs-blocks"></div>
+      <button onclick="addSaveurBlock()" style="display:flex;align-items:center;gap:5px;background:#fbe8e2;color:#d44218;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px">+ Ajouter une saveur</button>
+    </div>
   </div>
 </div>
-      
-      <!-- Saveurs multiples -->
-      <div id="saveurs-blocks-row" style="margin-bottom:13px">
-        <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Saveurs & lots à sortir *</label>
-        <div id="saveurs-blocks"></div>
-        <button onclick="addSaveurBlock()" style="display:flex;align-items:center;gap:5px;background:#fbe8e2;color:#d44218;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px">+ Ajouter une saveur</button>
+
+<!-- Carte Cakes B2B -->
+<div id="b2b-cake-section" style="display:none;margin-bottom:13px;border:0.5px solid #e8dfc0;border-top:2.5px solid #ba7517;border-radius:12px;overflow:hidden">
+  <div style="padding:9px 14px;background:#fffbf0;border-bottom:0.5px solid #f0e8c0;font-size:11px;font-weight:700;color:#7a4d00;text-transform:uppercase;letter-spacing:.06em">
+    🧁 Cakes
+  </div>
+  <div style="padding:13px 14px">
+    <div id="cake-lots-container">
+      <div style="text-align:center;color:#bbb;font-size:12px;padding:10px 0">Chargement des lots cakes…</div>
+    </div>
+    <div style="margin-top:10px;background:#faeeda;border-radius:9px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#633806">📅 DLC cakes</div>
+        <div style="font-size:10.5px;color:#854f0b;margin-top:2px">À consommer avant le :</div>
       </div>
+      <div id="cake-dlc-display" style="font-size:15px;font-weight:700;color:#633806">— · + 4 jours</div>
+    </div>
+  </div>
+</div>
 
       <div class="form-footer">
         <button class="btn btn-primary" onclick="saveSortie()">💾 Enregistrer + Bon de livraison</button>
@@ -3541,16 +3537,9 @@ var CAKE_VAR_NAMES = ['Brownie','Banana bread','Carrot cake','Muffin myrtille','
 
 function selectProduitB2B(type) {
   window._b2bProduit = type;
-  var cookieSection  = document.getElementById('b2b-preetape-section');
-  var cookieType     = document.getElementById('type-cookies-section');
-  var cookieSaveurs  = document.querySelector('.saveurs-blocks-wrapper') || document.getElementById('saveurs-blocks')?.parentElement;
-  var cakeSection    = document.getElementById('b2b-cake-section');
-  var preetape       = document.getElementById('b2b-preetape-section');
-  var cols = ['cookie','cake','both'];
-  var lblOn  = {cookie:'#fbe8e2',cake:'#fffff0',both:'#f0f7f0'};
-  var brdOn  = {cookie:'#d44218',cake:'#a07000',both:'#2e7d46'};
-  var clrOn  = {cookie:'#712b13',cake:'#5a4000',both:'#173404'};
-  cols.forEach(function(c){
+  var lblOn  = {cookie:'#fbe8e2',cake:'#fffbf0',both:'#f0f7f0'};
+  var brdOn  = {cookie:'#d44218',cake:'#ba7517',both:'#2e7d46'};
+  ['cookie','cake','both'].forEach(function(c){
     var lbl=document.getElementById('label-prod-'+c), dot=document.getElementById('dot-prod-'+c);
     var active=(c===type);
     if(lbl){ lbl.style.background=active?lblOn[type]:''; lbl.style.borderBottom=active?'2px solid '+brdOn[type]:'none'; }
@@ -3558,12 +3547,10 @@ function selectProduitB2B(type) {
   });
   var showCookies = (type==='cookie'||type==='both');
   var showCakes   = (type==='cake'  ||type==='both');
-  if(preetape)   preetape.style.display    = showCookies ? '' : 'none';
-  if(cookieType) cookieType.style.display  = showCookies ? '' : 'none';
-  if(cakeSection){ cakeSection.style.display = showCakes ? '' : 'none'; if(showCakes) loadCakeLots(); }
-  // masquer bloc saveurs cookies si cake seul
-  var saveursRow = document.getElementById('saveurs-blocks-row');
-  if(saveursRow) saveursRow.style.display = showCookies ? '' : 'none';
+  var cookieCard = document.getElementById('b2b-cookie-card');
+  var cakeCard   = document.getElementById('b2b-cake-section');
+  if(cookieCard) cookieCard.style.display = showCookies ? '' : 'none';
+  if(cakeCard){  cakeCard.style.display   = showCakes ? '' : 'none'; if(showCakes) loadCakeLots(); }
 }
 
 function loadCakeLots() {
@@ -3638,22 +3625,22 @@ function getCakeDLCStr() {
 function toggleDestination() {
   const type = document.getElementById('sortie-type').value;
   document.getElementById('b2b-client-group').style.display = type === 'b2b' ? '' : 'none';
-  const preetape = document.getElementById('b2b-preetape-section');
-  if (preetape) preetape.style.display = type === 'b2b' ? '' : 'none';
   window._b2bTypeCommande = 'oui';
   const autreGroup = document.getElementById('autre-dest-group');
   if (autreGroup) autreGroup.style.display = type === 'autre' ? '' : 'none';
   document.getElementById('boites-section-b2b').style.display = type === 'b2b' ? '' : 'none';
   { var _lg=document.getElementById('b2b-livreur-group'); if(_lg)_lg.style.display = type === 'b2b' ? '' : 'none'; }
   var _ps=document.getElementById('b2b-produit-section');
-  if(_ps){ _ps.style.display = type === 'b2b' ? '' : 'none';
-    if(type === 'b2b'){ window._b2bProduit = null; selectProduitB2B('cookie'); }
+  if(_ps){ _ps.style.display = type === 'b2b' ? '' : 'none'; }
+  if(type !== 'b2b'){
+    var _cc=document.getElementById('b2b-cookie-card');
+    var _ck=document.getElementById('b2b-cake-section');
+    if(_cc) _cc.style.display='none';
+    if(_ck) _ck.style.display='none';
+  } else {
+    window._b2bProduit = null; selectProduitB2B('cookie');
   }
-  const typeCookiesSection = document.getElementById('type-cookies-section');
-  if (typeCookiesSection) {
-    typeCookiesSection.style.display = type === 'b2b' ? '' : 'none';
-    if (type !== 'b2b') document.querySelectorAll('input[name="type-cookies"]').forEach(r => r.checked = false);
-  }
+  if (type !== 'b2b') document.querySelectorAll('input[name="type-cookies"]').forEach(r => r.checked = false);
   document.getElementById('boites-section-opt').style.display     = (type === 'evenement' || type === 'interne') ? '' : 'none';
   document.getElementById('boites-section-ixelles').style.display = (type === 'magasin' || type === 'anderlecht') ? '' : 'none';
   const tog = document.getElementById('boites-opt-toggle');
