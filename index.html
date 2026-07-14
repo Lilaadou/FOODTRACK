@@ -10473,8 +10473,9 @@ var _tarikManuelles = [];
 async function loadTarikManuelles(){
   try{
     var data = await fetchAPI('getTarikManuelles');
-    _tarikManuelles = Array.isArray(data) ? data : [];
-  }catch(e){ _tarikManuelles = []; }
+    if(Array.isArray(data)) _tarikManuelles = data;
+    // si le backend renvoie une erreur (pas encore déployé), on garde ce qu'on a en mémoire
+  }catch(e){ /* garder l'existant */ }
 }
 
 async function ajouterLivraisonTarikManuelle(){
@@ -10484,20 +10485,20 @@ async function ajouterLivraisonTarikManuelle(){
   var date = dEl ? dEl.value : '';
   var montant = mEl ? parseFloat(mEl.value) : 0;
   var desc = descEl ? descEl.value.trim() : '';
-  if(!date){ if(typeof toast==='function') toast('tarik','Choisis une date','err'); else alert('Choisis une date'); return; }
-  if(!montant || montant<=0){ if(typeof toast==='function') toast('tarik','Montant invalide','err'); else alert('Montant invalide'); return; }
+  if(!date){ alert('Choisis une date'); return; }
+  if(!montant || montant<=0){ alert('Montant invalide'); return; }
 
-  // Optimiste : on ajoute localement puis on envoie
+  // Ajout local immédiat
+  if(!Array.isArray(_tarikManuelles)) _tarikManuelles = [];
   _tarikManuelles.push({ date:date, montant:montant, description:desc });
   if(mEl) mEl.value=''; if(descEl) descEl.value='';
   renderTarikTracker();
 
+  // Envoi au backend (best-effort). On NE recharge pas derrière pour ne pas
+  // écraser l'ajout local si le backend n'est pas encore déployé.
   try{
     await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverTarikManuelle', date:date, montant:montant, description:desc }) });
-    if(typeof toast==='function') toast('tarik','Livraison manuelle ajoutée','ok');
   }catch(e){}
-  await loadTarikManuelles();
-  renderTarikTracker();
 }
 
 async function supprimerLivraisonTarikManuelle(date, montant, desc){
