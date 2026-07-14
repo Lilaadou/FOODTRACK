@@ -2176,6 +2176,31 @@
         </table>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">➕ Livraisons manuelles</div><div class="card-sub">Courses Tarik sans lien avec un BL B2B</div></div></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+        <div class="form-group" style="max-width:170px">
+          <label>Date</label>
+          <input type="date" id="tarik-manual-date">
+        </div>
+        <div class="form-group" style="max-width:170px">
+          <label>Montant HTVA (€)</label>
+          <input type="number" id="tarik-manual-montant" min="0" step="0.5" placeholder="Ex : 25">
+        </div>
+        <div class="form-group" style="flex:1;min-width:180px">
+          <label>Description (optionnel)</label>
+          <input type="text" id="tarik-manual-desc" placeholder="Ex : dépannage Ixelles, course spéciale…">
+        </div>
+        <button class="btn btn-primary" onclick="ajouterLivraisonTarikManuelle()" style="padding:10px 18px">Ajouter</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Date</th><th>Description</th><th style="text-align:right">HTVA</th><th></th></tr></thead>
+          <tbody id="tarik-manual-table"><tr><td colspan="4" class="empty">Aucune livraison manuelle ce mois-ci.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div><!-- /bl-sub-tarik -->
 </div>
   <!-- ══════════════════ RÉCAP MENSUEL B2B ══════════════════ -->
@@ -10433,6 +10458,7 @@ function setBlSub(sub){
     liv.style.display='none'; tar.style.display='';
     if(bT)bT.style.cssText=ON; if(bL)bL.style.cssText=OFF;
     renderTarikTracker();
+    if(typeof loadTarikManuelles==='function'){ loadTarikManuelles().then(renderTarikTracker); }
   } else {
     tar.style.display='none'; liv.style.display='';
     if(bL)bL.style.cssText=ON; if(bT)bT.style.cssText=OFF;
@@ -10441,6 +10467,51 @@ function setBlSub(sub){
 
 function tarikPrevMonth(){ _tarikState.m--; if(_tarikState.m<0){_tarikState.m=11;_tarikState.y--;} renderTarikTracker(); }
 function tarikNextMonth(){ _tarikState.m++; if(_tarikState.m>11){_tarikState.m=0;_tarikState.y++;} renderTarikTracker(); }
+
+var _tarikManuelles = [];
+
+async function loadTarikManuelles(){
+  try{
+    var data = await fetchAPI('getTarikManuelles');
+    _tarikManuelles = Array.isArray(data) ? data : [];
+  }catch(e){ _tarikManuelles = []; }
+}
+
+async function ajouterLivraisonTarikManuelle(){
+  var dEl = document.getElementById('tarik-manual-date');
+  var mEl = document.getElementById('tarik-manual-montant');
+  var descEl = document.getElementById('tarik-manual-desc');
+  var date = dEl ? dEl.value : '';
+  var montant = mEl ? parseFloat(mEl.value) : 0;
+  var desc = descEl ? descEl.value.trim() : '';
+  if(!date){ if(typeof toast==='function') toast('tarik','Choisis une date','err'); else alert('Choisis une date'); return; }
+  if(!montant || montant<=0){ if(typeof toast==='function') toast('tarik','Montant invalide','err'); else alert('Montant invalide'); return; }
+
+  // Optimiste : on ajoute localement puis on envoie
+  _tarikManuelles.push({ date:date, montant:montant, description:desc });
+  if(mEl) mEl.value=''; if(descEl) descEl.value='';
+  renderTarikTracker();
+
+  try{
+    await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverTarikManuelle', date:date, montant:montant, description:desc }) });
+    if(typeof toast==='function') toast('tarik','Livraison manuelle ajoutée','ok');
+  }catch(e){}
+  await loadTarikManuelles();
+  renderTarikTracker();
+}
+
+async function supprimerLivraisonTarikManuelle(date, montant, desc){
+  if(!confirm('Supprimer cette livraison manuelle ?')) return;
+  _tarikManuelles = _tarikManuelles.filter(function(x){
+    return !(String(x.date)===String(date) && Number(x.montant)===Number(montant) && String(x.description||'')===String(desc||''));
+  });
+  renderTarikTracker();
+  try{
+    await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerTarikManuelle', date:date, montant:montant, description:desc }) });
+  }catch(e){}
+  await loadTarikManuelles();
+  renderTarikTracker();
+}
 
 function renderTarikTracker(){
   var y=_tarikState.y, m=_tarikState.m;
@@ -10458,20 +10529,28 @@ function renderTarikTracker(){
   var prix=parseFloat((document.getElementById('tarik-prix')||{}).value)||0;
   var ajust=parseFloat((document.getElementById('tarik-ajust')||{}).value)||0;
 
+  // Livraisons manuelles du mois
+  var _parseD=function(v){ return (typeof _cdD==='function')?_cdD(v):new Date(v); };
+  var manuMois=(_tarikManuelles||[]).filter(function(x){
+    var d=_parseD(x.date);
+    return d && d.getFullYear()===y && d.getMonth()===m;
+  });
+  var totalManu=manuMois.reduce(function(s,x){ return s+(parseFloat(x.montant)||0); },0);
+
   var nb=list.length;
-  var htva=nb*prix + ajust;
+  var htva=nb*prix + ajust + totalManu;
   var tva=htva*0.21;
   var ttc=htva+tva;
   var fmt=function(n){ return n.toLocaleString('fr-BE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
 
   var set=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
-  set('tarik-nb', nb);
+  set('tarik-nb', nb + (manuMois.length?(' + '+manuMois.length+' man.'):''));
   set('tarik-htva', fmt(htva));
   set('tarik-tva', fmt(tva));
   set('tarik-ttc', fmt(ttc));
   var sub=document.getElementById('tarik-nb-sub'); if(sub) sub.textContent=(typeof _MOISFR!=='undefined'?_MOISFR[m]:'')+' '+y;
 
-  // Regrouper par jour
+  // Regrouper par jour (tournées B2B)
   var parJour={};
   list.forEach(function(bl){
     var d=(typeof _cdD==='function')?_cdD(bl.date):new Date(bl.date);
@@ -10497,6 +10576,27 @@ function renderTarikTracker(){
         '</tr>';
       }).join('')
       + (ajust!==0 ? '<tr><td colspan="3" style="text-align:right;color:#888;padding-top:8px">Ajustement (dépannage / retour)</td><td style="text-align:right;font-weight:700;color:#d44218;padding-top:8px">'+fmt(ajust)+'</td></tr>' : '');
+    }
+  }
+
+  // Table des livraisons manuelles
+  var mt=document.getElementById('tarik-manual-table');
+  if(mt){
+    if(!manuMois.length){
+      mt.innerHTML='<tr><td colspan="4" class="empty">Aucune livraison manuelle ce mois-ci.</td></tr>';
+    } else {
+      var manuTri=manuMois.slice().sort(function(a,b){ return String(a.date).localeCompare(String(b.date)); });
+      mt.innerHTML=manuTri.map(function(x){
+        var d=_parseD(x.date);
+        var dStr=(typeof _cdDayFull==='function' && d)?_cdDayFull(d):x.date;
+        var desc=(x.description||'').replace(/</g,'&lt;');
+        return '<tr>'+
+          '<td>'+dStr+'</td>'+
+          '<td style="color:#555">'+(desc||'<span style="color:#ccc">—</span>')+'</td>'+
+          '<td style="text-align:right;font-weight:700;color:#0c447c">'+fmt(parseFloat(x.montant)||0)+'</td>'+
+          '<td style="text-align:right"><button onclick="supprimerLivraisonTarikManuelle(\''+String(x.date).replace(/'/g,"")+'\','+(parseFloat(x.montant)||0)+',\''+String(x.description||'').replace(/'/g,"")+'\')" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:13px;padding:2px 8px;border-radius:6px" title="Supprimer">🗑️</button></td>'+
+        '</tr>';
+      }).join('');
     }
   }
 }
