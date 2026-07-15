@@ -2399,7 +2399,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzX_WjnW62OIceFIUkiVMKo94m7cy9AFRPMP6JpDCojhiByjQFAkHIeU7SSWZR7-ZwJdw/exec'; 
+const API = 'https://script.google.com/macros/s/AKfycbzX_WjnW62OIceFIUkiVMKo94m7cy9AFRPMP6JpDCojhiByjQFAkHIeU7SSWZR7-ZwJdw/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -8595,13 +8595,13 @@ function applyProduction(data) {
   };
 
   // Fusionner : localStorage en premier, puis les entrées API qui n'y sont pas déjà
-  // Les codes supprimés sont exclus des deux sources
+  // La liste "deleted" ne s'applique qu'aux entrées LOCALES : si une production
+  // existe réellement dans le Sheet (API), elle doit toujours s'afficher.
   const localFiltered = local.filter(r => !deletedCodes.has(r.code));
-  const localCodes = new Set(localFiltered.map(r => r.code));
   // Base API, complétée par les productions locales pas encore remontées dans l'API
   let base;
   if (apiData.length) {
-    const apiFiltered = apiData.filter(r => r.code !== '—' && !deletedCodes.has(r.code));
+    const apiFiltered = apiData.filter(r => r.code !== '—');
     const apiCodes = new Set(apiFiltered.map(r => r.code));
     const localOnly = localFiltered.filter(r => !apiCodes.has(r.code));
     base = localOnly.concat(apiFiltered);
