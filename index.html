@@ -6,7 +6,7 @@
   <title>KOOKI — Traçabilité</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#d44218">
+  <meta name="theme-color" content="#d44218" id="meta-theme-color">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kooki">
@@ -2540,8 +2540,11 @@ function applyMode(){
 }
 
 function _syncLogo(){
+  var isDelivery = (currentMode === 'delivery');
   var lg = document.getElementById('app-logo');
-  if(lg) lg.src = (currentMode === 'delivery') ? 'logo-bleu.png' : 'logo.png';
+  if(lg) lg.src = isDelivery ? 'logo-bleu.png' : 'logo.png';
+  var mt = document.getElementById('meta-theme-color');
+  if(mt) mt.setAttribute('content', isDelivery ? '#0662aa' : '#d44218');
 }
 
 function chooseMode(mode){
