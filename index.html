@@ -644,6 +644,11 @@
         <div class="search-results" id="search-results"></div>
       </div>
 
+      <div id="mode-quickswitch" onclick="toggleMode()" style="display:none;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s;margin-right:4px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'" title="Basculer entre Production et Delivery">
+        <span id="mode-quickswitch-icon" style="font-size:15px">🔀</span>
+        <span id="mode-quickswitch-label">Mode</span>
+      </div>
+
       <div class="bell">🔔<span class="bell-dot"></span></div>
 
       <!-- PROFILE -->
@@ -2545,6 +2550,31 @@ function _syncLogo(){
   if(lg) lg.src = isDelivery ? 'logo-bleu.png' : 'logo.png';
   var mt = document.getElementById('meta-theme-color');
   if(mt) mt.setAttribute('content', isDelivery ? '#0662aa' : '#d44218');
+  _syncQuickSwitch();
+}
+
+function _syncQuickSwitch(){
+  var qs = document.getElementById('mode-quickswitch');
+  if(!qs) return;
+  // Bouton visible seulement pour les profils qui ont les deux univers
+  if(!profileIsDual(currentProfile) || !currentMode){ qs.style.display = 'none'; return; }
+  qs.style.display = 'flex';
+  var lbl = document.getElementById('mode-quickswitch-label');
+  if(currentMode === 'delivery'){
+    // on est en delivery → le bouton propose de passer en production (rouge)
+    qs.style.background = '#fbe8e2';
+    if(lbl){ lbl.textContent = 'Passer en Production'; lbl.style.color = '#d44218'; }
+  } else {
+    // on est en production → le bouton propose de passer en delivery (bleu)
+    qs.style.background = '#e0edf8';
+    if(lbl){ lbl.textContent = 'Passer en Delivery'; lbl.style.color = '#0662aa'; }
+  }
+}
+
+function toggleMode(){
+  if(!profileIsDual(currentProfile)) return;
+  var next = (currentMode === 'delivery') ? 'production' : 'delivery';
+  chooseMode(next);
 }
 
 function chooseMode(mode){
@@ -2577,6 +2607,7 @@ function enterModeAfterLogin(name){
 function updateModeUI(){
   const btn = document.getElementById('switch-mode-btn');
   if(btn) btn.style.display = profileIsDual(currentProfile) ? 'flex' : 'none';
+  _syncQuickSwitch();
 }
 
 
