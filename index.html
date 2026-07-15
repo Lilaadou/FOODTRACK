@@ -1347,6 +1347,7 @@
     🍪 Cookies
   </div>
   <div style="padding:13px 14px">
+    <div id="b2b-only-cookie-options">
     <!-- Grand/Baby -->
     <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Le client prend-il des grands cookies ?</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
@@ -1393,6 +1394,7 @@
         </div>
       </label>
     </div>
+    </div><!-- /b2b-only-cookie-options -->
     <!-- Saveurs -->
     <div id="saveurs-blocks-row">
       <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Saveurs & lots à sortir *</div>
@@ -3622,12 +3624,21 @@ function toggleDestination() {
   { var _lg=document.getElementById('b2b-livreur-group'); if(_lg)_lg.style.display = type === 'b2b' ? '' : 'none'; }
   var _ps=document.getElementById('b2b-produit-section');
   if(_ps){ _ps.style.display = type === 'b2b' ? '' : 'none'; }
-  if(type !== 'b2b'){
-    var _cc=document.getElementById('b2b-cookie-card');
-    var _ck=document.getElementById('b2b-cake-section');
+  var _bo=document.getElementById('b2b-only-cookie-options');
+  var _cc=document.getElementById('b2b-cookie-card');
+  var _ck=document.getElementById('b2b-cake-section');
+  if(type === ''){
+    // Aucune destination choisie : tout masquer
     if(_cc) _cc.style.display='none';
+    if(_bo) _bo.style.display='none';
     if(_ck) _ck.style.display='none';
+  } else if(type !== 'b2b'){
+    if(_cc) _cc.style.display='';        // la carte cookie (avec saveurs & lots) reste visible pour toutes les destinations
+    if(_bo) _bo.style.display='none';    // mais on masque les options propres au B2B (Grand/Baby, type/DLC)
+    if(_ck) _ck.style.display='none';    // pas de cakes hors B2B
+    window._b2bTypeCommande = 'oui';     // par défaut Big+Small autorisés hors B2B
   } else {
+    if(_bo) _bo.style.display='';
     window._b2bProduit = null; selectProduitB2B('cookie');
   }
   if (type !== 'b2b') document.querySelectorAll('input[name="type-cookies"]').forEach(r => r.checked = false);
@@ -6830,6 +6841,8 @@ function renderBLTable(data) {
     style="background:#d44218;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🖨️</button>
   <button onclick="reimprimerEtiquettes('${bl.numeroBL}')"
     style="background:#e0edf8;color:#0662aa;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🏷️</button>
+  <button onclick="supprimerBL('${bl.numeroBL}')" title="Supprimer ce bon de livraison"
+    style="background:#f7f7f7;color:#c0392b;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🗑️</button>
 </td>
           </tr>`;
         }).join('')}
@@ -6846,6 +6859,24 @@ function renderBLTable(data) {
   document.getElementById('bl-total-big').textContent   = `Big : ${totalBig}`;
   document.getElementById('bl-total-small').textContent = `Small : ${totalSmall}`;
   document.getElementById('bl-total-boites').textContent = `Boîtes : ${totalBoites}`;
+}
+
+async function supprimerBL(numeroBL){
+  if(!confirm('Supprimer définitivement le bon de livraison '+numeroBL+' ?\n\nCette action est irréversible.')) return;
+
+  // Retrait local immédiat
+  if(Array.isArray(blData)){
+    blData = blData.filter(function(bl){ return String(bl.numeroBL)!==String(numeroBL); });
+  }
+  renderBLTable(blData);
+  updateBLStats(blData);
+  var _tw=document.getElementById('bl-sub-tarik');
+  if(_tw && _tw.style.display!=='none' && typeof renderTarikTracker==='function') renderTarikTracker();
+
+  // Suppression côté serveur (best-effort)
+  try{
+    await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerBL', numeroBL: numeroBL }) });
+  }catch(e){}
 }
 
 function filterBL(q) {
