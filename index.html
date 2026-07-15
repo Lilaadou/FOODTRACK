@@ -10410,29 +10410,29 @@ function imprimerIxellesSemaine(k){
   var byDay={}; arr.forEach(function(r){ var d=_cdD(r.date); var kk=d.toISOString().slice(0,10); (byDay[kk]=byDay[kk]||{d:d,rows:[]}).rows.push(r); });
   var days=Object.keys(byDay).sort();
   var flav={}; arr.forEach(function(r){ var q=Number(r.big)||0; flav[r.saveur]=(flav[r.saveur]||0)+q; });
-  var th='text-align:left;font-size:10px;color:#000;text-transform:uppercase;letter-spacing:.04em;font-weight:700;padding:6px 8px;border-bottom:1px solid #ddd';
+  var th='text-align:left;font-size:10px;color:#166534;text-transform:uppercase;letter-spacing:.04em;font-weight:700;padding:6px 8px;border-bottom:1px solid #cfe8d5';
   var thn=th+';text-align:right';
   var daysHTML=days.map(function(kk){ var g=byDay[kk]; var dck=g.rows.reduce(function(a,r){return a+(Number(r.big)||0);},0);
-    var rws=g.rows.map(function(r){ return '<tr><td style="padding:7px 8px;border-bottom:1px solid #f2f2f2"><span style="display:inline-block;font-size:11px;padding:3px 11px;border-radius:20px;font-weight:700;background:#ededed;color:#111">'+r.saveur+'</span></td>'+
-      '<td style="padding:7px 8px;border-bottom:1px solid #f2f2f2;font-size:12px">'+(r.lot||'—')+'</td>'+
-      '<td style="text-align:right;font-weight:700;color:#000;padding:7px 8px;border-bottom:1px solid #f2f2f2">'+(Number(r.big)||0)+'</td></tr>'; }).join('');
-    return '<div class="pgbrk" style="border:1px solid #e6e6e6;border-radius:10px;padding:12px 16px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px"><div style="font-size:13px;font-weight:700">🏪 '+_cdDayFull(g.d)+'</div><span style="background:#111;color:#fff;border-radius:8px;padding:3px 12px;font-size:12px;font-weight:700">'+dck+' cookies · '+Math.round(dck/40)+' bacs</span></div>'+
+    var rws=g.rows.map(function(r){ return '<tr><td style="padding:7px 8px;border-bottom:1px solid #eaf4ec"><span style="display:inline-block;font-size:11px;padding:3px 11px;border-radius:20px;font-weight:700;background:#dcf0e1;color:#1a6b32">'+r.saveur+'</span></td>'+
+      '<td style="padding:7px 8px;border-bottom:1px solid #eaf4ec;font-size:12px">'+(r.lot||'—')+'</td>'+
+      '<td style="text-align:right;font-weight:700;color:#1a6b32;padding:7px 8px;border-bottom:1px solid #eaf4ec">'+(Number(r.big)||0)+'</td></tr>'; }).join('');
+    return '<div class="pgbrk" style="border:1px solid #cfe8d5;border-radius:10px;padding:12px 16px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px"><div style="font-size:13px;font-weight:700;color:#166534">🏪 '+_cdDayFull(g.d)+'</div><span style="background:#2e9e52;color:#fff;border-radius:8px;padding:3px 12px;font-size:12px;font-weight:700">'+dck+' cookies · '+Math.round(dck/40)+' bacs</span></div>'+
       '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+th+'">Code lot</th><th style="'+thn+'">Cookies</th></tr></thead><tbody>'+rws+'</tbody></table></div>'; }).join('');
-  var flavHTML=Object.keys(flav).map(function(fn){ return '<tr><td style="font-weight:700;padding:8px;border-bottom:1px solid #f2f2f2">'+fn+'</td><td style="text-align:right;font-weight:700;color:#000;padding:8px;border-bottom:1px solid #f2f2f2">'+flav[fn]+'</td></tr>'; }).join('');
-  var html='<div style="background:#fff"><div style="background:#f2f2f2;padding:22px 40px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;border-bottom:1px solid #e6e6e6">'+
-    '<div><img src="'+_cdLogoNoir+'" style="height:52px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#111;margin-top:6px">BAKED WITH LOVE</div></div>'+
-    '<div style="text-align:right;font-size:12px;line-height:1.8;color:#000"><b>KOOKI COMPANY SRL</b><br>Avenue Emile Gryson 2D<br>1070 Anderlecht</div></div>'+
-    '<svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:18px;margin-top:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L794,0 L794,9 C635,24 476,3 317,12 C198,18 99,5 0,13 Z" fill="#f2f2f2"/></svg><div style="padding:20px 40px 24px"><div style="font-size:23px;color:#111">Livraisons Magasin Ixelles</div>'+
-    '<div style="font-size:14px;font-weight:700;color:#000;margin-top:2px">'+_cdWLbl(s)+'</div>'+
-    '<div style="background:#f4f4f4;border:1px solid #e6e6e6;border-radius:10px;padding:12px 18px;margin:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
-    '<div style="font-size:13px;font-weight:700;color:#111">'+days.length+' jour(s) de livraison</div>'+
-    '<div style="display:flex;gap:20px"><div style="text-align:center"><div style="font-size:19px;font-weight:700">'+ck+'</div><div style="font-size:10px">COOKIES</div></div>'+
-    '<div style="text-align:center"><div style="font-size:19px;font-weight:700">'+Math.round(ck/40)+'</div><div style="font-size:10px">BACS</div></div></div></div>'+
+  var flavHTML=Object.keys(flav).map(function(fn){ return '<tr><td style="font-weight:700;padding:8px;border-bottom:1px solid #eaf4ec">'+fn+'</td><td style="text-align:right;font-weight:700;color:#1a6b32;padding:8px;border-bottom:1px solid #eaf4ec">'+flav[fn]+'</td></tr>'; }).join('');
+  var html='<div style="background:#fff"><div style="background:#eaf7ee;padding:22px 40px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;border-bottom:1px solid #cfe8d5">'+
+    '<div><img src="'+_cdLogoNoir+'" style="height:52px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#166534;margin-top:6px">BAKED WITH LOVE</div></div>'+
+    '<div style="text-align:right;font-size:12px;line-height:1.8;color:#1a4d2e"><b>KOOKI COMPANY SRL</b><br>Avenue Emile Gryson 2D<br>1070 Anderlecht</div></div>'+
+    '<svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:18px;margin-top:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L794,0 L794,9 C635,24 476,3 317,12 C198,18 99,5 0,13 Z" fill="#eaf7ee"/></svg><div style="padding:20px 40px 24px"><div style="font-size:23px;color:#166534">Livraisons Magasin Ixelles</div>'+
+    '<div style="font-size:14px;font-weight:700;color:#1a6b32;margin-top:2px">'+_cdWLbl(s)+'</div>'+
+    '<div style="background:#eaf7ee;border:1px solid #cfe8d5;border-radius:10px;padding:12px 18px;margin:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
+    '<div style="font-size:13px;font-weight:700;color:#166534">'+days.length+' jour(s) de livraison</div>'+
+    '<div style="display:flex;gap:20px"><div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#1a6b32">'+ck+'</div><div style="font-size:10px;color:#1a4d2e">COOKIES</div></div>'+
+    '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#1a6b32">'+Math.round(ck/40)+'</div><div style="font-size:10px;color:#1a4d2e">BACS</div></div></div></div>'+
     daysHTML+
-    '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#000;margin:20px 0 6px">Total de la semaine par saveur</div>'+ 
+    '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#166534;margin:20px 0 6px">Total de la semaine par saveur</div>'+ 
     '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Saveur</th><th style="'+thn+'">Cookies</th></tr></thead><tbody>'+flavHTML+
-    '<tr><td style="border-top:1.5px solid #ccc;padding-top:9px;font-weight:700">TOTAL</td><td style="text-align:right;border-top:1.5px solid #ccc;padding-top:9px;font-weight:700">'+ck+'</td></tr></tbody></table>'+
-    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#f2f2f2"/></svg><div style="background:#f2f2f2;padding:24px 40px 32px;text-align:center;font-size:12px;color:#000;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Récap hebdomadaire des livraisons Ixelles</div></div>';
+    '<tr><td style="border-top:1.5px solid #a8d5b5;padding-top:9px;font-weight:700;color:#166534">TOTAL</td><td style="text-align:right;border-top:1.5px solid #a8d5b5;padding-top:9px;font-weight:700;color:#1a6b32">'+ck+'</td></tr></tbody></table>'+
+    '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#eaf7ee"/></svg><div style="background:#eaf7ee;padding:24px 40px 32px;text-align:center;font-size:12px;color:#1a4d2e;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Récap hebdomadaire des livraisons Ixelles</div></div>';
   _cdPrint(html, 'Ixelles-S'+_cdWNum(s)+'-'+s.getFullYear()+'.pdf');
 }
 
