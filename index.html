@@ -8580,13 +8580,39 @@ function applyProduction(data) {
   const apiData  = Array.isArray(data) ? data.map(normalise) : [];
   const local    = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
   const deletedCodes = new Set(JSON.parse(localStorage.getItem('kooki_productions_deleted') || '[]'));
+
+  // Parse robuste : gère l'ISO ET le format Google Sheets "dd/MM/yyyy HH:mm"
+  const parseDate = v => {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v) ? null : v;
+    var s = String(v).trim();
+    var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ]?(\d{2})?:?(\d{2})?/);
+    if (iso) return new Date(+iso[1], +iso[2]-1, +iso[3], +(iso[4]||0), +(iso[5]||0));
+    var fr = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+    if (fr) return new Date(+fr[3], +fr[2]-1, +fr[1], +(fr[4]||0), +(fr[5]||0));
+    var d = new Date(s);
+    return isNaN(d) ? null : d;
+  };
+
   // Fusionner : localStorage en premier, puis les entrées API qui n'y sont pas déjà
   // Les codes supprimés sont exclus des deux sources
   const localFiltered = local.filter(r => !deletedCodes.has(r.code));
   const localCodes = new Set(localFiltered.map(r => r.code));
-  const merged = (apiData.length 
-  ? apiData.filter(r => r.code !== '—' && !deletedCodes.has(r.code))
-  : localFiltered).sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Base API, complétée par les productions locales pas encore remontées dans l'API
+  let base;
+  if (apiData.length) {
+    const apiFiltered = apiData.filter(r => r.code !== '—' && !deletedCodes.has(r.code));
+    const apiCodes = new Set(apiFiltered.map(r => r.code));
+    const localOnly = localFiltered.filter(r => !apiCodes.has(r.code));
+    base = localOnly.concat(apiFiltered);
+  } else {
+    base = localFiltered;
+  }
+  // Enrichir chaque entrée d'une vraie Date parsée pour le tri/groupement
+  const merged = base.map(r => {
+    const pd = parseDate(r.date);
+    return Object.assign({}, r, { _d: pd });
+  }).sort((a, b) => (b._d ? b._d.getTime() : 0) - (a._d ? a._d.getTime() : 0));
 
   const tbody = document.getElementById('prod-table');
   if (!tbody) return;
@@ -8602,17 +8628,17 @@ function applyProduction(data) {
   let html = '';
 
   merged.forEach(r => {
-    const dateStr = r.date ? new Date(r.date).toDateString() : 'Inconnu';
+    const dateStr = r._d ? r._d.toDateString() : 'Inconnu';
     if (dateStr !== currentDay) {
       currentDay = dateStr;
       let label;
-      if (dateStr === today) label = '📅 Aujourd\'hui — ' + new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
-      else if (dateStr === yesterday) label = '📅 Hier — ' + new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
-      else label = '📅 ' + (r.date ? new Date(r.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : 'Date inconnue');
+      if (dateStr === today) label = '📅 Aujourd\'hui — ' + r._d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+      else if (dateStr === yesterday) label = '📅 Hier — ' + r._d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+      else label = '📅 ' + (r._d ? r._d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : 'Date inconnue');
       html += `<tr><td colspan="9" style="background:#f7f8fa;font-size:11px;font-weight:700;color:#888;padding:8px 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0f0f0">${label}</td></tr>`;
     }
     const color = '#d44218';
-    const dateFormatted = r.date ? new Date(r.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
+    const dateFormatted = r._d ? r._d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
    html += `<tr data-prod-code="${r.code}">
   <td><b>${r.code}</b>${dateFormatted ? `<div class="sub-text">${dateFormatted}</div>` : ''}</td>
   <td><span class="tag tag-o">${r.saveur}</span></td>
