@@ -148,6 +148,18 @@
     .btn{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
     .btn:hover{opacity:.85;}
     .btn-primary{background:#d44218;color:#fff;}
+
+    /* ═══ MODE DELIVERY : thème bleu ═══ */
+    body.mode-delivery .nav-item.active{background:#e0edf8;color:#0662aa;border-right-color:#0662aa;}
+    body.mode-delivery .nav-item:hover{background:#e8f1fb;color:#0662aa;}
+    body.mode-delivery .btn-primary{background:#0662aa;}
+    body.mode-delivery .search-bar:focus-within{border-color:#0662aa;}
+    body.mode-delivery .profile-btn:hover{border-color:#0662aa;}
+    body.mode-delivery .bell-dot{background:#0662aa;}
+    body.mode-delivery .view-all{color:#0662aa;}
+    body.mode-delivery .tag-o{background:#e0edf8;color:#0662aa;}
+    body.mode-delivery .form-group input:focus,
+    body.mode-delivery .form-group select:focus{border-color:#0662aa;}
     .btn-secondary{background:#e0edf8;color:#0662aa;}
     .toast{display:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;}
     .toast.ok{background:#e0edf8;color:#0662aa;}
@@ -580,7 +592,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <img src="logo.png" alt="Kooki" style="height:52px;width:auto;object-fit:contain;">
+    <img id="app-logo" src="logo.png" alt="Kooki" style="height:52px;width:auto;object-fit:contain;">
   </div>
 
   <div class="nav-label">Principal</div>
@@ -2527,8 +2539,15 @@ function applyMode(){
   }
 }
 
+function _syncLogo(){
+  var lg = document.getElementById('app-logo');
+  if(lg) lg.src = (currentMode === 'delivery') ? 'logo-bleu.png' : 'logo.png';
+}
+
 function chooseMode(mode){
   currentMode = mode;
+  document.body.classList.toggle('mode-delivery', mode === 'delivery');
+  _syncLogo();
   const scr = document.getElementById('mode-screen'); if(scr) scr.style.display = 'none';
   applyMode();
   const first = MODE_PAGES[mode].find(function(id){ const e = document.getElementById('nav-' + id); return e && !e.classList.contains('hidden'); });
@@ -2546,6 +2565,8 @@ function enterModeAfterLogin(name){
     openModeChoice();            // profils complets → on demande le mode
   } else {
     currentMode = null;          // profils mono-univers → navigation inchangée
+    document.body.classList.remove('mode-delivery');
+    _syncLogo();
   }
   updateModeUI();
 }
@@ -2584,6 +2605,8 @@ function selectProfile(name) {
   document.getElementById('profile-dropdown').classList.remove('open');
   if(!profileIsDual(name)) currentMode = null;
   else if(currentMode && !['production','delivery'].includes(currentMode)) currentMode = null;
+  document.body.classList.toggle('mode-delivery', currentMode === 'delivery');
+  _syncLogo();
   applyMode();
   updateModeUI();
   // Rafraîchir la bannière Ixelles selon le nouveau profil
