@@ -1447,23 +1447,6 @@
       </div>
     </div>
 
-    <!-- Récapitulatif semaine B2B -->
-    <div class="card" style="margin-top:18px">
-      <div class="card-header" style="flex-wrap:wrap;gap:8px">
-        <div>
-          <div class="card-title">📊 Récapitulatif semaine B2B</div>
-          <div class="card-sub" id="recap-b2b-periode">Livraisons de la semaine en cours</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-secondary" style="font-size:11px;padding:5px 12px" onclick="recapB2bSemainePrecedente()">◀ Semaine préc.</button>
-          <button class="btn btn-secondary" style="font-size:11px;padding:5px 12px" onclick="recapB2bSemaineActuelle()">Semaine actuelle</button>
-        </div>
-      </div>
-      <div id="recap-b2b-content">
-        <div class="empty" style="padding:16px">Aucune livraison B2B cette semaine.</div>
-      </div>
-    </div>
-
     <!-- Historique sorties -->
     <div class="card" style="margin-top:18px">
       <div class="card-header"><div><div class="card-title">Historique des sorties frigo</div><div class="card-sub">7 derniers jours</div></div></div>
@@ -9035,6 +9018,7 @@ function renderRecapB2b(offset) {
   });
 
   const container = document.getElementById('recap-b2b-content');
+  if (!container) return; // cadre récap B2B retiré de la page frigo
 
   if (!b2b.length) {
     container.innerHTML = '<div class="empty" style="padding:16px">Aucune livraison B2B cette semaine.</div>';
