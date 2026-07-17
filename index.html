@@ -160,6 +160,40 @@
     body.mode-delivery .tag-o{background:#e0edf8;color:#0662aa;}
     body.mode-delivery .form-group input:focus,
     body.mode-delivery .form-group select:focus{border-color:#0662aa;}
+
+    /* Formulaire sortie frigo : forcer le bleu (surcharge les styles inline rouges) */
+    body.mode-delivery #dest-changer{color:#0662aa !important;}
+    body.mode-delivery #label-prod-cookie[style*="#fbe8e2"]{background:#e0edf8 !important;border-bottom-color:#0662aa !important;}
+    body.mode-delivery #b2b-cookie-card{border-color:#0662aa !important;}
+    body.mode-delivery #b2b-cake-section{border-color:#0662aa !important;}
+    /* Toute teinte rouge / coral / brun du bloc cookies → bleu */
+    body.mode-delivery #b2b-cookie-card [style*="#d44218"],
+    body.mode-delivery #b2b-cookie-card [style*="#712b13"],
+    body.mode-delivery #b2b-cookie-card [style*="#993c1d"],
+    body.mode-delivery #b2b-cookie-card [style*="#b85d3a"],
+    body.mode-delivery #b2b-cookie-card [style*="#a5391c"],
+    body.mode-delivery #b2b-cake-section [style*="#d44218"],
+    body.mode-delivery #saveurs-blocks [style*="#d44218"]{color:#0662aa !important;}
+    /* Fonds rouges pâles → bleu pâle */
+    body.mode-delivery #b2b-cookie-card [style*="background:#fbe8e2"],
+    body.mode-delivery #b2b-cookie-card [style*="background: #fbe8e2"],
+    body.mode-delivery #saveurs-blocks [style*="background:#fbe8e2"],
+    body.mode-delivery #saveurs-blocks [style*="background: #fbe8e2"]{background:#e0edf8 !important;}
+    /* Boutons "+ Ajouter une saveur" / "+ Ajouter" : fond + texte */
+    body.mode-delivery #saveurs-blocks button[style*="#fbe8e2"],
+    body.mode-delivery #b2b-cookie-card button[style*="#fbe8e2"]{
+      background:#e0edf8 !important; color:#0662aa !important;
+    }
+    /* Bordures / puces rouges → bleu */
+    body.mode-delivery #b2b-cookie-card [style*="2px solid #d44218"],
+    body.mode-delivery #b2b-cookie-card [style*="2px solid #185fa5"]{border-color:#0662aa !important;}
+    body.mode-delivery #b2b-cookie-card [style*="border:2px solid #d44218"]{border-color:#0662aa !important;}
+    /* Radios / cases natives en bleu sur toute la page delivery */
+    body.mode-delivery input[type="radio"],
+    body.mode-delivery input[type="checkbox"]{accent-color:#0662aa;}
+    /* Livreur (bouton actif rouge) → bleu */
+    body.mode-delivery .livreur-btn.active,
+    body.mode-delivery [id^="livreur-opt-"][style*="#d44218"]{background:#0662aa !important;border-color:#0662aa !important;}
     .btn-secondary{background:#e0edf8;color:#0662aa;}
     .toast{display:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;}
     .toast.ok{background:#e0edf8;color:#0662aa;}
@@ -3600,8 +3634,9 @@ var CAKE_VAR_NAMES = ['Brownie','Banana bread','Carrot cake','Muffin myrtille','
 
 function selectProduitB2B(type) {
   window._b2bProduit = type;
-  var lblOn  = {cookie:'#fbe8e2',cake:'#fffbf0',both:'#f0f7f0'};
-  var brdOn  = {cookie:'#d44218',cake:'#ba7517',both:'#2e7d46'};
+  var _dlv = (document.body.classList.contains('mode-delivery'));
+  var lblOn  = _dlv ? {cookie:'#e0edf8',cake:'#e0edf8',both:'#e0edf8'} : {cookie:'#fbe8e2',cake:'#fffbf0',both:'#f0f7f0'};
+  var brdOn  = _dlv ? {cookie:'#0662aa',cake:'#0662aa',both:'#0662aa'} : {cookie:'#d44218',cake:'#ba7517',both:'#2e7d46'};
   ['cookie','cake','both'].forEach(function(c){
     var lbl=document.getElementById('label-prod-'+c), dot=document.getElementById('dot-prod-'+c);
     var active=(c===type);
@@ -3737,13 +3772,15 @@ function toggleDestination() {
   const dlcR = document.getElementById('dlc-crus-display');
 
   if (val === 'cuits') {
-    lc.style.background = '#fbe8e2'; lc.style.borderBottom = '2px solid #d44218';
+    var _dlv=document.body.classList.contains('mode-delivery');
+    var _bg=_dlv?'#e0edf8':'#fbe8e2', _bd=_dlv?'#0662aa':'#d44218', _tx=_dlv?'#0662aa':'#712b13';
+    lc.style.background = _bg; lc.style.borderBottom = '2px solid '+_bd;
     lr.style.background = '#fff'; lr.style.borderBottom = 'none';
-    dc.style.background = '#d44218'; dc.style.borderColor = '#d44218';
+    dc.style.background = _bd; dc.style.borderColor = _bd;
     dr.style.background = 'transparent'; dr.style.borderColor = '#e8e8e8';
     const d = new Date(now); d.setDate(now.getDate()+4);
     dlcC.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
-    dlcC.style.color = '#712b13';
+    dlcC.style.color = _tx;
     dlcR.textContent = '—'; dlcR.style.color = '#aaa';
   } else if (val === 'crus') {
     lr.style.background = '#e6f1fb'; lr.style.borderBottom = '2px solid #185fa5';
@@ -10321,7 +10358,8 @@ function setLivreurB2B(v){
   var t=document.getElementById('livreur-opt-tarik'), s=document.getElementById('livreur-opt-shippr'), i=document.getElementById('livreur-opt-interne');
   var base='padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;';
   var baseL='padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;';
-  var on='background:#d44218;color:#fff', off='background:#fff;color:#666';
+  var _dlv=document.body.classList.contains('mode-delivery');
+  var on=(_dlv?'background:#0662aa;color:#fff':'background:#d44218;color:#fff'), off='background:#fff;color:#666';
   if(t) t.style.cssText=base +(v==='Tarik'?on:off);
   if(s) s.style.cssText=baseL+(v==='Shippr'?on:off);
   if(i) i.style.cssText=baseL+(v==='Livreur interne'?on:off);
