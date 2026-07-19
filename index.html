@@ -148,6 +148,19 @@
     .btn{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
     .btn:hover{opacity:.85;}
     .btn-primary{background:#d44218;color:#fff;}
+    /* Bouton désactivé (ex : aucune destination choisie) */
+    .btn:disabled,.btn[disabled]{background:#e9ebef !important;color:#b0b6c0 !important;cursor:not-allowed;opacity:1;box-shadow:none;}
+    .btn:disabled:hover,.btn[disabled]:hover{opacity:1;}
+
+    /* ── Cartes de destination (sortie frigo) ── */
+    .dest-card{position:relative;}
+    .dest-card:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.08);}
+    .dest-card .dest-check{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:#0662aa;color:#fff;font-size:12px;font-weight:700;display:none;align-items:center;justify-content:center;line-height:1;}
+    body:not(.mode-delivery) .dest-card .dest-check{background:#d44218;}
+    .dest-card.is-selected .dest-check{display:flex;}
+
+    /* Largeur max de la page Sorties frigo (évite l'étirement sur grand écran) */
+    #page-frigo{max-width:1180px;}
 
     /* ═══ MODE DELIVERY : thème bleu ═══ */
     body.mode-delivery .nav-item.active{background:#e0edf8;color:#0662aa;border-right-color:#0662aa;}
@@ -225,14 +238,15 @@
 
     /* ── LOGIN SCREEN ── */
     .login-card{
-      background:#fff;border-radius:14px;border:1.5px solid #f0f0f0;
-      padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;
+      background:#fff;border-radius:14px;border:1.5px solid #eeeeef;
+      width:152px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;
       cursor:pointer;transition:all .18s;text-align:center;
     }
-    .login-card:hover{border-color:#d44218;box-shadow:0 4px 16px rgba(212,66,24,.12);transform:translateY(-2px);}
-    .login-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-    .login-name{font-size:12px;font-weight:700;color:#1a1a2e;line-height:1.3;}
+    .login-card:hover{border-color:#0662aa;box-shadow:0 6px 18px rgba(6,98,170,.16);transform:translateY(-3px);}
+    .login-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;background:#0662aa;}
+    .login-name{font-size:12.5px;font-weight:700;color:#1a1a2e;line-height:1.3;}
     .login-role{font-size:10px;color:#aaa;font-weight:500;}
+    .login-sec{font-size:10px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px;text-align:center;}
 
     @media(max-width:600px){
       #login-screen > div:nth-child(2){ grid-template-columns:repeat(2,1fr) !important; max-width:100% !important; }
@@ -516,29 +530,29 @@
   <div style="font-size:12px;color:#bbb;margin-bottom:36px">Qui êtes-vous ?</div>
 
   <!-- Groupes de profils -->
-  <div style="width:100%;max-width:640px;display:flex;flex-direction:column;gap:24px">
+  <div style="width:100%;max-width:720px;display:flex;flex-direction:column;gap:26px">
 
     <!-- Administration -->
     <div>
-      <div style="font-size:10px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Administration</div>
+      <div class="login-sec">Administration</div>
       <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
         <div class="login-card" onclick="loginAs('Virginia')">
-          <div class="login-av" style="background:#7c3aed">VK</div>
+          <div class="login-av">VK</div>
           <div class="login-name">Virginia Kunnen</div>
           <div class="login-role">Patron</div>
         </div>
         <div class="login-card" onclick="loginAs('Abenazer')">
-          <div class="login-av" style="background:#d44218">AH</div>
+          <div class="login-av">AH</div>
           <div class="login-name">Abenazer Hailu</div>
           <div class="login-role">Patron</div>
         </div>
         <div class="login-card" onclick="loginAs('Sebastien')">
-          <div class="login-av" style="background:#0662aa">SK</div>
+          <div class="login-av">SK</div>
           <div class="login-name">Sebastien Kunnen</div>
           <div class="login-role">Associé</div>
         </div>
         <div class="login-card" onclick="loginAs('DavidD')">
-          <div class="login-av" style="background:#2c7a3a">DD</div>
+          <div class="login-av">DD</div>
           <div class="login-name">David Deridder</div>
           <div class="login-role">Manager</div>
         </div>
@@ -547,47 +561,41 @@
 
     <!-- Production -->
     <div>
-      <div style="font-size:10px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Équipe production</div>
+      <div class="login-sec">Équipe production</div>
       <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
         <div class="login-card" onclick="loginAs('Production')">
-          <div class="login-av" style="background:#0662aa">PR</div>
+          <div class="login-av">PR</div>
           <div class="login-name">Production</div>
           <div class="login-role">Équipe partagée</div>
         </div>
         <div class="login-card" onclick="loginAs('Lila')">
-          <div class="login-av" style="background:#c0392b">LD</div>
+          <div class="login-av">LD</div>
           <div class="login-name">Lila Doudou</div>
           <div class="login-role">Administrateur</div>
         </div>
       </div>
     </div>
 
-    <!-- Frigo -->
+    <!-- Vente / Tablettes magasins -->
     <div>
-      <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Équipe vente</div>
+      <div class="login-sec">Équipe vente · Tablettes magasins</div>
       <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <div class="login-card" onclick="loginAs('Ixelles')">
+          <div class="login-av">IX</div>
+          <div class="login-name">Magasin Ixelles</div>
+          <div class="login-role">Commandes</div>
+        </div>
+        <div class="login-card" onclick="loginAs('Anderlecht')">
+          <div class="login-av">AN</div>
+          <div class="login-name">Magasin Anderlecht</div>
+          <div class="login-role">Frigo · Tâches</div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <div>
-    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;text-align:center">Tablettes magasins</div>
-    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-      <div class="login-card" onclick="loginAs('Ixelles')">
-        <div class="login-av" style="background:#d44218">IX</div>
-        <div class="login-name">Magasin Ixelles</div>
-        <div class="login-role">Commandes</div>
-      </div>
-      <div class="login-card" onclick="loginAs('Anderlecht')">
-        <div class="login-av" style="background:#0662aa">AN</div>
-        <div class="login-name">Magasin Anderlecht</div>
-        <div class="login-role">Frigo · Tâches</div>
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-top:32px;font-size:11px;color:#ccc">KOOKI COMPANY SRL · BE1015746980</div>
+  <div style="margin-top:36px;font-size:11px;color:#ccc;letter-spacing:.03em">KOOKI COMPANY SRL · BE1015746980</div>
 </div>
 
 <!-- LOADING OVERLAY -->
@@ -1148,6 +1156,9 @@
 </div>
 
   </div>
+  <div id="dest-hint" style="font-size:11.5px;color:#aaa;margin-top:9px;display:flex;align-items:center;gap:5px">
+    <span style="font-size:13px">👉</span> Choisissez une destination pour continuer
+  </div>
 </div>
         <div class="form-group" id="b2b-client-group" style="display:none">
           <label>Client B2B *</label>
@@ -1481,7 +1492,7 @@
 </div>
 
       <div class="form-footer">
-        <button class="btn btn-primary" onclick="saveSortie()">💾 Enregistrer + Bon de livraison</button>
+        <button id="btn-save-sortie" class="btn btn-primary" onclick="saveSortie()" disabled title="Choisissez d'abord une destination">💾 Enregistrer + Bon de livraison</button>
         <button class="btn btn-secondary" onclick="resetSortie()">↺ Réinitialiser</button>
         <span class="toast" id="toast-sortie"></span>
       </div>
@@ -1566,7 +1577,29 @@
     </div>
   </div>
 </div>
-  
+
+<!-- ══════════════════ COMMUNICATION SUR UN LOT ══════════════════ -->
+<div id="lotcomm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:440px;max-width:92vw;position:relative">
+    <button onclick="closeLotCommModal()" style="position:absolute;top:14px;right:16px;border:none;background:none;font-size:18px;cursor:pointer;color:#aaa">✕</button>
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px">💬 Communication sur le lot</div>
+    <div id="lotcomm-title" style="font-size:13px;color:#d44218;font-weight:700;margin-bottom:14px">—</div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.4">Ce message sera visible par la personne qui fait une sortie frigo sur ce lot. Ex&nbsp;: «&nbsp;Il manque des noisettes&nbsp;».</div>
+    <input type="hidden" id="lotcomm-code">
+    <div class="form-group" style="margin-bottom:18px">
+      <label>Message</label>
+      <textarea id="lotcomm-text" rows="3" placeholder="Ex : Il manque des noisettes…"
+        style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;font-family:inherit;resize:vertical;outline:none"
+        onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'"></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="saveLotCommModal()" style="flex:1">💾 Enregistrer</button>
+      <button id="lotcomm-delete-btn" class="btn btn-secondary" onclick="deleteLotCommModal()" style="display:none;color:#c0392b">🗑️ Supprimer</button>
+      <button class="btn btn-secondary" onclick="closeLotCommModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
   <!-- ══════════════════ BON DE LIVRAISON (modal print) ══════════════════ -->
 <div id="bon-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:14px;width:min(94vw,760px);max-height:92vh;overflow-y:auto;position:relative">
@@ -3218,9 +3251,23 @@ saveurs.forEach(sav => {
       const yy = parts[1].slice(0,2), mm = parts[1].slice(2,4), dd = parts[1].slice(4,6);
       dateStr = `${dd}/${mm}/20${yy}`;
     }
-    return `<div style="display:flex;justify-content:space-between;font-size:10.5px;color:#666">
-      <span>${l.code}${dateStr ? ' · '+dateStr : ''}</span>
-      <span style="color:#1a1a2e">${l.big} · ${l.small}</span>
+    const comm = getLotComm(l.code);
+    const commHtml = comm
+      ? `<div style="display:flex;align-items:flex-start;gap:5px;background:#fff5ec;border:1px solid #f6d3bd;border-radius:7px;padding:5px 8px;margin-top:3px">
+           <span style="font-size:11px;line-height:1.3">⚠️</span>
+           <span style="flex:1;font-size:10.5px;color:#b45309;line-height:1.35">${escapeHtmlComm(comm)}</span>
+         </div>`
+      : '';
+    return `<div style="padding:1px 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:#666">
+        <span>${l.code}${dateStr ? ' · '+dateStr : ''}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="color:#1a1a2e">${l.big} · ${l.small}</span>
+          <button onclick="openLotCommModal('${l.code}','${sav}')" title="Ajouter / modifier une communication sur ce lot"
+            style="border:none;background:${comm ? '#fdece0' : '#f0f2f5'};color:${comm ? '#d44218' : '#98a2b3'};border-radius:6px;padding:2px 6px;font-size:11px;cursor:pointer;line-height:1">💬</button>
+        </span>
+      </div>
+      ${commHtml}
     </div>`;
   }).join('');
   html += `<div style="border:1px solid #eee;border-radius:12px;padding:14px 16px;background:#fff">
@@ -3563,7 +3610,7 @@ function loadLotsBlock(id) {
       </div>
       ${lots.map(l => {
         const maxBacs = Math.floor(l.big / cpb);
-        return `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">
+        return lotCommBanner(l.code) + `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">
           <div>
             <div style="font-weight:600;font-size:12px">${l.code}</div>
             <div style="font-size:10px;color:#aaa">Stock : ${l.big} Big · max ${maxBacs} bac${maxBacs>1?'s':''}</div>
@@ -3587,7 +3634,7 @@ function loadLotsBlock(id) {
       ${!b2bSeulementSmall ? '<span style="text-align:center;color:#d44218">Big (max)</span>' : '<span></span>'}
       <span style="text-align:center;color:#0662aa">Small (max)${isB2B ? ' · 📦' : ''}</span>
     </div>
-    ${lots.map(l => `
+    ${lots.map(l => lotCommBanner(l.code) + `
       <div style="display:grid;grid-template-columns:2fr 1fr ${isB2B ? '1.2fr' : '1fr'};align-items:start;padding:8px 0;border-bottom:1px solid #f5f5f5;gap:4px">
         <div>
           <div style="font-weight:600;font-size:12px">${l.code}</div>
@@ -4196,6 +4243,66 @@ if(dlcCakeRow && dlcCakeVal){
 
 // Stock local (depuis getStock) — utilisé pour afficher les lots par saveur
 let stockLocal = JSON.parse(localStorage.getItem('kooki_stock_local') || '[]');
+
+// ── Communications par lot (ex : "il manque des noisettes") ──
+// Stockées par code lot : { "EMM-260606-01": "Il manque des noisettes", ... }
+let lotComms = JSON.parse(localStorage.getItem('kooki_lot_comms') || '{}');
+function getLotComm(code){ return (lotComms && lotComms[code]) ? lotComms[code] : ''; }
+function saveLotComms(){ localStorage.setItem('kooki_lot_comms', JSON.stringify(lotComms)); }
+function escapeHtmlComm(s){
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Bannière d'avertissement affichée dans la sortie frigo (bien visible)
+function lotCommBanner(code){
+  var comm = getLotComm(code);
+  if (!comm) return '';
+  return '<div style="display:flex;align-items:flex-start;gap:7px;background:#fff5ec;border:1.5px solid #f0b892;border-radius:9px;padding:8px 10px;margin:2px 0 8px">'
+    + '<span style="font-size:14px;line-height:1">⚠️</span>'
+    + '<div style="flex:1">'
+    +   '<div style="font-size:9px;font-weight:800;color:#c2410c;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">Communication sur ce lot</div>'
+    +   '<div style="font-size:11.5px;color:#9a3412;line-height:1.4;font-weight:600">' + escapeHtmlComm(comm) + '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+// Ouvre la modale d'édition de communication pour un lot
+function openLotCommModal(code, saveur){
+  document.getElementById('lotcomm-code').value = code;
+  document.getElementById('lotcomm-title').textContent = code + (saveur ? ' · ' + saveur : '');
+  document.getElementById('lotcomm-text').value = getLotComm(code);
+  var del = document.getElementById('lotcomm-delete-btn');
+  if (del) del.style.display = getLotComm(code) ? '' : 'none';
+  document.getElementById('lotcomm-overlay').style.display = 'flex';
+  setTimeout(function(){ var t=document.getElementById('lotcomm-text'); if(t) t.focus(); }, 50);
+}
+function closeLotCommModal(){ document.getElementById('lotcomm-overlay').style.display = 'none'; }
+
+// Rafraîchit tous les affichages où une communication de lot apparaît
+function refreshLotCommViews(){
+  if (typeof updateStockPage === 'function') updateStockPage();
+  document.querySelectorAll('[id^="saveur-block-"]').forEach(function(b){
+    var id = b.id.replace('saveur-block-','');
+    if (typeof loadLotsBlock === 'function') loadLotsBlock(id);
+  });
+}
+function saveLotCommModal(){
+  var code = document.getElementById('lotcomm-code').value;
+  var txt  = (document.getElementById('lotcomm-text').value || '').trim();
+  if (txt) { lotComms[code] = txt; } else { delete lotComms[code]; }
+  saveLotComms();
+  closeLotCommModal();
+  refreshLotCommViews();
+}
+function deleteLotCommModal(){
+  var code = document.getElementById('lotcomm-code').value;
+  delete lotComms[code];
+  saveLotComms();
+  closeLotCommModal();
+  refreshLotCommViews();
+}
 
   let cmdClientSave = false;
 let cmdClientsStored = JSON.parse(localStorage.getItem('kooki_cmd_clients') || '[]');
@@ -9668,15 +9775,42 @@ _logoImg.onload = () => {
   autre:      { border:'#D3D1C7', bg:'#F1EFE8' },
 };
 
+function ensureDestCheck(card){
+  let chk = card.querySelector('.dest-check');
+  if (!chk){
+    chk = document.createElement('div');
+    chk.className = 'dest-check';
+    chk.textContent = '✓';
+    card.appendChild(chk);
+  }
+  return chk;
+}
+
+// Active / désactive le bouton d'enregistrement selon qu'une destination est choisie
+function updateSaveSortieBtn(){
+  const btn = document.getElementById('btn-save-sortie');
+  if (!btn) return;
+  const hasDest = !!document.getElementById('sortie-type').value;
+  btn.disabled = !hasDest;
+  btn.title = hasDest ? '' : "Choisissez d'abord une destination";
+}
+
 function selectDestCard(dest) {
   const col = DEST_COLORS[dest];
   document.querySelectorAll('.dest-card').forEach(c => {
     const sel = c.dataset.dest === dest;
     c.style.display = sel ? '' : 'none';
-    if (sel) { c.style.border = '2px solid ' + col.border; c.style.background = col.bg; }
+    c.classList.toggle('is-selected', sel);
+    if (sel) {
+      c.style.border = '2px solid ' + col.border;
+      c.style.background = col.bg;
+      ensureDestCheck(c);
+    }
   });
   document.getElementById('sortie-type').value = dest;
   const ch = document.getElementById('dest-changer'); if (ch) ch.style.display = '';
+  const hint = document.getElementById('dest-hint'); if (hint) hint.style.display = 'none';
+  updateSaveSortieBtn();
   toggleDestination();
 }
 
@@ -9685,9 +9819,12 @@ function resetDestCard() {
     c.style.display = '';
     c.style.border = '0.5px solid #e8e8e8';
     c.style.background = '#fff';
+    c.classList.remove('is-selected');
   });
   document.getElementById('sortie-type').value = '';
   const ch = document.getElementById('dest-changer'); if (ch) ch.style.display = 'none';
+  const hint = document.getElementById('dest-hint'); if (hint) hint.style.display = 'flex';
+  updateSaveSortieBtn();
   toggleDestination();
 }
   
