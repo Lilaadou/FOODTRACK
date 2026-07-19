@@ -876,8 +876,9 @@
 
     <!-- Sous-panneau : Préparation -->
     <div id="prodsub-prep" style="display:none">
+    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start">
     <!-- ═══ VOLET : PRÉPARATEUR DE PRODUCTION ═══ -->
-    <div id="preparateur-volet" style="border:1.5px solid #cfe0f2;border-radius:14px;overflow:hidden;margin-bottom:18px;background:#fff">
+    <div id="preparateur-volet" style="border:1.5px solid #cfe0f2;border-radius:14px;overflow:hidden;background:#fff;flex:1 1 340px;min-width:300px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;background:#eef5fc">
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:18px">🧰</span>
@@ -910,6 +911,37 @@
         </div>
       </div>
     </div>
+
+    <!-- Calendrier de production conseillé -->
+    <div class="card" style="flex:1 1 340px;min-width:300px">
+      <div class="card-header">
+        <div><div class="card-title">📅 Calendrier de production conseillé</div><div class="card-sub">Priorités basées sur le stock actuel</div></div>
+        <button class="btn btn-secondary" onclick="updateCalendrierProduction()" style="font-size:11px;padding:5px 12px">🔄 Recalculer</button>
+      </div>
+      <div id="calendrier-production" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px">
+        <div class="empty" style="grid-column:1/-1;padding:16px">Chargement du stock…</div>
+      </div>
+    </div>
+
+    </div><!-- /flex prep -->
+
+    <!-- Checklist matières premières -->
+    <div class="card" style="margin-top:2px">
+      <div class="card-header" style="margin-bottom:6px">
+        <div><div class="card-title">🧺 Matières premières nécessaires</div><div class="card-sub" id="mat-sub">Coche des saveurs pour calculer</div></div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <button id="mat-showall-btn" onclick="toggleMatShowAll()" style="background:none;border:none;color:#0662aa;font-size:11px;cursor:pointer;text-decoration:underline">Voir tout</button>
+          <button onclick="resetMatieresCheck()" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline">Tout décocher</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:22px 1.3fr 0.7fr 0.6fr 1fr;gap:6px;font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;padding-bottom:6px;border-bottom:1px solid #efefef;margin-bottom:2px">
+        <span></span><span>Ingrédient</span><span style="text-align:center">/ bac</span><span style="text-align:center">Unité</span><span style="text-align:right">Total</span>
+      </div>
+      <div id="mat-rows"></div>
+      <div id="mat-empty" style="display:none;text-align:center;color:#bbb;font-size:12px;padding:16px 0">Coche des saveurs dans le préparateur pour voir la liste des matières premières.</div>
+      <div style="font-size:10.5px;color:#bbb;margin-top:10px">Indique la quantité « par bac » pour chaque ingrédient — le total se calcule selon les bacs planifiés ci-dessus.</div>
+    </div>
+
     </div><!-- /prodsub-prep -->
 
     <!-- Sous-panneau : Production (Cookies / Gâteaux) -->
@@ -1040,17 +1072,6 @@
   </div>
 </div>
 
-
-    <!-- Calendrier de production conseillé -->
-    <div class="card" style="margin-bottom:18px">
-      <div class="card-header">
-        <div><div class="card-title">📅 Calendrier de production conseillé</div><div class="card-sub">Priorités basées sur le stock actuel</div></div>
-        <button class="btn btn-secondary" onclick="updateCalendrierProduction()" style="font-size:11px;padding:5px 12px">🔄 Recalculer</button>
-      </div>
-      <div id="calendrier-production" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-        <div class="empty" style="grid-column:1/-1;padding:16px">Chargement du stock…</div>
-      </div>
-    </div>
 
     <div class="card">
       <div class="card-header"><div><div class="card-title">Historique de production</div></div></div>
@@ -2864,7 +2885,7 @@ function showPage(name, btn) {
   
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
-  if (name === 'production') setTimeout(async () => { setProdTab('prod'); renderBacsInventaire(); renderPlanificateur(); loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
+  if (name === 'production') setTimeout(async () => { setProdTab('prod'); renderBacsInventaire(); renderPlanificateur(); renderMatieres(); loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
   if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
   if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
@@ -6526,6 +6547,7 @@ function renderPlanificateur(){
 }
 function calcPlan(){
   let totalBacs = 0, nbSaveurs = 0;
+  const byFlavor = {};
   PLAN_SAVEURS.forEach(function(sav){
     const cpb = planCpb(sav);
     const checked = document.getElementById('plan-chk-' + sav) && document.getElementById('plan-chk-' + sav).checked;
@@ -6534,6 +6556,7 @@ function calcPlan(){
     // Griser le champ bacs si la saveur n'est pas cochée
     if (inp) { inp.style.opacity = checked ? '1' : '.4'; }
     const ck = document.getElementById('plan-ck-' + sav);
+    byFlavor[sav] = checked ? b : 0;
     if (checked) {
       totalBacs += b;
       if (b > 0) nbSaveurs++;
@@ -6542,7 +6565,10 @@ function calcPlan(){
       if (ck) ck.textContent = '—';
     }
   });
+  window._planByFlavor = byFlavor;
   const dispo = getBacsDispo();
+  window._planTotalBacs = totalBacs;
+  if (typeof updateMatieres === 'function') updateMatieres();
   const totEl = document.getElementById('plan-total');
   if (totEl) totEl.textContent = totalBacs + (totalBacs > 1 ? ' bacs' : ' bac');
   const v = document.getElementById('plan-verdict');
@@ -6570,6 +6596,145 @@ function resetPlan(){
   });
   calcPlan();
 }
+
+// ── Checklist matières premières ──
+const MATIERES_DEFAUT = ['Farine','Beurre','Œufs','Bretzels','Chocolat Côte d\'Or','Framboise','Speculoos','Compote de pomme','Lait d\'avoine'];
+// Ingrédients de base : utilisés par toutes les saveurs par défaut. Les autres → à assigner.
+const MAT_BASE = ['Farine','Beurre','Œufs'];
+// Saveurs par défaut par ingrédient ('ALL' = toutes les saveurs)
+const MAT_FLAVORS_DEFAUT = {
+  'Farine':'ALL','Beurre':'ALL','Œufs':'ALL',
+  'Bretzels':['CHARLY'],
+  'Chocolat Côte d\'Or':['SUZZY'],
+  'Framboise':['MOLLY'],
+  'Compote de pomme':['WALLY'],
+  'Lait d\'avoine':['WALLY'],
+  'Speculoos':[]
+};
+function matAllFlavors(){ return PLAN_SAVEURS.slice(); }
+function matId(nom){ return 'mat-' + nom.replace(/[^A-Za-z0-9]/g,''); }
+function getMatieres(){ try { return JSON.parse(localStorage.getItem('kooki_matieres') || '{}'); } catch(e){ return {}; } }
+function saveMatiereCfg(m){ localStorage.setItem('kooki_matieres', JSON.stringify(m)); }
+function saveMatiere(nom, field, val){
+  var m = getMatieres();
+  if (!m[nom]) m[nom] = { q:'', u:'' };
+  m[nom][field] = val;
+  saveMatiereCfg(m);
+}
+function getMatFlavors(nom){
+  var m = getMatieres();
+  if (m[nom] && Array.isArray(m[nom].flavors)) return m[nom].flavors;
+  var d = MAT_FLAVORS_DEFAUT[nom];
+  if (d === 'ALL') return matAllFlavors();
+  if (Array.isArray(d)) return d.slice();
+  return (MAT_BASE.indexOf(nom) >= 0) ? matAllFlavors() : [];
+}
+function setMatFlav(nom, sav, checked){
+  var m = getMatieres();
+  if (!m[nom]) m[nom] = { q:'', u:'' };
+  var arr = Array.isArray(m[nom].flavors) ? m[nom].flavors.slice() : getMatFlavors(nom).slice();
+  var i = arr.indexOf(sav);
+  if (checked && i < 0) arr.push(sav);
+  if (!checked && i >= 0) arr.splice(i, 1);
+  m[nom].flavors = arr;
+  saveMatiereCfg(m);
+  var lbl = document.getElementById(matId(nom) + '-flavcount');
+  if (lbl) lbl.textContent = arr.length;
+  updateMatieres();
+}
+function setMatFlavAll(nom, all){
+  var m = getMatieres();
+  if (!m[nom]) m[nom] = { q:'', u:'' };
+  m[nom].flavors = all ? matAllFlavors() : [];
+  saveMatiereCfg(m);
+  renderMatieres();
+  var p = document.getElementById(matId(nom) + '-flav'); if (p) p.style.display = 'block';
+}
+function toggleMatFlav(nom){
+  var p = document.getElementById(matId(nom) + '-flav');
+  if (p) p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none';
+}
+function renderMatieres(){
+  var c = document.getElementById('mat-rows');
+  if (!c) return;
+  var cfg = getMatieres();
+  c.innerHTML = MATIERES_DEFAUT.map(function(nom){
+    var q = (cfg[nom] && cfg[nom].q !== undefined) ? cfg[nom].q : '';
+    var u = (cfg[nom] && cfg[nom].u !== undefined) ? cfg[nom].u : '';
+    var id = matId(nom);
+    var esc = nom.replace(/'/g, "\\'");
+    var flav = getMatFlavors(nom);
+    var flavPanel = '<div id="' + id + '-flav" style="display:none;grid-column:1/-1;background:#f7f8fa;border-radius:9px;padding:10px;margin-top:4px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      + '<span style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase">Saveurs qui utilisent « ' + nom + ' »</span>'
+      + '<span><button onclick="setMatFlavAll(\'' + esc + '\',true)" style="background:none;border:none;color:#0662aa;font-size:10px;cursor:pointer">Toutes</button>'
+      + ' · <button onclick="setMatFlavAll(\'' + esc + '\',false)" style="background:none;border:none;color:#aaa;font-size:10px;cursor:pointer">Aucune</button></span></div>'
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:4px">'
+      + PLAN_SAVEURS.map(function(sav){
+          var on = flav.indexOf(sav) >= 0;
+          return '<label style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;cursor:pointer">'
+            + '<input type="checkbox" ' + (on ? 'checked' : '') + ' onchange="setMatFlav(\'' + esc + '\',\'' + sav + '\',this.checked)" style="accent-color:#0662aa;cursor:pointer"> ' + sav + '</label>';
+        }).join('')
+      + '</div></div>';
+    return '<div style="display:grid;grid-template-columns:22px 1.3fr 0.7fr 0.6fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #f7f7f7" id="' + id + '-row">'
+      + '<div style="text-align:center"><input type="checkbox" id="' + id + '-chk" style="width:16px;height:16px;accent-color:#0662aa;cursor:pointer" onchange="document.getElementById(\'' + id + '-row\').style.opacity=this.checked?\'.45\':\'1\'"></div>'
+      + '<div><div style="font-size:12.5px;font-weight:700;color:#1a1a2e">' + nom + '</div>'
+      + '<span onclick="toggleMatFlav(\'' + esc + '\')" style="font-size:10px;color:#0662aa;cursor:pointer">🏷️ saveurs (<span id="' + id + '-flavcount">' + flav.length + '</span>)</span></div>'
+      + '<div><input type="number" min="0" step="any" value="' + q + '" placeholder="0" oninput="saveMatiere(\'' + esc + '\',\'q\',this.value); updateMatieres()" style="width:100%;padding:5px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:12px;text-align:center;outline:none"></div>'
+      + '<div><input type="text" value="' + u + '" placeholder="kg…" oninput="saveMatiere(\'' + esc + '\',\'u\',this.value); updateMatieres()" style="width:100%;padding:5px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:12px;text-align:center;outline:none"></div>'
+      + '<div style="text-align:right;font-size:13px;font-weight:700;color:#0662aa" id="' + id + '-tot">—</div>'
+      + flavPanel
+      + '</div>';
+  }).join('');
+  updateMatieres();
+}
+function updateMatieres(){
+  var byF = window._planByFlavor || {};
+  var totalBacs = window._planTotalBacs || 0;
+  var showAll = !!window._matShowAll;
+  var checkedSet = {};
+  PLAN_SAVEURS.forEach(function(sav){
+    var c = document.getElementById('plan-chk-' + sav);
+    if (c && c.checked) checkedSet[sav] = true;
+  });
+  var sub = document.getElementById('mat-sub');
+  if (sub) sub.textContent = totalBacs > 0 ? ('Selon les saveurs cochées (' + totalBacs + ' bac' + (totalBacs>1?'s':'') + ')') : 'Coche des saveurs pour calculer';
+  var cfg = getMatieres();
+  var visible = 0;
+  MATIERES_DEFAUT.forEach(function(nom){
+    var id = matId(nom);
+    var row = document.getElementById(id + '-row');
+    var el = document.getElementById(id + '-tot');
+    var flav = getMatFlavors(nom);
+    var relevant = showAll || flav.some(function(f){ return checkedSet[f]; });
+    if (row) row.style.display = relevant ? 'grid' : 'none';
+    if (relevant) visible++;
+    if (!el) return;
+    var bacs = 0;
+    flav.forEach(function(f){ bacs += (byF[f] || 0); });
+    var q = parseFloat(cfg[nom] && cfg[nom].q);
+    var u = (cfg[nom] && cfg[nom].u) || '';
+    if (!q || bacs <= 0){ el.textContent = '—'; }
+    else { el.textContent = (Math.round(q * bacs * 100) / 100).toLocaleString('fr-FR') + (u ? (' ' + u) : ''); }
+  });
+  var empty = document.getElementById('mat-empty');
+  if (empty) empty.style.display = (visible === 0) ? 'block' : 'none';
+}
+function toggleMatShowAll(){
+  window._matShowAll = !window._matShowAll;
+  var b = document.getElementById('mat-showall-btn');
+  if (b) b.textContent = window._matShowAll ? 'Voir le nécessaire' : 'Voir tout';
+  updateMatieres();
+}
+function resetMatieresCheck(){
+  MATIERES_DEFAUT.forEach(function(nom){
+    var id = matId(nom);
+    var chk = document.getElementById(id + '-chk');
+    var row = document.getElementById(id + '-row');
+    if (chk){ chk.checked = false; }
+    if (row){ row.style.opacity = '1'; }
+  });
+}
 function togglePreparateur(){
   var b = document.getElementById('preparateur-body');
   var a = document.getElementById('prep-arrow');
@@ -6590,7 +6755,7 @@ function setProdTab(tab){
   var bProd = document.getElementById('prodtab-prod');
   function on(btn){ if(!btn) return; btn.style.background='#fff'; btn.style.color='#0662aa'; btn.style.boxShadow='0 1px 2px rgba(0,0,0,.06)'; }
   function off(btn){ if(!btn) return; btn.style.background='transparent'; btn.style.color='#999'; btn.style.boxShadow='none'; }
-  if (prep){ on(bPrep); off(bProd); renderPlanificateur(); renderBacsInventaire(); }
+  if (prep){ on(bPrep); off(bProd); renderPlanificateur(); renderBacsInventaire(); renderMatieres(); if (typeof updateCalendrierProduction === 'function') updateCalendrierProduction(); }
   else { off(bPrep); on(bProd); }
 }
 
