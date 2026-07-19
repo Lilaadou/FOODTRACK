@@ -921,6 +921,13 @@
             <input type="number" id="prod-bacs-double" placeholder="0" min="0" oninput="calcProdTotaux()" style="display:none;padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;color:#1a1a2e;background:#f9f9f9;outline:none;width:100%">
           </div>
         </div>
+        <div id="prod-bacs-total-box" style="background:#eef1f5;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div>
+            <div style="font-size:12px;color:#334155;font-weight:600">🗃️ Total bacs</div>
+            <div id="prod-bacs-total-detail" style="font-size:10px;color:#64748b">0 simple</div>
+          </div>
+          <span id="prod-bacs-total-display" style="font-size:18px;font-weight:700;color:#334155">0 bac</span>
+        </div>
         <div style="background:#fbe8e2;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
           <div>
             <div style="font-size:12px;color:#d44218;font-weight:600">Total Big</div>
@@ -975,6 +982,10 @@
       <div style="flex:1;background:#e0edf8;border-radius:9px;padding:8px 10px;text-align:center">
         <div style="font-size:9px;font-weight:700;color:#0662aa;text-transform:uppercase">Small</div>
         <div style="font-size:22px;font-weight:700;color:#0662aa" id="lots-total-small">0</div>
+      </div>
+      <div style="flex:1;background:#eef1f5;border-radius:9px;padding:8px 10px;text-align:center">
+        <div style="font-size:9px;font-weight:700;color:#334155;text-transform:uppercase">Bacs</div>
+        <div style="font-size:22px;font-weight:700;color:#334155" id="lots-total-bacs">0</div>
       </div>
     </div>
   </div>
@@ -2520,7 +2531,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzoq6NntbP4Q9kf5P6moO-GJh4cJzZSRP4uj4oHal_uAkVPfWdmFyEnmN7RU392C8S1EQ/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzX_WjnW62OIceFIUkiVMKo94m7cy9AFRPMP6JpDCojhiByjQFAkHIeU7SSWZR7-ZwJdw/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -5995,6 +6006,7 @@ function updateLotsduJour() {
   const dateEl    = document.getElementById('lots-du-jour-date');
   const totalBigEl  = document.getElementById('lots-total-big');
   const totalSmallEl= document.getElementById('lots-total-small');
+  const totalBacsEl = document.getElementById('lots-total-bacs');
   if (!container) return;
 
   const now = new Date();
@@ -6004,12 +6016,13 @@ function updateLotsduJour() {
     container.innerHTML = '<div class="empty" style="padding:12px;font-size:12px">Aucune production ce jour</div>';
     if (totalBigEl) totalBigEl.textContent = '0';
     if (totalSmallEl) totalSmallEl.textContent = '0';
+    if (totalBacsEl) totalBacsEl.textContent = '0';
     return;
   }
 
   // Grouper par saveur
   const bySav = {};
-  let totalBig = 0, totalSmall = 0;
+  let totalBig = 0, totalSmall = 0, totalBacs = 0;
   prods.forEach(p => {
     if (!bySav[p.saveur]) bySav[p.saveur] = { big: 0, small: 0, lots: 0 };
     bySav[p.saveur].big   += parseInt(p.big   || 0);
@@ -6017,6 +6030,7 @@ function updateLotsduJour() {
     bySav[p.saveur].lots++;
     totalBig   += parseInt(p.big   || 0);
     totalSmall += parseInt(p.small || 0);
+    totalBacs  += (parseInt(p.bacsSimple || 0) + parseInt(p.bacsDouble || 0));
   });
 
   container.innerHTML = Object.entries(bySav).map(([sav, d]) =>
@@ -6032,6 +6046,7 @@ function updateLotsduJour() {
 
   if (totalBigEl)   totalBigEl.textContent   = totalBig;
   if (totalSmallEl) totalSmallEl.textContent = totalSmall;
+  if (totalBacsEl)  totalBacsEl.textContent  = totalBacs;
 }
 
 // ─────────────────────────────────────
@@ -6431,6 +6446,18 @@ function calcProdTotaux() {
   if (dbl > 0) detail += ' + ' + dbl + ' × ' + (cfg.cpb*2) + ' (double)';
   document.getElementById('prod-bac-detail').textContent = detail;
   document.getElementById('prod-bac-tag').textContent = cfg.cpb + ' cookies/bac';
+
+  // Total de bacs physiques (simples + doubles)
+  const totalBacs = simple + dbl;
+  const dispTot = document.getElementById('prod-bacs-total-display');
+  const dispDet = document.getElementById('prod-bacs-total-detail');
+  if (dispTot) dispTot.textContent = totalBacs + (totalBacs > 1 ? ' bacs' : ' bac');
+  if (dispDet) {
+    let d = simple + (simple > 1 ? ' simples' : ' simple');
+    if (dbl > 0) d += ' · ' + dbl + (dbl > 1 ? ' doubles' : ' double');
+    dispDet.textContent = d;
+  }
+
   const ss = document.getElementById('prod-small-section');
   if (ss) ss.style.display = cfg.baby ? '' : 'none';
 }
@@ -7330,7 +7357,10 @@ async function saveProduction() {
   const factures = getCheckedFactures('prod-fac-list');
   if (!factures.length) { toast('prod','⚠️ Cochez au moins 1 BL','err'); return; }
   try {
-  const res = await fetch(API, { method:'POST', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures }) });
+  const res = await fetch(API, { method:'POST', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures,
+    bacsSimple: parseInt(document.getElementById('prod-bacs-simple')?.value) || 0,
+    bacsDouble: document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0
+  }) });
     const json = await res.json();
     if (json.success) {
   // Créer les bacs dans Sheets
@@ -7366,11 +7396,8 @@ async function saveProduction() {
       storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString(), bacsSimple: nbSimple, bacsDouble: nbDouble });
       localStorage.setItem('kooki_productions', JSON.stringify(storedProd));
 
-      // 2. Ajouter dans le tableau historique production
-      const isBlue = saveur === 'WOODY';
-      const trProd = document.createElement('tr');
-      trProd.innerHTML = `<td><b>${code}</b></td><td><span class="tag ${'tag-o'}">${saveur}</span></td><td>${big}</td><td>${small}</td><td style="color:${'#d44218'};font-weight:700">${big}</td><td>${small}</td><td class="sub-text">${pmx}</td><td>${nom}</td>`;
-      document.getElementById('prod-table').prepend(trProd);
+      // 2. Ré-afficher le tableau historique production (colonnes bacs correctes)
+      applyProduction([]);
 
       // 3. Mettre à jour la page Stock
       updateStockPage();
@@ -8874,6 +8901,8 @@ function applyProduction(data) {
     big:     parseInt(r.big   || r.bigSize   || r.qtyBig   || 0),
     small:   parseInt(r.small || r.babySize  || r.qtySmall || 0),
     nom:     r.nom       || r.producteur    || r.producer   || '—',
+    bacsSimple: parseInt(r.bacsSimple || r.bacsSimples || 0) || 0,
+    bacsDouble: parseInt(r.bacsDouble || r.bacsDoubles || 0) || 0,
     date:    r.date      || null,
   });
 
