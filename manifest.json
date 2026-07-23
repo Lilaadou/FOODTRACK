@@ -2,7 +2,7 @@
   "name": "Kooki Dashboard",
   "short_name": "Kooki",
   "description": "Traçabilité & gestion de production Kooki",
-  "start_url": "./dashboard-mockup.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#d44218",
