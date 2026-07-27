@@ -13920,6 +13920,8 @@ var qrcode = function() {
   var scanner = null, current = null;
   // Mémorise la dernière destination choisie (pour enchaîner les bacs plus vite)
   var lastDest = { type:'', client:'', custom:'' };
+  // Panier B2B : accumule les bacs d'une même livraison pour générer UN seul BL
+  var cart = { client:'', items:[] };
   var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café'];
   var DEST_TYPES = [
     { v:'interne',    label:'🔧 Usage interne' },
@@ -14014,7 +14016,13 @@ var qrcode = function() {
     var body = document.getElementById('qr-body');
     var opts = lots().slice().sort(function(a,b){ return String(a.code).localeCompare(String(b.code)); })
       .map(function(s){ return '<option value="'+s.code+'">'+s.code+' — '+s.saveur+' ('+s.big+' Big · '+s.small+' Baby)</option>'; }).join('');
+    var cartBanner = cart.items.length ?
+      '<div onclick="KookiQR.finishBL()" style="cursor:pointer;background:#E6F1FB;border:1px solid #cfe2f5;border-radius:12px;padding:9px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
+        '<span style="font-size:12.5px;color:#0c447c;font-weight:700">🧾 BL en cours — '+cart.client+' ('+cart.items.length+' bac'+(cart.items.length>1?'s':'')+')</span>'+
+        '<span style="font-size:12px;color:#0662aa;font-weight:700">Terminer →</span>'+
+      '</div>' : '';
     body.innerHTML =
+      cartBanner +
       '<div id="qr-reader"></div>'+
       '<div id="qr-scan-msg" style="text-align:center;font-size:12px;color:#8a97a5;margin:8px 0 4px">Initialisation de la caméra…</div>'+
       '<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir le lot manuellement —</div>'+
@@ -14078,6 +14086,42 @@ var qrcode = function() {
       '</div></div>';
   }
 
+  function getLivreur(){
+    var livreur = 'Scan frigo';
+    try{
+      if(typeof FULL_NAMES!=='undefined' && typeof currentProfile!=='undefined' && FULL_NAMES[currentProfile]) livreur = FULL_NAMES[currentProfile];
+      else if(typeof currentProfile!=='undefined' && currentProfile) livreur = currentProfile;
+    }catch(e){}
+    return livreur;
+  }
+  function refreshStockUI(){
+    try{ if(typeof updateStockPage==='function') updateStockPage(); }catch(e){}
+    try{ if(typeof updateDashboardStockTable==='function') updateDashboardStockTable(); }catch(e){}
+    try{ if(typeof applySorties==='function') applySorties([]); }catch(e){}
+  }
+  // Écrit UN groupe de sortie (1 ligne/lot, même idGroupe) + sync API
+  function writeSortieGroup(items, destination, livreur){
+    var idGroupe = 'SOR-' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*1000);
+    try{
+      var stored = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
+      items.forEach(function(it){
+        stored.unshift({ id: Date.now()+Math.random(), idGroupe: idGroupe, date: new Date().toISOString(),
+          saveur: it.saveur, destination: destination, lot: it.code, big: it.big, small: it.small, boites: 0, producteur: livreur });
+      });
+      localStorage.setItem('kooki_sorties', JSON.stringify(stored));
+    }catch(e){}
+    try{
+      if(typeof API !== 'undefined' && API){
+        fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+          action:'sortie',
+          saveur: items.map(function(i){ return i.saveur; }).filter(function(v,idx,a){ return a.indexOf(v)===idx; }).join(', '),
+          destination: destination, boites:0, livreur: livreur, idGroupe: idGroupe,
+          lots: items.map(function(i){ return { code:i.code, saveur:i.saveur, big:i.big, small:i.small }; }) }) }).catch(function(){});
+      }
+    }catch(e){}
+    return idGroupe;
+  }
+
   function doConfirm(){
     if(!current) return;
     var big = Math.max(0, parseInt((document.getElementById('qr-big')||{}).value,10) || 0);
@@ -14085,46 +14129,112 @@ var qrcode = function() {
     if(big===0 && small===0){ toast('Entre au moins une quantité','err'); return; }
     var s = lots().find(function(x){ return x.code === current.code; });
     if(!s){ toast('Lot introuvable','err'); return; }
-    if(big > s.big || small > s.small){ toast('Quantité > stock disponible','err'); return; }
 
     // Destination choisie (comme l'onglet Nouvelle sortie)
     var destination = computeDest();
     if(destination === null) return; // message déjà affiché
+    var isB2B = (lastDest.type === 'b2b');
 
-    // 1) décrément stock (même logique que saveSortie)
+    if(isB2B){
+      // Mode panier : on n'enlève pas encore du stock, on accumule pour le BL
+      if(cart.items.length && cart.client && cart.client !== destination){
+        toast('Termine d\'abord le BL pour '+cart.client, 'err'); return;
+      }
+      var used = cart.items.filter(function(i){ return i.code===s.code; })
+        .reduce(function(a,i){ return { big:a.big+i.big, small:a.small+i.small }; }, { big:0, small:0 });
+      if(big > s.big - used.big || small > s.small - used.small){ toast('Quantité > stock disponible (panier compris)','err'); return; }
+      cart.client = destination;
+      cart.items.push({ code:s.code, saveur:s.saveur, big:big, small:small });
+      toast('➕ Ajouté au BL '+destination, 'ok');
+      stepCart();
+      return;
+    }
+
+    // Destinations non-B2B : décrément immédiat + une sortie (pas de BL)
+    if(big > s.big || small > s.small){ toast('Quantité > stock disponible','err'); return; }
     s.big -= big; s.small -= small;
     try{ localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal)); }catch(e){}
-
-    // 2) historique des sorties
-    var livreur = 'Scan frigo';
-    try{
-      if(typeof FULL_NAMES!=='undefined' && typeof currentProfile!=='undefined' && FULL_NAMES[currentProfile]) livreur = FULL_NAMES[currentProfile];
-      else if(typeof currentProfile!=='undefined' && currentProfile) livreur = currentProfile;
-    }catch(e){}
-    var idGroupe = 'SOR-' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*1000);
-    try{
-      var stored = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-      stored.unshift({ id: Date.now()+Math.random(), idGroupe: idGroupe, date: new Date().toISOString(),
-        saveur: s.saveur, destination: destination, lot: s.code, big: big, small: small, boites: 0, producteur: livreur });
-      localStorage.setItem('kooki_sorties', JSON.stringify(stored));
-    }catch(e){}
-
-    // 3) sync backend si dispo (fire-and-forget, n'empêche jamais l'enregistrement local)
-    try{
-      if(typeof API !== 'undefined' && API){
-        fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
-          action:'sortie', saveur: s.saveur, destination: destination, boites:0, livreur: livreur, idGroupe: idGroupe,
-          lots:[{ code: s.code, saveur: s.saveur, big: big, small: small }] }) }).catch(function(){});
-      }
-    }catch(e){}
-
-    // 4) rafraîchir l'UI existante
-    try{ if(typeof updateStockPage==='function') updateStockPage(); }catch(e){}
-    try{ if(typeof updateDashboardStockTable==='function') updateDashboardStockTable(); }catch(e){}
-    try{ if(typeof applySorties==='function') applySorties([]); }catch(e){}
-
+    writeSortieGroup([{ code:s.code, saveur:s.saveur, big:big, small:small }], destination, getLivreur());
+    refreshStockUI();
     toast('✓ '+ (big?big+' Big ':'') + (small?small+' Baby ':'') + '→ '+destination, 'ok');
-    stepScan(); // prêt à scanner le bac suivant
+    stepScan();
+  }
+
+  // ── Panier B2B : récap + génération du BL ──
+  function stepCart(){
+    stopScanner();
+    document.getElementById('qr-title').textContent = '🧾 BL — ' + cart.client;
+    var rows = cart.items.map(function(it){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px">'+
+        '<span><b>'+it.code+'</b> · '+it.saveur+'</span>'+
+        '<span style="color:#66727f">'+ (it.big?it.big+' Big ':'') + (it.small?it.small+' Baby':'') +'</span></div>';
+    }).join('') || '<div style="color:#8a97a5;padding:10px 0">Aucun bac ajouté.</div>';
+    var tb = cart.items.reduce(function(a,i){ return a+i.big; }, 0);
+    var ts = cart.items.reduce(function(a,i){ return a+i.small; }, 0);
+    document.getElementById('qr-body').innerHTML =
+      '<div style="background:#E6F1FB;border:1px solid #cfe2f5;border-radius:12px;padding:10px 14px;margin-bottom:10px">'+
+        '<div style="font-size:12px;color:#0662aa;font-weight:700">Client B2B</div>'+
+        '<div style="font-size:17px;font-weight:800;color:#0c447c">'+cart.client+'</div>'+
+      '</div>'+
+      '<div style="border:1px solid #e6ebf1;border-radius:12px;padding:6px 14px;margin-bottom:8px">'+ rows +
+        '<div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:4px;border-top:1px solid #e6e6e6;font-weight:800;font-size:13px"><span>Total</span><span>'+tb+' Big · '+ts+' Baby</span></div>'+
+      '</div>'+
+      '<button class="qr-btn qr-btn-ghost" onclick="KookiQR.addMore()">📷 Scanner un autre bac</button>'+
+      '<button class="qr-btn qr-btn-primary" style="margin-top:8px;background:#0662aa" onclick="KookiQR.finishBL()">✅ Terminer &amp; générer le BL</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px;color:#c0392b" onclick="KookiQR.cancelCart()">🗑️ Vider le panier</button>';
+  }
+  function cancelCart(){
+    cart = { client:'', items:[] };
+    toast('Panier vidé','');
+    stepScan();
+  }
+  function finishBL(){
+    if(!cart.items.length){ toast('Panier vide','err'); return; }
+    // 1) décrément du stock maintenant (une seule fois, pour tous les bacs)
+    cart.items.forEach(function(it){
+      var s = lots().find(function(x){ return x.code === it.code; });
+      if(s){ s.big -= it.big; s.small -= it.small; }
+    });
+    try{ localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal)); }catch(e){}
+    var livreur = getLivreur();
+    // 2) historique des sorties (un seul groupe)
+    writeSortieGroup(cart.items, cart.client, livreur);
+    refreshStockUI();
+    // 3) numéro de BL (via l'API, avec repli)
+    var lotsBL = cart.items.map(function(i){ return { saveur:i.saveur, lot:i.code, big:i.big, small:i.small, qte:null }; });
+    var bonLots = cart.items.map(function(i){ return { code:i.code, saveur:i.saveur, big:i.big, small:i.small }; });
+    var allSaveurs = cart.items.map(function(i){ return i.saveur; }).filter(function(v,idx,a){ return a.indexOf(v)===idx; }).join(', ');
+    var client = cart.client;
+    cart = { client:'', items:[] };
+
+    function withBL(numeroBL){
+      if(!numeroBL) numeroBL = 'BL-' + new Date().getFullYear() + '-' + Date.now().toString().slice(-3);
+      // sauvegarde backend du BL
+      try{
+        if(typeof API !== 'undefined' && API){
+          fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+            action:'sauverBL', numeroBL:numeroBL, client:client, lots:lotsBL, boites:0, sortiPar:livreur, livreurB2B:'', typeCookies:'cuits' }) }).catch(function(){});
+        }
+      }catch(e){}
+      // sauvegarde locale du BL (même structure que saveSortie)
+      try{ if(typeof blData !== 'undefined' && blData && blData.unshift){ blData.unshift({ numeroBL:numeroBL, date:new Date().toISOString(), client:client, lots:lotsBL, boites:0, sortiPar:livreur, livreurB2B:'', typeCookies:'cuits' }); } }catch(e){}
+      // affichage du bon (on ferme d'abord notre panneau)
+      try{ window._cmdDocType='livraison'; }catch(e){}
+      document.getElementById('qr-overlay').classList.remove('open');
+      stopScanner();
+      try{
+        if(typeof showBonLivraison==='function'){
+          showBonLivraison({ client:client, saveur:allSaveurs, lots:bonLots, boites:0, typeBoite:'plastique', livreur:livreur, numeroBL:numeroBL, typeCookies:'cuits' });
+        }
+      }catch(e){ toast('Sortie enregistrée, mais BL non affiché','err'); }
+      toast('✓ BL '+numeroBL+' généré','ok');
+    }
+
+    try{
+      if(typeof fetchAPI === 'function'){
+        Promise.resolve(fetchAPI('getNextBLNumber')).then(function(n){ withBL(n); }).catch(function(){ withBL(null); });
+      } else { withBL(null); }
+    }catch(e){ withBL(null); }
   }
 
   // ── Génération / impression des QR de lots ──
@@ -14198,12 +14308,15 @@ var qrcode = function() {
   }
 
   window.KookiQR = {
-    open: function(){ document.getElementById('qr-overlay').classList.add('open'); stepScan(); },
+    open: function(){ cart = { client:'', items:[] }; document.getElementById('qr-overlay').classList.add('open'); stepScan(); },
     showLot: showLot,
     printOne: printOne,
     downloadOne: downloadOne,
     close: function(){ stopScanner(); document.getElementById('qr-overlay').classList.remove('open'); },
     back: function(){ stepScan(); },
+    addMore: function(){ stepScan(); },
+    finishBL: finishBL,
+    cancelCart: cancelCart,
     pickManual: function(){ var v = (document.getElementById('qr-manual')||{}).value; if(!v){ toast('Choisis un lot','err'); return; } onCode(v); },
     bump: function(id, dir){ var el = document.getElementById('qr-'+id); if(!el) return; var max = parseInt(el.max,10)||9999; el.value = Math.min(max, Math.max(0,(parseInt(el.value,10)||0)+dir)); },
     destChange: destChange,
