@@ -3725,12 +3725,7 @@ function loadLotsBlock(id) {
           <div style="font-size:10px;color:#aaa">Stock : ${l.big} Big · ${l.small} Small</div>
         </div>
         <div style="text-align:center">
-          ${!b2bSeulementSmall ? `<input type="number" min="0" max="${l.big}" placeholder="0"
-            id="b${id}-big-${l.code}"
-            oninput="calcBoites()"
-            style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none"
-            onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
-            <div style="font-size:9px;color:#ccc;margin-top:2px">max ${l.big}</div>` : '<div></div>'}
+          ${bigCellHTML(id, l, b2bSeulementSmall)}
         </div>
         <div style="text-align:center">
           <input type="number" min="0" max="${l.small}" placeholder="0"
@@ -3746,6 +3741,46 @@ function loadLotsBlock(id) {
           </div>` : ''}
         </div>
       </div>`).join('')}`;
+}
+
+// Cellule « Big » de la sortie : par bac (option 2) si le lot a un détail, sinon champ unique
+function bigCellHTML(id, l, b2bSeulementSmall){
+  if(b2bSeulementSmall) return '<div></div>';
+  const single = '<input type="number" min="0" max="'+l.big+'" placeholder="0" id="b'+id+'-big-'+l.code+'" oninput="calcBoites()" style="width:62px;padding:5px 6px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;text-align:center;background:#fff;outline:none" onfocus="this.style.borderColor=\'#d44218\'" onblur="this.style.borderColor=\'#e8e8e8\'"><div style="font-size:9px;color:#ccc;margin-top:2px">max '+l.big+'</div>';
+  const bacs = (typeof getBacsForLot==='function') ? getBacsForLot(l.code) : null;
+  if(!bacs || !bacs.length) return single;
+  const rows = bacs.map(function(b){
+    const dis = b.restant<=0 ? ' disabled' : '';
+    return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-bottom:3px">'+
+      '<span style="font-size:9px;color:#8a97a5;white-space:nowrap">'+b.lettre+' · '+b.restant+'</span>'+
+      '<input type="number" min="0" max="'+b.restant+'" placeholder="0"'+dis+' id="b'+id+'-bacq-'+l.code+'-'+b.lettre+'" data-lot="'+l.code+'" data-lettre="'+b.lettre+'" oninput="onBacQty(\''+id+'\',this)" style="width:46px;padding:4px 5px;border:1.5px solid #e8e8e8;border-radius:6px;font-size:12px;text-align:center;outline:none'+(b.restant<=0?';background:#f4f4f4':'')+'">'+
+    '</div>';
+  }).join('');
+  return rows +
+    '<input type="hidden" id="b'+id+'-big-'+l.code+'" value="0">'+
+    '<div id="b'+id+'-bigsum-'+l.code+'" style="font-size:9px;color:#d44218;font-weight:700;text-align:right;margin-top:1px">0 big</div>';
+}
+function onBacQty(id, inp){
+  const lot = inp.getAttribute('data-lot');
+  let sum = 0;
+  document.querySelectorAll('input[data-lot="'+lot+'"][data-lettre]').forEach(function(x){
+    if(x.id.indexOf('b'+id+'-bacq-')===0) sum += parseInt(x.value,10)||0;
+  });
+  const hid = document.getElementById('b'+id+'-big-'+lot); if(hid) hid.value = sum;
+  const disp = document.getElementById('b'+id+'-bigsum-'+lot); if(disp) disp.textContent = sum + ' big';
+  if(typeof calcBoites==='function') calcBoites();
+}
+// Lit la répartition par bac saisie pour un lot : [{lettre, qty}] ou null
+function readBacDistribution(bId, code){
+  const inputs = document.querySelectorAll('input[data-lot="'+code+'"][data-lettre]');
+  if(!inputs.length) return null;
+  const dist = [];
+  inputs.forEach(function(x){
+    if(x.id.indexOf('b'+bId+'-bacq-')!==0) return;
+    const q = parseInt(x.value,10)||0;
+    if(q>0) dist.push({ lettre: x.getAttribute('data-lettre'), qty: q });
+  });
+  return dist;
 }
 
   function changeBacIx(blockId, lotCode, delta, max, cpb) {
@@ -3794,6 +3829,7 @@ function getAllSaveursLots() {
             saveur,
             big:   parseInt(document.getElementById(`b${bId}-big-${l.code}`)?.value)   || 0,
             small: parseInt(document.getElementById(`b${bId}-small-${l.code}`)?.value) || 0,
+            bacs:  readBacDistribution(bId, l.code),
           };
         }
       })
@@ -4642,6 +4678,7 @@ if (type === 'autre') {
         lots.forEach(lot => {
           const s = stockLocal.find(s => s.code === lot.code);
           if (s) { s.big -= lot.big; s.small -= lot.small; }
+          if (lot.bacs && lot.bacs.length && typeof decrementBacs === 'function') decrementBacs(lot.code, lot.bacs);
         });
         // Historique — 1 ligne par lot
         lots.forEach(lot => {
@@ -7716,6 +7753,47 @@ function closeCodeEtiquette(){
   var ov=document.getElementById('etiq-overlay'); if(ov) ov.style.display='none';
 }
 
+// ═══ Suivi du restant PAR BAC (lot|lettre → cookies restants) ═══
+var BAC_LETTRES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function _bacRestantMap(){ try{ return JSON.parse(localStorage.getItem('kooki_bac_restant') || '{}'); }catch(e){ return {}; } }
+function _saveBacRestant(m){ try{ localStorage.setItem('kooki_bac_restant', JSON.stringify(m)); }catch(e){} }
+function initBacsRestant(code, bacsArr){
+  if(!Array.isArray(bacsArr)) return;
+  const m = _bacRestantMap();
+  bacsArr.forEach(function(ck,i){
+    const key = code + '|' + (BAC_LETTRES[i] || ('B'+i));
+    if(m[key] === undefined) m[key] = parseInt(ck,10) || 0;
+  });
+  _saveBacRestant(m);
+}
+// Renvoie les bacs d'un lot avec leur restant courant, ou null si le lot n'a pas de détail par bac (ancien système)
+function getBacsForLot(code){
+  let prods = [];
+  try{ prods = JSON.parse(localStorage.getItem('kooki_productions') || '[]'); }catch(e){}
+  const prod = prods.find(function(p){ return p.code === code; });
+  if(!prod || !Array.isArray(prod.bacs) || !prod.bacs.length) return null;
+  initBacsRestant(code, prod.bacs); // init paresseuse si jamais fait
+  const m = _bacRestantMap();
+  const out = [];
+  prod.bacs.forEach(function(ck,i){
+    const lettre = BAC_LETTRES[i] || ('B'+i);
+    const key = code + '|' + lettre;
+    const restant = (m[key] !== undefined) ? m[key] : (parseInt(ck,10)||0);
+    out.push({ lettre: lettre, restant: restant, initial: parseInt(ck,10)||0 });
+  });
+  return out;
+}
+// distribution : [{ lettre, qty }]
+function decrementBacs(code, distribution){
+  const m = _bacRestantMap();
+  distribution.forEach(function(d){
+    const key = code + '|' + d.lettre;
+    const cur = (m[key] !== undefined) ? m[key] : 0;
+    m[key] = Math.max(0, cur - (parseInt(d.qty,10)||0));
+  });
+  _saveBacRestant(m);
+}
+
 async function saveProduction() {
   const nom=val('prod-nom'), pmx=val('prod-pmx'), code=val('prod-code'), saveur=val('prod-saveur');
   const small=parseInt(val('prod-small'))||0;
@@ -7755,6 +7833,7 @@ async function saveProduction() {
       const storedProd = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
       storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString(), bacsSimple: bacsArr.length, bacsDouble: 0, bacs: bacsArr });
       localStorage.setItem('kooki_productions', JSON.stringify(storedProd));
+      initBacsRestant(code, bacsArr); // initialise le restant par bac
 
       // 2. Ré-afficher le tableau historique production (colonnes bacs correctes)
       applyProduction([]);
