@@ -1258,6 +1258,7 @@
             <option>Petit Mercado</option>
             <option>La Belladone</option>
             <option>JAT Café</option>
+            <option>Muse Co-stu</option>
           </select>
         </div>
       </div>
@@ -1336,6 +1337,10 @@
       <div class="b2b-client-btn" data-client="JAT Café" onclick="selectClientBtn('JAT Café')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
         <div style="width:34px;height:34px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#0C447C">JC</div>
         <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">JAT Café</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Louise Roobaert</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="Muse Co-stu" onclick="selectClientBtn('Muse Co-stu')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#FCE7F3;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#9D174D">MC</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Muse Co-stu</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nour Elibol</div></div>
       </div>
     </div>
   </div>
@@ -2271,6 +2276,7 @@
             <tr><td><b>Kooki Anderlecht</b><div class="sub-text">Virginia Kunnen · 0492 80 10 38</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>Petit Mercado</b><div class="sub-text">Pia & Meno · 0487 30 09 69</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>JAT Café</b><div class="sub-text">Louise Roobaert · +32 495 21 01 96</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Muse Co-stu</b><div class="sub-text">Nour Elibol</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2293,6 +2299,7 @@
             <option>Kooki Anderlecht</option>
             <option>Petit Mercado</option>
             <option>La Belladone</option>
+            <option>Muse Co-stu</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:14px">
@@ -2953,6 +2960,7 @@ const SEARCH_DB = [
   { cat:'Client B2B', icon:'🏪', ref:'Slide Coffee',     detail:'Sebastien Kunnen · +32 489 39 65 16 · Forest',    page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'Kooki Anderlecht', detail:'Virginia Kunnen · 0492 80 10 38 · Anderlecht',    page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'Petit Mercado',    detail:'Pia & Meno · 0487 30 09 69 · Saint-Gilles',       page:'frigo' },
+  { cat:'Client B2B', icon:'🏪', ref:'Muse Co-stu',      detail:'Nour Elibol · Rue de la Reinette 4 · Bruxelles',  page:'frigo' },
   // Fournisseurs
   { cat:'Fournisseur', icon:'🚛', ref:'Foodflow',        detail:'Fournisseur ingrédients', page:'reception' },
   { cat:'Fournisseur', icon:'🚛', ref:'Bruyerre',        detail:'Fournisseur ingrédients', page:'reception' },
@@ -3211,6 +3219,7 @@ const B2B_CLIENTS = {
   'Petit Mercado':   { adresse:'Rue de l\'Hôtel des Monnaies 82, 1060 Saint-Gilles', contact:'Pia & Meno',  tel:'0487 30 09 69' },
   'La Belladone':    { adresse:'Rue Moris 17A, 1060 Saint-Gilles', contact:'Aurélie Alonso', tel:'+32 489 32 18 26' },
   'JAT Café': { adresse:'Rue de Namur 28, 1000 Bruxelles', contact:'Louise Roobaert', tel:'+32 495 21 01 96' },
+  'Muse Co-stu':     { adresse:'Rue de la Reinette 4, 1000 Bruxelles', contact:'Nour Elibol', tel:'' },
 };
 
 function fillClientInfo() {
@@ -4024,7 +4033,7 @@ function renderBoitesTable() {
   if (!tbody) return;
 
   const boites = JSON.parse(localStorage.getItem('kooki_boites') || '[]');
-  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone'];
+  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
 
   tbody.innerHTML = B2B_LIST.map(client => {
     let envoyees = 0, retournees = 0;
@@ -9086,7 +9095,7 @@ function applySorties(data) {
   // Déterminer le type de destination
   const getDestType = (dest) => {
     if (['Magasin Ixelles', 'Magasin Anderlecht'].includes(dest)) return { icon:'🏪', badge:'Magasin', color:'#fbe8e2', textColor:'#d44218' };
-    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado'];
+    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
     if (b2b.includes(dest)) return { icon:'🤝', badge:'B2B', color:'#e8f8f0', textColor:'#1a8a4a' };
     return { icon:'📦', badge:'Autre', color:'#f0f0f0', textColor:'#888' };
   };
@@ -9670,7 +9679,7 @@ function renderRecapB2b(offset) {
   const b2b = sorties.filter(s => {
     const d = new Date(s.date);
     const clients = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière',
-      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado'];
+      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
     return d >= monday && d <= sunday && clients.includes(s.destination);
   });
 
@@ -13922,7 +13931,7 @@ var qrcode = function() {
   var lastDest = { type:'', client:'', custom:'' };
   // Panier B2B : accumule les bacs d'une même livraison pour générer UN seul BL
   var cart = { client:'', items:[] };
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
   var DEST_TYPES = [
     { v:'interne',    label:'🔧 Usage interne' },
     { v:'magasin',    label:'🛍️ Magasin Ixelles' },
