@@ -977,7 +977,7 @@
        <div id="prod-pmx-warning" style="display:none;background:#fdf0ec;border:1.5px solid #f5cbb8;border-radius:9px;padding:10px 14px;font-size:12px;color:#d44218;font-weight:600;grid-column:1/-1"></div>
 <div class="form-group"><label>Code Lot *</label><input type="text" id="prod-code" placeholder="Ex: SUZ-260606-01"></div>
         <div class="form-group"><label>Saveur *</label>
-          <select id="prod-saveur" onchange="calcProdTotaux();autoGenCodeLot()">
+          <select id="prod-saveur" onchange="prodSaveurChanged()">
             <option value="">-- Choisir --</option>
             <option>SUZZY</option><option>JACKY</option><option>BENNY</option><option>DAVY</option>
             <option>MOLLY</option><option>WALLY</option><option>CHARLY</option><option>LENI</option>
@@ -989,22 +989,15 @@
       <div style="background:#f9f9f9;border-radius:10px;padding:13px 16px;margin-bottom:11px;border:1.5px solid #e8e8e8;grid-column:1/-1">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div style="font-size:13px;font-weight:700">Grands (Big 165g)</div>
-          <span id="prod-bac-tag" style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">45 cookies/bac</span>
+          <span id="prod-bac-tag" style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">≈ 45 / bac</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;align-items:end">
-          <div class="form-group"><label>Bacs simples (1 étage)</label><input type="number" id="prod-bacs-simple" placeholder="0" min="0" oninput="calcProdTotaux()"></div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em">
-              <input type="checkbox" id="prod-has-double" onchange="toggleProdDouble()" style="accent-color:#d44218;width:14px;height:14px;cursor:pointer">
-              Bacs doubles (2 étages · Anderlecht)
-            </label>
-            <input type="number" id="prod-bacs-double" placeholder="0" min="0" oninput="calcProdTotaux()" style="display:none;padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;color:#1a1a2e;background:#f9f9f9;outline:none;width:100%">
-          </div>
-        </div>
+        <div style="font-size:11px;color:#888;margin-bottom:8px">Note le nombre réel de cookies dans chaque bac :</div>
+        <div id="prod-bac-list"></div>
+        <button type="button" onclick="addProdBac()" style="width:100%;border:1.5px dashed #e2b3a4;background:#fff7f4;color:#d44218;border-radius:9px;padding:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">＋ Ajouter un bac</button>
         <div id="prod-bacs-total-box" style="background:#eef1f5;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div>
             <div style="font-size:12px;color:#334155;font-weight:600">🗃️ Total bacs</div>
-            <div id="prod-bacs-total-detail" style="font-size:10px;color:#64748b">0 simple</div>
+            <div id="prod-bacs-total-detail" style="font-size:10px;color:#64748b">0 bac</div>
           </div>
           <span id="prod-bacs-total-display" style="font-size:18px;font-weight:700;color:#334155">0 bac</span>
         </div>
@@ -1076,7 +1069,7 @@
     <div class="card">
       <div class="card-header"><div><div class="card-title">Historique de production</div></div></div>
       <table>
-        <thead><tr><th>Code Lot</th><th>Saveur</th><th>Bacs simples</th><th>Bacs doubles</th><th>Total Big</th><th>Total Baby</th><th>Premix</th><th>Producteur</th><th></th></tr></thead>
+        <thead><tr><th>Code Lot</th><th>Saveur</th><th>Bacs</th><th>Cookies / bac</th><th>Total Big</th><th>Total Baby</th><th>Premix</th><th>Producteur</th><th></th></tr></thead>
         <tbody id="prod-table">
           <tr><td colspan="8" class="empty">Chargement…</td></tr>
         </tbody>
@@ -6768,69 +6761,81 @@ function setProdTab(tab){
   else { off(bPrep); on(bProd); }
 }
 
+// ═══ Système « par bac » : on note le nombre réel de cookies dans chaque bac ═══
+var prodBacs = [];  // ex : [120, 118, 95]
+function prodSuggestCpb(){
+  const s = document.getElementById('prod-saveur')?.value || '';
+  const cfg = SAVEUR_BAC_CONFIG[s] || {cpb:45};
+  return cfg.cpb || 45;
+}
+function renderProdBacs(){
+  const el = document.getElementById('prod-bac-list');
+  if(!el) return;
+  const L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  el.innerHTML = prodBacs.map(function(v,i){
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'+
+      '<div style="width:30px;height:34px;flex-shrink:0;border-radius:8px;background:#fbe8e2;color:#d44218;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">'+(L[i]||'?')+'</div>'+
+      '<input type="number" min="0" value="'+v+'" oninput="setProdBac('+i+',this.value)" placeholder="cookies" style="flex:1;padding:8px 11px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;outline:none">'+
+      '<button type="button" onclick="removeProdBac('+i+')" title="Retirer ce bac" style="width:34px;height:34px;flex-shrink:0;border:none;background:#f1f4f8;color:#c0392b;border-radius:8px;font-size:14px;cursor:pointer">✕</button>'+
+    '</div>';
+  }).join('') || '<div style="font-size:12px;color:#aaa;padding:4px 0 10px">Aucun bac — clique « Ajouter un bac ».</div>';
+  calcProdTotaux();
+}
+function addProdBac(){ prodBacs.push(prodSuggestCpb()); renderProdBacs(); }
+function removeProdBac(i){ prodBacs.splice(i,1); renderProdBacs(); }
+function setProdBac(i,v){ prodBacs[i] = Math.max(0, parseInt(v,10)||0); calcProdTotaux(); }
+function prodSaveurChanged(){ if(!prodBacs.length) prodBacs = [prodSuggestCpb()]; renderProdBacs(); if(typeof autoGenCodeLot==='function') autoGenCodeLot(); }
+
 function calcProdTotaux() {
   const saveur = document.getElementById('prod-saveur')?.value || 'EMMY';
   const cfg = SAVEUR_BAC_CONFIG[saveur] || {cpb:45,baby:true};
-  const simple = parseInt(document.getElementById('prod-bacs-simple')?.value)||0;
-  const hasDbl = document.getElementById('prod-has-double')?.checked;
-  const dbl    = hasDbl ? (parseInt(document.getElementById('prod-bacs-double')?.value)||0) : 0;
-  const small  = parseInt(document.getElementById('prod-small')?.value)||0;
-  const totalBig = (simple * cfg.cpb) + (dbl * cfg.cpb * 2);
-  document.getElementById('prod-big').value = totalBig;
-  document.getElementById('prod-total-big-display').textContent = totalBig + ' cookies';
-  document.getElementById('prod-total-small-display').textContent = small + ' cookies';
-  let detail = simple + ' × ' + cfg.cpb;
-  if (dbl > 0) detail += ' + ' + dbl + ' × ' + (cfg.cpb*2) + ' (double)';
-  document.getElementById('prod-bac-detail').textContent = detail;
-  document.getElementById('prod-bac-tag').textContent = cfg.cpb + ' cookies/bac';
+  const nbBacs   = prodBacs.length;
+  const totalBig = prodBacs.reduce(function(a,b){ return a + (parseInt(b,10)||0); }, 0);
+  const small    = parseInt(document.getElementById('prod-small')?.value)||0;
 
-  // Total de bacs physiques (simples + doubles)
-  const totalBacs = simple + dbl;
+  const pb = document.getElementById('prod-big'); if (pb) pb.value = totalBig;
+  const tbd = document.getElementById('prod-total-big-display'); if (tbd) tbd.textContent = totalBig + ' cookies';
+  const tsd = document.getElementById('prod-total-small-display'); if (tsd) tsd.textContent = small + ' cookies';
+  const det = document.getElementById('prod-bac-detail'); if (det) det.textContent = nbBacs>0 ? ('somme de '+nbBacs+' bac'+(nbBacs>1?'s':'')) : 'somme des bacs';
+  const tag = document.getElementById('prod-bac-tag'); if (tag) tag.textContent = '≈ ' + cfg.cpb + ' / bac';
+
   const dispTot = document.getElementById('prod-bacs-total-display');
   const dispDet = document.getElementById('prod-bacs-total-detail');
-  if (dispTot) dispTot.textContent = totalBacs + (totalBacs > 1 ? ' bacs' : ' bac');
-  if (dispDet) {
-    let d = simple + (simple > 1 ? ' simples' : ' simple');
-    if (dbl > 0) d += ' · ' + dbl + (dbl > 1 ? ' doubles' : ' double');
-    dispDet.textContent = d;
-  }
+  if (dispTot) dispTot.textContent = nbBacs + (nbBacs > 1 ? ' bacs' : ' bac');
+  if (dispDet) dispDet.textContent = nbBacs>0 ? prodBacs.join(' · ') + ' cookies' : '0 bac';
 
   const ss = document.getElementById('prod-small-section');
   if (ss) ss.style.display = cfg.baby ? '' : 'none';
 
-  // Contrôle de faisabilité : besoin vs bacs blancs disponibles
+  // Contrôle de faisabilité : besoin en bacs vs bacs blancs disponibles
   const chk = document.getElementById('prod-bacs-check');
   if (chk) {
     const dispo = getBacsDispo();
-    if (totalBacs <= 0) {
+    if (nbBacs <= 0) {
       chk.style.display = 'none';
     } else {
       chk.style.display = '';
-      if (dispo >= totalBacs) {
-        const reste = dispo - totalBacs;
+      if (dispo >= nbBacs) {
+        const reste = dispo - nbBacs;
         chk.style.background = '#eafaf0';
         chk.style.borderColor = '#b7e4c7';
         chk.style.color = '#1a7a3a';
         chk.textContent = '✅ Production possible · il restera ' + reste + ' bac' + (reste > 1 ? 's' : '') + ' (dispo : ' + dispo + ')';
       } else {
-        const manque = totalBacs - dispo;
+        const manque = nbBacs - dispo;
         chk.style.background = '#fdecec';
         chk.style.borderColor = '#f5c0c0';
         chk.style.color = '#c0392b';
-        chk.textContent = '⚠️ Il manque ' + manque + ' bac' + (manque > 1 ? 's' : '') + ' · besoin ' + totalBacs + ' · dispo ' + dispo;
+        chk.textContent = '⚠️ Il manque ' + manque + ' bac' + (manque > 1 ? 's' : '') + ' · besoin ' + nbBacs + ' · dispo ' + dispo;
       }
     }
   }
 }
+document.addEventListener('DOMContentLoaded', function(){ try{ if(document.getElementById('prod-bac-list')) renderProdBacs(); }catch(e){} });
 
-function toggleProdDouble() {
-  const show = document.getElementById('prod-has-double').checked;
-  const dbl  = document.getElementById('prod-bacs-double');
-  if (dbl) dbl.style.display = show ? '' : 'none';
-  calcProdTotaux();
-}
+/* toggleProdDouble supprimé : plus de bacs doubles (système « par bac ») */
   
-function resetProd() { ['prod-pmx','prod-code','prod-big','prod-small'].forEach(id=>document.getElementById(id).value=''); document.getElementById('prod-saveur').selectedIndex=0; document.querySelectorAll('#prod-fac-list input').forEach(c=>c.checked=false); }
+function resetProd() { prodBacs=[]; renderProdBacs(); ['prod-pmx','prod-code','prod-big','prod-small'].forEach(id=>{var e=document.getElementById(id); if(e) e.value='';}); document.getElementById('prod-saveur').selectedIndex=0; document.querySelectorAll('#prod-fac-list input').forEach(c=>c.checked=false); }
 function resetRec() {
   ['rec-numero','rec-nom','rec-date','rec-facture-odoo'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
@@ -7713,32 +7718,26 @@ function closeCodeEtiquette(){
 
 async function saveProduction() {
   const nom=val('prod-nom'), pmx=val('prod-pmx'), code=val('prod-code'), saveur=val('prod-saveur');
-  const big=parseInt(val('prod-big'))||0, small=parseInt(val('prod-small'))||0;
+  const small=parseInt(val('prod-small'))||0;
+  // Nouveau système : un nombre de cookies par bac
+  const bacsArr = prodBacs.map(function(x){ return parseInt(x,10)||0; }).filter(function(x){ return x > 0; });
+  const big = bacsArr.reduce(function(a,b){ return a+b; }, 0);
   if (!nom||!pmx||!code||!saveur) { toast('prod','⚠️ Tous les champs * sont requis','err'); return; }
+  if (!bacsArr.length) { toast('prod','⚠️ Ajoute au moins un bac avec un nombre de cookies','err'); return; }
   const factures = getCheckedFactures('prod-fac-list');
   if (!factures.length) { toast('prod','⚠️ Cochez au moins 1 BL','err'); return; }
   try {
   const res = await fetch(API, { method:'POST', body: JSON.stringify({ action:'production', nom, pmx, code, saveur, big, small, factures,
-    bacsSimple: parseInt(document.getElementById('prod-bacs-simple')?.value) || 0,
-    bacsDouble: document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0
+    bacsSimple: bacsArr.length, bacsDouble: 0, bacs: bacsArr
   }) });
     const json = await res.json();
     if (json.success) {
-  // Créer les bacs dans Sheets
+  // Créer les bacs dans Sheets (un bac = son vrai nombre de cookies)
   const LETTRES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
-  const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
-  const cpbSimple = parseInt(document.getElementById('prod-bac-tag')?.textContent) || 45;
-  const cpbDouble = cpbSimple * 2;
   const date = new Date().toISOString();
-  let letIdx = 0;
-  const bacsACreer = [];
-  for (let i = 0; i < nbSimple; i++) {
-    bacsACreer.push({ date, lot: code, saveur, lettre: LETTRES[letIdx++], type: 'simple', cookies: cpbSimple, restant: cpbSimple, statut: 'en frigo' });
-  }
-  for (let i = 0; i < nbDouble; i++) {
-    bacsACreer.push({ date, lot: code, saveur, lettre: LETTRES[letIdx++], type: 'double', cookies: cpbDouble, restant: cpbDouble, statut: 'en frigo' });
-  }
+  const bacsACreer = bacsArr.map(function(ck, i){
+    return { date, lot: code, saveur, lettre: LETTRES[i] || ('B'+i), type: 'simple', cookies: ck, restant: ck, statut: 'en frigo' };
+  });
   bacsACreer.forEach(bac => {
     fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) }).catch(() => {});
   });
@@ -7754,7 +7753,7 @@ async function saveProduction() {
       localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
       // Sauvegarder dans localStorage
       const storedProd = JSON.parse(localStorage.getItem('kooki_productions') || '[]');
-      storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString(), bacsSimple: nbSimple, bacsDouble: nbDouble });
+      storedProd.unshift({ code, saveur, big, small, pmx, nom, bls: factures, date: new Date().toISOString(), bacsSimple: bacsArr.length, bacsDouble: 0, bacs: bacsArr });
       localStorage.setItem('kooki_productions', JSON.stringify(storedProd));
 
       // 2. Ré-afficher le tableau historique production (colonnes bacs correctes)
@@ -9264,6 +9263,7 @@ function applyProduction(data) {
     nom:     r.nom       || r.producteur    || r.producer   || '—',
     bacsSimple: parseInt(r.bacsSimple || r.bacsSimples || 0) || 0,
     bacsDouble: parseInt(r.bacsDouble || r.bacsDoubles || 0) || 0,
+    bacs:    Array.isArray(r.bacs) ? r.bacs.map(function(x){ return parseInt(x,10)||0; }) : null,
     date:    r.date      || null,
   });
 
@@ -9300,9 +9300,11 @@ function applyProduction(data) {
       if (loc && !(r.bacsSimple || r.bacsDouble) && (loc.bacsSimple || loc.bacsDouble)) {
         return Object.assign({}, r, {
           bacsSimple: parseInt(loc.bacsSimple) || 0,
-          bacsDouble: parseInt(loc.bacsDouble) || 0
+          bacsDouble: parseInt(loc.bacsDouble) || 0,
+          bacs: Array.isArray(loc.bacs) ? loc.bacs : r.bacs
         });
       }
+      if (loc && !r.bacs && Array.isArray(loc.bacs)) { return Object.assign({}, r, { bacs: loc.bacs }); }
       return r;
     });
     const apiCodes = new Set(apiFiltered.map(r => r.code));
@@ -9345,8 +9347,8 @@ function applyProduction(data) {
    html += `<tr data-prod-code="${r.code}">
   <td><b>${r.code}</b>${dateFormatted ? `<div class="sub-text">${dateFormatted}</div>` : ''}</td>
   <td><span class="tag tag-o">${r.saveur}</span></td>
-  <td>${r.bacsSimple || 0}</td>
-  <td>${r.bacsDouble || 0}</td>
+  <td>${r.bacs ? r.bacs.length : (r.bacsSimple || 0)}</td>
+  <td class="sub-text">${r.bacs ? r.bacs.join(' · ') : (r.bacsDouble ? r.bacsDouble + ' double(s)' : '—')}</td>
   <td style="color:${color};font-weight:700">${r.big}</td>
   <td style="color:#0662aa;font-weight:700">${r.small}</td>
   <td class="sub-text">${r.pmx}</td>
@@ -10112,8 +10114,8 @@ function showLoginScreen() {
 function imprimerEtiquettesProductionFormulaire() {
   const saveur = document.getElementById('prod-saveur')?.value;
   const code = document.getElementById('prod-code')?.value;
-  const nbSimple = parseInt(document.getElementById('prod-bacs-simple')?.value) || 0;
-  const nbDouble = document.getElementById('prod-has-double')?.checked ? (parseInt(document.getElementById('prod-bacs-double')?.value) || 0) : 0;
+  const nbSimple = prodBacs.length;   // une étiquette par bac
+  const nbDouble = 0;
   if (!saveur || !code) { toast('prod', '⚠️ Remplis la saveur et le code lot d\'abord', 'err'); return; }
 
   const choix = confirm('Quel type d\'étiquettes veux-tu imprimer ?\n\nOK → Étiquettes bacs (usage interne)\nAnnuler → Étiquettes B2B (livraison client)');
@@ -10121,7 +10123,8 @@ function imprimerEtiquettesProductionFormulaire() {
   if (choix) {
     imprimerEtiquettesProduction(code, saveur, new Date().toISOString(), nbSimple, nbDouble);
   } else {
-    const lots = [{ code, saveur, big: nbSimple * (SAVEUR_BAC_CONFIG[saveur]?.cpb || 45), small: 0 }];
+    const big = prodBacs.reduce(function(a,b){ return a + (parseInt(b,10)||0); }, 0);
+    const lots = [{ code, saveur, big: big, small: 0 }];
     const client = prompt('Nom du client B2B ?') || 'Client';
     imprimerEtiquettesLot(lots, client, 'cuits');
   }
@@ -10436,14 +10439,25 @@ function buildBacsFromProductions(prods, sorties) {
   prods.forEach(prod => {
     const sav = (prod.saveur || '').toUpperCase();
     const code = prod.code;
+    if (!result[sav]) result[sav] = [];
+    let letIdx = 0;
+
+    // Nouveau système : nombre réel de cookies par bac
+    if (Array.isArray(prod.bacs) && prod.bacs.length) {
+      prod.bacs.forEach(function(ck){
+        const lettre = LETTRES[letIdx++];
+        if (!bacsSortis.has(code + '-' + lettre)) {
+          result[sav].push({ lot: code, lettre, qty: (parseInt(ck,10)||0), type: 'simple', sorti: false });
+        }
+      });
+      return;
+    }
+
+    // Ancien système (rétro-compatibilité) : bacs simples/doubles × cpb
     const nbSimple = prod.bacsSimple || Math.floor((prod.big || 0) / (SAVEUR_CPB[sav] || 45));
     const nbDouble = prod.bacsDouble || 0;
     const cpbSimple = SAVEUR_CPB[sav] || 45;
     const cpbDouble = SAVEUR_CPB_DOUBLE[sav] || 90;
-
-    if (!result[sav]) result[sav] = [];
-
-    let letIdx = 0;
     for (let i = 0; i < nbSimple; i++) {
       const lettre = LETTRES[letIdx++];
 if (!bacsSortis.has(code + '-' + lettre)) {
