@@ -7848,15 +7848,7 @@ async function saveProduction() {
   }) });
     const json = await res.json();
     if (json.success) {
-  // Créer les bacs dans Sheets (un bac = son vrai nombre de cookies)
-  const LETTRES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const date = new Date().toISOString();
-  const bacsACreer = bacsArr.map(function(ck, i){
-    return { date, lot: code, saveur, lettre: LETTRES[i] || ('B'+i), type: 'simple', cookies: ck, restant: ck, statut: 'en frigo' };
-  });
-  bacsACreer.forEach(bac => {
-    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) }).catch(() => {});
-  });
+  // Les bacs sont désormais créés côté serveur en une seule écriture (action 'production').
       toast('prod','✓ Production enregistrée !','ok');
       // 1. Mettre à jour stockLocal (utilisé par le frigo)
       const existing = stockLocal.find(s => s.code === code);
