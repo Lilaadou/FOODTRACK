@@ -529,67 +529,30 @@
   <div style="font-size:14px;color:#888;font-weight:500;margin-bottom:4px">Traçabilité & gestion de production</div>
   <div style="font-size:12px;color:#bbb;margin-bottom:36px">Qui êtes-vous ?</div>
 
-  <!-- Groupes de profils -->
-  <div style="width:100%;max-width:720px;display:flex;flex-direction:column;gap:26px">
+  <!-- Boutons de rôle -->
+  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px">
 
-    <!-- Administration -->
-    <div>
-      <div class="login-sec">Administration</div>
-      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-        <div class="login-card" onclick="loginAs('Virginia')">
-          <div class="login-av">VK</div>
-          <div class="login-name">Virginia Kunnen</div>
-          <div class="login-role">Patron</div>
-        </div>
-        <div class="login-card" onclick="loginAs('Abenazer')">
-          <div class="login-av">AH</div>
-          <div class="login-name">Abenazer Hailu</div>
-          <div class="login-role">Patron</div>
-        </div>
-        <div class="login-card" onclick="loginAs('Sebastien')">
-          <div class="login-av">SK</div>
-          <div class="login-name">Sebastien Kunnen</div>
-          <div class="login-role">Associé</div>
-        </div>
-        <div class="login-card" onclick="loginAs('DavidD')">
-          <div class="login-av">DD</div>
-          <div class="login-name">David Deridder</div>
-          <div class="login-role">Manager</div>
-        </div>
-      </div>
+    <div onclick="enterRole('admin')" style="cursor:pointer;border:1.5px solid #eee;border-radius:18px;padding:20px;display:flex;align-items:center;gap:16px;background:#fff;transition:.15s" onmouseover="this.style.borderColor='#d44218';this.style.background='#fdf0ec'" onmouseout="this.style.borderColor='#eee';this.style.background='#fff'">
+      <div style="width:52px;height:52px;border-radius:14px;background:#fbe8e2;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🗂️</div>
+      <div><div style="font-size:16px;font-weight:800;color:#1a1a2e">Administratif</div><div style="font-size:12px;color:#999;margin-top:2px">Accès complet — production + livraison</div></div>
     </div>
 
-    <!-- Production -->
-    <div>
-      <div class="login-sec">Équipe production</div>
-      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-        <div class="login-card" onclick="loginAs('Production')">
-          <div class="login-av">PR</div>
-          <div class="login-name">Production</div>
-          <div class="login-role">Équipe partagée</div>
-        </div>
-        <div class="login-card" onclick="loginAs('Lila')">
-          <div class="login-av">LD</div>
-          <div class="login-name">Lila Doudou</div>
-          <div class="login-role">Administrateur</div>
-        </div>
-      </div>
+    <div onclick="enterRole('frigo')" style="cursor:pointer;border:1.5px solid #eee;border-radius:18px;padding:20px;display:flex;align-items:center;gap:16px;background:#fff;transition:.15s" onmouseover="this.style.borderColor='#0662aa';this.style.background='#eef4fb'" onmouseout="this.style.borderColor='#eee';this.style.background='#fff'">
+      <div style="width:52px;height:52px;border-radius:14px;background:#e0edf8;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">❄️</div>
+      <div><div style="font-size:16px;font-weight:800;color:#1a1a2e">Sortie frigo</div><div style="font-size:12px;color:#999;margin-top:2px">Stock cookies + sorties frigo</div></div>
     </div>
 
-    <!-- Vente / Tablettes magasins -->
-    <div>
-      <div class="login-sec">Équipe vente · Tablettes magasins</div>
-      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-        <div class="login-card" onclick="loginAs('Ixelles')">
-          <div class="login-av">IX</div>
-          <div class="login-name">Magasin Ixelles</div>
-          <div class="login-role">Commandes</div>
-        </div>
-        <div class="login-card" onclick="loginAs('Anderlecht')">
-          <div class="login-av">AN</div>
-          <div class="login-name">Magasin Anderlecht</div>
-          <div class="login-role">Frigo · Tâches</div>
-        </div>
+    <div id="role-prod-main" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'" style="cursor:pointer;border:1.5px solid #eee;border-radius:18px;padding:20px;display:flex;align-items:center;gap:16px;background:#fff;transition:.15s" onmouseover="this.style.borderColor='#e8956a';this.style.background='#fdf3ee'" onmouseout="this.style.borderColor='#eee';this.style.background='#fff'">
+      <div style="width:52px;height:52px;border-radius:14px;background:#fbeadf;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏭</div>
+      <div><div style="font-size:16px;font-weight:800;color:#1a1a2e">Production</div><div style="font-size:12px;color:#999;margin-top:2px">Premix + production</div></div>
+    </div>
+    <div id="role-prod-sub" style="display:none;flex-direction:column;gap:10px;padding-left:6px">
+      <div style="font-size:11px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 4px">Production — choisis :</div>
+      <div onclick="enterRole('prod','premix')" style="cursor:pointer;border:1.5px solid #eee;border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:12px;background:#fafafa;transition:.15s" onmouseover="this.style.borderColor='#e8956a';this.style.background='#fff'" onmouseout="this.style.borderColor='#eee';this.style.background='#fafafa'">
+        <span style="font-size:22px">🧪</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Premix</span>
+      </div>
+      <div onclick="enterRole('prod','production')" style="cursor:pointer;border:1.5px solid #eee;border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:12px;background:#fafafa;transition:.15s" onmouseover="this.style.borderColor='#e8956a';this.style.background='#fff'" onmouseout="this.style.borderColor='#eee';this.style.background='#fafafa'">
+        <span style="font-size:22px">🏭</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Production</span>
       </div>
     </div>
 
@@ -2636,13 +2599,17 @@ const PROFILES = {
   Ixelles:   { color:'#d44218', initial:'IX', role:'Magasin Ixelles',   pages: IXELLES_PAGES },
   Anderlecht:{ color:'#0662aa', initial:'AN', role:'Magasin Anderlecht', pages: ANDERLECHT_PAGES },
 };
+// ── Rôles simplifiés (boutons de l'écran d'accueil) ──
+PROFILES.frigo = { color:'#0662aa', initial:'SF', role:'Sortie frigo', pages:['stock','frigo'] };
+PROFILES.prod  = { color:'#e8956a', initial:'PR', role:'Production',   pages:['premix','production'] };
 
 const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Sorties frigo', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder', Production:'Production',
   Meg:'Meg Dollinger', Alexandre:'Alexandre Michel', DavidC:'David Cohenca',
-  Ixelles:'Magasin Ixelles', Anderlecht:'Magasin Anderlecht'
+  Ixelles:'Magasin Ixelles', Anderlecht:'Magasin Anderlecht',
+  frigo:'Sortie frigo', prod:'Production'
 };
 
 // Liste des producteurs sélectionnables (Premix / Production / Cake)
@@ -2839,6 +2806,46 @@ function selectProfile(name) {
   updateDashboardIxellesBanner();
   // Rafraîchir les commandes Ixelles si l'onglet est ouvert
   if (document.getElementById('page-ixelles')?.classList.contains('active')) loadCommandesIxelles();
+}
+
+// ── Entrée par RÔLE (remplace la sélection par personne) ──
+var ALL_NAV_IDS = ['premix','production','stock','ingredients','frigo','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons','alertes','parametres'];
+var ROLE_NAV = {
+  admin: ALL_NAV_IDS.slice(),
+  frigo: ['stock','frigo'],
+  prod:  ['premix','production']
+};
+var ROLE_META = {
+  admin:{ profil:'Lila',  initial:'AD', color:'#c0392b', nom:'Administratif' },
+  frigo:{ profil:'frigo', initial:'SF', color:'#0662aa', nom:'Sortie frigo' },
+  prod: { profil:'prod',  initial:'PR', color:'#e8956a', nom:'Production' }
+};
+function enterRole(roleKey, firstPage){
+  var m = ROLE_META[roleKey]; if(!m) return;
+  currentProfile = m.profil;
+  currentMode = null;
+  document.body.classList.remove('mode-delivery');
+  // En-tête (avatar + nom du rôle)
+  var av = document.getElementById('topbar-avatar'); if(av){ av.textContent = m.initial; av.style.background = m.color; }
+  var nm = document.getElementById('topbar-name'); if(nm) nm.textContent = m.nom;
+  // Visibilité des onglets selon le rôle
+  var allowed = ROLE_NAV[roleKey] || ALL_NAV_IDS;
+  ALL_NAV_IDS.forEach(function(id){ var el = document.getElementById('nav-' + id); if(el) el.classList.toggle('hidden', allowed.indexOf(id) === -1); });
+  // Pas de bascule de mode avec les rôles
+  var sm = document.getElementById('switch-mode-btn'); if(sm) sm.style.display = 'none';
+  var qs = document.getElementById('mode-quickswitch'); if(qs) qs.style.display = 'none';
+  // Entrer dans l'app
+  try{ chargerStockInitial(); }catch(e){}
+  var ls = document.getElementById('login-screen'); if(ls) ls.style.display = 'none';
+  var lo = document.getElementById('loading-overlay'); if(lo) lo.style.display = 'none';
+  var fp = firstPage || allowed[0] || 'dashboard';
+  showPage(fp, document.getElementById('nav-' + fp));
+  if(typeof applyLastProducteur === 'function') applyLastProducteur();
+  try{ loadAllData(); }catch(e){}
+  try{ _syncLogo(); }catch(e){}
+  // Réinitialiser le sous-menu Production pour la prochaine fois
+  var sub = document.getElementById('role-prod-sub'); if(sub) sub.style.display = 'none';
+  var main = document.getElementById('role-prod-main'); if(main) main.style.display = 'flex';
 }
 
 function toggleProfileMenu() {
