@@ -2602,7 +2602,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzX_WjnW62OIceFIUkiVMKo94m7cy9AFRPMP6JpDCojhiByjQFAkHIeU7SSWZR7-ZwJdw/exec';
+const API = 'https://script.google.com/macros/s/AKfycbz3mdsfuxTMb03UBDj56lgmu8v7H_sPdvpca1F_6XBrCE0awR1eIUpP9avmZmp0WglX6w/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -2877,7 +2877,17 @@ function showPage(name, btn) {
     loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); 
     renderPdfList(); 
   }
-  if (name === 'frigo') setTimeout(() => { if(typeof setFrigoSub==='function') setFrigoSub('sortie'); }, 60);
+  if (name === 'frigo') setTimeout(() => {
+    if(typeof setFrigoSub==='function') setFrigoSub('sortie');
+    // Rafraîchir les bacs depuis le serveur, puis recharger les blocs saveur ouverts
+    if(typeof syncBacsFromServer==='function') syncBacsFromServer().then(() => {
+      document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
+        const bId = block.id.replace('saveur-block-','');
+        const sel = document.getElementById('saveur-sel-'+bId);
+        if(sel && sel.value && typeof loadLotsBlock==='function') loadLotsBlock(bId);
+      });
+    });
+  }, 60);
   if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
   if (name === 'recap-mois') setTimeout(() => { renderRecapMois(); }, 60);
   if (name === 'centre-docs') setTimeout(() => { renderCentreDocs(); }, 60);
@@ -7731,8 +7741,50 @@ function initBacsRestant(code, bacsArr){
   });
   _saveBacRestant(m);
 }
+// ═══ Cache des bacs synchronisés depuis le serveur (multi-appareils) ═══
+// Format : { code_lot: [ { lettre, restant, initial }, ... ] }
+function _bacsServerMap(){ try{ return JSON.parse(localStorage.getItem('kooki_bacs_server') || '{}'); }catch(e){ return {}; } }
+function _saveBacsServer(m){ try{ localStorage.setItem('kooki_bacs_server', JSON.stringify(m)); }catch(e){} }
+
+// Récupère les bacs "en frigo" depuis le Google Sheet et les met en cache local.
+// Permet à n'importe quel appareil (ex : tablette) de voir les lettres de bac,
+// même s'il n'a jamais saisi la production lui-même.
+async function syncBacsFromServer(){
+  try{
+    const data = await fetchAPI('getBacs');
+    if(!Array.isArray(data)) return;
+    const local = _bacRestantMap();
+    const byLot = {};
+    data.forEach(function(b){
+      const lot    = String(b.lot || '').trim();
+      const lettre = String(b.lettre || '').trim();
+      if(!lot || !lettre) return;
+      let restant = parseInt(b.restant, 10); if(isNaN(restant)) restant = parseInt(b.cookies,10)||0;
+      const initial = parseInt(b.cookies, 10) || restant;
+      // Si CET appareil a déjà décrémenté ce bac sans que ce soit encore remonté,
+      // on garde la valeur locale la plus basse (jamais on ne "regonfle" un bac).
+      const key = lot + '|' + lettre;
+      if(local[key] !== undefined && local[key] < restant) restant = local[key];
+      if(!byLot[lot]) byLot[lot] = [];
+      byLot[lot].push({ lettre: lettre, restant: restant, initial: initial });
+    });
+    Object.keys(byLot).forEach(function(lot){
+      byLot[lot].sort(function(a,b){ return a.lettre < b.lettre ? -1 : (a.lettre > b.lettre ? 1 : 0); });
+    });
+    _saveBacsServer(byLot);
+  }catch(e){}
+}
+
 // Renvoie les bacs d'un lot avec leur restant courant, ou null si le lot n'a pas de détail par bac (ancien système)
 function getBacsForLot(code){
+  // 1) Priorité : bacs synchronisés depuis le serveur (fonctionne sur tous les appareils)
+  const srv = _bacsServerMap();
+  if(srv[code] && srv[code].length){
+    return srv[code]
+      .map(function(b){ return { lettre: b.lettre, restant: parseInt(b.restant,10)||0, initial: parseInt(b.initial,10)||0 }; })
+      .filter(function(b){ return b.restant > 0; });
+  }
+  // 2) Repli : détail local (appareil qui a saisi la production, ou hors-ligne)
   let prods = [];
   try{ prods = JSON.parse(localStorage.getItem('kooki_productions') || '[]'); }catch(e){}
   const prod = prods.find(function(p){ return p.code === code; });
@@ -7749,14 +7801,35 @@ function getBacsForLot(code){
   return out;
 }
 // distribution : [{ lettre, qty }]
+// Décrémente le restant par bac EN LOCAL, met à jour le cache serveur, et
+// pousse le nouveau restant vers le Google Sheet (majStatutBac) pour que
+// les autres appareils voient la mise à jour.
 function decrementBacs(code, distribution){
   const m = _bacRestantMap();
+  const srv = _bacsServerMap();
   distribution.forEach(function(d){
     const key = code + '|' + d.lettre;
-    const cur = (m[key] !== undefined) ? m[key] : 0;
-    m[key] = Math.max(0, cur - (parseInt(d.qty,10)||0));
+    // Base de départ = restant connu (serveur si dispo, sinon local, sinon 0)
+    let base = (m[key] !== undefined) ? m[key] : null;
+    let sb = null;
+    if(srv[code]) sb = srv[code].find(function(b){ return b.lettre === d.lettre; });
+    if(sb){
+      const sr = parseInt(sb.restant,10)||0;
+      base = (base === null) ? sr : Math.min(base, sr);
+    }
+    if(base === null) base = 0;
+    const nouveau = Math.max(0, base - (parseInt(d.qty,10)||0));
+    m[key] = nouveau;
+    if(sb) sb.restant = nouveau;
+    // Remonter vers le serveur (ne bloque pas l'UI)
+    try{
+      fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+        action:'majStatutBac', lot: code, lettre: d.lettre, restant: nouveau, statut: nouveau > 0 ? 'en frigo' : 'sorti'
+      })}).catch(function(){});
+    }catch(e){}
   });
   _saveBacRestant(m);
+  _saveBacsServer(srv);
 }
 
 async function saveProduction() {
@@ -8915,6 +8988,9 @@ async function loadAllData() {
     setLoading('Chargement de la production…', 58);
     const prodData = await fetchAPI('getProduction');
     applyProduction(prodData);
+
+    setLoading('Chargement des bacs…', 62);
+    if(typeof syncBacsFromServer === 'function') await syncBacsFromServer();
 
     setLoading('Chargement des premix…', 65);
     const premixData = await fetchAPI('getPremix');
