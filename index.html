@@ -1170,7 +1170,13 @@
     </div>
 
     <div id="frigo-sub-sortie">
-    <!-- Formulaire sortie frigo -->
+    <!-- Choix du mode de sortie : manuelle ou par QR -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button type="button" id="sortie-mode-manuelle" onclick="document.getElementById('frigo-form-manuelle').scrollIntoView({behavior:'smooth',block:'start'})" style="flex:1;border:1.5px solid #d44218;background:#fbe8e2;color:#b3350f;border-radius:13px;padding:14px 10px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">✍️ Sortie manuelle</button>
+      <button type="button" id="sortie-mode-qr" onclick="KookiQR.open()" style="flex:1;border:1.5px solid #e0e6ee;background:#fff;color:#44515f;border-radius:13px;padding:14px 10px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📷 Sortie par QR</button>
+    </div>
+    <!-- Formulaire sortie frigo (manuelle) -->
+    <div id="frigo-form-manuelle"></div>
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
       <div class="form-grid fg-2">
@@ -2602,7 +2608,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbwJQB6P_ItSV_EP1XZ7gXvD27sSEc9GSDiOS8v4RJQV41qL1qQkMd0xEbonlM0uKg7ydA/exec';
+const API = 'https://script.google.com/macros/s/AKfycbz3mdsfuxTMb03UBDj56lgmu8v7H_sPdvpca1F_6XBrCE0awR1eIUpP9avmZmp0WglX6w/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -7848,7 +7854,15 @@ async function saveProduction() {
   }) });
     const json = await res.json();
     if (json.success) {
-  // Les bacs sont désormais créés côté serveur en une seule écriture (action 'production').
+  // Créer les bacs dans Sheets (un bac = son vrai nombre de cookies)
+  const LETTRES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const date = new Date().toISOString();
+  const bacsACreer = bacsArr.map(function(ck, i){
+    return { date, lot: code, saveur, lettre: LETTRES[i] || ('B'+i), type: 'simple', cookies: ck, restant: ck, statut: 'en frigo' };
+  });
+  bacsACreer.forEach(bac => {
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) }).catch(() => {});
+  });
       toast('prod','✓ Production enregistrée !','ok');
       // 1. Mettre à jour stockLocal (utilisé par le frigo)
       const existing = stockLocal.find(s => s.code === code);
@@ -14051,412 +14065,355 @@ var qrcode = function() {
 <script>
 (function(){
   var CDN_SCAN = 'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';
-  var CDN_GEN  = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
   var scanner = null, current = null;
-  // Mémorise la dernière destination choisie (pour enchaîner les bacs plus vite)
-  var lastDest = { type:'', client:'', custom:'' };
-  // Panier B2B : accumule les bacs d'une même livraison pour générer UN seul BL
-  var cart = { client:'', items:[] };
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
-  var DEST_TYPES = [
-    { v:'interne',    label:'🔧 Usage interne' },
-    { v:'magasin',    label:'🛍️ Magasin Ixelles' },
-    { v:'anderlecht', label:'🏠 Anderlecht' },
-    { v:'evenement',  label:'🎉 Événement' },
-    { v:'b2b',        label:'🏬 Client B2B' },
-    { v:'autre',      label:'🛒 Commande client' }
-  ];
-  function destSelectorHTML(){
-    var opts = DEST_TYPES.map(function(d){
-      return '<option value="'+d.v+'"'+(d.v===lastDest.type?' selected':'')+'>'+d.label+'</option>';
-    }).join('');
-    var clientOpts = B2B_CLIENTS.map(function(c){
-      return '<option'+(c===lastDest.client?' selected':'')+'>'+c+'</option>';
-    }).join('');
-    return '<div style="margin-top:14px">'+
-      '<label style="font-size:12px;font-weight:700;color:#26303a;display:block;margin-bottom:6px">Destination *</label>'+
-      '<select id="qr-dest" onchange="KookiQR.destChange()" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff">'+
-        '<option value="">-- Choisir une destination --</option>'+ opts +
-      '</select>'+
-      '<div id="qr-dest-b2b" style="display:none;margin-top:8px">'+
-        '<select id="qr-dest-client" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff">'+
-          '<option value="">-- Client B2B --</option>'+ clientOpts +
-        '</select>'+
-      '</div>'+
-      '<div id="qr-dest-autre" style="display:none;margin-top:8px">'+
-        '<input id="qr-dest-custom" placeholder="Nom du client / commande" value="'+ (lastDest.custom||'').replace(/"/g,'&quot;') +'" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px">'+
-      '</div>'+
-    '</div>';
-  }
-  function destChange(){
-    var v = (document.getElementById('qr-dest')||{}).value || '';
-    var b2b = document.getElementById('qr-dest-b2b'), autre = document.getElementById('qr-dest-autre');
-    if(b2b) b2b.style.display = (v==='b2b') ? 'block' : 'none';
-    if(autre) autre.style.display = (v==='autre') ? 'block' : 'none';
-  }
-  // Calcule la chaîne de destination à partir des champs (ou null si incomplet)
-  function computeDest(){
-    var v = (document.getElementById('qr-dest')||{}).value || '';
-    if(!v){ toast('Choisis une destination','err'); return null; }
-    if(v==='b2b'){
-      var c = (document.getElementById('qr-dest-client')||{}).value || '';
-      if(!c){ toast('Choisis un client B2B','err'); return null; }
-      lastDest = { type:v, client:c, custom:'' };
-      return c;
-    }
-    if(v==='autre'){
-      var cu = ((document.getElementById('qr-dest-custom')||{}).value||'').trim();
-      lastDest = { type:v, client:'', custom:cu };
-      return cu || 'Commande client';
-    }
-    var map = { magasin:'Magasin Ixelles', anderlecht:'Magasin Anderlecht', evenement:'Événement', interne:'Usage interne' };
-    lastDest = { type:v, client:'', custom:'' };
-    return map[v] || 'Sortie frigo';
-  }
 
-  function _load(src, check){
-    return new Promise(function(res, rej){
-      if(check()){ res(); return; }
-      var s = document.createElement('script');
-      s.src = src; s.onload = function(){ res(); }; s.onerror = function(){ rej(new Error('load '+src)); };
-      document.head.appendChild(s);
-    });
-  }
-  function toast(msg, kind){
-    var t = document.getElementById('qr-toast');
-    t.textContent = msg; t.className = 'qr-toast show ' + (kind||'');
-    clearTimeout(t._to); t._to = setTimeout(function(){ t.className = 'qr-toast'; }, 2600);
-  }
-  function lots(){ try{ return (typeof stockLocal!=='undefined' && Array.isArray(stockLocal)) ? stockLocal : []; }catch(e){ return []; } }
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
+  var LIVREURS = ['Tarik','Shippr','Interne'];
+  var DEST_TYPES = [
+    { v:'b2b',        label:'🏬 Client B2B',       sub:'Livraison + BL',    client:true,  bl:true },
+    { v:'magasin',    label:'🛍️ Magasin Ixelles',  sub:'Boîtes blanches',   client:false, bl:false },
+    { v:'anderlecht', label:'🏠 Anderlecht',        sub:'Atelier',           client:false, bl:false },
+    { v:'evenement',  label:'🎉 Événement',         sub:'Stand, marché',     client:false, bl:false },
+    { v:'interne',    label:'🔧 Usage interne',     sub:'Test, dégustation', client:false, bl:false },
+    { v:'autre',      label:'🛒 Commande client',   sub:'Au comptoir',       client:false, bl:false, custom:true }
+  ];
+
+  var dest = { type:'', name:'', client:'', livreur:'', bl:false };
+  var cart = []; // { code, saveur, big, small, bacs:[{lettre,qty}] | null }
+  var work = { lot:null, bacs:[], small:0, smallMax:0, single:false };
+
+  // ---------- utilitaires ----------
+  function _load(src, check){ return new Promise(function(res,rej){ if(check()){res();return;} var s=document.createElement('script'); s.src=src; s.onload=function(){res();}; s.onerror=function(){rej(new Error('load '+src));}; document.head.appendChild(s); }); }
+  function toast(msg,kind){ var t=document.getElementById('qr-toast'); if(!t)return; t.textContent=msg; t.className='qr-toast show '+(kind||''); clearTimeout(t._to); t._to=setTimeout(function(){t.className='qr-toast';},2600); }
+  function lots(){ try{ return (typeof stockLocal!=='undefined' && Array.isArray(stockLocal))?stockLocal:[]; }catch(e){ return []; } }
+  function esc(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
   function findLot(raw){
     if(!raw) return null;
-    var txt = String(raw).trim();
-    // le QR peut contenir un préfixe type "KOOKI:CODE" ou une URL ?lot=CODE
-    var m = txt.match(/(?:lot=|KOOKI[:\-])?([A-Za-z]{2,4}-\d[\w\-]*)/);
-    var code = m ? m[1] : txt;
-    var L = lots();
-    return L.find(function(s){ return s.code === code; })
-        || L.find(function(s){ return String(s.code).toLowerCase() === code.toLowerCase(); })
-        || L.find(function(s){ return String(s.code).toLowerCase() === txt.toLowerCase(); })
+    var txt=String(raw).trim();
+    var m=txt.match(/(?:lot=|KOOKI[:\-])?([A-Za-z]{2,4}-\d[\w\-]*)/);
+    var code=m?m[1]:txt;
+    var L=lots();
+    return L.find(function(s){return s.code===code;})
+        || L.find(function(s){return String(s.code).toLowerCase()===code.toLowerCase();})
+        || L.find(function(s){return String(s.code).toLowerCase()===txt.toLowerCase();})
         || null;
   }
-  function stopScanner(){
-    if(scanner){ try{ scanner.stop().then(function(){ try{scanner.clear();}catch(e){} scanner=null; }).catch(function(){ scanner=null; }); }catch(e){ scanner=null; } }
+  function stopScanner(){ if(scanner){ try{ scanner.stop().then(function(){ try{scanner.clear();}catch(e){} scanner=null; }).catch(function(){scanner=null;}); }catch(e){ scanner=null; } } }
+  function getProfil(){ var l='Scan frigo'; try{ if(typeof FULL_NAMES!=='undefined'&&typeof currentProfile!=='undefined'&&FULL_NAMES[currentProfile]) l=FULL_NAMES[currentProfile]; else if(typeof currentProfile!=='undefined'&&currentProfile) l=currentProfile; }catch(e){} return l; }
+  function refreshStockUI(){ try{if(typeof updateStockPage==='function')updateStockPage();}catch(e){} try{if(typeof updateDashboardStockTable==='function')updateDashboardStockTable();}catch(e){} try{if(typeof applySorties==='function')applySorties([]);}catch(e){} }
+  function body(){ return document.getElementById('qr-body'); }
+  function title(t){ var el=document.getElementById('qr-title'); if(el) el.textContent=t; }
+  function destTypeInfo(v){ for(var i=0;i<DEST_TYPES.length;i++){ if(DEST_TYPES[i].v===v) return DEST_TYPES[i]; } return null; }
+  function bannerHTML(){
+    if(!dest.type) return '';
+    var extra = dest.client ? (' · '+dest.client+' · 🚚 '+dest.livreur) : '';
+    return '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#eef4fb;border-radius:12px;padding:9px 13px;margin-bottom:12px">'+
+      '<span style="font-size:12.5px;font-weight:800;color:#0c447c">'+dest.name+extra+'</span>'+
+      '<span style="margin-left:auto;font-size:11px;font-weight:700;color:#0662aa;cursor:pointer;text-decoration:underline" onclick="KookiQR.changeDest()">changer</span>'+
+    '</div>';
   }
 
-  // ── Étape 1 : scanner / choisir un lot ──
+  // ---------- Étape 1 : destination ----------
+  function stepDest(){
+    stopScanner(); current=null;
+    title('📷 Sortie par QR');
+    var cards = DEST_TYPES.map(function(d){
+      var emoji=d.label.split(' ')[0];
+      var name=d.label.replace(/^\S+\s/,'');
+      return '<div onclick="KookiQR.pickDest(\''+d.v+'\')" style="border:1.5px solid #e6ebf1;border-radius:14px;padding:13px;cursor:pointer;display:flex;align-items:center;gap:12px">'+
+        '<div style="font-size:22px">'+emoji+'</div>'+
+        '<div><div style="font-size:14px;font-weight:800;color:#1a2430">'+name+'</div>'+
+        '<div style="font-size:11px;color:#8a97a5">'+d.sub+'</div></div></div>';
+    }).join('');
+    body().innerHTML =
+      '<div style="font-size:13px;color:#66727f;margin-bottom:12px">Où part cette sortie&nbsp;?</div>'+
+      '<div style="display:flex;flex-direction:column;gap:9px">'+cards+'</div>';
+  }
+  function pickDest(v){
+    var info=destTypeInfo(v); if(!info) return;
+    if(info.client){ stepClient(v); return; }
+    if(info.custom){ stepCustom(v); return; }
+    var map={ magasin:'Magasin Ixelles', anderlecht:'Magasin Anderlecht', evenement:'Événement', interne:'Usage interne' };
+    dest={ type:v, name:map[v]||'Sortie frigo', client:'', livreur:getProfil(), bl:false };
+    stepScan();
+  }
+
+  // ---------- Étape 1b : client + livreur (B2B, une seule fois) ----------
+  function stepClient(v){
+    title('🏬 Client & livreur');
+    var clientOpts = B2B_CLIENTS.map(function(c){ return '<option'+(c===dest.client?' selected':'')+'>'+c+'</option>'; }).join('');
+    if(!dest.livreur) dest.livreur='Tarik';
+    dest._pendType=v;
+    var livChips = LIVREURS.map(function(l){
+      var seld=(l===dest.livreur);
+      return '<div onclick="KookiQR.pickLiv(\''+l+'\')" id="qr-liv-'+l+'" style="flex:1;text-align:center;border:1.6px solid '+(seld?'#0662aa':'#e0e6ee')+';background:'+(seld?'#e0edf8':'#fff')+';color:'+(seld?'#054e86':'#44515f')+';border-radius:12px;padding:11px 6px;font-size:13px;font-weight:700;cursor:pointer">'+l+'</div>';
+    }).join('');
+    body().innerHTML =
+      '<div style="font-size:12.5px;color:#66727f;margin-bottom:12px">Demandé une seule fois. Reste valable pour toute la sortie.</div>'+
+      '<label style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px">Client B2B</label>'+
+      '<select id="qr-client" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff;margin:6px 0 14px">'+
+        '<option value="">-- Choisir le client --</option>'+clientOpts+'</select>'+
+      '<label style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px">Livreur</label>'+
+      '<div style="display:flex;gap:8px;margin:6px 0 6px">'+livChips+'</div>'+
+      '<button class="qr-btn qr-btn-primary" style="margin-top:14px;background:#0662aa" onclick="KookiQR.confirmClient()">Continuer vers le scan →</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.changeDest()">← Destination</button>';
+  }
+  function pickLiv(l){ dest.livreur=l; LIVREURS.forEach(function(x){ var el=document.getElementById('qr-liv-'+x); if(el){ var s=(x===l); el.style.borderColor=s?'#0662aa':'#e0e6ee'; el.style.background=s?'#e0edf8':'#fff'; el.style.color=s?'#054e86':'#44515f'; } }); }
+  function confirmClient(){
+    var c=(document.getElementById('qr-client')||{}).value||'';
+    if(!c){ toast('Choisis un client','err'); return; }
+    var v=dest._pendType||'b2b';
+    if(dest.client && dest.client!==c) cart=[]; // nouveau client => panier remis à zéro
+    dest={ type:v, name:c, client:c, livreur:dest.livreur||'Tarik', bl:true };
+    stepScan();
+  }
+
+  // ---------- Étape 1c : commande client (nom libre) ----------
+  function stepCustom(v){
+    title('🛒 Commande client');
+    body().innerHTML =
+      '<label style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px">Nom du client / commande</label>'+
+      '<input id="qr-custom" placeholder="Ex : Commande Dupont" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;margin:6px 0 4px" value="'+(dest.custom||'').replace(/"/g,'&quot;')+'">'+
+      '<button class="qr-btn qr-btn-primary" style="margin-top:14px" onclick="KookiQR.confirmCustom()">Continuer vers le scan →</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.changeDest()">← Destination</button>';
+  }
+  function confirmCustom(){
+    var cu=((document.getElementById('qr-custom')||{}).value||'').trim();
+    dest={ type:'autre', name:cu||'Commande client', client:'', livreur:getProfil(), bl:false, custom:cu };
+    stepScan();
+  }
+
+  // ---------- Étape 2 : scan ----------
   function stepScan(){
-    current = null;
-    document.getElementById('qr-title').textContent = '📷 Sortie frigo';
-    var body = document.getElementById('qr-body');
+    current=null;
+    title('📷 Scanner le lot');
     var opts = lots().slice().sort(function(a,b){ return String(a.code).localeCompare(String(b.code)); })
-      .map(function(s){ return '<option value="'+s.code+'">'+s.code+' — '+s.saveur+' ('+s.big+' Big · '+s.small+' Baby)</option>'; }).join('');
-    var cartBanner = cart.items.length ?
-      '<div onclick="KookiQR.finishBL()" style="cursor:pointer;background:#E6F1FB;border:1px solid #cfe2f5;border-radius:12px;padding:9px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
-        '<span style="font-size:12.5px;color:#0c447c;font-weight:700">🧾 BL en cours — '+cart.client+' ('+cart.items.length+' bac'+(cart.items.length>1?'s':'')+')</span>'+
-        '<span style="font-size:12px;color:#0662aa;font-weight:700">Terminer →</span>'+
-      '</div>' : '';
-    body.innerHTML =
-      cartBanner +
+      .map(function(s){ return '<option value="'+s.code+'">'+s.code+' — '+s.saveur+' ('+s.big+' Big · '+s.small+' Small)</option>'; }).join('');
+    var cartBanner = cart.length ?
+      '<div onclick="KookiQR.recap()" style="cursor:pointer;background:#eafaf0;border:1px solid #bfe6cd;border-radius:12px;padding:9px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
+        '<span style="font-size:12.5px;color:#1a7a3a;font-weight:700">🧾 Sortie en cours — '+cart.length+' saveur'+(cart.length>1?'s':'')+'</span>'+
+        '<span style="font-size:12px;color:#27ae60;font-weight:700">Voir le récap →</span></div>' : '';
+    body().innerHTML =
+      bannerHTML() + cartBanner +
       '<div id="qr-reader"></div>'+
       '<div id="qr-scan-msg" style="text-align:center;font-size:12px;color:#8a97a5;margin:8px 0 4px">Initialisation de la caméra…</div>'+
       '<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir le lot manuellement —</div>'+
       '<select id="qr-manual" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff">'+
-        '<option value="">Sélectionner un lot…</option>'+ opts +
-      '</select>'+
+        '<option value="">Sélectionner un lot…</option>'+opts+'</select>'+
       '<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.pickManual()">Continuer</button>';
     startCamera();
   }
   function startCamera(){
-    var msg = document.getElementById('qr-scan-msg');
-    var secure = (window.isSecureContext || location.hostname==='localhost' || location.hostname==='127.0.0.1');
-    if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || !secure){
-      var r = document.getElementById('qr-reader'); if(r) r.style.display='none';
-      if(msg) msg.innerHTML = '⚠️ Caméra indisponible ici (ouvre l\'app en https). Utilise la liste ci-dessous.';
-      return;
-    }
-    _load(CDN_SCAN, function(){ return !!window.Html5Qrcode; }).then(function(){
+    var msg=document.getElementById('qr-scan-msg');
+    var secure=(window.isSecureContext||location.hostname==='localhost'||location.hostname==='127.0.0.1');
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)||!secure){ var r=document.getElementById('qr-reader'); if(r)r.style.display='none'; if(msg)msg.innerHTML='⚠️ Caméra indisponible ici (ouvre l\'app en https). Utilise la liste ci-dessous.'; return; }
+    _load(CDN_SCAN,function(){return !!window.Html5Qrcode;}).then(function(){
       try{
-        scanner = new Html5Qrcode('qr-reader');
-        scanner.start({ facingMode:'environment' }, { fps:10, qrbox:{width:220,height:220} },
-          function(decoded){ stopScanner(); onCode(decoded); },
-          function(){}
-        ).then(function(){ if(msg) msg.textContent='Vise le QR du lot 🎯'; })
-         .catch(function(){ if(msg) msg.innerHTML='⚠️ Accès caméra refusé. Utilise la liste ci-dessous.'; var r=document.getElementById('qr-reader'); if(r) r.style.display='none'; });
-      }catch(e){ if(msg) msg.textContent='⚠️ Caméra indisponible. Utilise la liste ci-dessous.'; }
-    }).catch(function(){ if(msg) msg.innerHTML='⚠️ Scanner non chargé (hors ligne ?). Utilise la liste ci-dessous.'; var r=document.getElementById('qr-reader'); if(r) r.style.display='none'; });
+        scanner=new Html5Qrcode('qr-reader');
+        scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},
+          function(decoded){ stopScanner(); onCode(decoded); }, function(){}
+        ).then(function(){ if(msg)msg.textContent='Vise le QR du lot 🎯'; })
+         .catch(function(){ if(msg)msg.innerHTML='⚠️ Accès caméra refusé. Utilise la liste ci-dessous.'; var r=document.getElementById('qr-reader'); if(r)r.style.display='none'; });
+      }catch(e){ if(msg)msg.textContent='⚠️ Caméra indisponible. Utilise la liste ci-dessous.'; }
+    }).catch(function(){ if(msg)msg.innerHTML='⚠️ Scanner non chargé (hors ligne ?). Utilise la liste ci-dessous.'; var r=document.getElementById('qr-reader'); if(r)r.style.display='none'; });
   }
-  function onCode(raw){
-    var lot = findLot(raw);
-    if(!lot){ toast('Lot introuvable : '+String(raw).slice(0,24), 'err'); stepScan(); return; }
-    stepQty(lot);
-  }
+  function onCode(raw){ var lot=findLot(raw); if(!lot){ toast('Lot introuvable : '+String(raw).slice(0,24),'err'); stepScan(); return; } stepBacs(lot); }
 
-  // ── Étape 2 : quantités ──
-  function stepQty(lot){
-    stopScanner();
-    current = lot;
-    document.getElementById('qr-title').textContent = '🍪 ' + lot.saveur;
-    var body = document.getElementById('qr-body');
-    body.innerHTML =
-      '<div style="background:#f7f9fc;border:1px solid #e6ebf1;border-radius:14px;padding:12px 14px;margin-bottom:6px">'+
-        '<div style="font-size:13px;color:#8a97a5">Lot</div>'+
-        '<div style="font-size:18px;font-weight:800;color:#1a2430" class="qr-accent">'+lot.code+'</div>'+
-        '<div style="font-size:12px;color:#66727f;margin-top:2px">En stock : <b>'+lot.big+'</b> Big · <b>'+lot.small+'</b> Baby</div>'+
-      '</div>'+
-      numRow('big','Big pris','Grands 165g', lot.big)+
-      numRow('small','Baby pris','Baby cookies', lot.small)+
-      destSelectorHTML()+
-      '<button class="qr-btn qr-btn-primary" style="margin-top:14px" onclick="KookiQR.confirm()">✓ OK — enregistrer la sortie</button>'+
-      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.back()">← Autre lot</button>';
-    destChange(); // révèle le sous-champ si une destination est déjà mémorisée
+  // ---------- Étape 3 : bacs + small ----------
+  function cartUsage(code){
+    var u={ small:0, big:0, bac:{} };
+    cart.forEach(function(it){ if(it.code!==code) return; u.small+=it.small||0; if(it.bacs && it.bacs.length){ it.bacs.forEach(function(b){ u.bac[b.lettre]=(u.bac[b.lettre]||0)+b.qty; }); } else { u.big+=it.big||0; } });
+    return u;
   }
-  function numRow(id, label, sub, max){
-    return '<div class="qr-num">'+
-      '<div><label>'+label+'</label><div class="qr-sub">'+sub+' · max '+max+'</div></div>'+
-      '<div class="qr-step">'+
-        '<button class="qr-stepbtn" onclick="KookiQR.bump(\''+id+'\',-1)">−</button>'+
-        '<input id="qr-'+id+'" type="number" inputmode="numeric" min="0" max="'+max+'" value="0">'+
-        '<button class="qr-stepbtn" onclick="KookiQR.bump(\''+id+'\',1)">+</button>'+
-      '</div></div>';
-  }
-
-  function getLivreur(){
-    var livreur = 'Scan frigo';
-    try{
-      if(typeof FULL_NAMES!=='undefined' && typeof currentProfile!=='undefined' && FULL_NAMES[currentProfile]) livreur = FULL_NAMES[currentProfile];
-      else if(typeof currentProfile!=='undefined' && currentProfile) livreur = currentProfile;
-    }catch(e){}
-    return livreur;
-  }
-  function refreshStockUI(){
-    try{ if(typeof updateStockPage==='function') updateStockPage(); }catch(e){}
-    try{ if(typeof updateDashboardStockTable==='function') updateDashboardStockTable(); }catch(e){}
-    try{ if(typeof applySorties==='function') applySorties([]); }catch(e){}
-  }
-  // Écrit UN groupe de sortie (1 ligne/lot, même idGroupe) + sync API
-  function writeSortieGroup(items, destination, livreur){
-    var idGroupe = 'SOR-' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*1000);
-    try{
-      var stored = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-      items.forEach(function(it){
-        stored.unshift({ id: Date.now()+Math.random(), idGroupe: idGroupe, date: new Date().toISOString(),
-          saveur: it.saveur, destination: destination, lot: it.code, big: it.big, small: it.small, boites: 0, producteur: livreur });
+  function stepBacs(lot){
+    stopScanner(); current=lot;
+    title('🍪 '+lot.saveur);
+    var used=cartUsage(lot.code);
+    var srvBacs=(typeof getBacsForLot==='function')?getBacsForLot(lot.code):null;
+    work={ lot:lot, bacs:[], small:0, smallMax:0, single:false };
+    var rowsHTML='';
+    if(srvBacs && srvBacs.length){
+      srvBacs.forEach(function(b){
+        var rest=Math.max(0,(parseInt(b.restant,10)||0)-(used.bac[b.lettre]||0));
+        work.bacs.push({ lettre:b.lettre, restant:rest, qty:0 });
       });
+      rowsHTML = work.bacs.map(function(b,i){ return bacRow(i,b); }).join('');
+    } else {
+      work.single=true;
+      var restBig=Math.max(0,(parseInt(lot.big,10)||0)-(used.big||0));
+      work.bacs.push({ lettre:'*', restant:restBig, qty:0 });
+      rowsHTML = bacRowSingle(restBig);
+    }
+    var smax=Math.max(0,(parseInt(lot.small,10)||0)-used.small);
+    work.smallMax=smax;
+    body().innerHTML =
+      bannerHTML()+
+      '<div style="background:#f7f9fc;border:1px solid #e6ebf1;border-radius:14px;padding:12px 14px;margin-bottom:12px">'+
+        '<div style="font-size:18px;font-weight:800;color:#1a2430" class="qr-accent">'+lot.code+'</div>'+
+        '<div style="font-size:12px;color:#66727f;margin-top:2px">'+ (work.single?('Stock : '+lot.big+' Big'):(work.bacs.length+' bac(s) en frigo')) +' · '+smax+' Small dispo</div>'+
+      '</div>'+
+      '<div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">'+(work.single?'Big (165g)':'Bacs — choisis A, B, C…')+'</div>'+
+      rowsHTML+
+      '<div style="font-size:11px;font-weight:800;color:#0662aa;text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px">Small 80g</div>'+
+      smallRow(smax)+
+      '<div style="display:flex;justify-content:space-around;background:#fff;border:1.5px dashed #e3e8ee;border-radius:12px;padding:11px;margin-top:12px">'+
+        '<div style="text-align:center"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Big</div><div style="font-size:16px;font-weight:800;color:#d44218"><span id="qr-tot-big">0</span> 🍪</div></div>'+
+        '<div style="text-align:center"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Small</div><div style="font-size:16px;font-weight:800;color:#0662aa"><span id="qr-tot-small">0</span></div></div>'+
+      '</div>'+
+      '<button class="qr-btn qr-btn-primary" style="margin-top:14px" id="qr-valbtn" onclick="KookiQR.validate(true)" disabled>Valider cette saveur →</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.validate(false)">+ Ajouter une autre saveur</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.back()">← Autre lot (sans valider)</button>';
+    updTotals();
+  }
+  function bacRow(i,b){
+    var dis=b.restant<=0;
+    return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #eef0f3;border-radius:13px;margin-bottom:8px'+(dis?';opacity:.5':'')+'">'+
+      '<div style="width:36px;height:36px;border-radius:10px;background:#eef2f6;color:#5a6775;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center">'+b.lettre+'</div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:700">Bac '+b.lettre+'</div><div style="font-size:11px;color:#8a97a5">'+b.restant+' 🍪 en frigo</div></div>'+
+      stepBox('bac-'+i, b.restant, dis)+
+    '</div>';
+  }
+  function bacRowSingle(rest){
+    return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #eef0f3;border-radius:13px;margin-bottom:8px">'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:700">Big pris</div><div style="font-size:11px;color:#8a97a5">Lot sans détail bac · max '+rest+'</div></div>'+
+      stepBox('bac-0', rest, rest<=0)+
+    '</div>';
+  }
+  function smallRow(max){
+    return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #dde7f0;border-radius:13px;background:#f6fafe">'+
+      '<div style="width:36px;height:36px;border-radius:10px;background:#e0edf8;color:#0662aa;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center">80</div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:700">Small 80g</div><div style="font-size:11px;color:#8a97a5">max '+max+'</div></div>'+
+      stepBox('small', max, max<=0)+
+    '</div>';
+  }
+  function stepBox(id,max,dis){
+    return '<div style="display:flex;align-items:center;background:#fff;border:1.5px solid #e3e8ee;border-radius:11px;overflow:hidden;flex-shrink:0">'+
+      '<button onclick="KookiQR.bump(\''+id+'\',-1)" style="width:34px;height:38px;border:none;background:#fff;font-size:19px;font-weight:700;color:#d44218;cursor:pointer" '+(dis?'disabled':'')+'>−</button>'+
+      '<input id="qr-in-'+id+'" type="text" inputmode="numeric" value="0" data-max="'+max+'" oninput="KookiQR.typeIn(\''+id+'\')" style="width:44px;height:38px;border:none;border-left:1px solid #eef0f3;border-right:1px solid #eef0f3;text-align:center;font-size:15px;font-weight:800;font-family:inherit;color:#1a2430;outline:none" '+(dis?'disabled':'')+'>'+
+      '<button onclick="KookiQR.bump(\''+id+'\',1)" style="width:34px;height:38px;border:none;background:#fff;font-size:19px;font-weight:700;color:#d44218;cursor:pointer" '+(dis?'disabled':'')+'>+</button>'+
+    '</div>';
+  }
+  function readVal(id){ var el=document.getElementById('qr-in-'+id); if(!el) return 0; var max=parseInt(el.getAttribute('data-max'),10)||0; var v=parseInt((el.value||'').replace(/\D/g,''),10)||0; if(v<0)v=0; if(v>max)v=max; return v; }
+  function setVal(id,v){ var el=document.getElementById('qr-in-'+id); if(el) el.value=v; }
+  function syncWork(){ work.bacs.forEach(function(b,i){ b.qty=readVal('bac-'+i); }); work.small=readVal('small'); }
+  function updTotals(){
+    syncWork();
+    var big=work.bacs.reduce(function(a,b){return a+b.qty;},0);
+    var te=document.getElementById('qr-tot-big'); if(te)te.textContent=big;
+    var ts=document.getElementById('qr-tot-small'); if(ts)ts.textContent=work.small;
+    var vb=document.getElementById('qr-valbtn'); if(vb)vb.disabled=(big<=0 && work.small<=0);
+  }
+  function bump(id,dir){ var el=document.getElementById('qr-in-'+id); if(!el)return; setVal(id,Math.max(0,readVal(id)+dir)); setVal(id,readVal(id)); updTotals(); }
+  function typeIn(id){ setVal(id,readVal(id)); updTotals(); }
+
+  // ---------- Validation d'une saveur ----------
+  function validate(goRecap){
+    if(!current) return;
+    syncWork();
+    var big=work.bacs.reduce(function(a,b){return a+b.qty;},0);
+    if(big<=0 && work.small<=0){ toast('Entre au moins une quantité','err'); return; }
+    var bacsDist = work.single ? null : work.bacs.filter(function(b){return b.qty>0;}).map(function(b){return {lettre:b.lettre,qty:b.qty};});
+    cart.push({ code:current.code, saveur:current.saveur, big:big, small:work.small, bacs:bacsDist });
+    toast('➕ '+current.saveur+' ajouté','ok');
+    if(goRecap) recap(); else stepScan();
+  }
+
+  // ---------- Récap ----------
+  function recap(){
+    stopScanner();
+    title('🧾 Récapitulatif');
+    if(!cart.length){ stepScan(); return; }
+    var rows=cart.map(function(it,idx){
+      var chips='';
+      if(it.bacs && it.bacs.length){ chips += it.bacs.map(function(b){return '<span style="font-size:11px;font-weight:700;background:#fbe8e2;color:#b3350f;padding:3px 9px;border-radius:20px;margin:2px">'+b.lettre+' · '+b.qty+'</span>';}).join(''); }
+      else if(it.big>0){ chips += '<span style="font-size:11px;font-weight:700;background:#fbe8e2;color:#b3350f;padding:3px 9px;border-radius:20px;margin:2px">'+it.big+' Big</span>'; }
+      if(it.small>0){ chips += '<span style="font-size:11px;font-weight:700;background:#e0edf8;color:#054e86;padding:3px 9px;border-radius:20px;margin:2px">Small · '+it.small+'</span>'; }
+      return '<div style="border:1.5px solid #eef0f3;border-radius:13px;padding:11px 13px;margin-bottom:9px">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-family:monospace;font-weight:800;font-size:13px">'+it.code+'</span>'+
+        '<span style="font-size:9.5px;font-weight:800;color:#fff;background:#d44218;padding:3px 9px;border-radius:20px">'+it.saveur+'</span>'+
+        '<span style="margin-left:auto;color:#c9d0d8;font-size:16px;cursor:pointer" onclick="KookiQR.delItem('+idx+')">✕</span></div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:4px">'+chips+'</div></div>';
+    }).join('');
+    body().innerHTML =
+      bannerHTML()+ rows +
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:6px" onclick="KookiQR.addMore()">📷 Ajouter une autre saveur</button>'+
+      '<button class="qr-btn qr-btn-primary" style="margin-top:8px'+(dest.bl?';background:#0662aa':'')+'" onclick="KookiQR.finalize()">✓ Enregistrer la sortie'+(dest.bl?' & BL':'')+'</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px;color:#c0392b" onclick="KookiQR.cancelCart()">🗑️ Tout annuler</button>';
+  }
+  function delItem(i){ cart.splice(i,1); if(cart.length) recap(); else stepScan(); }
+  function cancelCart(){ cart=[]; toast('Sortie annulée',''); stepScan(); }
+
+  // ---------- Écriture / API ----------
+  function writeSortieGroup(items, destination, livreur){
+    var idGroupe='SOR-'+new Date().toISOString().slice(2,10).replace(/-/g,'')+'-'+Math.floor(Math.random()*1000);
+    try{
+      var stored=JSON.parse(localStorage.getItem('kooki_sorties')||'[]');
+      items.forEach(function(it){ stored.unshift({ id:Date.now()+Math.random(), idGroupe:idGroupe, date:new Date().toISOString(), saveur:it.saveur, destination:destination, lot:it.code, big:it.big, small:it.small, boites:0, producteur:livreur }); });
       localStorage.setItem('kooki_sorties', JSON.stringify(stored));
     }catch(e){}
     try{
-      if(typeof API !== 'undefined' && API){
-        fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+      if(typeof API!=='undefined'&&API){
+        fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({
           action:'sortie',
-          saveur: items.map(function(i){ return i.saveur; }).filter(function(v,idx,a){ return a.indexOf(v)===idx; }).join(', '),
-          destination: destination, boites:0, livreur: livreur, idGroupe: idGroupe,
-          lots: items.map(function(i){ return { code:i.code, saveur:i.saveur, big:i.big, small:i.small }; }) }) }).catch(function(){});
+          saveur: items.map(function(i){return i.saveur;}).filter(function(v,idx,a){return a.indexOf(v)===idx;}).join(', '),
+          destination:destination, boites:0, livreur:livreur, idGroupe:idGroupe,
+          lots: items.map(function(i){ return { code:i.code, saveur:i.saveur, big:i.big, small:i.small, bacs:i.bacs||null }; }) })}).catch(function(){});
       }
     }catch(e){}
     return idGroupe;
   }
-
-  function doConfirm(){
-    if(!current) return;
-    var big = Math.max(0, parseInt((document.getElementById('qr-big')||{}).value,10) || 0);
-    var small = Math.max(0, parseInt((document.getElementById('qr-small')||{}).value,10) || 0);
-    if(big===0 && small===0){ toast('Entre au moins une quantité','err'); return; }
-    var s = lots().find(function(x){ return x.code === current.code; });
-    if(!s){ toast('Lot introuvable','err'); return; }
-
-    // Destination choisie (comme l'onglet Nouvelle sortie)
-    var destination = computeDest();
-    if(destination === null) return; // message déjà affiché
-    var isB2B = (lastDest.type === 'b2b');
-
-    if(isB2B){
-      // Mode panier : on n'enlève pas encore du stock, on accumule pour le BL
-      if(cart.items.length && cart.client && cart.client !== destination){
-        toast('Termine d\'abord le BL pour '+cart.client, 'err'); return;
-      }
-      var used = cart.items.filter(function(i){ return i.code===s.code; })
-        .reduce(function(a,i){ return { big:a.big+i.big, small:a.small+i.small }; }, { big:0, small:0 });
-      if(big > s.big - used.big || small > s.small - used.small){ toast('Quantité > stock disponible (panier compris)','err'); return; }
-      cart.client = destination;
-      cart.items.push({ code:s.code, saveur:s.saveur, big:big, small:small });
-      toast('➕ Ajouté au BL '+destination, 'ok');
-      stepCart();
-      return;
-    }
-
-    // Destinations non-B2B : décrément immédiat + une sortie (pas de BL)
-    if(big > s.big || small > s.small){ toast('Quantité > stock disponible','err'); return; }
-    s.big -= big; s.small -= small;
-    try{ localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal)); }catch(e){}
-    writeSortieGroup([{ code:s.code, saveur:s.saveur, big:big, small:small }], destination, getLivreur());
-    refreshStockUI();
-    toast('✓ '+ (big?big+' Big ':'') + (small?small+' Baby ':'') + '→ '+destination, 'ok');
-    stepScan();
-  }
-
-  // ── Panier B2B : récap + génération du BL ──
-  function stepCart(){
-    stopScanner();
-    document.getElementById('qr-title').textContent = '🧾 BL — ' + cart.client;
-    var rows = cart.items.map(function(it){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px">'+
-        '<span><b>'+it.code+'</b> · '+it.saveur+'</span>'+
-        '<span style="color:#66727f">'+ (it.big?it.big+' Big ':'') + (it.small?it.small+' Baby':'') +'</span></div>';
-    }).join('') || '<div style="color:#8a97a5;padding:10px 0">Aucun bac ajouté.</div>';
-    var tb = cart.items.reduce(function(a,i){ return a+i.big; }, 0);
-    var ts = cart.items.reduce(function(a,i){ return a+i.small; }, 0);
-    document.getElementById('qr-body').innerHTML =
-      '<div style="background:#E6F1FB;border:1px solid #cfe2f5;border-radius:12px;padding:10px 14px;margin-bottom:10px">'+
-        '<div style="font-size:12px;color:#0662aa;font-weight:700">Client B2B</div>'+
-        '<div style="font-size:17px;font-weight:800;color:#0c447c">'+cart.client+'</div>'+
-      '</div>'+
-      '<div style="border:1px solid #e6ebf1;border-radius:12px;padding:6px 14px;margin-bottom:8px">'+ rows +
-        '<div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:4px;border-top:1px solid #e6e6e6;font-weight:800;font-size:13px"><span>Total</span><span>'+tb+' Big · '+ts+' Baby</span></div>'+
-      '</div>'+
-      '<button class="qr-btn qr-btn-ghost" onclick="KookiQR.addMore()">📷 Scanner un autre bac</button>'+
-      '<button class="qr-btn qr-btn-primary" style="margin-top:8px;background:#0662aa" onclick="KookiQR.finishBL()">✅ Terminer &amp; générer le BL</button>'+
-      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px;color:#c0392b" onclick="KookiQR.cancelCart()">🗑️ Vider le panier</button>';
-  }
-  function cancelCart(){
-    cart = { client:'', items:[] };
-    toast('Panier vidé','');
-    stepScan();
-  }
-  function finishBL(){
-    if(!cart.items.length){ toast('Panier vide','err'); return; }
-    // 1) décrément du stock maintenant (une seule fois, pour tous les bacs)
-    cart.items.forEach(function(it){
-      var s = lots().find(function(x){ return x.code === it.code; });
-      if(s){ s.big -= it.big; s.small -= it.small; }
+  function finalize(){
+    if(!cart.length){ toast('Rien à enregistrer','err'); return; }
+    cart.forEach(function(it){
+      var s=lots().find(function(x){return x.code===it.code;});
+      if(s){ s.big=Math.max(0,(s.big||0)-it.big); s.small=Math.max(0,(s.small||0)-it.small); }
+      if(it.bacs && it.bacs.length && typeof decrementBacs==='function'){ try{ decrementBacs(it.code, it.bacs); }catch(e){} }
     });
     try{ localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal)); }catch(e){}
-    var livreur = getLivreur();
-    // 2) historique des sorties (un seul groupe)
-    writeSortieGroup(cart.items, cart.client, livreur);
+    var livreur=dest.livreur||getProfil();
+    writeSortieGroup(cart.slice(), dest.name, livreur);
     refreshStockUI();
-    // 3) numéro de BL (via l'API, avec repli)
-    var lotsBL = cart.items.map(function(i){ return { saveur:i.saveur, lot:i.code, big:i.big, small:i.small, qte:null }; });
-    var bonLots = cart.items.map(function(i){ return { code:i.code, saveur:i.saveur, big:i.big, small:i.small }; });
-    var allSaveurs = cart.items.map(function(i){ return i.saveur; }).filter(function(v,idx,a){ return a.indexOf(v)===idx; }).join(', ');
-    var client = cart.client;
-    cart = { client:'', items:[] };
-
+    if(dest.bl){ genererBL(cart.slice(), dest.name, livreur); }
+    else { toast('✓ Sortie enregistrée → '+dest.name,'ok'); cart=[]; close(); }
+  }
+  function genererBL(items, client, livreur){
+    var lotsBL=items.map(function(i){ return { saveur:i.saveur, lot:i.code, big:i.big, small:i.small, qte:null }; });
+    var bonLots=items.map(function(i){ return { code:i.code, saveur:i.saveur, big:i.big, small:i.small }; });
+    var allSaveurs=items.map(function(i){return i.saveur;}).filter(function(v,idx,a){return a.indexOf(v)===idx;}).join(', ');
+    cart=[];
     function withBL(numeroBL){
-      if(!numeroBL) numeroBL = 'BL-' + new Date().getFullYear() + '-' + Date.now().toString().slice(-3);
-      // sauvegarde backend du BL
-      try{
-        if(typeof API !== 'undefined' && API){
-          fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
-            action:'sauverBL', numeroBL:numeroBL, client:client, lots:lotsBL, boites:0, sortiPar:livreur, livreurB2B:'', typeCookies:'cuits' }) }).catch(function(){});
-        }
-      }catch(e){}
-      // sauvegarde locale du BL (même structure que saveSortie)
-      try{ if(typeof blData !== 'undefined' && blData && blData.unshift){ blData.unshift({ numeroBL:numeroBL, date:new Date().toISOString(), client:client, lots:lotsBL, boites:0, sortiPar:livreur, livreurB2B:'', typeCookies:'cuits' }); } }catch(e){}
-      // affichage du bon (on ferme d'abord notre panneau)
+      if(!numeroBL) numeroBL='BL-'+new Date().getFullYear()+'-'+Date.now().toString().slice(-3);
+      try{ if(typeof API!=='undefined'&&API){ fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({ action:'sauverBL', numeroBL:numeroBL, client:client, lots:lotsBL, boites:0, sortiPar:livreur, livreurB2B:livreur, typeCookies:'cuits' })}).catch(function(){}); } }catch(e){}
+      try{ if(typeof blData!=='undefined'&&blData&&blData.unshift){ blData.unshift({ numeroBL:numeroBL, date:new Date().toISOString(), client:client, lots:lotsBL, boites:0, sortiPar:livreur, livreurB2B:livreur, typeCookies:'cuits' }); } }catch(e){}
       try{ window._cmdDocType='livraison'; }catch(e){}
-      document.getElementById('qr-overlay').classList.remove('open');
-      stopScanner();
-      try{
-        if(typeof showBonLivraison==='function'){
-          showBonLivraison({ client:client, saveur:allSaveurs, lots:bonLots, boites:0, typeBoite:'plastique', livreur:livreur, numeroBL:numeroBL, typeCookies:'cuits' });
-        }
-      }catch(e){ toast('Sortie enregistrée, mais BL non affiché','err'); }
+      close();
+      try{ if(typeof showBonLivraison==='function'){ showBonLivraison({ client:client, saveur:allSaveurs, lots:bonLots, boites:0, typeBoite:'plastique', livreur:livreur, numeroBL:numeroBL, typeCookies:'cuits' }); } }catch(e){ toast('Sortie enregistrée, BL non affiché','err'); }
       toast('✓ BL '+numeroBL+' généré','ok');
     }
-
-    try{
-      if(typeof fetchAPI === 'function'){
-        Promise.resolve(fetchAPI('getNextBLNumber')).then(function(n){ withBL(n); }).catch(function(){ withBL(null); });
-      } else { withBL(null); }
-    }catch(e){ withBL(null); }
+    try{ if(typeof fetchAPI==='function'){ Promise.resolve(fetchAPI('getNextBLNumber')).then(function(n){withBL(n);}).catch(function(){withBL(null);}); } else withBL(null); }catch(e){ withBL(null); }
   }
 
-  // ── Génération / impression des QR de lots ──
-  // ── Génération QR (100% local, via la librairie embarquée qrcode-generator) ──
-  function esc(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-  function _qrGif(code){
-    try{ if(typeof qrcode!=='function') return null; var qr = qrcode(0,'M'); qr.addData(String(code)); qr.make(); return qr.createDataURL(6,12); }
-    catch(e){ return null; }
-  }
-  function printQRs(){
-    var L = lots().slice().sort(function(a,b){ return String(a.code).localeCompare(String(b.code)); });
-    if(!L.length){ toast('Aucun lot en stock à imprimer','err'); return; }
-    var cards = L.map(function(s){
-      var data = _qrGif(s.code) || '';
-      return '<div style="border:1px solid #ddd;border-radius:10px;padding:12px;text-align:center;page-break-inside:avoid;width:180px">'+
-             '<img src="'+data+'" style="width:150px;height:150px;image-rendering:pixelated"><div style="font-weight:800;font-size:15px;margin-top:6px">'+s.code+'</div>'+
-             '<div style="font-size:12px;color:#555">'+s.saveur+'</div></div>';
-    }).join('');
-    var page = '<!doctype html><html><head><title>QR lots Kooki</title><meta charset="utf-8">'+
-      '<style>body{font-family:system-ui,Arial,sans-serif;margin:18px}h2{margin:0 0 14px}img{image-rendering:pixelated}'+
-      '.grid{display:flex;flex-wrap:wrap;gap:14px}</style></head><body>'+
-      '<h2>🏷️ QR codes des lots — à coller sur les bacs du frigo</h2>'+
-      '<div class="grid">'+cards+'</div></body></html>';
-    _printViaFrame(page);
-  }
+  // ---------- Génération / impression des QR ----------
+  function _qrGif(code){ try{ if(typeof qrcode!=='function') return null; var qr=qrcode(0,'M'); qr.addData(String(code)); qr.make(); return qr.createDataURL(6,12); }catch(e){ return null; } }
+  function _printViaFrame(page){ var old=document.getElementById('qr-print-frame'); if(old)old.remove(); var ifr=document.createElement('iframe'); ifr.id='qr-print-frame'; ifr.style.position='fixed'; ifr.style.right='0'; ifr.style.bottom='0'; ifr.style.width='0'; ifr.style.height='0'; ifr.style.border='0'; document.body.appendChild(ifr); var doc=ifr.contentWindow.document; doc.open(); doc.write(page); doc.close(); setTimeout(function(){ try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }catch(e){ toast('Impression bloquée — utilise « Télécharger »','err'); } },300); }
+  function printOne(code,saveur){ var data=_qrGif(code); if(!data){ toast('Erreur de génération du QR','err'); return; } var page='<!doctype html><html><head><title>QR '+code+'</title><meta charset="utf-8"><style>@media print{@page{margin:12mm}}body{font-family:system-ui,Arial,sans-serif;text-align:center;margin-top:40px}img{image-rendering:pixelated}</style></head><body><img src="'+data+'" style="width:230px;height:230px"><div style="font-weight:800;font-size:24px;margin-top:12px">'+code+'</div><div style="font-size:16px;color:#555">'+(saveur||'')+'</div></body></html>'; _printViaFrame(page); }
+  function downloadOne(code){ var data=_qrGif(code); if(!data){ toast('Erreur de génération du QR','err'); return; } var a=document.createElement('a'); a.href=data; a.download='QR-'+code+'.gif'; document.body.appendChild(a); a.click(); a.remove(); }
+  function printQRs(){ var L=lots().slice().sort(function(a,b){return String(a.code).localeCompare(String(b.code));}); if(!L.length){ toast('Aucun lot en stock à imprimer','err'); return; } var cards=L.map(function(s){ var data=_qrGif(s.code)||''; return '<div style="border:1px solid #ddd;border-radius:10px;padding:12px;text-align:center;page-break-inside:avoid;width:180px"><img src="'+data+'" style="width:150px;height:150px;image-rendering:pixelated"><div style="font-weight:800;font-size:15px;margin-top:6px">'+s.code+'</div><div style="font-size:12px;color:#555">'+s.saveur+'</div></div>'; }).join(''); var page='<!doctype html><html><head><title>QR lots Kooki</title><meta charset="utf-8"><style>body{font-family:system-ui,Arial,sans-serif;margin:18px}h2{margin:0 0 14px}img{image-rendering:pixelated}.grid{display:flex;flex-wrap:wrap;gap:14px}</style></head><body><h2>🏷️ QR codes des lots — à coller sur les bacs du frigo</h2><div class="grid">'+cards+'</div></body></html>'; _printViaFrame(page); }
+  function showLot(code,saveur){ document.getElementById('qr-overlay').classList.add('open'); title('🏷️ QR du lot'); var url=_qrGif(code); body().innerHTML='<div style="text-align:center;padding:6px 0">'+(url?'<img src="'+url+'" alt="QR" style="width:190px;height:190px;image-rendering:pixelated">':'<div style="color:#c0392b;padding:30px 0">⚠️ Erreur de génération du QR</div>')+'<div style="font-size:20px;font-weight:800;margin-top:10px" class="qr-accent">'+code+'</div><div style="font-size:13px;color:#66727f">'+(saveur||'')+'</div><div style="font-size:12px;color:#8a97a5;margin-top:10px">À coller sur le bac au frigo — scannable à la sortie.</div></div>'+'<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.printOne(\''+esc(code)+'\',\''+esc(saveur||'')+'\')">🖨️ Imprimer</button><button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.downloadOne(\''+esc(code)+'\')">⬇️ Télécharger l\'image</button><button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.close()">Fermer</button>'; }
 
-  // ── QR d'un seul lot (aperçu + impression) ──
-  function showLot(code, saveur){
-    document.getElementById('qr-overlay').classList.add('open');
-    document.getElementById('qr-title').textContent = '🏷️ QR du lot';
-    var url = _qrGif(code);
-    var body = document.getElementById('qr-body');
-    body.innerHTML =
-      '<div style="text-align:center;padding:6px 0">'+
-        (url ? '<img src="'+url+'" alt="QR" style="width:190px;height:190px;image-rendering:pixelated">'
-             : '<div style="color:#c0392b;padding:30px 0">⚠️ Erreur de génération du QR</div>')+
-        '<div style="font-size:20px;font-weight:800;margin-top:10px" class="qr-accent">'+code+'</div>'+
-        '<div style="font-size:13px;color:#66727f">'+(saveur||'')+'</div>'+
-        '<div style="font-size:12px;color:#8a97a5;margin-top:10px">À coller sur le bac au frigo — scannable à la sortie.</div>'+
-      '</div>'+
-      '<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.printOne(\''+esc(code)+'\',\''+esc(saveur||'')+'\')">🖨️ Imprimer</button>'+
-      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.downloadOne(\''+esc(code)+'\')">⬇️ Télécharger l\'image</button>'+
-      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.close()">Fermer</button>';
-  }
-  // Impression via iframe interne — pas de pop-up, jamais bloquée
-  function _printViaFrame(page){
-    var old = document.getElementById('qr-print-frame'); if(old) old.remove();
-    var ifr = document.createElement('iframe'); ifr.id='qr-print-frame';
-    ifr.style.position='fixed'; ifr.style.right='0'; ifr.style.bottom='0'; ifr.style.width='0'; ifr.style.height='0'; ifr.style.border='0';
-    document.body.appendChild(ifr);
-    var doc = ifr.contentWindow.document; doc.open(); doc.write(page); doc.close();
-    setTimeout(function(){
-      try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }
-      catch(e){ toast('Impression bloquée — utilise « Télécharger »','err'); }
-    }, 300);
-  }
-  function printOne(code, saveur){
-    var data = _qrGif(code);
-    if(!data){ toast('Erreur de génération du QR','err'); return; }
-    var page = '<!doctype html><html><head><title>QR '+code+'</title><meta charset="utf-8">'+
-      '<style>@media print{@page{margin:12mm}}body{font-family:system-ui,Arial,sans-serif;text-align:center;margin-top:40px}img{image-rendering:pixelated}</style></head>'+
-      '<body><img src="'+data+'" style="width:230px;height:230px"><div style="font-weight:800;font-size:24px;margin-top:12px">'+code+'</div>'+
-      '<div style="font-size:16px;color:#555">'+(saveur||'')+'</div></body></html>';
-    _printViaFrame(page);
-  }
-  function downloadOne(code){
-    var data = _qrGif(code);
-    if(!data){ toast('Erreur de génération du QR','err'); return; }
-    var a = document.createElement('a'); a.href = data; a.download = 'QR-'+code+'.gif';
-    document.body.appendChild(a); a.click(); a.remove();
-  }
+  function close(){ stopScanner(); var o=document.getElementById('qr-overlay'); if(o)o.classList.remove('open'); }
 
   window.KookiQR = {
-    open: function(){ cart = { client:'', items:[] }; document.getElementById('qr-overlay').classList.add('open'); stepScan(); },
-    showLot: showLot,
-    printOne: printOne,
-    downloadOne: downloadOne,
-    close: function(){ stopScanner(); document.getElementById('qr-overlay').classList.remove('open'); },
+    open: function(){ cart=[]; dest={type:'',name:'',client:'',livreur:'',bl:false}; document.getElementById('qr-overlay').classList.add('open'); stepDest(); },
+    showLot: showLot, printOne: printOne, downloadOne: downloadOne, printQRs: printQRs,
+    close: close,
+    changeDest: function(){ stepDest(); },
+    pickDest: pickDest, pickLiv: pickLiv, confirmClient: confirmClient, confirmCustom: confirmCustom,
+    pickManual: function(){ var v=(document.getElementById('qr-manual')||{}).value; if(!v){ toast('Choisis un lot','err'); return; } onCode(v); },
     back: function(){ stepScan(); },
     addMore: function(){ stepScan(); },
-    finishBL: finishBL,
-    cancelCart: cancelCart,
-    pickManual: function(){ var v = (document.getElementById('qr-manual')||{}).value; if(!v){ toast('Choisis un lot','err'); return; } onCode(v); },
-    bump: function(id, dir){ var el = document.getElementById('qr-'+id); if(!el) return; var max = parseInt(el.max,10)||9999; el.value = Math.min(max, Math.max(0,(parseInt(el.value,10)||0)+dir)); },
-    destChange: destChange,
-    confirm: doConfirm,
-    printQRs: printQRs
+    recap: recap, validate: validate, delItem: delItem, cancelCart: cancelCart, finalize: finalize,
+    bump: bump, typeIn: typeIn
   };
 })();
 </script>
