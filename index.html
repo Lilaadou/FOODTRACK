@@ -767,7 +767,10 @@
         <div></div>
       </div>
       <div class="form-group" style="margin-bottom:13px">
-        <label>Bons de livraison (BL) * <span style="font-weight:400;color:#bbb">(cocher au moins 1)</span></label>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+          <label style="margin:0">Bons de livraison (BL) * <span style="font-weight:400;color:#bbb">(cocher ou scanner)</span></label>
+          <button type="button" onclick="scanFacturePremix()" style="display:inline-flex;align-items:center;gap:6px;background:#d44218;color:#fff;border:none;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap">📷 Scanner</button>
+        </div>
         <div class="fac-list" id="pmx-fac-list">
           <div class="fac-empty">Aucun BL disponible — réceptionnez-en dans l'onglet Réception facture</div>
         </div>
@@ -3192,17 +3195,67 @@ function getCheckedFactures(listId) {
   return [...document.querySelectorAll(`#${listId} input[type=checkbox]:checked`)].map(c => c.value);
 }
 
+// ── Scan d'une facture au premix : coche la case correspondante ──
+function scanFacturePremix() {
+  if (typeof KookiQR === 'undefined' || typeof KookiQR.scan !== 'function') { toast('pmx','Scanner indisponible','err'); return; }
+  var opts = {
+    title: '📷 Scanner la facture',
+    hint: 'Vise le QR collé sur le sac / carton de matière première.',
+    options: (facturesRecues || []).map(function(f){ return { value: f.numero, label: f.numero + ' — ' + (f.fournisseur || '') }; })
+  };
+  KookiQR.scan(function(raw){ onFactureScanned(raw); }, opts);
+}
+function _parseFactureCode(raw) {
+  var t = String(raw || '').trim();
+  var m = t.match(/(?:FAC[:=]|BL[:=])?\s*([A-Za-z]*-?\d[\w\-\/]*)/);
+  return m ? m[1] : t;
+}
+function _flashFac(box) {
+  var label = box.closest('.fac-check'); if (!label) return;
+  var old = label.style.cssText;
+  label.style.transition = 'background .2s'; label.style.background = '#d4edda';
+  try { label.scrollIntoView({ block:'nearest', behavior:'smooth' }); } catch(e) {}
+  setTimeout(function(){ label.style.background=''; }, 1200);
+}
+function _addFacturePremix(numero, fournisseur, date) {
+  var list = document.getElementById('pmx-fac-list'); if (!list) return;
+  var empty = list.querySelector('.fac-empty'); if (empty) empty.remove();
+  var d = date ? new Date(date).toLocaleDateString('fr-FR') : '';
+  var lab = document.createElement('label');
+  lab.className = 'fac-check';
+  lab.innerHTML = '<input type="checkbox" value="'+numero+'" checked>' +
+    '<span><b>'+numero+'</b> — '+(fournisseur||'')+' <span style="font-size:9px;font-weight:800;color:#fff;background:#27ae60;padding:2px 6px;border-radius:20px">ajoutée</span></span>' +
+    '<span class="fac-tag">'+d+'</span>';
+  list.appendChild(lab);
+  _flashFac(lab.querySelector('input'));
+}
+function onFactureScanned(raw) {
+  var num = _parseFactureCode(raw);
+  // 1) déjà dans la liste premix ?
+  var box = document.querySelector('#pmx-fac-list input[type=checkbox][value="' + num + '"]');
+  if (box) { box.checked = true; _flashFac(box); toast('pmx','✅ Facture cochée : ' + num, 'ok'); return; }
+  // 2) existe dans l'app mais plus dans la liste (ancienne) ?
+  var f = (facturesRecues || []).find(function(x){ return String(x.numero) === num; });
+  if (f) { _addFacturePremix(num, f.fournisseur, f.date); toast('pmx','🗓️ Facture ajoutée + cochée : ' + num, 'ok'); return; }
+  // 3) inconnue
+  toast('pmx','❌ Facture inconnue (' + num + ') — réceptionne-la d\'abord', 'err');
+}
+
 function refreshFacTable() {
   const tbody = document.getElementById('fac-table');
   if (!tbody) return;
   if (!facturesManuelles.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">Aucune facture.</td></tr>'; return; }
-  tbody.innerHTML = facturesManuelles.map(f => `
+  tbody.innerHTML = facturesManuelles.map(f => {
+    const sN = String(f.numero || '').replace(/'/g, "\\'");
+    const sF = String(f.fournisseur || '').replace(/'/g, "\\'");
+    return `
     <tr data-ref="${f.numero}">
-      <td><b>${f.numero}</b></td>
+      <td><b>${f.numero}</b> <button type="button" onclick="KookiQR.showFacture('${sN}','${sF}')" style="background:#fbe8e2;color:#d44218;border:none;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🏷️ QR</button></td>
       <td>${f.fournisseur}</td>
       <td>${f.codeProduction || '—'}</td>
       <td class="sub-text">${f.ajouteLe}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 // ─────────────────────────────────────
@@ -8604,7 +8657,7 @@ async function loadRecentInvoices() {
       return `<tr data-bl="${r.numero}">
         <td class="sub-text">${d}</td>
         <td><b>${r.fournisseur||'—'}</b></td>
-        <td><span class="bl-tag">${r.numero}</span></td>
+        <td><span class="bl-tag">${r.numero}</span> <button type="button" onclick="KookiQR.showFacture('${safeBl}','${safeFo}')" style="background:#fbe8e2;color:#d44218;border:none;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🏷️ QR</button></td>
         <td>${r.nom||'—'}</td>
       </tr>`;
     }).join('');
@@ -14073,6 +14126,7 @@ var qrcode = function() {
 (function(){
   var CDN_SCAN = 'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';
   var scanner = null, current = null;
+  var _scanMode = null, _genericCb = null;
 
   var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
   var LIVREURS = ['Tarik','Shippr','Interne'];
@@ -14224,7 +14278,38 @@ var qrcode = function() {
       }catch(e){ if(msg)msg.textContent='⚠️ Caméra indisponible. Utilise la liste ci-dessous.'; }
     }).catch(function(){ if(msg)msg.innerHTML='⚠️ Scanner non chargé (hors ligne ?). Utilise la liste ci-dessous.'; var r=document.getElementById('qr-reader'); if(r)r.style.display='none'; });
   }
-  function onCode(raw){ var lot=findLot(raw); if(!lot){ toast('Lot introuvable : '+String(raw).slice(0,24),'err'); stepScan(); return; } stepBacs(lot); }
+  function onCode(raw){
+    if(_scanMode==='generic'){ var cb=_genericCb; _scanMode=null; _genericCb=null; close(); if(typeof cb==='function') cb(raw); return; }
+    var lot=findLot(raw); if(!lot){ toast('Lot introuvable : '+String(raw).slice(0,24),'err'); stepScan(); return; } stepBacs(lot);
+  }
+  // Mode « scan générique » : ouvre le scanner et renvoie le texte décodé au callback (pour scanner une facture, etc.)
+  function scanGeneric(onResult, opts){
+    opts = opts || {};
+    _scanMode='generic'; _genericCb=onResult;
+    document.getElementById('qr-overlay').classList.add('open');
+    title(opts.title || '📷 Scanner');
+    var manual = (opts.options||[]).map(function(o){ return '<option value="'+String(o.value).replace(/"/g,'&quot;')+'">'+o.label+'</option>'; }).join('');
+    body().innerHTML =
+      (opts.hint?('<div style="font-size:12.5px;color:#66727f;margin-bottom:10px">'+opts.hint+'</div>'):'')+
+      '<div id="qr-reader"></div>'+
+      '<div id="qr-scan-msg" style="text-align:center;font-size:12px;color:#8a97a5;margin:8px 0 4px">Initialisation de la caméra…</div>'+
+      (manual?('<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir manuellement —</div>'+
+        '<select id="qr-manual" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff"><option value="">Sélectionner…</option>'+manual+'</select>'+
+        '<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.pickManual()">Valider</button>'):'')+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.close()">Annuler</button>';
+    startCamera();
+  }
+  // QR d'une facture / BL fournisseur (à coller sur les matières premières)
+  function showFacture(numero, fournisseur){
+    document.getElementById('qr-overlay').classList.add('open');
+    title('🏷️ QR de la facture'); var url=_qrGif(numero);
+    body().innerHTML='<div style="text-align:center;padding:6px 0">'+(url?'<img src="'+url+'" alt="QR" style="width:190px;height:190px;image-rendering:pixelated">':'<div style="color:#c0392b;padding:30px 0">⚠️ Erreur de génération du QR</div>')+
+      '<div style="font-size:20px;font-weight:800;margin-top:10px" class="qr-accent">'+numero+'</div><div style="font-size:13px;color:#66727f">'+(fournisseur||'')+'</div>'+
+      '<div style="font-size:12px;color:#8a97a5;margin-top:10px">À coller sur toutes les matières premières de cette livraison — scannable au premix.</div></div>'+
+      '<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.printOne(\''+esc(numero)+'\',\''+esc(fournisseur||'')+'\')">🖨️ Imprimer</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.downloadOne(\''+esc(numero)+'\')">⬇️ Télécharger l\'image</button>'+
+      '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.close()">Fermer</button>';
+  }
 
   // ---------- Étape 3 : bacs + small ----------
   function cartUsage(code){
@@ -14417,7 +14502,7 @@ var qrcode = function() {
   function printQRs(){ var L=lots().slice().sort(function(a,b){return String(a.code).localeCompare(String(b.code));}); if(!L.length){ toast('Aucun lot en stock à imprimer','err'); return; } var cards=L.map(function(s){ var data=_qrGif(s.code)||''; return '<div style="border:1px solid #ddd;border-radius:10px;padding:12px;text-align:center;page-break-inside:avoid;width:180px"><img src="'+data+'" style="width:150px;height:150px;image-rendering:pixelated"><div style="font-weight:800;font-size:15px;margin-top:6px">'+s.code+'</div><div style="font-size:12px;color:#555">'+s.saveur+'</div></div>'; }).join(''); var page='<!doctype html><html><head><title>QR lots Kooki</title><meta charset="utf-8"><style>body{font-family:system-ui,Arial,sans-serif;margin:18px}h2{margin:0 0 14px}img{image-rendering:pixelated}.grid{display:flex;flex-wrap:wrap;gap:14px}</style></head><body><h2>🏷️ QR codes des lots — à coller sur les bacs du frigo</h2><div class="grid">'+cards+'</div></body></html>'; _printViaFrame(page); }
   function showLot(code,saveur){ document.getElementById('qr-overlay').classList.add('open'); title('🏷️ QR du lot'); var url=_qrGif(code); body().innerHTML='<div style="text-align:center;padding:6px 0">'+(url?'<img src="'+url+'" alt="QR" style="width:190px;height:190px;image-rendering:pixelated">':'<div style="color:#c0392b;padding:30px 0">⚠️ Erreur de génération du QR</div>')+'<div style="font-size:20px;font-weight:800;margin-top:10px" class="qr-accent">'+code+'</div><div style="font-size:13px;color:#66727f">'+(saveur||'')+'</div><div style="font-size:12px;color:#8a97a5;margin-top:10px">À coller sur le bac au frigo — scannable à la sortie.</div></div>'+'<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.printOne(\''+esc(code)+'\',\''+esc(saveur||'')+'\')">🖨️ Imprimer</button><button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.downloadOne(\''+esc(code)+'\')">⬇️ Télécharger l\'image</button><button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.close()">Fermer</button>'; }
 
-  function close(){ stopScanner(); var o=document.getElementById('qr-overlay'); if(o)o.classList.remove('open'); }
+  function close(){ _scanMode=null; _genericCb=null; stopScanner(); var o=document.getElementById('qr-overlay'); if(o)o.classList.remove('open'); }
 
   window.KookiQR = {
     open: function(){ cart=[]; dest={type:'',name:'',client:'',livreur:'',bl:false}; document.getElementById('qr-overlay').classList.add('open'); stepDest(); },
@@ -14429,7 +14514,8 @@ var qrcode = function() {
     back: function(){ stepScan(); },
     addMore: function(){ stepScan(); },
     recap: recap, validate: validate, delItem: delItem, cancelCart: cancelCart, finalize: finalize,
-    bump: bump, typeIn: typeIn, fillMax: fillMax
+    bump: bump, typeIn: typeIn, fillMax: fillMax,
+    scan: scanGeneric, showFacture: showFacture
   };
 })();
 </script>
