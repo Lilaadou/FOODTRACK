@@ -2019,6 +2019,11 @@
     <div class="card">
       <div class="card-header">
         <div><div class="card-title">Bons de livraison reçus</div><div class="card-sub">30 derniers jours</div></div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <input id="qr-reprint-bl" list="qr-bl-list" placeholder="N° BL à (ré)imprimer…" style="padding:7px 10px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:12px;outline:none;width:160px" onfocus="this.style.borderColor='#d44218'" onblur="this.style.borderColor='#e8e8e8'">
+          <datalist id="qr-bl-list"></datalist>
+          <button type="button" onclick="var v=(document.getElementById('qr-reprint-bl').value||'').trim(); if(v){ KookiQR.showFacture(v, (facturesRecues.find(function(f){return String(f.numero)===v;})||{}).fournisseur||''); } else { toast('rec','Entre un N° BL','err'); }" style="background:#d44218;color:#fff;border:none;border-radius:8px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap">🏷️ QR</button>
+        </div>
       </div>
       <table>
         <thead><tr><th>Date</th><th>Fournisseur</th><th>N° BL</th><th>Ajouté par</th></tr></thead> 
@@ -2890,7 +2895,7 @@ function showPage(name, btn) {
   if (btn) btn.classList.add('active');
   document.getElementById('page-title').textContent = titles[name] || name;
   if (name === 'reception') { 
-    loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); }); 
+    loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); if(typeof fillBLDatalist==='function') fillBLDatalist(); });
     renderPdfList(); 
   }
   if (name === 'frigo') setTimeout(() => {
@@ -3193,6 +3198,12 @@ function refreshFactureLists() {
 
 function getCheckedFactures(listId) {
   return [...document.querySelectorAll(`#${listId} input[type=checkbox]:checked`)].map(c => c.value);
+}
+
+// Remplit l'autocomplétion des N° BL pour la (ré)impression du QR
+function fillBLDatalist() {
+  var dl = document.getElementById('qr-bl-list'); if (!dl) return;
+  dl.innerHTML = (facturesRecues || []).map(function(f){ return '<option value="' + String(f.numero).replace(/"/g,'&quot;') + '">' + (f.fournisseur || '') + '</option>'; }).join('');
 }
 
 // ── Scan d'une facture au premix : coche la case correspondante ──
@@ -8018,13 +8029,17 @@ async function saveReception() {
 
   const tr = document.createElement('tr');
   tr.setAttribute('data-bl', numero);
+  const safeBlJs = numero.replace(/'/g, "\\'");
   tr.innerHTML = `<td class="sub-text">${today}</td>
     <td><b>${fournisseur}</b></td>
-    <td><span class="bl-tag">${numero}</span></td>
+    <td><span class="bl-tag">${numero}</span> <button type="button" onclick="KookiQR.showFacture('${safeBlJs}','${safeFo}')" style="background:#fbe8e2;color:#d44218;border:none;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🏷️ QR</button></td>
     <td>${nom || '—'}</td>`;
   tbody.prepend(tr);
 
   resetRec();
+
+  // Générer et afficher tout de suite le QR du BL (à imprimer + coller sur les matières premières)
+  try { if (typeof KookiQR !== 'undefined' && typeof KookiQR.showFacture === 'function') KookiQR.showFacture(numero, fournisseur); } catch(e) {}
 }
 
 function lierFactureDepuisReception(bl, fournisseur) {
