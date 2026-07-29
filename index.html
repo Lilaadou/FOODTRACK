@@ -14270,20 +14270,20 @@ var qrcode = function() {
     return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #eef0f3;border-radius:13px;margin-bottom:8px'+(dis?';opacity:.5':'')+'">'+
       '<div style="width:36px;height:36px;border-radius:10px;background:#eef2f6;color:#5a6775;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center">'+b.lettre+'</div>'+
       '<div style="flex:1"><div style="font-size:13px;font-weight:700">Bac '+b.lettre+'</div><div style="font-size:11px;color:#8a97a5">'+b.restant+' 🍪 en frigo</div></div>'+
-      stepBox('bac-'+i, b.restant, dis)+
+      qtyControls('bac-'+i, b.restant, dis)+
     '</div>';
   }
   function bacRowSingle(rest){
     return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #eef0f3;border-radius:13px;margin-bottom:8px">'+
       '<div style="flex:1"><div style="font-size:13px;font-weight:700">Big pris</div><div style="font-size:11px;color:#8a97a5">Lot sans détail bac · max '+rest+'</div></div>'+
-      stepBox('bac-0', rest, rest<=0)+
+      qtyControls('bac-0', rest, rest<=0)+
     '</div>';
   }
   function smallRow(max){
     return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #dde7f0;border-radius:13px;background:#f6fafe">'+
       '<div style="width:36px;height:36px;border-radius:10px;background:#e0edf8;color:#0662aa;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center">80</div>'+
       '<div style="flex:1"><div style="font-size:13px;font-weight:700">Small 80g</div><div style="font-size:11px;color:#8a97a5">max '+max+'</div></div>'+
-      stepBox('small', max, max<=0)+
+      qtyControls('small', max, max<=0)+
     '</div>';
   }
   function stepBox(id,max,dis){
@@ -14293,6 +14293,14 @@ var qrcode = function() {
       '<button onclick="KookiQR.bump(\''+id+'\',1)" style="width:34px;height:38px;border:none;background:#fff;font-size:19px;font-weight:700;color:#d44218;cursor:pointer" '+(dis?'disabled':'')+'>+</button>'+
     '</div>';
   }
+  function qtyControls(id,max,dis){
+    return '<div style="display:flex;align-items:center;gap:7px;flex-shrink:0">'+
+      '<button onclick="KookiQR.fillMax(\''+id+'\')" id="qr-tout-'+id+'" style="border:1.4px solid #d44218;background:#fff;color:#d44218;border-radius:9px;height:38px;padding:0 10px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit" '+(dis?'disabled':'')+'>Tout</button>'+
+      stepBox(id,max,dis)+
+    '</div>';
+  }
+  function fillMax(id){ var inp=document.getElementById('qr-in-'+id); if(!inp) return; var max=parseInt(inp.getAttribute('data-max'),10)||0; if(max<=0) return; var cur=readVal(id); setVal(id, cur>=max?0:max); updTotals(); }
+  function toutState(id){ var el=document.getElementById('qr-tout-'+id); var inp=document.getElementById('qr-in-'+id); if(!el||!inp) return; var max=parseInt(inp.getAttribute('data-max'),10)||0; if(max<=0){ el.style.display='none'; return; } var full=(readVal(id)>=max); el.style.background=full?'#d44218':'#fff'; el.style.color=full?'#fff':'#d44218'; el.textContent=full?'✓ Tout':'Tout'; }
   function readVal(id){ var el=document.getElementById('qr-in-'+id); if(!el) return 0; var max=parseInt(el.getAttribute('data-max'),10)||0; var v=parseInt((el.value||'').replace(/\D/g,''),10)||0; if(v<0)v=0; if(v>max)v=max; return v; }
   function setVal(id,v){ var el=document.getElementById('qr-in-'+id); if(el) el.value=v; }
   function syncWork(){ work.bacs.forEach(function(b,i){ b.qty=readVal('bac-'+i); }); work.small=readVal('small'); }
@@ -14302,6 +14310,7 @@ var qrcode = function() {
     var te=document.getElementById('qr-tot-big'); if(te)te.textContent=big;
     var ts=document.getElementById('qr-tot-small'); if(ts)ts.textContent=work.small;
     var vb=document.getElementById('qr-valbtn'); if(vb)vb.disabled=(big<=0 && work.small<=0);
+    work.bacs.forEach(function(b,i){ toutState('bac-'+i); }); toutState('small');
   }
   function bump(id,dir){ var el=document.getElementById('qr-in-'+id); if(!el)return; setVal(id,Math.max(0,readVal(id)+dir)); setVal(id,readVal(id)); updTotals(); }
   function typeIn(id){ setVal(id,readVal(id)); updTotals(); }
@@ -14413,7 +14422,7 @@ var qrcode = function() {
     back: function(){ stepScan(); },
     addMore: function(){ stepScan(); },
     recap: recap, validate: validate, delItem: delItem, cancelCart: cancelCart, finalize: finalize,
-    bump: bump, typeIn: typeIn
+    bump: bump, typeIn: typeIn, fillMax: fillMax
   };
 })();
 </script>
