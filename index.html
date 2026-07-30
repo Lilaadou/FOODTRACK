@@ -16,10 +16,10 @@
     body{font-family:'Segoe UI',system-ui,sans-serif;background:#f7f8fa;color:#1a1a2e;display:flex;min-height:100vh;}
 
     /* ── SIDEBAR ── */ 
-    .sidebar{width:220px;background:#fff;border-right:1px solid #efefef;display:flex;flex-direction:column;padding:22px 0;position:fixed;height:100vh;overflow-y:auto;}
-    .logo{display:flex;align-items:center;justify-content:center;padding:0 20px 26px;}
+    .sidebar{width:150px;background:#fff;border-right:1px solid #efefef;display:flex;flex-direction:column;padding:22px 0;position:fixed;height:100vh;overflow-y:auto;}
+    .logo{display:flex;align-items:center;justify-content:center;padding:0 12px 22px;}
     .nav-label{font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.08em;padding:0 20px 6px;}
-    .nav-item{display:flex;align-items:center;gap:11px;padding:10px 20px;font-size:13.5px;color:#666;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:10px 15px;font-size:12.5px;color:#666;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;}
     .nav-item:hover{background:#fdf0ec;color:#d44218;}
     .nav-item.active{background:#fbe8e2;color:#d44218;font-weight:600;border-right:3px solid #d44218;}
     .nav-item.hidden{display:none;}
@@ -27,7 +27,7 @@
     .sidebar-bottom{margin-top:auto;border-top:1px solid #efefef;padding-top:10px;}
 
     /* ── MAIN ── */
-    .main{margin-left:220px;flex:1;padding:22px 28px;}
+    .main{margin-left:150px;flex:1;padding:22px 26px;}
 
     /* ── TOPBAR ── */
     .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
@@ -597,7 +597,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <img id="app-logo" src="logo.png" alt="Kooki" style="height:52px;width:150px;object-fit:contain;object-position:center;">
+    <img id="app-logo" src="logo.png" alt="Kooki" style="height:46px;width:100%;object-fit:contain;object-position:center;">
   </div>
 
   <div class="nav-label">Principal</div>
@@ -951,8 +951,9 @@
           </select>
         </div>
         </div>
-      <!-- Section Grands -->
-      <div style="background:#f9f9f9;border-radius:10px;padding:13px 16px;margin-bottom:11px;border:1.5px solid #e8e8e8;grid-column:1/-1">
+      <!-- Sections Grands + Petits côte à côte -->
+      <div style="display:flex;gap:11px;align-items:flex-start;flex-wrap:wrap;grid-column:1/-1;margin-bottom:11px">
+      <div style="background:#f9f9f9;border-radius:10px;padding:13px 16px;border:1.5px solid #e8e8e8;flex:1;min-width:260px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div style="font-size:13px;font-weight:700">Grands (Big 165g)</div>
           <span id="prod-bac-tag" style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">≈ 45 / bac</span>
@@ -977,7 +978,7 @@
         </div>
       </div>
       <!-- Section Petits -->
-      <div id="prod-small-section" style="background:#f9f9f9;border-radius:10px;padding:13px 16px;margin-bottom:11px;border:1.5px solid #e8e8e8">
+      <div id="prod-small-section" style="background:#f9f9f9;border-radius:10px;padding:13px 16px;border:1.5px solid #e8e8e8;flex:1;min-width:260px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div style="font-size:13px;font-weight:700">Petits (Small 80g)</div>
           <span style="font-size:11px;color:#aaa">optionnel · reste de pâte</span>
@@ -988,6 +989,7 @@
           <span id="prod-total-small-display" style="font-size:18px;font-weight:700;color:#0662aa">0 cookies</span>
         </div>
       </div>
+      </div><!-- fin flex Grands+Petits -->
       <!-- Champ caché big -->
       <input type="hidden" id="prod-big" value="0">
       <div style="display:none">
@@ -2841,7 +2843,7 @@ function enterRole(roleKey, firstPage){
   var nm = document.getElementById('topbar-name'); if(nm) nm.textContent = m.nom;
   // Visibilité des onglets selon le rôle
   var allowed = ROLE_NAV[roleKey] || ALL_NAV_IDS;
-  ALL_NAV_IDS.forEach(function(id){ var el = document.getElementById('nav-' + id); if(el) el.classList.toggle('hidden', allowed.indexOf(id) === -1); });
+  ALL_NAV_IDS.forEach(function(id){ document.querySelectorAll('[id="nav-' + id + '"]').forEach(function(el){ el.classList.toggle('hidden', allowed.indexOf(id) === -1); }); });
   // Pas de bascule de mode avec les rôles
   var sm = document.getElementById('switch-mode-btn'); if(sm) sm.style.display = 'none';
   var qs = document.getElementById('mode-quickswitch'); if(qs) qs.style.display = 'none';
@@ -2897,6 +2899,8 @@ function showPage(name, btn) {
   document.getElementById('page-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
   document.getElementById('page-title').textContent = titles[name] || name;
+  // Le bouton flottant « Scanner sortie » n'apparaît que sur la page Sorties frigo
+  var _fab = document.getElementById('qr-fab'); if (_fab) _fab.style.display = (name === 'frigo') ? 'inline-flex' : 'none';
   if (name === 'reception') { 
     loadRecentInvoices().then(() => { loadBLSelect(); renderLiensBL(); if(typeof fillBLDatalist==='function') fillBLDatalist(); });
     renderPdfList(); 
@@ -11830,7 +11834,7 @@ function renderTarikTracker(){
   .qr-toast.ok{background:#1a8a4a}
 </style>
 
-<button id="qr-fab" onclick="KookiQR.open()">📷 Scanner sortie</button>
+<button id="qr-fab" onclick="KookiQR.open()" style="display:none">📷 Scanner sortie</button>
 
 <div id="qr-overlay" onclick="if(event.target===this)KookiQR.close()">
   <div id="qr-sheet">
