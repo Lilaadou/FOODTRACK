@@ -2923,7 +2923,7 @@ function showPage(name, btn) {
   
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
-  if (name === 'production') setTimeout(async () => { setProdTab('prod'); renderBacsInventaire(); renderPlanificateur(); renderMatieres(); loadPremixDispo(); const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
+  if (name === 'production') setTimeout(async () => { setProdTab('prod'); renderBacsInventaire(); renderPlanificateur(); renderMatieres(); loadPremixDispo(); if(typeof syncBacsFromServer==='function'){ try{ await syncBacsFromServer(); }catch(e){} } const prodData = await fetchAPI('getProduction'); applyProduction(prodData); updateLotsduJour(); updateCalendrierProduction(); calcProdTotaux(); }, 60);
   if (name === 'ixelles') setTimeout(() => { initCommandeIxelles(); renderHistoriqueIxelles(); }, 60);
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
   if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
@@ -9461,6 +9461,19 @@ function supprimerLivraison(idx) {
   toast('ing', '✓ Livraison supprimée — stock mis à jour', 'ok');
 }
 
+// Récap bacs pour l'historique : utilise le détail local, sinon le reconstruit depuis la feuille Bacs (multi-appareils)
+function _bacsRecap(r){
+  if(Array.isArray(r.bacs) && r.bacs.length) return { count:r.bacs.length, detail:r.bacs.join(' · ') };
+  try{
+    var srv=JSON.parse(localStorage.getItem('kooki_bacs_server')||'{}');
+    var arr=srv[r.code];
+    if(arr && arr.length){
+      var qtys=arr.map(function(b){ var v=parseInt(b.initial,10); if(!v) v=parseInt(b.restant,10)||0; return v; }).filter(function(x){ return x>0; });
+      if(qtys.length) return { count:qtys.length, detail:qtys.join(' · ') };
+    }
+  }catch(e){}
+  return { count:(r.bacsSimple||0), detail:(r.bacsDouble? r.bacsDouble+' double(s)':'—') };
+}
 function applyProduction(data) {
   // Normaliser les données venant de Google Sheets
   // Format attendu depuis l'onglet "Production" (ligne 72+) :
@@ -9555,11 +9568,12 @@ function applyProduction(data) {
     }
     const color = '#d44218';
     const dateFormatted = r._d ? r._d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
+   const _br = _bacsRecap(r);
    html += `<tr data-prod-code="${r.code}">
   <td><b>${r.code}</b>${dateFormatted ? `<div class="sub-text">${dateFormatted}</div>` : ''}</td>
   <td><span class="tag tag-o">${r.saveur}</span></td>
-  <td>${r.bacs ? r.bacs.length : (r.bacsSimple || 0)}</td>
-  <td class="sub-text">${r.bacs ? r.bacs.join(' · ') : (r.bacsDouble ? r.bacsDouble + ' double(s)' : '—')}</td>
+  <td>${_br.count}</td>
+  <td class="sub-text">${_br.detail}</td>
   <td style="color:${color};font-weight:700">${r.big}</td>
   <td style="color:#0662aa;font-weight:700">${r.small}</td>
   <td class="sub-text">${r.pmx}</td>
