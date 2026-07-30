@@ -522,7 +522,7 @@
 <body>
 
 <!-- ══════ ÉCRAN DE CONNEXION ══════ -->
-<div id="login-screen" style="position:fixed;inset:0;background:#fff;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
+<div id="login-screen" style="position:fixed;inset:0;background:radial-gradient(1000px 520px at 50% 0%, #fdf2ee 0%, rgba(253,242,238,0) 60%), linear-gradient(180deg,#ffffff 0%, #faf9f8 100%);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
 
   <!-- Logo + titre -->
   <img src="logo.png" alt="Kooki" style="height:60px;margin-bottom:10px">
@@ -530,30 +530,43 @@
   <div style="font-size:12px;color:#bbb;margin-bottom:36px">Qui êtes-vous ?</div>
 
   <!-- Boutons de rôle -->
-  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px">
+  <style>
+    .role-cards{width:100%;max-width:440px;display:flex;flex-direction:column;gap:15px}
+    .role-card{position:relative;display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #eef0f3;border-radius:18px;padding:19px 20px 19px 24px;cursor:pointer;overflow:hidden;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+    .role-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c);border-radius:18px 0 0 18px}
+    .role-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px var(--c);border-color:var(--c)}
+    .role-ic{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--cl)}
+    .role-txt{flex:1}
+    .role-title{font-size:16px;font-weight:800;color:#1a1a2e}
+    .role-sub{font-size:12px;color:#9aa4af;margin-top:3px}
+    .role-chev{font-size:25px;color:#d0d6dd;transition:color .16s,transform .16s}
+    .role-card:hover .role-chev{color:var(--c);transform:translateX(3px)}
+    .role-sub-card{display:flex;align-items:center;gap:12px;background:#fafafa;border:1px solid #eef0f3;border-radius:13px;padding:14px 16px;cursor:pointer;transition:.15s}
+    .role-sub-card:hover{border-color:#2c8a4a;background:#fff}
+  </style>
+  <div class="role-cards">
 
-    <div onclick="enterRole('admin')" style="cursor:pointer;border:1.5px solid #eee;border-radius:18px;padding:20px;display:flex;align-items:center;gap:16px;background:#fff;transition:.15s" onmouseover="this.style.borderColor='#d44218';this.style.background='#fdf0ec'" onmouseout="this.style.borderColor='#eee';this.style.background='#fff'">
-      <div style="width:52px;height:52px;border-radius:14px;background:#fbe8e2;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🗂️</div>
-      <div><div style="font-size:16px;font-weight:800;color:#1a1a2e">Administratif</div><div style="font-size:12px;color:#999;margin-top:2px">Accès complet — production + livraison</div></div>
+    <div class="role-card" style="--c:#d44218;--cl:#fbe8e2" onclick="enterRole('admin')">
+      <div class="role-ic">🗂️</div>
+      <div class="role-txt"><div class="role-title">Administratif</div><div class="role-sub">Accès complet — production + livraison</div></div>
+      <div class="role-chev">›</div>
     </div>
 
-    <div onclick="enterRole('frigo')" style="cursor:pointer;border:1.5px solid #eee;border-radius:18px;padding:20px;display:flex;align-items:center;gap:16px;background:#fff;transition:.15s" onmouseover="this.style.borderColor='#0662aa';this.style.background='#eef4fb'" onmouseout="this.style.borderColor='#eee';this.style.background='#fff'">
-      <div style="width:52px;height:52px;border-radius:14px;background:#e0edf8;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">❄️</div>
-      <div><div style="font-size:16px;font-weight:800;color:#1a1a2e">Sortie frigo</div><div style="font-size:12px;color:#999;margin-top:2px">Stock cookies + sorties frigo</div></div>
+    <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo')">
+      <div class="role-ic">❄️</div>
+      <div class="role-txt"><div class="role-title">Sortie frigo</div><div class="role-sub">Stock cookies + sorties frigo</div></div>
+      <div class="role-chev">›</div>
     </div>
 
-    <div id="role-prod-main" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'" style="cursor:pointer;border:1.5px solid #eee;border-radius:18px;padding:20px;display:flex;align-items:center;gap:16px;background:#fff;transition:.15s" onmouseover="this.style.borderColor='#e8956a';this.style.background='#fdf3ee'" onmouseout="this.style.borderColor='#eee';this.style.background='#fff'">
-      <div style="width:52px;height:52px;border-radius:14px;background:#fbeadf;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏭</div>
-      <div><div style="font-size:16px;font-weight:800;color:#1a1a2e">Production</div><div style="font-size:12px;color:#999;margin-top:2px">Premix + production</div></div>
+    <div class="role-card" id="role-prod-main" style="--c:#2c8a4a;--cl:#e4f4ea" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'">
+      <div class="role-ic">🏭</div>
+      <div class="role-txt"><div class="role-title">Production</div><div class="role-sub">Premix + production</div></div>
+      <div class="role-chev">›</div>
     </div>
     <div id="role-prod-sub" style="display:none;flex-direction:column;gap:10px;padding-left:6px">
       <div style="font-size:11px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 4px">Production — choisis :</div>
-      <div onclick="enterRole('prod','premix')" style="cursor:pointer;border:1.5px solid #eee;border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:12px;background:#fafafa;transition:.15s" onmouseover="this.style.borderColor='#e8956a';this.style.background='#fff'" onmouseout="this.style.borderColor='#eee';this.style.background='#fafafa'">
-        <span style="font-size:22px">🧪</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Premix</span>
-      </div>
-      <div onclick="enterRole('prod','production')" style="cursor:pointer;border:1.5px solid #eee;border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:12px;background:#fafafa;transition:.15s" onmouseover="this.style.borderColor='#e8956a';this.style.background='#fff'" onmouseout="this.style.borderColor='#eee';this.style.background='#fafafa'">
-        <span style="font-size:22px">🏭</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Production</span>
-      </div>
+      <div class="role-sub-card" onclick="enterRole('prod','premix')"><span style="font-size:22px">🧪</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Premix</span></div>
+      <div class="role-sub-card" onclick="enterRole('prod','production')"><span style="font-size:22px">🏭</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Production</span></div>
     </div>
 
   </div>
