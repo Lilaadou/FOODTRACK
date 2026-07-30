@@ -993,7 +993,10 @@
       <div style="display:none">
       </div>
       <div class="form-group" style="margin-bottom:13px">
-        <label>Bons de livraison (BL) * <span style="font-weight:400;color:#bbb">(cocher au moins 1)</span></label>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+          <label style="margin:0">Bons de livraison (BL) * <span style="font-weight:400;color:#bbb">(cocher ou scanner)</span></label>
+          <button type="button" onclick="scanFactureProduction()" style="display:inline-flex;align-items:center;gap:6px;background:#d44218;color:#fff;border:none;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap">📷 Scanner</button>
+        </div>
         <div class="fac-list" id="prod-fac-list">
           <div class="fac-empty">Aucun BL disponible — réceptionnez-en dans l'onglet Réception facture</div>
         </div>
@@ -3206,16 +3209,7 @@ function fillBLDatalist() {
   dl.innerHTML = (facturesRecues || []).map(function(f){ return '<option value="' + String(f.numero).replace(/"/g,'&quot;') + '">' + (f.fournisseur || '') + '</option>'; }).join('');
 }
 
-// ── Scan d'une facture au premix : coche la case correspondante ──
-function scanFacturePremix() {
-  if (typeof KookiQR === 'undefined' || typeof KookiQR.scan !== 'function') { toast('pmx','Scanner indisponible','err'); return; }
-  var opts = {
-    title: '📷 Scanner la facture',
-    hint: 'Vise le QR collé sur le sac / carton de matière première.',
-    options: (facturesRecues || []).map(function(f){ return { value: f.numero, label: f.numero + ' — ' + (f.fournisseur || '') }; })
-  };
-  KookiQR.scan(function(raw){ onFactureScanned(raw); }, opts);
-}
+// ── Scan d'une facture : coche la case correspondante (premix OU production) ──
 function _parseFactureCode(raw) {
   var t = String(raw || '').trim();
   var m = t.match(/(?:FAC[:=]|BL[:=])?\s*([A-Za-z]*-?\d[\w\-\/]*)/);
@@ -3223,13 +3217,12 @@ function _parseFactureCode(raw) {
 }
 function _flashFac(box) {
   var label = box.closest('.fac-check'); if (!label) return;
-  var old = label.style.cssText;
   label.style.transition = 'background .2s'; label.style.background = '#d4edda';
   try { label.scrollIntoView({ block:'nearest', behavior:'smooth' }); } catch(e) {}
   setTimeout(function(){ label.style.background=''; }, 1200);
 }
-function _addFacturePremix(numero, fournisseur, date) {
-  var list = document.getElementById('pmx-fac-list'); if (!list) return;
+function _addFactureRow(listId, numero, fournisseur, date) {
+  var list = document.getElementById(listId); if (!list) return;
   var empty = list.querySelector('.fac-empty'); if (empty) empty.remove();
   var d = date ? new Date(date).toLocaleDateString('fr-FR') : '';
   var lab = document.createElement('label');
@@ -3240,17 +3233,30 @@ function _addFacturePremix(numero, fournisseur, date) {
   list.appendChild(lab);
   _flashFac(lab.querySelector('input'));
 }
-function onFactureScanned(raw) {
+// listId = 'pmx-fac-list' ou 'prod-fac-list' ; toastId = 'pmx' ou 'prod'
+function scanFactureFor(listId, toastId) {
+  if (typeof KookiQR === 'undefined' || typeof KookiQR.scan !== 'function') { toast(toastId,'Scanner indisponible','err'); return; }
+  var opts = {
+    title: '📷 Scanner la facture',
+    hint: 'Vise le QR collé sur le sac / carton de matière première.',
+    options: (facturesRecues || []).map(function(f){ return { value: f.numero, label: f.numero + ' — ' + (f.fournisseur || '') }; })
+  };
+  KookiQR.scan(function(raw){ onFactureScannedFor(listId, toastId, raw); }, opts);
+}
+function onFactureScannedFor(listId, toastId, raw) {
   var num = _parseFactureCode(raw);
-  // 1) déjà dans la liste premix ?
-  var box = document.querySelector('#pmx-fac-list input[type=checkbox][value="' + num + '"]');
-  if (box) { box.checked = true; _flashFac(box); toast('pmx','✅ Facture cochée : ' + num, 'ok'); return; }
+  // 1) déjà dans la liste ?
+  var box = document.querySelector('#' + listId + ' input[type=checkbox][value="' + num + '"]');
+  if (box) { box.checked = true; _flashFac(box); toast(toastId,'✅ Facture cochée : ' + num, 'ok'); return; }
   // 2) existe dans l'app mais plus dans la liste (ancienne) ?
   var f = (facturesRecues || []).find(function(x){ return String(x.numero) === num; });
-  if (f) { _addFacturePremix(num, f.fournisseur, f.date); toast('pmx','🗓️ Facture ajoutée + cochée : ' + num, 'ok'); return; }
+  if (f) { _addFactureRow(listId, num, f.fournisseur, f.date); toast(toastId,'🗓️ Facture ajoutée + cochée : ' + num, 'ok'); return; }
   // 3) inconnue
-  toast('pmx','❌ Facture inconnue (' + num + ') — réceptionne-la d\'abord', 'err');
+  toast(toastId,'❌ Facture inconnue (' + num + ') — réceptionne-la d\'abord', 'err');
 }
+// Raccourcis
+function scanFacturePremix() { scanFactureFor('pmx-fac-list', 'pmx'); }
+function scanFactureProduction() { scanFactureFor('prod-fac-list', 'prod'); }
 
 function refreshFacTable() {
   const tbody = document.getElementById('fac-table');
