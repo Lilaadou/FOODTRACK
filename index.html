@@ -11082,8 +11082,8 @@ function _rmClientHTML(c, forPrint){
   var tdQk=tdPk+';text-align:right;font-weight:600;color:#a07000';
   var rows=jours.map(function(j){
     var r='<tr><td colspan="2" style="'+tdD+'">'+fdate(j.dt)+'</td></tr>';
-    if(j.big)   r+='<tr><td style="'+tdP+'">1 GIANT SIZE</td><td style="'+tdQ+'">'+j.big+'</td></tr>';
-    if(j.small) r+='<tr><td style="'+tdP+'">1 BABY SIZE</td><td style="'+tdQ+'">'+j.small+'</td></tr>';
+    if(j.big)   r+='<tr><td style="'+tdP+'">GIANT SIZE</td><td style="'+tdQ+'">'+j.big+'</td></tr>';
+    if(j.small) r+='<tr><td style="'+tdP+'">BABY SIZE</td><td style="'+tdQ+'">'+j.small+'</td></tr>';
     Object.keys(j.cakes).forEach(function(nm){
       if(j.cakes[nm]>0) r+='<tr><td style="'+tdPk+'">'+nm+'</td><td style="'+tdQk+'">'+j.cakes[nm]+'</td></tr>';
     });
