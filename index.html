@@ -9502,6 +9502,7 @@ function applyProduction(data) {
     bacsSimple: parseInt(r.bacsSimple || r.bacsSimples || 0) || 0,
     bacsDouble: parseInt(r.bacsDouble || r.bacsDoubles || 0) || 0,
     bacs:    Array.isArray(r.bacs) ? r.bacs.map(function(x){ return parseInt(x,10)||0; }) : null,
+    bls:     Array.isArray(r.bls) ? r.bls : (Array.isArray(r.factures) ? r.factures : []),
     date:    r.date      || null,
   });
 
@@ -9534,16 +9535,22 @@ function applyProduction(data) {
   if (apiData.length) {
     const apiFiltered = apiData.filter(r => r.code !== '—').map(r => {
       const loc = localByCode[r.code];
+      let out = r;
       // Si le Sheet ne renvoie pas encore les bacs mais qu'on les connaît en local, on les garde
       if (loc && !(r.bacsSimple || r.bacsDouble) && (loc.bacsSimple || loc.bacsDouble)) {
-        return Object.assign({}, r, {
+        out = Object.assign({}, r, {
           bacsSimple: parseInt(loc.bacsSimple) || 0,
           bacsDouble: parseInt(loc.bacsDouble) || 0,
           bacs: Array.isArray(loc.bacs) ? loc.bacs : r.bacs
         });
+      } else if (loc && !r.bacs && Array.isArray(loc.bacs)) {
+        out = Object.assign({}, r, { bacs: loc.bacs });
       }
-      if (loc && !r.bacs && Array.isArray(loc.bacs)) { return Object.assign({}, r, { bacs: loc.bacs }); }
-      return r;
+      // Préserver les factures/BL liées si l'API n'en renvoie pas mais qu'on les a en local
+      if (loc && (!out.bls || !out.bls.length) && Array.isArray(loc.bls) && loc.bls.length) {
+        out = Object.assign({}, out, { bls: loc.bls });
+      }
+      return out;
     });
     const apiCodes = new Set(apiFiltered.map(r => r.code));
     const localOnly = localFiltered.filter(r => !apiCodes.has(r.code));
