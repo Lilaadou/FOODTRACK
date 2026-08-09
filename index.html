@@ -1023,8 +1023,33 @@
   <span class="toast" id="toast-prod"></span>
 </div>
     </div>
+    <!-- Heatmap d'activité de production -->
+    <style>
+      .phm-c{width:13px;height:13px;border-radius:4px;background:#eceef1;display:inline-block}
+      .phm-cell{width:100%;aspect-ratio:1;border-radius:4px;background:#eceef1;min-width:0}
+      .phm-l1{background:#fbdccd}.phm-l2{background:#f2a888}.phm-l3{background:#e56b41}.phm-l4{background:#d44218}
+    </style>
     <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px">
-    <div class="card" style="flex:0 0 320px;min-width:280px;margin:0">
+    <div class="card" style="flex:1;min-width:300px;margin:0">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px">
+        <div><div class="card-title">📊 Activité de production</div><div class="card-sub" id="phm-since">—</div></div>
+        <div style="text-align:right"><div id="phm-total" style="font-size:34px;font-weight:800;line-height:1;color:#1a1a2e">0</div><div style="font-size:10px;font-weight:700;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em">productions</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:5px">
+        <div style="width:30px;flex-shrink:0"></div>
+        <div id="phm-months" style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(30,1fr);font-size:10px;color:#8a97a5;font-weight:600"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <div style="width:30px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:#8a97a5;padding:1px 0">
+          <span>Lun</span><span>Mer</span><span>Ven</span><span>Dim</span>
+        </div>
+        <div id="phm-grid" style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(30,1fr);grid-template-rows:repeat(7,auto);grid-auto-flow:column;gap:3px"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:10px;font-size:11px;color:#8a97a5">Moins
+        <span class="phm-c"></span><span class="phm-c phm-l1"></span><span class="phm-c phm-l2"></span><span class="phm-c phm-l3"></span><span class="phm-c phm-l4"></span> Plus</div>
+    </div>
+
+    <div class="card" style="flex:1;min-width:300px;margin:0">
   <div class="card-header" style="margin-bottom:10px">
     <div><div class="card-title">📦 Lots du jour</div><div class="card-sub" id="lots-du-jour-date">—</div></div>
   </div>
@@ -1049,9 +1074,9 @@
     </div>
   </div>
 </div>
+    </div><!-- /fin flex heatmap + lots du jour -->
 
-
-    <div class="card" style="flex:1;min-width:340px;margin:0">
+    <div class="card">
       <div class="card-header"><div><div class="card-title">Historique de production</div></div></div>
       <table>
         <thead><tr><th>Code Lot</th><th>Saveur</th><th>Bacs</th><th>Cookies / bac</th><th>Total Big</th><th>Total Baby</th><th>Premix</th><th>Producteur</th><th></th></tr></thead>
@@ -1060,7 +1085,6 @@
         </tbody>
       </table>
     </div>
-    </div><!-- /fin flex lots + historique -->
     </div><!-- /prod-cookie-wrap -->
 
     <!-- ═══════════ PRODUCTION GÂTEAUX ═══════════ -->
@@ -9490,6 +9514,33 @@ function _bacsRecap(r){
   }catch(e){}
   return { count:(r.bacsSimple||0), detail:(r.bacsDouble? r.bacsDouble+' double(s)':'—') };
 }
+// Heatmap d'activité de production (façon GitHub) — lit les vraies productions
+function renderProdHeatmap(){
+  var grid = document.getElementById('phm-grid'); if(!grid) return;
+  var prods = []; try{ prods = JSON.parse(localStorage.getItem('kooki_productions')||'[]'); }catch(e){}
+  function key(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function parseD(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]); var fr=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(fr) return new Date(+fr[3],+fr[2]-1,+fr[1]); var d=new Date(s); return isNaN(d)?null:d; }
+  var counts={};
+  prods.forEach(function(p){ var d=parseD(p.date); if(!d) return; counts[key(d)]=(counts[key(d)]||0)+1; });
+  var WEEKS=30, MONTHS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+  var today=new Date(); today.setHours(0,0,0,0);
+  var start=new Date(today); var dow=(start.getDay()+6)%7; start.setDate(start.getDate()-dow-(WEEKS-1)*7);
+  grid.innerHTML=''; var total=0, monthCols=[];
+  for(var w=0;w<WEEKS;w++){ for(var dd=0;dd<7;dd++){
+    var day=new Date(start); day.setDate(start.getDate()+w*7+dd);
+    var cell=document.createElement('div'); cell.className='phm-cell';
+    if(day<=today){
+      var n=counts[key(day)]||0;
+      if(n>0){ var lvl=n>=4?4:n; cell.className='phm-cell phm-l'+lvl; total+=n; }
+      cell.title=(n||0)+' production'+(n>1?'s':'')+' · '+day.toLocaleDateString('fr-FR');
+    } else { cell.style.visibility='hidden'; }
+    grid.appendChild(cell);
+    if(dd===0) monthCols.push(day.getMonth());
+  }}
+  var t=document.getElementById('phm-total'); if(t) t.textContent=total;
+  var si=document.getElementById('phm-since'); if(si) si.textContent='Depuis le '+start.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  var mEl=document.getElementById('phm-months'); if(mEl){ mEl.innerHTML=''; var last=-1; monthCols.forEach(function(m){ var sp=document.createElement('span'); sp.textContent=(m!==last)?MONTHS[m]:''; last=m; mEl.appendChild(sp); }); }
+}
 function applyProduction(data) {
   // Normaliser les données venant de Google Sheets
   // Format attendu depuis l'onglet "Production" (ligne 72+) :
@@ -9619,6 +9670,7 @@ function applyProduction(data) {
   localStorage.setItem('kooki_productions', JSON.stringify(merged));
   tbody.innerHTML = html || '<tr><td colspan="9" class="empty">Aucune production enregistrée.</td></tr>';
   buildProdByProducer();
+  try{ if(typeof renderProdHeatmap==='function') renderProdHeatmap(); }catch(e){}
 }
 
 // ── Premix ──
