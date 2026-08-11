@@ -522,56 +522,66 @@
 <body>
 
 <!-- ══════ ÉCRAN DE CONNEXION ══════ -->
-<div id="login-screen" style="position:fixed;inset:0;background:radial-gradient(1000px 520px at 50% 0%, #fdf2ee 0%, rgba(253,242,238,0) 60%), linear-gradient(180deg,#ffffff 0%, #faf9f8 100%);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(180deg,#f5f6f8 0%,#eceef2 100%);z-index:10000;display:flex;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
 
-  <!-- Logo + titre -->
-  <img src="logo.png" alt="Kooki" style="height:60px;margin-bottom:10px">
-  <div style="font-size:14px;color:#888;font-weight:500;margin-bottom:4px">Traçabilité & gestion de production</div>
-  <div style="font-size:12px;color:#bbb;margin-bottom:36px">Qui êtes-vous ?</div>
-
-  <!-- Boutons de rôle -->
   <style>
-    .role-cards{width:100%;max-width:440px;display:flex;flex-direction:column;gap:15px}
-    .role-card{position:relative;display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #eef0f3;border-radius:18px;padding:19px 20px 19px 24px;cursor:pointer;overflow:hidden;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;box-shadow:0 1px 2px rgba(20,30,50,.04)}
-    .role-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c);border-radius:18px 0 0 18px}
-    .role-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px var(--c);border-color:var(--c)}
-    .role-ic{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--cl)}
-    .role-txt{flex:1}
-    .role-title{font-size:16px;font-weight:800;color:#1a1a2e}
-    .role-sub{font-size:12px;color:#9aa4af;margin-top:3px}
-    .role-chev{font-size:25px;color:#d0d6dd;transition:color .16s,transform .16s}
-    .role-card:hover .role-chev{color:var(--c);transform:translateX(3px)}
-    .role-sub-card{display:flex;align-items:center;gap:12px;background:#fafafa;border:1px solid #eef0f3;border-radius:13px;padding:14px 16px;cursor:pointer;transition:.15s}
-    .role-sub-card:hover{border-color:#2c8a4a;background:#fff}
+    .login-card{width:100%;max-width:420px;background:#fff;border:1px solid #e4e6ea;border-radius:16px;box-shadow:0 1px 2px rgba(20,21,26,.03),0 12px 32px -16px rgba(20,21,26,.08);padding:40px 32px 28px}
+    .login-logo-row{display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+    .login-logo-row img{height:44px}
+    .login-tagline{text-align:center;font-size:13px;color:#8a8e99;margin-bottom:28px}
+    .login-divider{height:1px;background:#e4e6ea;margin-bottom:22px}
+    .login-question{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#8a8e99;margin-bottom:14px}
+    .role-cards{display:flex;flex-direction:column;gap:8px}
+    .role-card{position:relative;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e4e6ea;border-radius:10px;padding:13px 14px;cursor:pointer;transition:border-color .15s ease,background .15s ease,transform .15s ease}
+    .role-card:hover{border-color:var(--c);background:var(--cl);transform:translateY(-1px)}
+    .role-ic{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--cl);color:var(--c)}
+    .role-txt{flex:1;min-width:0}
+    .role-title{font-size:14.5px;font-weight:600;color:#1b1d22}
+    .role-sub{font-size:12.5px;color:#8a8e99;margin-top:2px}
+    .role-chev{font-size:17px;color:#c3c6cc;transition:color .15s}
+    .role-card:hover .role-chev{color:var(--c)}
+    .role-sub-card{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e6ea;border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+    .role-sub-card:hover{border-color:#2c8a4a;background:#f2f9f5}
+    .role-sub-card i{font-size:17px;color:#2c8a4a;width:18px;text-align:center}
+    .role-sub-card span{font-size:14px;font-weight:600;color:#1b1d22}
+    .login-footer{text-align:center;font-size:11.5px;color:#8a8e99;margin-top:28px;letter-spacing:.2px}
   </style>
-  <div class="role-cards">
 
-    <div class="role-card" style="--c:#d44218;--cl:#fbe8e2" onclick="enterRole('admin')">
-      <div class="role-ic">🗂️</div>
-      <div class="role-txt"><div class="role-title">Administratif</div><div class="role-sub">Accès complet — production + livraison</div></div>
-      <div class="role-chev">›</div>
+  <div class="login-card">
+    <div class="login-logo-row"><img src="logo.png" alt="Kooki"></div>
+    <div class="login-tagline">Traçabilité &amp; gestion de production</div>
+    <div class="login-divider"></div>
+    <div class="login-question">Qui êtes-vous ?</div>
+
+    <div class="role-cards">
+
+      <div class="role-card" style="--c:#d44218;--cl:#fbe8e2" onclick="enterRole('admin')">
+        <div class="role-ic"><i class="ti ti-briefcase"></i></div>
+        <div class="role-txt"><div class="role-title">Administratif</div><div class="role-sub">Accès complet — production + livraison</div></div>
+        <i class="ti ti-chevron-right role-chev"></i>
+      </div>
+
+      <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo')">
+        <div class="role-ic"><i class="ti ti-snowflake"></i></div>
+        <div class="role-txt"><div class="role-title">Sortie frigo</div><div class="role-sub">Stock cookies + sorties frigo</div></div>
+        <i class="ti ti-chevron-right role-chev"></i>
+      </div>
+
+      <div class="role-card" id="role-prod-main" style="--c:#2c8a4a;--cl:#e4f4ea" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'">
+        <div class="role-ic"><i class="ti ti-building-factory-2"></i></div>
+        <div class="role-txt"><div class="role-title">Production</div><div class="role-sub">Premix + production</div></div>
+        <i class="ti ti-chevron-right role-chev"></i>
+      </div>
+      <div id="role-prod-sub" style="display:none;flex-direction:column;gap:8px;padding-left:2px">
+        <div style="font-size:11px;color:#8a8e99;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 4px 2px">Production — choisis :</div>
+        <div class="role-sub-card" onclick="enterRole('prod','premix')"><i class="ti ti-flask"></i><span>Premix</span></div>
+        <div class="role-sub-card" onclick="enterRole('prod','production')"><i class="ti ti-building-factory-2"></i><span>Production</span></div>
+      </div>
+
     </div>
 
-    <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo')">
-      <div class="role-ic">❄️</div>
-      <div class="role-txt"><div class="role-title">Sortie frigo</div><div class="role-sub">Stock cookies + sorties frigo</div></div>
-      <div class="role-chev">›</div>
-    </div>
-
-    <div class="role-card" id="role-prod-main" style="--c:#2c8a4a;--cl:#e4f4ea" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'">
-      <div class="role-ic">🏭</div>
-      <div class="role-txt"><div class="role-title">Production</div><div class="role-sub">Premix + production</div></div>
-      <div class="role-chev">›</div>
-    </div>
-    <div id="role-prod-sub" style="display:none;flex-direction:column;gap:10px;padding-left:6px">
-      <div style="font-size:11px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 4px">Production — choisis :</div>
-      <div class="role-sub-card" onclick="enterRole('prod','premix')"><span style="font-size:22px">🧪</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Premix</span></div>
-      <div class="role-sub-card" onclick="enterRole('prod','production')"><span style="font-size:22px">🏭</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Production</span></div>
-    </div>
-
+    <div class="login-footer">Kooki Company SRL · BE1015746980</div>
   </div>
-
-  <div style="margin-top:36px;font-size:11px;color:#ccc;letter-spacing:.03em">KOOKI COMPANY SRL · BE1015746980</div>
 </div>
 
 <!-- LOADING OVERLAY -->
@@ -1191,6 +1201,11 @@
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
       <div class="form-grid fg-2">
+        <div style="margin-bottom:13px;grid-column:1/-1;max-width:220px">
+  <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">Date de sortie *</label>
+  <input type="date" id="sortie-date" style="width:100%;height:42px;border:1.5px solid #e3e8ee;border-radius:11px;padding:0 12px;font-size:13.5px;background:#fbfcfd;font-family:inherit;outline:none;color:#1a1a2e">
+  <script>(function(){var d=document.currentScript.previousElementSibling;if(d&&d.id==='sortie-date'&&!d.value){var t=new Date();d.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}})();</script>
+</div>
         <div style="margin-bottom:13px;grid-column:1/-1">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em">Type de destination *</label>
@@ -4647,6 +4662,15 @@ async function saveSortie() {
   const b2bClient = document.getElementById('sortie-b2b-client')?.value || '';
   const custom    = document.getElementById('sortie-destination-custom')?.value.trim() || '';
 
+  // Date de sortie choisie (permet une sortie différée / rétroactive) — l'heure reste celle du moment
+  const _now = new Date();
+  let effectiveDate = _now;
+  const _dateInput = document.getElementById('sortie-date')?.value || '';
+  if (_dateInput) {
+    const [_y,_m,_d] = _dateInput.split('-').map(Number);
+    if (_y && _m && _d) effectiveDate = new Date(_y, _m-1, _d, _now.getHours(), _now.getMinutes(), _now.getSeconds());
+  }
+
   let destination = '';
   if      (type === 'b2b')       destination = b2bClient;
   else if (type === 'magasin')    destination = 'Magasin Ixelles';
@@ -4727,7 +4751,7 @@ if (type === 'autre') {
   numeroBL = prefix + '-' + new Date().getFullYear() + '-' + Date.now().toString().slice(-3);
 }
     
-    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLotsAvecSaveur, boites, livreur, idGroupe }) });
+    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLotsAvecSaveur, boites, livreur, idGroupe, date: effectiveDate.toISOString() }) });
     const json = await res.json();
 
     if (json.success) {
@@ -4747,7 +4771,8 @@ if (type === 'autre') {
       boites,
       sortiPar: livreur,
       livreurB2B,
-      typeCookies: typeCookiesSave
+      typeCookies: typeCookiesSave,
+      date: effectiveDate.toISOString()
     })}).catch(() => {});
     // Décrémentation stock cake (décrément partiel, ne supprime pas la production)
     cakeLots.forEach(function(cl){
@@ -4759,7 +4784,7 @@ if (type === 'autre') {
     });
     blData.unshift({
       numeroBL,
-      date: new Date().toISOString(),
+      date: effectiveDate.toISOString(),
       client: destination,
       lots: allLotsBL,
       boites,
@@ -4769,9 +4794,9 @@ if (type === 'autre') {
     });
   }
 
-      const now     = new Date();
-      const time    = now.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
-      const date    = now.toLocaleDateString('fr-FR',{ day:'2-digit', month:'2-digit' });
+      const time    = effectiveDate.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
+      const date    = effectiveDate.toLocaleDateString('fr-FR',{ day:'2-digit', month:'2-digit' });
+      const isBackdated = effectiveDate.toDateString() !== _now.toDateString();
       const tbody   = document.getElementById('sortie-history');
 
       const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
@@ -4788,7 +4813,7 @@ if (type === 'autre') {
           const tr = document.createElement('tr');
           tr.setAttribute('data-sortie-id', sortieId);
           tr.innerHTML = `
-            <td class="sub-text">${date} ${time}</td>
+            <td class="sub-text">${date} ${time}${isBackdated ? ' <span style="display:inline-block;margin-left:4px;font-size:9.5px;font-weight:700;color:#0662aa;background:#e0edf8;padding:2px 6px;border-radius:20px;vertical-align:middle" title="Sortie enregistrée en différé">différé</span>' : ''}</td>
             <td><span class="tag tag-o">${saveur}</span></td>
             <td><b>${destination}</b></td>
             <td>${lot.code}</td>
@@ -4802,7 +4827,7 @@ if (type === 'autre') {
               title="Annuler et retourner au stock">↩️ Annuler</button></td>`;
           tbody.prepend(tr);
           // Sauvegarder dans localStorage
-          storedSorties.unshift({ id: sortieId, date: new Date().toISOString(), saveur, destination, lot: lot.code, big: lot.big||0, small: lot.small||0, boites: boites||0, producteur: livreur });
+          storedSorties.unshift({ id: sortieId, date: effectiveDate.toISOString(), saveur, destination, lot: lot.code, big: lot.big||0, small: lot.small||0, boites: boites||0, producteur: livreur });
         });
       });
       localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
@@ -4843,6 +4868,8 @@ function resetSortie() {
   ['sortie-type','sortie-b2b-client'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
+  const dateEl = document.getElementById('sortie-date');
+  if (dateEl) { const t = new Date(); dateEl.value = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
   const custom = document.getElementById('sortie-destination-custom');
   if (custom) custom.value = '';
   const tog = document.getElementById('boites-opt-toggle');
