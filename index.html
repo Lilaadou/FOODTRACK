@@ -417,7 +417,10 @@
       }
 
       /* Stat grid 2 colonnes */
-      .stat-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+      .stat-grid{ grid-template-columns:repeat(2,1fr) !important; gap:10px; }
+
+      /* Grille "Type de destination" (sortie frigo) — 6 colonnes fixes déborde en mobile */
+      #dest-grid{ grid-template-columns:repeat(3,1fr) !important; }
       .stat-value{ font-size:32px; }
       .stat-label{ font-size:15px; }
       .stat-badge{ font-size:13px; padding:5px 10px; }
@@ -502,6 +505,10 @@
 
       /* Zero grid */
       .zero-grid{ grid-template-columns:repeat(2,1fr); }
+    }
+
+    @media(max-width:480px){
+      #dest-grid{ grid-template-columns:repeat(2,1fr) !important; }
     }
 
     /* Desktop : cacher éléments mobile */
