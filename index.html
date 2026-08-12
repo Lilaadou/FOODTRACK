@@ -8015,9 +8015,15 @@ async function saveProduction() {
   const bacsACreer = bacsArr.map(function(ck, i){
     return { date, lot: code, saveur, lettre: LETTRES[i] || ('B'+i), type: 'simple', cookies: ck, restant: ck, statut: 'en frigo' };
   });
-  bacsACreer.forEach(bac => {
-    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) }).catch(() => {});
-  });
+  // Envoi SÉQUENTIEL (un bac à la fois) : en envoyant les 4 requêtes en même
+  // temps, Google Sheets peut les traiter en parallèle et faire en sorte que
+  // deux bacs s'écrivent sur la même ligne — les autres disparaissent.
+  // On attend chaque bac avant d'envoyer le suivant pour que chacun ait sa ligne.
+  for (const bac of bacsACreer) {
+    try {
+      await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) });
+    } catch (e) {}
+  }
       toast('prod','✓ Production enregistrée !','ok');
       // 1. Mettre à jour stockLocal (utilisé par le frigo)
       const existing = stockLocal.find(s => s.code === code);
