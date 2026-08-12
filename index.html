@@ -568,7 +568,7 @@
         <i class="ti ti-chevron-right role-chev"></i>
       </div>
 
-      <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo')">
+      <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo','frigo')">
         <div class="role-ic"><i class="ti ti-snowflake"></i></div>
         <div class="role-txt"><div class="role-title">Sortie frigo</div><div class="role-sub">Stock cookies + sorties frigo</div></div>
         <i class="ti ti-chevron-right role-chev"></i>
@@ -670,21 +670,10 @@
       </div>
     </div>
     <div class="topbar-right">
-      <!-- SEARCH -->
-      <div class="search-wrap">
-        <div class="search-bar">
-          <span style="color:#bbb">🔍</span>
-          <input type="text" id="search-input" placeholder="Code lot, facture…" oninput="doSearch(this.value)" onfocus="doSearch(this.value)">
-        </div>
-        <div class="search-results" id="search-results"></div>
-      </div>
-
       <div id="mode-quickswitch" onclick="toggleMode()" style="display:none;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s;margin-right:4px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'" title="Basculer entre Production et Delivery">
         <span id="mode-quickswitch-icon" style="font-size:15px">🔀</span>
         <span id="mode-quickswitch-label">Mode</span>
       </div>
-
-      <div class="bell">🔔<span class="bell-dot"></span></div>
 
       <!-- PROFILE -->
       <div class="profile-btn" onclick="toggleProfileMenu()">
@@ -748,24 +737,6 @@
 
   <!-- ══════════════════ PREMIX ══════════════════ -->
   <div id="page-premix" class="page">
-
-    <!-- ══ Récapitulatif ingrédients manquants ══ -->
-    <div id="manquants-summary-card" style="display:none;margin-bottom:18px">
-      <div style="background:#fdf0ec;border:1.5px solid #f5cbb8;border-radius:16px;padding:19px 21px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:36px;height:36px;border-radius:10px;background:#d44218;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div>
-            <div>
-              <div style="font-size:14px;font-weight:700;color:#d44218">Ingrédients manquants</div>
-              <div style="font-size:11px;color:#888" id="mq-summary-sub">— premix incomplets</div>
-            </div>
-          </div>
-          <div style="background:#d44218;color:#fff;font-size:22px;font-weight:700;min-width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0 10px" id="mq-total-badge">0</div>
-        </div>
-        <div id="mq-list"></div>
-      </div>
-    </div>
-
 
     <div class="form-section">
       <div class="form-title">🥣 Ajouter un code Premix</div>
