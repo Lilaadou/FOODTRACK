@@ -2917,7 +2917,21 @@ function showPage(name, btn) {
   if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
   if (name === 'recap-mois') setTimeout(() => { renderRecapMois(); }, 60);
   if (name === 'centre-docs') setTimeout(() => { renderCentreDocs(); }, 60);
-  if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
+  if (name === 'factures') setTimeout(async () => {
+    // Resynchroniser productions + premix depuis Google Sheets AVANT de construire
+    // le récapitulatif : sans ça, la page n'affichait que le cache local du
+    // téléphone, donc un BL coché en production sur un autre appareil (ou pas
+    // encore resynchronisé ici) n'apparaissait jamais dans "Factures".
+    try {
+      const prodData = await fetchAPI('getProduction');
+      applyProduction(prodData);
+    } catch (e) {}
+    try {
+      const pmxData = await fetchAPI('getPremix');
+      applyPremix(pmxData);
+    } catch (e) {}
+    loadCorrespondances();
+  }, 60);
   
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
