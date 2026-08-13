@@ -1767,14 +1767,6 @@
           </div>
         </div>
 
-        <div style="border:1px solid #d6e6f5;border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start">
-          <div style="font-size:18px;line-height:1;flex-shrink:0;margin-top:1px">🌡️</div>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#0c447c;margin-bottom:3px">Information  importante — Cookies Jacky &amp; Benny</div>
-            <div style="font-size:11px;color:#000;line-height:1.55">En raison des fortes chaleurs de la semaine passée, le chocolat a légèrement fondu pendant la production. Vos cookies Jacky &amp; Benny peuvent apparaître plus foncés que d'habitude. Leur qualité gustative n'est pas affectée — ils restent délicieux ! 🍪</div>
-          </div>
-        </div>
-
         <div style="font-size:10.5px;color:#000;line-height:1.6;font-style:italic;margin:12px 0 16px">
           Madame, Monsieur, veuillez trouver ci-dessus le détail de votre livraison. Nous vous remercions de bien vouloir vérifier les quantités reçues et de nous signaler tout produit endommagé ou manquant dans les <b style="color:#000">24h</b> à <b style="color:#000">anderlecht@kooki.be</b> ou au <b style="color:#000">0492 80 10 38</b>. Ce document mentionne les références de lots produits livrés à des fins de traçabilité alimentaire (AFSCA). Tout retard de paiement pourra entraîner la suspension des livraisons suivantes. L'équipe KOOKI 🍪
         </div>
@@ -9661,9 +9653,13 @@ function renderSortieHeatmap(prefix, filterFn, weeks){
   var si=document.getElementById('shm-'+prefix+'-since'); if(si) si.textContent='Depuis le '+start.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
   var mEl=document.getElementById('shm-'+prefix+'-months'); if(mEl){ mEl.innerHTML=''; var last=-1; monthCols.forEach(function(m){ var sp=document.createElement('span'); sp.textContent=(m!==last)?MONTHS[m]:''; last=m; mEl.appendChild(sp); }); }
 }
+// Vrais clients B2B (liste blanche) — tout ce qui n'est pas ici (destinations
+// fixes comme "Magasin Ixelles", ou noms saisis à la main via "Commande client",
+// par ex. une livraison ponctuelle pour un mariage) n'est PAS compté comme B2B.
+var B2B_CLIENTS_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
 var SORTIE_DEST_HORS_B2B = ['Magasin Ixelles','Magasin Anderlecht','Événement','Usage interne'];
 function renderSortieHeatmaps(){
-  renderSortieHeatmap('b2b', function(s){ return s.destination && SORTIE_DEST_HORS_B2B.indexOf(s.destination) === -1; });
+  renderSortieHeatmap('b2b', function(s){ return s.destination && B2B_CLIENTS_LIST.indexOf(s.destination) !== -1; });
   renderSortieHeatmap('ixl', function(s){ return s.destination === 'Magasin Ixelles'; });
 }
 function renderProdHeatmap(){
@@ -11190,6 +11186,7 @@ async function renderRecapMois(){
 
   var doB = all.filter(function(bl){
     var name = _rmClient(bl); if (!name) return false;
+    if (B2B_CLIENTS_LIST.indexOf(name) === -1) return false;
     var d = _rmParseDate(bl.date);
     return d && d.getFullYear()===_rmState.y && d.getMonth()===_rmState.m && !blEstMasque(bl);
   });
