@@ -2494,6 +2494,16 @@
     </div>
 
     <div class="rm-card">
+      <div class="rm-label">🗓️ Qui a commandé, et quand</div>
+      <div style="overflow-x:auto">
+        <table id="rm-matrix-table" style="border-collapse:collapse;white-space:nowrap;width:100%">
+          <thead><tr><th style="position:sticky;left:0;background:#fff;z-index:1">Client</th></tr></thead>
+          <tbody><tr><td class="rm-empty">—</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rm-card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div class="rm-label" style="margin-bottom:0">Détail par client — clique pour ouvrir le récap</div>
         <button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="imprimerRecapMoisGlobal()">🖨️ Imprimer le récap global</button>
@@ -9342,9 +9352,37 @@ function applySorties(data) {
   const tbody = document.getElementById('sortie-history');
   if (!tbody) return;
 
-  // Charger depuis Google Sheets si disponible, sinon localStorage
+  // Fusionner serveur + local, et PERSISTER le résultat dans localStorage.
+  // Avant, les données serveur servaient juste à construire ce tableau sans
+  // jamais être sauvegardées : une sortie saisie sur un autre appareil restait
+  // invisible partout ailleurs (heatmaps, etc.) tant qu'on ne rouvrait pas cet
+  // onglet précis. Le serveur est la source commune à tous les appareils ; le
+  // local comble ce qui n'est pas encore remonté, et une annulation faite en
+  // local est conservée même si le serveur ne l'a pas encore.
   const local = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  const source = Array.isArray(data) && data.length ? data : local;
+  const apiData = Array.isArray(data) ? data : [];
+  const sig = r => [r.date, r.destination, r.lot, r.saveur, r.producteur].map(x => String(x || '').trim()).join('|');
+
+  let merged;
+  if (apiData.length) {
+    const localBySig = {};
+    local.forEach(r => { localBySig[sig(r)] = r; });
+    const apiNormalized = apiData.map(r => {
+      const loc = localBySig[sig(r)];
+      const out = Object.assign({ id: (loc && loc.id) || r.id || (Date.now() + Math.random()) }, r);
+      if (loc && loc.annule) out.annule = true;
+      return out;
+    });
+    const apiSigs = new Set(apiNormalized.map(sig));
+    const localOnly = local.filter(r => !apiSigs.has(sig(r)));
+    merged = apiNormalized.concat(localOnly);
+  } else {
+    merged = local;
+  }
+  localStorage.setItem('kooki_sorties', JSON.stringify(merged));
+  if (typeof renderSortieHeatmaps === 'function') renderSortieHeatmaps();
+
+  const source = merged;
 
   if (!source.length) {
     tbody.innerHTML = '<tr><td colspan="2" class="empty">Aucune sortie enregistrée.</td></tr>';
@@ -9546,6 +9584,55 @@ function _bacsRecap(r){
   return { count:(r.bacsSimple||0), detail:(r.bacsDouble? r.bacsDouble+' double(s)':'—') };
 }
 // Heatmap d'activité de production (façon GitHub) — lit les vraies productions
+// ── Matrice B2B : clients (lignes) x dates de commande (colonnes) ──
+function renderB2BMatrix(daysBack){
+  daysBack = daysBack || 90;
+  var tbl = document.getElementById('b2b-matrix-table'); if(!tbl) return;
+  var sorties = []; try{ sorties = JSON.parse(localStorage.getItem('kooki_sorties')||'[]'); }catch(e){}
+  function parseD(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]); var fr=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(fr) return new Date(+fr[3],+fr[2]-1,+fr[1]); var d=new Date(s); return isNaN(d)?null:d; }
+  function key(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  var cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-daysBack);
+
+  // { client: { dateKey: count } }
+  var matrix = {}, dateSet = {};
+  sorties.forEach(function(s){
+    if (s.annule) return;
+    if (!s.destination || SORTIE_DEST_HORS_B2B.indexOf(s.destination) !== -1) return;
+    var d = parseD(s.date); if (!d || d < cutoff) return;
+    var k = key(d);
+    if (!matrix[s.destination]) matrix[s.destination] = {};
+    matrix[s.destination][k] = (matrix[s.destination][k] || 0) + 1;
+    dateSet[k] = d;
+  });
+
+  var dates = Object.keys(dateSet).sort().map(function(k){ return dateSet[k]; });
+  var clients = Object.keys(matrix).sort(function(a,b){
+    var totA = Object.values(matrix[a]).reduce(function(x,y){return x+y;},0);
+    var totB = Object.values(matrix[b]).reduce(function(x,y){return x+y;},0);
+    return totB - totA;
+  });
+
+  if (!clients.length || !dates.length) {
+    tbl.querySelector('tbody').innerHTML = '<tr><td class="empty">Aucune commande B2B sur cette période.</td></tr>';
+    return;
+  }
+
+  var thead = tbl.querySelector('thead');
+  thead.innerHTML = '<tr><th style="position:sticky;left:0;background:#fff;z-index:1;text-align:left">Client</th>' +
+    dates.map(function(d){ return '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:600;padding:6px 8px">' + d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) + '</th>'; }).join('') +
+    '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:700;padding:6px 8px">Total</th></tr>';
+
+  tbl.querySelector('tbody').innerHTML = clients.map(function(c){
+    var total = 0;
+    var cells = dates.map(function(d){
+      var n = matrix[c][key(d)] || 0;
+      total += n;
+      return '<td style="text-align:center;padding:6px 8px;font-size:13px;' + (n ? 'color:#1a8a4a;font-weight:700' : 'color:#e2e5ea') + '" title="' + (n ? n + ' commande(s) le ' + d.toLocaleDateString('fr-FR') : '') + '">' + (n ? '✓' : '·') + '</td>';
+    }).join('');
+    return '<tr><td style="position:sticky;left:0;background:#fff;z-index:1;font-weight:600;font-size:13px;padding:6px 10px 6px 0;border-right:1px solid #f0f0f0">' + c + '</td>' + cells + '<td style="text-align:center;font-size:13px;font-weight:700;color:#1a1a2e;padding:6px 8px">' + total + '</td></tr>';
+  }).join('');
+}
+
 // ── Heatmaps sorties frigo (B2B / Ixelles) — même logique visuelle que la heatmap de production ──
 function renderSortieHeatmap(prefix, filterFn, weeks){
   weeks = weeks || 20;
@@ -11168,9 +11255,38 @@ async function renderRecapMois(){
       (c.cakes>0 ? '<span class="rm-badge" style="background:#fff3cc;color:#a07000">'+c.cakes+' cake'+(c.cakes>1?'s':'')+'</span>' : '')+
       '<span class="rm-badge rm-bBox">'+c.boxes+' boîtes</span>'+
       '<span class="rm-chev">Voir le récap →</span></div></div>'+
-      '<div class="rm-cbls">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>';
-  }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
+      '<div class="rm-cbls">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>';  }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
+  _rmRenderMatrix(list);
 }
+function _rmRenderMatrix(list){
+  var tbl = document.getElementById('rm-matrix-table'); if(!tbl) return;
+  var dateSet = {};
+  list.forEach(function(c){ c.bls.forEach(function(b){ if (b.dt) dateSet[_rmDayKey(b.dt)] = b.dt; }); });
+  var dates = Object.keys(dateSet).sort().map(function(k){ return dateSet[k]; });
+
+  if (!list.length || !dates.length) {
+    tbl.querySelector('thead').innerHTML = '<tr><th style="position:sticky;left:0;background:#fff">Client</th></tr>';
+    tbl.querySelector('tbody').innerHTML = '<tr><td class="rm-empty">Aucune livraison ce mois-ci.</td></tr>';
+    return;
+  }
+
+  tbl.querySelector('thead').innerHTML = '<tr><th style="position:sticky;left:0;background:#fff;text-align:left;padding:6px 10px 6px 0">Client</th>' +
+    dates.map(function(d){ return '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:600;padding:6px 8px">' + p2(d.getDate()) + '/' + p2(d.getMonth()+1) + '</th>'; }).join('') +
+    '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:700;padding:6px 8px">Total</th></tr>';
+
+  tbl.querySelector('tbody').innerHTML = list.map(function(c){
+    var byDay = {};
+    c.bls.forEach(function(b){ if (b.dt) byDay[_rmDayKey(b.dt)] = (byDay[_rmDayKey(b.dt)]||0) + 1; });
+    var cells = dates.map(function(d){
+      var n = byDay[_rmDayKey(d)] || 0;
+      return '<td style="text-align:center;padding:6px 8px;font-size:13px;' + (n ? 'color:#1a8a4a;font-weight:700' : 'color:#e2e5ea') + '" title="' + (n ? n + ' livraison(s) le ' + p2(d.getDate())+'/'+p2(d.getMonth()+1) : '') + '">' + (n ? '✓' : '·') + '</td>';
+    }).join('');
+    return '<tr><td style="position:sticky;left:0;background:#fff;font-weight:600;font-size:13px;padding:6px 10px 6px 0;border-right:1px solid #f0f0f0">' + c.name + '</td>' + cells + '<td style="text-align:center;font-size:13px;font-weight:700;color:#1a1a2e;padding:6px 8px">' + c.bls.length + '</td></tr>';
+  }).join('');
+
+  function p2(n){ return String(n).padStart(2,'0'); }
+}
+function _rmDayKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _rmClientHTML(c, forPrint){
   var BLUE='#0c447c', RED='#d44218', BAND='#e6f1fb', SOFT='#eef5fc', GREY='#f0f0f0';
   function p2(n){ return String(n).padStart(2,'0'); }
@@ -11310,9 +11426,49 @@ function _rmClientPDF(c){
   }); });
 }
 
+function _rmMatrixHTML(list){
+  var BLUE='#0c447c', RED='#d44218', BAND='#e6f1fb';
+  function p2(n){ return String(n).padStart(2,'0'); }
+  var dateSet = {};
+  list.forEach(function(c){ c.bls.forEach(function(b){ if (b.dt) dateSet[_rmDayKey(b.dt)] = b.dt; }); });
+  var dates = Object.keys(dateSet).sort().map(function(k){ return dateSet[k]; });
+  var y=_rmState.y, m=_rmState.m, dernier=new Date(y,m+1,0).getDate();
+  var periode='01/'+p2(m+1)+'/'+y+' &rarr; '+p2(dernier)+'/'+p2(m+1)+'/'+y;
+  var font="font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif";
+
+  var head = '<tr><td style="padding:8px 10px 8px 0;font-weight:700;font-size:12px;color:#333;text-align:left">Client</td>' +
+    dates.map(function(d){ return '<td style="text-align:center;font-size:10.5px;color:#888;font-weight:600;padding:8px 6px">'+p2(d.getDate())+'/'+p2(d.getMonth()+1)+'</td>'; }).join('') +
+    '<td style="text-align:center;font-size:10.5px;color:#888;font-weight:700;padding:8px 6px">Total</td></tr>';
+
+  var rows = list.map(function(c){
+    var byDay={};
+    c.bls.forEach(function(b){ if (b.dt) byDay[_rmDayKey(b.dt)] = (byDay[_rmDayKey(b.dt)]||0)+1; });
+    var cells = dates.map(function(d){
+      var n = byDay[_rmDayKey(d)] || 0;
+      return '<td style="text-align:center;padding:8px 6px;font-size:13px;'+(n?'color:#1a8a4a;font-weight:700':'color:#ddd')+'">'+(n?'✓':'·')+'</td>';
+    }).join('');
+    return '<tr style="border-top:1px solid #f0f0f0"><td style="font-weight:700;font-size:13px;padding:8px 10px 8px 0">'+c.name+'</td>'+cells+'<td style="text-align:center;font-size:13px;font-weight:700;padding:8px 6px">'+c.bls.length+'</td></tr>';
+  }).join('');
+
+  return ''+
+  "<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');</style>"+
+  '<div style="'+font+';min-height:297mm;display:flex;flex-direction:column;">'+
+    '<div style="background:'+BAND+';padding:30px 42px;border-radius:0 0 18px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">'+
+      '<div><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:46px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:'+RED+';margin-top:4px">BAKED WITH LOVE</div></div>'+
+      '<div style="text-align:right;font-size:12px;line-height:1.7;color:#4a4a4a"><b style="color:'+BLUE+'">KOOKI COMPANY SRL</b><br>BE1015746980<br>Avenue Emile Gryson 2D<br>1070 Anderlecht<br>Belgique</div>'+
+    '</div>'+
+    '<div style="padding:30px 42px 10px;flex:1">'+
+      '<div style="font-size:19px;font-weight:800;color:'+BLUE+'">Vue d\'ensemble B2B</div>'+
+      '<div style="font-size:12.5px;color:#888;margin-top:2px">'+periode+'</div>'+
+      '<table style="width:100%;border-collapse:collapse;margin-top:22px">'+
+        '<thead>'+head+'</thead><tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
+}
 function imprimerRecapMoisGlobal(){
   if(!_rmCache || !_rmCache.length){ alert('Aucune donnée à imprimer pour ce mois.'); return; }
-  var clients=_rmCache.slice();
+  var clients=[{ __matrix:true }].concat(_rmCache.slice());
   function ls(src,cb){ if([].slice.call(document.scripts).some(function(s){return s.src===src;})){cb();return;} var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=function(){alert('Impossible de charger '+src);}; document.head.appendChild(s); }
   ls('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',function(){
   ls('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',function(){
@@ -11324,7 +11480,7 @@ function imprimerRecapMoisGlobal(){
       var c=clients[i];
       var box=document.createElement('div');
       box.style.cssText='position:fixed;left:-10000px;top:0;width:'+A4W+'px;background:#fff;';
-      box.innerHTML=_rmClientHTML(c, true);
+      box.innerHTML = c.__matrix ? _rmMatrixHTML(_rmCache) : _rmClientHTML(c, true);
       document.body.appendChild(box);
       var wrap=box.querySelector('div');
       var ran=false;
