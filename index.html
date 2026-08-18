@@ -2,7 +2,7 @@
 <html lang="fr">
 <head> 
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
   <title>KOOKI — Traçabilité</title> 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="manifest" href="manifest.json">
@@ -10,7 +10,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kooki">
-  <link rel="apple-touch-icon" href="logo.png">  
+  <link rel="apple-touch-icon" href="icon-kooki-180.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <style>
+    /* Rendu « app » natif sur mobile */
+    html{ -webkit-text-size-adjust:100%; }
+    body{ -webkit-tap-highlight-color:rgba(0,0,0,0); overscroll-behavior-y:none; }
+    @supports (padding:max(0px)){
+      #bottom-nav{ padding-bottom:max(14px, env(safe-area-inset-bottom)) !important; }
+    }
+  </style>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',system-ui,sans-serif;background:#f7f8fa;color:#1a1a2e;display:flex;min-height:100vh;}
@@ -417,10 +426,7 @@
       }
 
       /* Stat grid 2 colonnes */
-      .stat-grid{ grid-template-columns:repeat(2,1fr) !important; gap:10px; }
-
-      /* Grille "Type de destination" (sortie frigo) — 6 colonnes fixes déborde en mobile */
-      #dest-grid{ grid-template-columns:repeat(3,1fr) !important; }
+      .stat-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
       .stat-value{ font-size:32px; }
       .stat-label{ font-size:15px; }
       .stat-badge{ font-size:13px; padding:5px 10px; }
@@ -507,10 +513,6 @@
       .zero-grid{ grid-template-columns:repeat(2,1fr); }
     }
 
-    @media(max-width:480px){
-      #dest-grid{ grid-template-columns:repeat(2,1fr) !important; }
-    }
-
     /* Desktop : cacher éléments mobile */
     @media(min-width:769px){
       #hamburger{ display:none; }
@@ -529,70 +531,56 @@
 <body>
 
 <!-- ══════ ÉCRAN DE CONNEXION ══════ -->
-<div id="login-screen" style="position:fixed;inset:0;background:
-    radial-gradient(720px 420px at 12% -6%, rgba(212,66,24,.07), transparent 60%),
-    radial-gradient(720px 420px at 88% -6%, rgba(6,98,170,.07), transparent 60%),
-    linear-gradient(180deg,#f5f6f8 0%,#eceef2 100%);
-  z-index:10000;display:flex;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
+<div id="login-screen" style="position:fixed;inset:0;background:radial-gradient(1000px 520px at 50% 0%, #fdf2ee 0%, rgba(253,242,238,0) 60%), linear-gradient(180deg,#ffffff 0%, #faf9f8 100%);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto">
 
+  <!-- Logo + titre -->
+  <img src="logo.png" alt="Kooki" style="height:60px;margin-bottom:10px">
+  <div style="font-size:14px;color:#888;font-weight:500;margin-bottom:4px">Traçabilité & gestion de production</div>
+  <div style="font-size:12px;color:#bbb;margin-bottom:36px">Qui êtes-vous ?</div>
+
+  <!-- Boutons de rôle -->
   <style>
-    .login-card{width:100%;max-width:420px;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#d44218,#0662aa) border-box;border:2px solid transparent;border-radius:16px;box-shadow:0 1px 2px rgba(20,21,26,.03),0 12px 32px -16px rgba(20,21,26,.08);padding:40px 32px 28px;position:relative}
-    .login-logo-row{display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-    .login-logo-row img{height:44px}
-    .login-tagline{text-align:center;font-size:13px;color:#8a8e99;margin-bottom:28px}
-    .login-divider{height:1px;background:#e4e6ea;margin-bottom:22px}
-    .login-question{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#8a8e99;margin-bottom:14px}
-    .role-cards{display:flex;flex-direction:column;gap:8px}
-    .role-card{position:relative;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e4e6ea;border-radius:10px;padding:13px 14px;cursor:pointer;transition:border-color .15s ease,background .15s ease,transform .15s ease}
-    .role-card:hover{border-color:var(--c);background:var(--cl);transform:translateY(-1px)}
-    .role-ic{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--cl);color:var(--c)}
-    .role-txt{flex:1;min-width:0}
-    .role-title{font-size:14.5px;font-weight:600;color:#1b1d22}
-    .role-sub{font-size:12.5px;color:#8a8e99;margin-top:2px}
-    .role-chev{font-size:17px;color:#c3c6cc;transition:color .15s}
-    .role-card:hover .role-chev{color:var(--c)}
-    .role-sub-card{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e6ea;border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
-    .role-sub-card:hover{border-color:#2c8a4a;background:#f2f9f5}
-    .role-sub-card i{font-size:17px;color:#2c8a4a;width:18px;text-align:center}
-    .role-sub-card span{font-size:14px;font-weight:600;color:#1b1d22}
-    .login-footer{text-align:center;font-size:11.5px;color:#8a8e99;margin-top:28px;letter-spacing:.2px}
+    .role-cards{width:100%;max-width:440px;display:flex;flex-direction:column;gap:15px}
+    .role-card{position:relative;display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #eef0f3;border-radius:18px;padding:19px 20px 19px 24px;cursor:pointer;overflow:hidden;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+    .role-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c);border-radius:18px 0 0 18px}
+    .role-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px var(--c);border-color:var(--c)}
+    .role-ic{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--cl)}
+    .role-txt{flex:1}
+    .role-title{font-size:16px;font-weight:800;color:#1a1a2e}
+    .role-sub{font-size:12px;color:#9aa4af;margin-top:3px}
+    .role-chev{font-size:25px;color:#d0d6dd;transition:color .16s,transform .16s}
+    .role-card:hover .role-chev{color:var(--c);transform:translateX(3px)}
+    .role-sub-card{display:flex;align-items:center;gap:12px;background:#fafafa;border:1px solid #eef0f3;border-radius:13px;padding:14px 16px;cursor:pointer;transition:.15s}
+    .role-sub-card:hover{border-color:#2c8a4a;background:#fff}
   </style>
+  <div class="role-cards">
 
-  <div class="login-card">
-    <div class="login-logo-row"><img src="logo.png" alt="Kooki"></div>
-    <div class="login-tagline">Traçabilité &amp; gestion de production</div>
-    <div class="login-divider"></div>
-    <div class="login-question">Quel mode ?</div>
-
-    <div class="role-cards">
-
-      <div class="role-card" style="--c:#d44218;--cl:#fbe8e2" onclick="enterRole('admin')">
-        <div class="role-ic"><i class="ti ti-briefcase"></i></div>
-        <div class="role-txt"><div class="role-title">Administratif</div><div class="role-sub">Accès complet — production + livraison</div></div>
-        <i class="ti ti-chevron-right role-chev"></i>
-      </div>
-
-      <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo','frigo')">
-        <div class="role-ic"><i class="ti ti-snowflake"></i></div>
-        <div class="role-txt"><div class="role-title">Sortie frigo</div><div class="role-sub">Stock cookies + sorties frigo</div></div>
-        <i class="ti ti-chevron-right role-chev"></i>
-      </div>
-
-      <div class="role-card" id="role-prod-main" style="--c:#2c8a4a;--cl:#e4f4ea" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'">
-        <div class="role-ic"><i class="ti ti-building-factory-2"></i></div>
-        <div class="role-txt"><div class="role-title">Production</div><div class="role-sub">Premix + production</div></div>
-        <i class="ti ti-chevron-right role-chev"></i>
-      </div>
-      <div id="role-prod-sub" style="display:none;flex-direction:column;gap:8px;padding-left:2px">
-        <div style="font-size:11px;color:#8a8e99;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 4px 2px">Production — choisis :</div>
-        <div class="role-sub-card" onclick="enterRole('prod','premix')"><i class="ti ti-flask"></i><span>Premix</span></div>
-        <div class="role-sub-card" onclick="enterRole('prod','production')"><i class="ti ti-building-factory-2"></i><span>Production</span></div>
-      </div>
-
+    <div class="role-card" style="--c:#d44218;--cl:#fbe8e2" onclick="enterRole('admin')">
+      <div class="role-ic">🗂️</div>
+      <div class="role-txt"><div class="role-title">Administratif</div><div class="role-sub">Accès complet — production + livraison</div></div>
+      <div class="role-chev">›</div>
     </div>
 
+    <div class="role-card" style="--c:#0662aa;--cl:#e0edf8" onclick="enterRole('frigo')">
+      <div class="role-ic">❄️</div>
+      <div class="role-txt"><div class="role-title">Sortie frigo</div><div class="role-sub">Stock cookies + sorties frigo</div></div>
+      <div class="role-chev">›</div>
+    </div>
+
+    <div class="role-card" id="role-prod-main" style="--c:#2c8a4a;--cl:#e4f4ea" onclick="var s=document.getElementById('role-prod-sub');s.style.display='flex';this.style.display='none'">
+      <div class="role-ic">🏭</div>
+      <div class="role-txt"><div class="role-title">Production</div><div class="role-sub">Premix + production</div></div>
+      <div class="role-chev">›</div>
+    </div>
+    <div id="role-prod-sub" style="display:none;flex-direction:column;gap:10px;padding-left:6px">
+      <div style="font-size:11px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 4px">Production — choisis :</div>
+      <div class="role-sub-card" onclick="enterRole('prod','premix')"><span style="font-size:22px">🧪</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Premix</span></div>
+      <div class="role-sub-card" onclick="enterRole('prod','production')"><span style="font-size:22px">🏭</span><span style="font-size:15px;font-weight:700;color:#1a1a2e">Production</span></div>
+    </div>
 
   </div>
+
+  <div style="margin-top:36px;font-size:11px;color:#ccc;letter-spacing:.03em">KOOKI COMPANY SRL · BE1015746980</div>
 </div>
 
 <!-- LOADING OVERLAY -->
@@ -674,10 +662,21 @@
       </div>
     </div>
     <div class="topbar-right">
+      <!-- SEARCH -->
+      <div class="search-wrap">
+        <div class="search-bar">
+          <span style="color:#bbb">🔍</span>
+          <input type="text" id="search-input" placeholder="Code lot, facture…" oninput="doSearch(this.value)" onfocus="doSearch(this.value)">
+        </div>
+        <div class="search-results" id="search-results"></div>
+      </div>
+
       <div id="mode-quickswitch" onclick="toggleMode()" style="display:none;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s;margin-right:4px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'" title="Basculer entre Production et Delivery">
         <span id="mode-quickswitch-icon" style="font-size:15px">🔀</span>
         <span id="mode-quickswitch-label">Mode</span>
       </div>
+
+      <div class="bell">🔔<span class="bell-dot"></span></div>
 
       <!-- PROFILE -->
       <div class="profile-btn" onclick="toggleProfileMenu()">
@@ -687,13 +686,52 @@
       </div>
       <div class="profile-dropdown" id="profile-dropdown">
         <div class="profile-dropdown-title">Profil actif</div>
-        <div onclick="showLoginScreen()" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;background:#fbe8e2;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+        <div onclick="showLoginScreen()" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;background:#fbe8e2;margin-bottom:8px;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
           <span style="font-size:16px">🔄</span>
-          <span style="font-size:13px;font-weight:700;color:#d44218">Changer de mode</span>
+          <span style="font-size:13px;font-weight:700;color:#d44218">Changer de profil</span>
         </div>
-        <div id="switch-mode-btn" onclick="openModeChoice()" style="display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;background:#e4eefb;margin-top:8px" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+        <div id="switch-mode-btn" onclick="openModeChoice()" style="display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;background:#e4eefb;margin-bottom:8px" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
           <span style="font-size:16px">🔀</span>
           <span style="font-size:13px;font-weight:700;color:#0662aa">Changer de mode</span>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;padding:0 8px 6px">Passer à</div>
+
+        <div style="font-size:9px;font-weight:700;color:#d44218;text-transform:uppercase;letter-spacing:.06em;padding:2px 10px 4px">Administration</div>
+        <div class="profile-option selected" onclick="loginAs('Lila')">
+          <div class="p-av" style="background:#c0392b">LD</div>
+          <div class="p-info"><div class="p-name">Lila Doudou</div><div class="p-role">Administrateur</div></div>
+        </div>
+        <div class="profile-option" onclick="loginAs('Virginia')">
+          <div class="p-av" style="background:#7c3aed">VK</div>
+          <div class="p-info"><div class="p-name">Virginia Kunnen</div><div class="p-role">Patron</div></div>
+        </div>
+        <div class="profile-option" onclick="loginAs('Abenazer')">
+          <div class="p-av" style="background:#d44218">AH</div>
+          <div class="p-info"><div class="p-name">Abenazer Hailu</div><div class="p-role">Patron</div></div>
+        </div>
+        <div class="profile-option" onclick="loginAs('Sebastien')">
+          <div class="p-av" style="background:#0662aa">SK</div>
+          <div class="p-info"><div class="p-name">Sebastien Kunnen</div><div class="p-role">Associé</div></div>
+        </div>
+        <div class="profile-option" onclick="loginAs('DavidD')">
+          <div class="p-av" style="background:#2c7a3a">DD</div>
+          <div class="p-info"><div class="p-name">David Deridder</div><div class="p-role">Manager</div></div>
+        </div>
+
+        <div style="font-size:9px;font-weight:700;color:#0662aa;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px 4px">Équipe production</div>
+        <div class="profile-option" onclick="selectProfile('Production')">
+          <div class="p-av" style="background:#0662aa">PR</div>
+          <div class="p-info"><div class="p-name">Production</div><div class="p-role">Équipe partagée</div></div>
+        </div>
+
+        <div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px 4px">Opérations frigo</div>
+        <div class="profile-option" onclick="selectProfile('Noemie')">
+          <div class="p-av" style="background:#888">NL</div>
+          <div class="p-info"><div class="p-name">Noémie Lambiotte</div><div class="p-role">Frigo</div></div>
+        </div>
+        <div class="profile-option" onclick="selectProfile('Delia')">
+          <div class="p-av" style="background:#9b59b6">DR</div>
+          <div class="p-info"><div class="p-name">Délia Ruettner</div><div class="p-role">Frigo</div></div>
         </div>
       </div>
     </div>
@@ -702,6 +740,24 @@
 
   <!-- ══════════════════ PREMIX ══════════════════ -->
   <div id="page-premix" class="page">
+
+    <!-- ══ Récapitulatif ingrédients manquants ══ -->
+    <div id="manquants-summary-card" style="display:none;margin-bottom:18px">
+      <div style="background:#fdf0ec;border:1.5px solid #f5cbb8;border-radius:16px;padding:19px 21px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#d44218;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#d44218">Ingrédients manquants</div>
+              <div style="font-size:11px;color:#888" id="mq-summary-sub">— premix incomplets</div>
+            </div>
+          </div>
+          <div style="background:#d44218;color:#fff;font-size:22px;font-weight:700;min-width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0 10px" id="mq-total-badge">0</div>
+        </div>
+        <div id="mq-list"></div>
+      </div>
+    </div>
+
 
     <div class="form-section">
       <div class="form-title">🥣 Ajouter un code Premix</div>
@@ -1002,7 +1058,7 @@
         <span class="phm-c"></span><span class="phm-c phm-l1"></span><span class="phm-c phm-l2"></span><span class="phm-c phm-l3"></span><span class="phm-c phm-l4"></span> Plus</div>
     </div>
 
-    <div class="card" style="flex:1;min-width:300px;margin:0">
+    <div class="card" style="flex:1;min-width:300px;margin:0;display:flex;flex-direction:column;justify-content:center">
   <div class="card-header" style="margin-bottom:10px">
     <div><div class="card-title">📦 Lots du jour</div><div class="card-sub" id="lots-du-jour-date">—</div></div>
   </div>
@@ -1144,11 +1200,6 @@
     <div class="form-section">
       <div class="form-title">🧊 Enregistrer une sortie frigo</div>
       <div class="form-grid fg-2">
-        <div style="margin-bottom:13px;grid-column:1/-1;max-width:220px">
-  <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">Date de sortie *</label>
-  <input type="date" id="sortie-date" style="width:100%;height:42px;border:1.5px solid #e3e8ee;border-radius:11px;padding:0 12px;font-size:13.5px;background:#fbfcfd;font-family:inherit;outline:none;color:#1a1a2e">
-  <script>(function(){var d=document.currentScript.previousElementSibling;if(d&&d.id==='sortie-date'&&!d.value){var t=new Date();d.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}})();</script>
-</div>
         <div style="margin-bottom:13px;grid-column:1/-1">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <label style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em">Type de destination *</label>
@@ -1227,6 +1278,8 @@
             <option>La Belladone</option>
             <option>JAT Café</option>
             <option>Muse Co-stu</option>
+            <option>ZIZI waterloo</option>
+            <option>ZIZI Uccle</option>
           </select>
         </div>
       </div>
@@ -1310,10 +1363,18 @@
         <div style="width:34px;height:34px;border-radius:50%;background:#FCE7F3;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#9D174D">MC</div>
         <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Muse Co-stu</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nour Elibol</div></div>
       </div>
+      <div class="b2b-client-btn" data-client="ZIZI waterloo" onclick="selectClientBtn('ZIZI waterloo')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#0C447C">ZW</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">ZIZI waterloo</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Uccle</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="ZIZI Uccle" onclick="selectClientBtn('ZIZI Uccle')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#27500A">ZU</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">ZIZI Uccle</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Uccle</div></div>
+      </div>
     </div>
   </div>
 </div>
-      
+
 <div id="autre-dest-group" style="display:none;margin-bottom:13px">
   <div style="background:#EAF3DE;border:2px solid #C0DD97;border-radius:12px;padding:16px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
@@ -1556,42 +1617,6 @@
     </div><!-- /frigo-sub-sortie -->
 
     <div id="frigo-sub-historique" style="display:none">
-    <!-- Heatmaps d'activité des sorties (ponctuel vs récurrent) -->
-    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px">
-      <div class="card" style="flex:1;min-width:260px;margin:0">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px">
-          <div><div class="card-title" style="font-size:13px">🤝 Sorties B2B</div><div class="card-sub" id="shm-b2b-since" style="font-size:10px">—</div></div>
-          <div style="text-align:right"><div id="shm-b2b-total" style="font-size:24px;font-weight:800;line-height:1;color:#1a1a2e">0</div><div style="font-size:9px;font-weight:700;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em">sorties</div></div>
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:4px">
-          <div style="width:22px;flex-shrink:0"></div>
-          <div id="shm-b2b-months" style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(20,1fr);font-size:9px;color:#8a97a5;font-weight:600"></div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:stretch">
-          <div style="width:22px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;font-size:8px;color:#8a97a5;padding:1px 0">
-            <span>Lun</span><span>Mer</span><span>Ven</span><span>Dim</span>
-          </div>
-          <div id="shm-b2b-grid" style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(20,1fr);grid-template-rows:repeat(7,auto);grid-auto-flow:column;gap:2px"></div>
-        </div>
-      </div>
-      <div class="card" style="flex:1;min-width:260px;margin:0">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px">
-          <div><div class="card-title" style="font-size:13px">🏬 Sorties Ixelles</div><div class="card-sub" id="shm-ixl-since" style="font-size:10px">—</div></div>
-          <div style="text-align:right"><div id="shm-ixl-total" style="font-size:24px;font-weight:800;line-height:1;color:#1a1a2e">0</div><div style="font-size:9px;font-weight:700;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em">sorties</div></div>
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:4px">
-          <div style="width:22px;flex-shrink:0"></div>
-          <div id="shm-ixl-months" style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(20,1fr);font-size:9px;color:#8a97a5;font-weight:600"></div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:stretch">
-          <div style="width:22px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;font-size:8px;color:#8a97a5;padding:1px 0">
-            <span>Lun</span><span>Mer</span><span>Ven</span><span>Dim</span>
-          </div>
-          <div id="shm-ixl-grid" style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(20,1fr);grid-template-rows:repeat(7,auto);grid-auto-flow:column;gap:2px"></div>
-        </div>
-      </div>
-    </div>
-
     <!-- Historique sorties -->
     <div class="card">
       <div class="card-header"><div><div class="card-title">Historique des sorties frigo</div><div class="card-sub">7 derniers jours</div></div></div>
@@ -1764,6 +1789,14 @@
           <div id="bon-dlc-cake-row" style="display:none;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #f3cdbf">
             <div class="dlc-cake-subtitle" style="font-size:12px;color:#b06a52">Cakes · À consommer avant le :</div>
             <div id="bon-dlc-cake" style="font-size:20px;font-weight:700;color:#d44218"></div>
+          </div>
+        </div>
+
+        <div style="border:1px solid #d6e6f5;border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start">
+          <div style="font-size:18px;line-height:1;flex-shrink:0;margin-top:1px">🌡️</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#0c447c;margin-bottom:3px">Information  importante — Cookies Jacky &amp; Benny</div>
+            <div style="font-size:11px;color:#000;line-height:1.55">En raison des fortes chaleurs de la semaine passée, le chocolat a légèrement fondu pendant la production. Vos cookies Jacky &amp; Benny peuvent apparaître plus foncés que d'habitude. Leur qualité gustative n'est pas affectée — ils restent délicieux ! 🍪</div>
           </div>
         </div>
 
@@ -2278,6 +2311,8 @@
             <tr><td><b>Petit Mercado</b><div class="sub-text">Pia & Meno · 0487 30 09 69</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>JAT Café</b><div class="sub-text">Louise Roobaert · +32 495 21 01 96</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>Muse Co-stu</b><div class="sub-text">Nour Elibol</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>ZIZI waterloo</b><div class="sub-text">02 344 70 81 · Uccle</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>ZIZI Uccle</b><div class="sub-text">02 344 70 81 · Uccle</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2301,6 +2336,8 @@
             <option>Petit Mercado</option>
             <option>La Belladone</option>
             <option>Muse Co-stu</option>
+            <option>ZIZI waterloo</option>
+            <option>ZIZI Uccle</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:14px">
@@ -2483,16 +2520,6 @@
     <div class="rm-totalband">
       <div class="lbl" id="rm-total-label">—</div>
       <div class="rm-pills" id="rm-total-pills"></div>
-    </div>
-
-    <div class="rm-card">
-      <div class="rm-label">🗓️ Qui a commandé, et quand</div>
-      <div style="overflow-x:auto">
-        <table id="rm-matrix-table" style="border-collapse:collapse;white-space:nowrap;width:100%">
-          <thead><tr><th style="position:sticky;left:0;background:#fff;z-index:1">Client</th></tr></thead>
-          <tbody><tr><td class="rm-empty">—</td></tr></tbody>
-        </table>
-      </div>
     </div>
 
     <div class="rm-card">
@@ -2919,7 +2946,6 @@ function setFrigoSub(sub){
   if(sub==='historique'){
     so.style.display='none'; hi.style.display='';
     if(bh)bh.style.cssText=ON; if(bs)bs.style.cssText=OFF;
-    if(typeof renderSortieHeatmaps==='function') renderSortieHeatmaps();
     // Rafraîchir l'historique
     if(typeof fetchAPI==='function' && typeof applySorties==='function'){
       fetchAPI('getHistoriqueSorties').then(applySorties).catch(function(){});
@@ -2944,7 +2970,6 @@ function showPage(name, btn) {
   }
   if (name === 'frigo') setTimeout(() => {
     if(typeof setFrigoSub==='function') setFrigoSub('sortie');
-    if(typeof renderSortieHeatmaps==='function') renderSortieHeatmaps();
     // Rafraîchir les bacs depuis le serveur, puis recharger les blocs saveur ouverts
     if(typeof syncBacsFromServer==='function') syncBacsFromServer().then(() => {
       document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
@@ -2957,21 +2982,7 @@ function showPage(name, btn) {
   if (name === 'bl') setTimeout(() => { loadBL(); loadBoites(); }, 60);
   if (name === 'recap-mois') setTimeout(() => { renderRecapMois(); }, 60);
   if (name === 'centre-docs') setTimeout(() => { renderCentreDocs(); }, 60);
-  if (name === 'factures') setTimeout(async () => {
-    // Resynchroniser productions + premix depuis Google Sheets AVANT de construire
-    // le récapitulatif : sans ça, la page n'affichait que le cache local du
-    // téléphone, donc un BL coché en production sur un autre appareil (ou pas
-    // encore resynchronisé ici) n'apparaissait jamais dans "Factures".
-    try {
-      const prodData = await fetchAPI('getProduction');
-      applyProduction(prodData);
-    } catch (e) {}
-    try {
-      const pmxData = await fetchAPI('getPremix');
-      applyPremix(pmxData);
-    } catch (e) {}
-    loadCorrespondances();
-  }, 60);
+  if (name === 'factures') setTimeout(() => { loadCorrespondances(); }, 60);
   
   if (name === 'premix' || name === 'production') refreshFactureLists();
   if (name === 'dashboard') setTimeout(() => { drawChart(currentChartMode); updateDashboardIxellesBanner(); updateDashboardBacsVides(); updateDashboardMiniCal(); }, 60);
@@ -3044,6 +3055,8 @@ const SEARCH_DB = [
   { cat:'Client B2B', icon:'🏪', ref:'Kooki Anderlecht', detail:'Virginia Kunnen · 0492 80 10 38 · Anderlecht',    page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'Petit Mercado',    detail:'Pia & Meno · 0487 30 09 69 · Saint-Gilles',       page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'Muse Co-stu',      detail:'Nour Elibol · Rue de la Reinette 4 · Bruxelles',  page:'frigo' },
+  { cat:'Client B2B', icon:'🏪', ref:'ZIZI waterloo',    detail:'02 344 70 81 · Rue de la Mutualité 57A · Uccle',   page:'frigo' },
+  { cat:'Client B2B', icon:'🏪', ref:'ZIZI Uccle',       detail:'02 344 70 81 · Rue de la Mutualité 57A · Uccle',   page:'frigo' },
   // Fournisseurs
   { cat:'Fournisseur', icon:'🚛', ref:'Foodflow',        detail:'Fournisseur ingrédients', page:'reception' },
   { cat:'Fournisseur', icon:'🚛', ref:'Bruyerre',        detail:'Fournisseur ingrédients', page:'reception' },
@@ -3362,6 +3375,8 @@ const B2B_CLIENTS = {
   'La Belladone':    { adresse:'Rue Moris 17A, 1060 Saint-Gilles', contact:'Aurélie Alonso', tel:'+32 489 32 18 26' },
   'JAT Café': { adresse:'Rue de Namur 28, 1000 Bruxelles', contact:'Louise Roobaert', tel:'+32 495 21 01 96' },
   'Muse Co-stu':     { adresse:'Rue de la Reinette 4, 1000 Bruxelles', contact:'Nour Elibol', tel:'' },
+  'ZIZI waterloo':   { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
+  'ZIZI Uccle':      { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
 };
 
 function fillClientInfo() {
@@ -4176,7 +4191,7 @@ function renderBoitesTable() {
   if (!tbody) return;
 
   const boites = JSON.parse(localStorage.getItem('kooki_boites') || '[]');
-  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
+  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
 
   tbody.innerHTML = B2B_LIST.map(client => {
     let envoyees = 0, retournees = 0;
@@ -4659,15 +4674,6 @@ async function saveSortie() {
   const b2bClient = document.getElementById('sortie-b2b-client')?.value || '';
   const custom    = document.getElementById('sortie-destination-custom')?.value.trim() || '';
 
-  // Date de sortie choisie (permet une sortie différée / rétroactive) — l'heure reste celle du moment
-  const _now = new Date();
-  let effectiveDate = _now;
-  const _dateInput = document.getElementById('sortie-date')?.value || '';
-  if (_dateInput) {
-    const [_y,_m,_d] = _dateInput.split('-').map(Number);
-    if (_y && _m && _d) effectiveDate = new Date(_y, _m-1, _d, _now.getHours(), _now.getMinutes(), _now.getSeconds());
-  }
-
   let destination = '';
   if      (type === 'b2b')       destination = b2bClient;
   else if (type === 'magasin')    destination = 'Magasin Ixelles';
@@ -4748,7 +4754,7 @@ if (type === 'autre') {
   numeroBL = prefix + '-' + new Date().getFullYear() + '-' + Date.now().toString().slice(-3);
 }
     
-    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLotsAvecSaveur, boites, livreur, idGroupe, date: effectiveDate.toISOString() }) });
+    const res  = await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sortie', saveur: allSaveur, destination, lots: allLotsAvecSaveur, boites, livreur, idGroupe }) });
     const json = await res.json();
 
     if (json.success) {
@@ -4768,8 +4774,7 @@ if (type === 'autre') {
       boites,
       sortiPar: livreur,
       livreurB2B,
-      typeCookies: typeCookiesSave,
-      date: effectiveDate.toISOString()
+      typeCookies: typeCookiesSave
     })}).catch(() => {});
     // Décrémentation stock cake (décrément partiel, ne supprime pas la production)
     cakeLots.forEach(function(cl){
@@ -4781,7 +4786,7 @@ if (type === 'autre') {
     });
     blData.unshift({
       numeroBL,
-      date: effectiveDate.toISOString(),
+      date: new Date().toISOString(),
       client: destination,
       lots: allLotsBL,
       boites,
@@ -4791,9 +4796,9 @@ if (type === 'autre') {
     });
   }
 
-      const time    = effectiveDate.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
-      const date    = effectiveDate.toLocaleDateString('fr-FR',{ day:'2-digit', month:'2-digit' });
-      const isBackdated = effectiveDate.toDateString() !== _now.toDateString();
+      const now     = new Date();
+      const time    = now.toLocaleTimeString('fr-FR',{ hour:'2-digit', minute:'2-digit' });
+      const date    = now.toLocaleDateString('fr-FR',{ day:'2-digit', month:'2-digit' });
       const tbody   = document.getElementById('sortie-history');
 
       const storedSorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
@@ -4810,7 +4815,7 @@ if (type === 'autre') {
           const tr = document.createElement('tr');
           tr.setAttribute('data-sortie-id', sortieId);
           tr.innerHTML = `
-            <td class="sub-text">${date} ${time}${isBackdated ? ' <span style="display:inline-block;margin-left:4px;font-size:9.5px;font-weight:700;color:#0662aa;background:#e0edf8;padding:2px 6px;border-radius:20px;vertical-align:middle" title="Sortie enregistrée en différé">différé</span>' : ''}</td>
+            <td class="sub-text">${date} ${time}</td>
             <td><span class="tag tag-o">${saveur}</span></td>
             <td><b>${destination}</b></td>
             <td>${lot.code}</td>
@@ -4824,13 +4829,12 @@ if (type === 'autre') {
               title="Annuler et retourner au stock">↩️ Annuler</button></td>`;
           tbody.prepend(tr);
           // Sauvegarder dans localStorage
-          storedSorties.unshift({ id: sortieId, date: effectiveDate.toISOString(), saveur, destination, lot: lot.code, big: lot.big||0, small: lot.small||0, boites: boites||0, producteur: livreur });
+          storedSorties.unshift({ id: sortieId, date: new Date().toISOString(), saveur, destination, lot: lot.code, big: lot.big||0, small: lot.small||0, boites: boites||0, producteur: livreur });
         });
       });
       localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
       localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
       applySorties([]);
-      if (typeof renderSortieHeatmaps === 'function') renderSortieHeatmaps();
 
       // Boîtes plastiques B2B
       if (type === 'b2b' && boites > 0) {
@@ -4866,8 +4870,6 @@ function resetSortie() {
   ['sortie-type','sortie-b2b-client'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
-  const dateEl = document.getElementById('sortie-date');
-  if (dateEl) { const t = new Date(); dateEl.value = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
   const custom = document.getElementById('sortie-destination-custom');
   if (custom) custom.value = '';
   const tog = document.getElementById('boites-opt-toggle');
@@ -8006,15 +8008,9 @@ async function saveProduction() {
   const bacsACreer = bacsArr.map(function(ck, i){
     return { date, lot: code, saveur, lettre: LETTRES[i] || ('B'+i), type: 'simple', cookies: ck, restant: ck, statut: 'en frigo' };
   });
-  // Envoi SÉQUENTIEL (un bac à la fois) : en envoyant les 4 requêtes en même
-  // temps, Google Sheets peut les traiter en parallèle et faire en sorte que
-  // deux bacs s'écrivent sur la même ligne — les autres disparaissent.
-  // On attend chaque bac avant d'envoyer le suivant pour que chacun ait sa ligne.
-  for (const bac of bacsACreer) {
-    try {
-      await fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) });
-    } catch (e) {}
-  }
+  bacsACreer.forEach(bac => {
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'sauverBac', ...bac }) }).catch(() => {});
+  });
       toast('prod','✓ Production enregistrée !','ok');
       // 1. Mettre à jour stockLocal (utilisé par le frigo)
       const existing = stockLocal.find(s => s.code === code);
@@ -9293,7 +9289,6 @@ function annulerSortieGroupe(idGroupe) {
   updateStockPage();
   updateDashboardStockTable();
   applySorties([]);
-  if (typeof renderSortieHeatmaps === 'function') renderSortieHeatmaps();
   toast('sortie', '✓ Sortie supprimée — stock restauré !', 'ok');
 } 
   
@@ -9331,7 +9326,6 @@ function annulerSortie(sortieId) {
   updateStockPage();
   updateDashboardStockTable();
   applySorties([]);
-  if (typeof renderSortieHeatmaps === 'function') renderSortieHeatmaps();
 
   // Feedback
   const msg = `✓ Sortie annulée — ${big > 0 ? big + ' Big' : ''} ${small > 0 ? small + ' Small' : ''} de ${saveur} retourné${big+small>1?'s':''} dans le stock`;
@@ -9344,37 +9338,9 @@ function applySorties(data) {
   const tbody = document.getElementById('sortie-history');
   if (!tbody) return;
 
-  // Fusionner serveur + local, et PERSISTER le résultat dans localStorage.
-  // Avant, les données serveur servaient juste à construire ce tableau sans
-  // jamais être sauvegardées : une sortie saisie sur un autre appareil restait
-  // invisible partout ailleurs (heatmaps, etc.) tant qu'on ne rouvrait pas cet
-  // onglet précis. Le serveur est la source commune à tous les appareils ; le
-  // local comble ce qui n'est pas encore remonté, et une annulation faite en
-  // local est conservée même si le serveur ne l'a pas encore.
+  // Charger depuis Google Sheets si disponible, sinon localStorage
   const local = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  const apiData = Array.isArray(data) ? data : [];
-  const sig = r => [r.date, r.destination, r.lot, r.saveur, r.producteur].map(x => String(x || '').trim()).join('|');
-
-  let merged;
-  if (apiData.length) {
-    const localBySig = {};
-    local.forEach(r => { localBySig[sig(r)] = r; });
-    const apiNormalized = apiData.map(r => {
-      const loc = localBySig[sig(r)];
-      const out = Object.assign({ id: (loc && loc.id) || r.id || (Date.now() + Math.random()) }, r);
-      if (loc && loc.annule) out.annule = true;
-      return out;
-    });
-    const apiSigs = new Set(apiNormalized.map(sig));
-    const localOnly = local.filter(r => !apiSigs.has(sig(r)));
-    merged = apiNormalized.concat(localOnly);
-  } else {
-    merged = local;
-  }
-  localStorage.setItem('kooki_sorties', JSON.stringify(merged));
-  if (typeof renderSortieHeatmaps === 'function') renderSortieHeatmaps();
-
-  const source = merged;
+  const source = Array.isArray(data) && data.length ? data : local;
 
   if (!source.length) {
     tbody.innerHTML = '<tr><td colspan="2" class="empty">Aucune sortie enregistrée.</td></tr>';
@@ -9406,7 +9372,7 @@ function applySorties(data) {
   // Déterminer le type de destination
   const getDestType = (dest) => {
     if (['Magasin Ixelles', 'Magasin Anderlecht'].includes(dest)) return { icon:'🏪', badge:'Magasin', color:'#fbe8e2', textColor:'#d44218' };
-    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
+    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
     if (b2b.includes(dest)) return { icon:'🤝', badge:'B2B', color:'#e8f8f0', textColor:'#1a8a4a' };
     return { icon:'📦', badge:'Autre', color:'#f0f0f0', textColor:'#888' };
   };
@@ -9576,92 +9542,6 @@ function _bacsRecap(r){
   return { count:(r.bacsSimple||0), detail:(r.bacsDouble? r.bacsDouble+' double(s)':'—') };
 }
 // Heatmap d'activité de production (façon GitHub) — lit les vraies productions
-// ── Matrice B2B : clients (lignes) x dates de commande (colonnes) ──
-function renderB2BMatrix(daysBack){
-  daysBack = daysBack || 90;
-  var tbl = document.getElementById('b2b-matrix-table'); if(!tbl) return;
-  var sorties = []; try{ sorties = JSON.parse(localStorage.getItem('kooki_sorties')||'[]'); }catch(e){}
-  function parseD(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]); var fr=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(fr) return new Date(+fr[3],+fr[2]-1,+fr[1]); var d=new Date(s); return isNaN(d)?null:d; }
-  function key(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
-  var cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-daysBack);
-
-  // { client: { dateKey: count } }
-  var matrix = {}, dateSet = {};
-  sorties.forEach(function(s){
-    if (s.annule) return;
-    if (!s.destination || SORTIE_DEST_HORS_B2B.indexOf(s.destination) !== -1) return;
-    var d = parseD(s.date); if (!d || d < cutoff) return;
-    var k = key(d);
-    if (!matrix[s.destination]) matrix[s.destination] = {};
-    matrix[s.destination][k] = (matrix[s.destination][k] || 0) + 1;
-    dateSet[k] = d;
-  });
-
-  var dates = Object.keys(dateSet).sort().map(function(k){ return dateSet[k]; });
-  var clients = Object.keys(matrix).sort(function(a,b){
-    var totA = Object.values(matrix[a]).reduce(function(x,y){return x+y;},0);
-    var totB = Object.values(matrix[b]).reduce(function(x,y){return x+y;},0);
-    return totB - totA;
-  });
-
-  if (!clients.length || !dates.length) {
-    tbl.querySelector('tbody').innerHTML = '<tr><td class="empty">Aucune commande B2B sur cette période.</td></tr>';
-    return;
-  }
-
-  var thead = tbl.querySelector('thead');
-  thead.innerHTML = '<tr><th style="position:sticky;left:0;background:#fff;z-index:1;text-align:left">Client</th>' +
-    dates.map(function(d){ return '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:600;padding:6px 8px">' + d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) + '</th>'; }).join('') +
-    '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:700;padding:6px 8px">Total</th></tr>';
-
-  tbl.querySelector('tbody').innerHTML = clients.map(function(c){
-    var total = 0;
-    var cells = dates.map(function(d){
-      var n = matrix[c][key(d)] || 0;
-      total += n;
-      return '<td style="text-align:center;padding:6px 8px;font-size:13px;' + (n ? 'color:#1a8a4a;font-weight:700' : 'color:#e2e5ea') + '" title="' + (n ? n + ' commande(s) le ' + d.toLocaleDateString('fr-FR') : '') + '">' + (n ? '✓' : '·') + '</td>';
-    }).join('');
-    return '<tr><td style="position:sticky;left:0;background:#fff;z-index:1;font-weight:600;font-size:13px;padding:6px 10px 6px 0;border-right:1px solid #f0f0f0">' + c + '</td>' + cells + '<td style="text-align:center;font-size:13px;font-weight:700;color:#1a1a2e;padding:6px 8px">' + total + '</td></tr>';
-  }).join('');
-}
-
-// ── Heatmaps sorties frigo (B2B / Ixelles) — même logique visuelle que la heatmap de production ──
-function renderSortieHeatmap(prefix, filterFn, weeks){
-  weeks = weeks || 20;
-  var grid = document.getElementById('shm-'+prefix+'-grid'); if(!grid) return;
-  var MONTHS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
-  var sorties = []; try{ sorties = JSON.parse(localStorage.getItem('kooki_sorties')||'[]'); }catch(e){}
-  function key(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
-  function parseD(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]); var fr=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(fr) return new Date(+fr[3],+fr[2]-1,+fr[1]); var d=new Date(s); return isNaN(d)?null:d; }
-  var counts={};
-  sorties.filter(function(s){ return !s.annule && filterFn(s); }).forEach(function(s){ var d=parseD(s.date); if(!d) return; counts[key(d)]=(counts[key(d)]||0)+1; });
-  var today=new Date(); today.setHours(0,0,0,0);
-  var start=new Date(today); var dow=(start.getDay()+6)%7; start.setDate(start.getDate()-dow-(weeks-1)*7);
-  grid.innerHTML=''; var total=0, monthCols=[];
-  for(var w=0;w<weeks;w++){ for(var dd=0;dd<7;dd++){
-    var day=new Date(start); day.setDate(start.getDate()+w*7+dd);
-    var cell=document.createElement('div'); cell.className='phm-cell';
-    if(day<=today){
-      var n=counts[key(day)]||0;
-      if(n>0){ var lvl=n>=4?4:n; cell.className='phm-cell phm-l'+lvl; total+=n; }
-      cell.title=(n||0)+' sortie'+(n>1?'s':'')+' · '+day.toLocaleDateString('fr-FR');
-    } else { cell.style.visibility='hidden'; }
-    grid.appendChild(cell);
-    if(dd===0) monthCols.push(day.getMonth());
-  }}
-  var t=document.getElementById('shm-'+prefix+'-total'); if(t) t.textContent=total;
-  var si=document.getElementById('shm-'+prefix+'-since'); if(si) si.textContent='Depuis le '+start.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  var mEl=document.getElementById('shm-'+prefix+'-months'); if(mEl){ mEl.innerHTML=''; var last=-1; monthCols.forEach(function(m){ var sp=document.createElement('span'); sp.textContent=(m!==last)?MONTHS[m]:''; last=m; mEl.appendChild(sp); }); }
-}
-// Vrais clients B2B (liste blanche) — tout ce qui n'est pas ici (destinations
-// fixes comme "Magasin Ixelles", ou noms saisis à la main via "Commande client",
-// par ex. une livraison ponctuelle pour un mariage) n'est PAS compté comme B2B.
-var B2B_CLIENTS_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
-var SORTIE_DEST_HORS_B2B = ['Magasin Ixelles','Magasin Anderlecht','Événement','Usage interne'];
-function renderSortieHeatmaps(){
-  renderSortieHeatmap('b2b', function(s){ return s.destination && B2B_CLIENTS_LIST.indexOf(s.destination) !== -1; });
-  renderSortieHeatmap('ixl', function(s){ return s.destination === 'Magasin Ixelles'; });
-}
 function renderProdHeatmap(){
   var grid = document.getElementById('phm-grid'); if(!grid) return;
   var prods = []; try{ prods = JSON.parse(localStorage.getItem('kooki_productions')||'[]'); }catch(e){}
@@ -10128,7 +10008,7 @@ function renderRecapB2b(offset) {
   const b2b = sorties.filter(s => {
     const d = new Date(s.date);
     const clients = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière',
-      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
+      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
     return d >= monday && d <= sunday && clients.includes(s.destination);
   });
 
@@ -11186,7 +11066,6 @@ async function renderRecapMois(){
 
   var doB = all.filter(function(bl){
     var name = _rmClient(bl); if (!name) return false;
-    if (B2B_CLIENTS_LIST.indexOf(name) === -1) return false;
     var d = _rmParseDate(bl.date);
     return d && d.getFullYear()===_rmState.y && d.getMonth()===_rmState.m && !blEstMasque(bl);
   });
@@ -11252,38 +11131,9 @@ async function renderRecapMois(){
       (c.cakes>0 ? '<span class="rm-badge" style="background:#fff3cc;color:#a07000">'+c.cakes+' cake'+(c.cakes>1?'s':'')+'</span>' : '')+
       '<span class="rm-badge rm-bBox">'+c.boxes+' boîtes</span>'+
       '<span class="rm-chev">Voir le récap →</span></div></div>'+
-      '<div class="rm-cbls">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>';  }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
-  _rmRenderMatrix(list);
+      '<div class="rm-cbls">'+c.bls.map(function(b){return b.n+' ('+b.d+')';}).join(' · ')+'</div></div>';
+  }).join('') : '<div class="rm-empty">Aucune livraison ce mois-ci.</div>';
 }
-function _rmRenderMatrix(list){
-  var tbl = document.getElementById('rm-matrix-table'); if(!tbl) return;
-  var dateSet = {};
-  list.forEach(function(c){ c.bls.forEach(function(b){ if (b.dt) dateSet[_rmDayKey(b.dt)] = b.dt; }); });
-  var dates = Object.keys(dateSet).sort().map(function(k){ return dateSet[k]; });
-
-  if (!list.length || !dates.length) {
-    tbl.querySelector('thead').innerHTML = '<tr><th style="position:sticky;left:0;background:#fff">Client</th></tr>';
-    tbl.querySelector('tbody').innerHTML = '<tr><td class="rm-empty">Aucune livraison ce mois-ci.</td></tr>';
-    return;
-  }
-
-  tbl.querySelector('thead').innerHTML = '<tr><th style="position:sticky;left:0;background:#fff;text-align:left;padding:6px 10px 6px 0">Client</th>' +
-    dates.map(function(d){ return '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:600;padding:6px 8px">' + p2(d.getDate()) + '/' + p2(d.getMonth()+1) + '</th>'; }).join('') +
-    '<th style="text-align:center;font-size:10.5px;color:#8a97a5;font-weight:700;padding:6px 8px">Total</th></tr>';
-
-  tbl.querySelector('tbody').innerHTML = list.map(function(c){
-    var byDay = {};
-    c.bls.forEach(function(b){ if (b.dt) byDay[_rmDayKey(b.dt)] = (byDay[_rmDayKey(b.dt)]||0) + 1; });
-    var cells = dates.map(function(d){
-      var n = byDay[_rmDayKey(d)] || 0;
-      return '<td style="text-align:center;padding:6px 8px;font-size:13px;' + (n ? 'color:#1a8a4a;font-weight:700' : 'color:#e2e5ea') + '" title="' + (n ? n + ' livraison(s) le ' + p2(d.getDate())+'/'+p2(d.getMonth()+1) : '') + '">' + (n ? '✓' : '·') + '</td>';
-    }).join('');
-    return '<tr><td style="position:sticky;left:0;background:#fff;font-weight:600;font-size:13px;padding:6px 10px 6px 0;border-right:1px solid #f0f0f0">' + c.name + '</td>' + cells + '<td style="text-align:center;font-size:13px;font-weight:700;color:#1a1a2e;padding:6px 8px">' + c.bls.length + '</td></tr>';
-  }).join('');
-
-  function p2(n){ return String(n).padStart(2,'0'); }
-}
-function _rmDayKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _rmClientHTML(c, forPrint){
   var BLUE='#0c447c', RED='#d44218', BAND='#e6f1fb', SOFT='#eef5fc', GREY='#f0f0f0';
   function p2(n){ return String(n).padStart(2,'0'); }
@@ -11423,49 +11273,9 @@ function _rmClientPDF(c){
   }); });
 }
 
-function _rmMatrixHTML(list){
-  var BLUE='#0c447c', RED='#d44218', BAND='#e6f1fb';
-  function p2(n){ return String(n).padStart(2,'0'); }
-  var dateSet = {};
-  list.forEach(function(c){ c.bls.forEach(function(b){ if (b.dt) dateSet[_rmDayKey(b.dt)] = b.dt; }); });
-  var dates = Object.keys(dateSet).sort().map(function(k){ return dateSet[k]; });
-  var y=_rmState.y, m=_rmState.m, dernier=new Date(y,m+1,0).getDate();
-  var periode='01/'+p2(m+1)+'/'+y+' &rarr; '+p2(dernier)+'/'+p2(m+1)+'/'+y;
-  var font="font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif";
-
-  var head = '<tr><td style="padding:8px 10px 8px 0;font-weight:700;font-size:12px;color:#333;text-align:left">Client</td>' +
-    dates.map(function(d){ return '<td style="text-align:center;font-size:10.5px;color:#888;font-weight:600;padding:8px 6px">'+p2(d.getDate())+'/'+p2(d.getMonth()+1)+'</td>'; }).join('') +
-    '<td style="text-align:center;font-size:10.5px;color:#888;font-weight:700;padding:8px 6px">Total</td></tr>';
-
-  var rows = list.map(function(c){
-    var byDay={};
-    c.bls.forEach(function(b){ if (b.dt) byDay[_rmDayKey(b.dt)] = (byDay[_rmDayKey(b.dt)]||0)+1; });
-    var cells = dates.map(function(d){
-      var n = byDay[_rmDayKey(d)] || 0;
-      return '<td style="text-align:center;padding:8px 6px;font-size:13px;'+(n?'color:#1a8a4a;font-weight:700':'color:#ddd')+'">'+(n?'✓':'·')+'</td>';
-    }).join('');
-    return '<tr style="border-top:1px solid #f0f0f0"><td style="font-weight:700;font-size:13px;padding:8px 10px 8px 0">'+c.name+'</td>'+cells+'<td style="text-align:center;font-size:13px;font-weight:700;padding:8px 6px">'+c.bls.length+'</td></tr>';
-  }).join('');
-
-  return ''+
-  "<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');</style>"+
-  '<div style="'+font+';min-height:297mm;display:flex;flex-direction:column;">'+
-    '<div style="background:'+BAND+';padding:30px 42px;border-radius:0 0 18px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">'+
-      '<div><img src="https://lilaadou.github.io/FOODTRACK/Kooki_texte_transparent.png" style="height:46px" alt="Kooki"><div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:'+RED+';margin-top:4px">BAKED WITH LOVE</div></div>'+
-      '<div style="text-align:right;font-size:12px;line-height:1.7;color:#4a4a4a"><b style="color:'+BLUE+'">KOOKI COMPANY SRL</b><br>BE1015746980<br>Avenue Emile Gryson 2D<br>1070 Anderlecht<br>Belgique</div>'+
-    '</div>'+
-    '<div style="padding:30px 42px 10px;flex:1">'+
-      '<div style="font-size:19px;font-weight:800;color:'+BLUE+'">Vue d\'ensemble B2B</div>'+
-      '<div style="font-size:12.5px;color:#888;margin-top:2px">'+periode+'</div>'+
-      '<table style="width:100%;border-collapse:collapse;margin-top:22px">'+
-        '<thead>'+head+'</thead><tbody>'+rows+'</tbody>'+
-      '</table>'+
-    '</div>'+
-  '</div>';
-}
 function imprimerRecapMoisGlobal(){
   if(!_rmCache || !_rmCache.length){ alert('Aucune donnée à imprimer pour ce mois.'); return; }
-  var clients=[{ __matrix:true }].concat(_rmCache.slice());
+  var clients=_rmCache.slice();
   function ls(src,cb){ if([].slice.call(document.scripts).some(function(s){return s.src===src;})){cb();return;} var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=function(){alert('Impossible de charger '+src);}; document.head.appendChild(s); }
   ls('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',function(){
   ls('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',function(){
@@ -11477,7 +11287,7 @@ function imprimerRecapMoisGlobal(){
       var c=clients[i];
       var box=document.createElement('div');
       box.style.cssText='position:fixed;left:-10000px;top:0;width:'+A4W+'px;background:#fff;';
-      box.innerHTML = c.__matrix ? _rmMatrixHTML(_rmCache) : _rmClientHTML(c, true);
+      box.innerHTML=_rmClientHTML(c, true);
       document.body.appendChild(box);
       var wrap=box.querySelector('div');
       var ran=false;
@@ -14459,7 +14269,7 @@ var qrcode = function() {
   var scanner = null, current = null;
   var _scanMode = null, _genericCb = null;
 
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
   var LIVREURS = ['Tarik','Shippr','Interne'];
   var DEST_TYPES = [
     { v:'b2b',        label:'🏬 Client B2B',       sub:'Livraison + BL',    client:true,  bl:true },
@@ -14873,7 +14683,7 @@ var qrcode = function() {
     { v:'interne', label:'🔧 Usage interne', client:false },
     { v:'autre', label:'🛒 Commande client', client:true }
   ];
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
   function body(){ return document.getElementById('ixelles-body'); }
   function _toast(msg){ try{ if(typeof toast==='function'){ toast('sortie', msg, 'err'); return; } }catch(e){} alert(msg); }
   function _pd(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(m) return new Date(+m[3],+m[2]-1,+m[1]); var d=new Date(s); return isNaN(d)?null:d; }
