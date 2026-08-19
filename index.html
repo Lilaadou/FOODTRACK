@@ -14549,11 +14549,14 @@ var qrcode = function() {
   function stepScan(){
     current=null;
     title('📷 Scanner le lot');
-    var allLots = lots().slice();
+    var isIx = dest.type === 'magasin';   // Magasin Ixelles = uniquement les lots avec du Big
+    var allLots = lots().slice().filter(function(s){ return !isIx || (parseInt(s.big,10)||0) > 0; });
     var savs = allLots.map(function(s){ return s.saveur; })
       .filter(function(v,i,a){ return v && a.indexOf(v)===i; })
       .sort();
-    var savOpts = savs.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
+    var savBtns = savs.map(function(s){
+      return '<button type="button" class="qr-sav-b" data-sav="'+s+'" onclick="KookiQR.pickManualSav(\''+esc(s)+'\')" style="border:1.5px solid #e0e6ee;border-radius:0;padding:16px 24px;background:#fff;cursor:pointer;font-size:17px;font-weight:800;color:#1a2430">'+s+'</button>';
+    }).join('');
     var cartBanner = cart.length ?
       '<div onclick="KookiQR.recap()" style="cursor:pointer;background:#eafaf0;border:1px solid #bfe6cd;border-radius:12px;padding:9px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
         '<span style="font-size:12.5px;color:#1a7a3a;font-weight:700">🧾 Sortie en cours — '+cart.length+' saveur'+(cart.length>1?'s':'')+'</span>'+
@@ -14562,26 +14565,41 @@ var qrcode = function() {
       bannerHTML() + cartBanner +
       '<div id="qr-reader"></div>'+
       '<div id="qr-scan-msg" style="text-align:center;font-size:12px;color:#8a97a5;margin:8px 0 4px">Initialisation de la caméra…</div>'+
-      '<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir le lot manuellement —</div>'+
-      '<select id="qr-manual-sav" onchange="KookiQR.filterManual()" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff;margin-bottom:8px">'+
-        '<option value="">1️⃣ Choisir une saveur…</option>'+savOpts+'</select>'+
-      '<select id="qr-manual" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff">'+
-        '<option value="">2️⃣ Choisis d\'abord une saveur</option></select>'+
-      '<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.pickManual()">Continuer</button>';
+      '<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir manuellement —</div>'+
+      '<div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">1️⃣ Saveur</div>'+
+      '<div id="qr-sav-btns" style="display:flex;flex-wrap:wrap;gap:8px">'+(savBtns||'<span style="font-size:12px;color:#8a97a5">Aucun lot disponible</span>')+'</div>'+
+      '<div id="qr-lot-title" style="display:none;font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px;margin:14px 0 8px">2️⃣ Lot</div>'+
+      '<div id="qr-lot-btns" style="display:flex;flex-direction:column;gap:8px"></div>';
     startCamera();
   }
-  // Ne montre que les lots de la saveur choisie dans la liste manuelle
-  function filterManual(){
-    var savEl = document.getElementById('qr-manual-sav');
-    var sel = document.getElementById('qr-manual');
-    if(!sel) return;
-    var v = savEl ? savEl.value : '';
+  // Choix d'une saveur (bouton) : affiche ses lots en boutons
+  function pickManualSav(sav){
+    var host = document.getElementById('qr-lot-btns');
+    var titre = document.getElementById('qr-lot-title');
+    if(!host) return;
+    var btns = document.querySelectorAll('#qr-sav-btns .qr-sav-b');
+    for(var i=0;i<btns.length;i++){
+      var on = btns[i].getAttribute('data-sav') === sav;
+      btns[i].style.background  = on ? '#0662aa' : '#fff';
+      btns[i].style.color       = on ? '#fff'    : '#1a2430';
+      btns[i].style.borderColor = on ? '#0662aa' : '#e0e6ee';
+    }
+    if(titre) titre.style.display = '';
+    var isIx = dest.type === 'magasin';
     var L = lots().slice()
-      .filter(function(s){ return !v || s.saveur === v; })
+      .filter(function(s){ return s.saveur === sav && (!isIx || (parseInt(s.big,10)||0) > 0); })
       .sort(function(a,b){ return String(a.code).localeCompare(String(b.code)); });
-    var opts = L.map(function(s){ return '<option value="'+s.code+'">'+s.code+' — '+s.saveur+' ('+s.big+' Big · '+s.small+' Small)</option>'; }).join('');
-    sel.innerHTML = '<option value="">'+(v ? '2️⃣ Choisir un lot…' : '2️⃣ Choisis d\'abord une saveur')+'</option>'+opts;
+    if(!L.length){ host.innerHTML = '<div style="text-align:center;color:#8a97a5;font-size:12px;padding:8px">Aucun lot disponible</div>'; return; }
+    host.innerHTML = L.map(function(s){
+      var big = parseInt(s.big,10)||0, small = parseInt(s.small,10)||0;
+      var info = big+' Big'+(isIx ? '' : ' · '+small+' Small');
+      return '<button type="button" onclick="KookiQR.pickLot(\''+esc(s.code)+'\')" style="text-align:left;border:1.5px solid #e6ebf1;border-radius:0;padding:17px 18px;background:#fff;cursor:pointer;display:flex;flex-direction:column;gap:3px">'+
+        '<span style="font-size:18px;font-weight:800;color:#1a2430">'+s.code+'</span>'+
+        '<span style="font-size:13.5px;color:#8a97a5">'+s.saveur+' · '+info+'</span>'+
+      '</button>';
+    }).join('');
   }
+  function pickLot(code){ if(code) onCode(code); }
   function startCamera(){
     var msg=document.getElementById('qr-scan-msg');
     var secure=(window.isSecureContext||location.hostname==='localhost'||location.hostname==='127.0.0.1');
@@ -14830,7 +14848,7 @@ var qrcode = function() {
     changeDest: function(){ stepDest(); },
     pickDest: pickDest, pickLiv: pickLiv, confirmClient: confirmClient, confirmCustom: confirmCustom,
     pickManual: function(){ var v=(document.getElementById('qr-manual')||{}).value; if(!v){ toast('Choisis un lot','err'); return; } onCode(v); },
-    filterManual: filterManual,
+    pickManualSav: pickManualSav, pickLot: pickLot,
     back: function(){ stepScan(); },
     addMore: function(){ stepScan(); },
     recap: recap, validate: validate, delItem: delItem, cancelCart: cancelCart, finalize: finalize,
