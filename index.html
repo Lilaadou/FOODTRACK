@@ -14555,7 +14555,7 @@ var qrcode = function() {
       .filter(function(v,i,a){ return v && a.indexOf(v)===i; })
       .sort();
     var savBtns = savs.map(function(s){
-      return '<button type="button" class="qr-sav-b" data-sav="'+s+'" onclick="KookiQR.pickManualSav(\''+esc(s)+'\')" style="border:1.5px solid #e0e6ee;border-radius:0;padding:16px 24px;background:#fff;cursor:pointer;font-size:17px;font-weight:800;color:#1a2430">'+s+'</button>';
+      return '<button type="button" class="qr-sav-b" data-sav="'+s+'" onclick="KookiQR.pickManualSav(\''+esc(s)+'\')" style="width:100%;min-height:56px;border:1.5px solid #e0e6ee;border-radius:0;padding:10px 8px;background:#fff;cursor:pointer;font-size:17px;font-weight:800;color:#1a2430;text-align:center">'+s+'</button>';
     }).join('');
     var cartBanner = cart.length ?
       '<div onclick="KookiQR.recap()" style="cursor:pointer;background:#eafaf0;border:1px solid #bfe6cd;border-radius:12px;padding:9px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
@@ -14567,7 +14567,7 @@ var qrcode = function() {
       '<div id="qr-scan-msg" style="text-align:center;font-size:12px;color:#8a97a5;margin:8px 0 4px">Initialisation de la caméra…</div>'+
       '<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir manuellement —</div>'+
       '<div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">1️⃣ Saveur</div>'+
-      '<div id="qr-sav-btns" style="display:flex;flex-wrap:wrap;gap:8px">'+(savBtns||'<span style="font-size:12px;color:#8a97a5">Aucun lot disponible</span>')+'</div>'+
+      '<div id="qr-sav-btns" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">'+(savBtns||'<span style="font-size:12px;color:#8a97a5">Aucun lot disponible</span>')+'</div>'+
       '<div id="qr-lot-title" style="display:none;font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px;margin:14px 0 8px">2️⃣ Lot</div>'+
       '<div id="qr-lot-btns" style="display:flex;flex-direction:column;gap:8px"></div>';
     startCamera();
