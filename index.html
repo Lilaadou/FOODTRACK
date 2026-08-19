@@ -193,6 +193,17 @@
     .lot-acc-collbl.big{color:#d44218}
     .lot-acc-collbl.small{color:#0662aa}
 
+    /* ── Petit message festif "pop up" (sortie enregistrée) ── */
+    .kooki-pop{position:fixed;top:0;left:50%;transform:translate(-50%,-140%);z-index:99999;
+      background:#fff;border:1.5px solid #f2d9cf;border-left:5px solid #d44218;border-radius:14px;
+      padding:13px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;
+      box-shadow:0 16px 38px -12px rgba(0,0,0,.32);max-width:90vw;
+      transition:transform .38s cubic-bezier(.2,1.35,.4,1)}
+    .kooki-pop.show{transform:translate(-50%,18px)}
+    .kooki-pop .e{font-size:26px;line-height:1}
+    .kooki-pop .m{font-size:15px;font-weight:800;color:#1a1a2e}
+    @supports(padding:max(0px)){ .kooki-pop.show{transform:translate(-50%,max(18px, env(safe-area-inset-top)))} }
+
     /* ═══ MODE DELIVERY : thème bleu ═══ */
     body.mode-delivery .nav-item.active{background:#e0edf8;color:#0662aa;border-right-color:#0662aa;}
     body.mode-delivery .nav-item:hover{background:#e8f1fb;color:#0662aa;}
@@ -3374,6 +3385,23 @@ function toast(id, msg, type) {
   el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'inline-block';
   setTimeout(() => el.style.display = 'none', 4000);
 }
+// Petit message festif qui apparaît en haut de l'écran (ex : sortie enregistrée)
+function popKooki(msg, emoji) {
+  var el = document.getElementById('kooki-pop');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'kooki-pop';
+    el.className = 'kooki-pop';
+    el.innerHTML = '<span class="e" id="kooki-pop-e">🎉</span><span class="m" id="kooki-pop-m"></span>';
+    document.body.appendChild(el);
+    el.addEventListener('click', function () { el.classList.remove('show'); });
+  }
+  document.getElementById('kooki-pop-e').textContent = emoji || '🎉';
+  document.getElementById('kooki-pop-m').textContent = msg || '';
+  el.classList.add('show');
+  clearTimeout(el._to);
+  el._to = setTimeout(function () { el.classList.remove('show'); }, 2800);
+}
 function val(id) { return (document.getElementById(id)?.value || '').trim(); }
 
 // ─────────────────────────────────────
@@ -4924,6 +4952,7 @@ if (type === 'autre') {
       updateStockPage();
       updateDashboardStockTable();
       toast('sortie','✓ Sortie enregistrée !','ok');
+      popKooki('Youpi la sortie est faite !');
       // Bon de livraison avec tous les lots
       if (type !== 'magasin' && type !== 'anderlecht') {
         const allLotsForBon = [...allLotsAvecSaveur, ...cakeLots];
@@ -14746,6 +14775,7 @@ var qrcode = function() {
     var livreur=dest.livreur||getProfil();
     writeSortieGroup(cart.slice(), dest.name, livreur);
     refreshStockUI();
+    if(typeof popKooki==='function') popKooki('Youpi la sortie est faite !');
     if(dest.bl){ genererBL(cart.slice(), dest.name, livreur); }
     else { toast('✓ Sortie enregistrée → '+dest.name,'ok'); cart=[]; close(); }
   }
