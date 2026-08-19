@@ -14549,8 +14549,11 @@ var qrcode = function() {
   function stepScan(){
     current=null;
     title('📷 Scanner le lot');
-    var opts = lots().slice().sort(function(a,b){ return String(a.code).localeCompare(String(b.code)); })
-      .map(function(s){ return '<option value="'+s.code+'">'+s.code+' — '+s.saveur+' ('+s.big+' Big · '+s.small+' Small)</option>'; }).join('');
+    var allLots = lots().slice();
+    var savs = allLots.map(function(s){ return s.saveur; })
+      .filter(function(v,i,a){ return v && a.indexOf(v)===i; })
+      .sort();
+    var savOpts = savs.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
     var cartBanner = cart.length ?
       '<div onclick="KookiQR.recap()" style="cursor:pointer;background:#eafaf0;border:1px solid #bfe6cd;border-radius:12px;padding:9px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
         '<span style="font-size:12.5px;color:#1a7a3a;font-weight:700">🧾 Sortie en cours — '+cart.length+' saveur'+(cart.length>1?'s':'')+'</span>'+
@@ -14560,10 +14563,24 @@ var qrcode = function() {
       '<div id="qr-reader"></div>'+
       '<div id="qr-scan-msg" style="text-align:center;font-size:12px;color:#8a97a5;margin:8px 0 4px">Initialisation de la caméra…</div>'+
       '<div style="text-align:center;font-size:12px;color:#8a97a5;margin:14px 0 6px">— ou choisir le lot manuellement —</div>'+
+      '<select id="qr-manual-sav" onchange="KookiQR.filterManual()" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff;margin-bottom:8px">'+
+        '<option value="">1️⃣ Choisir une saveur…</option>'+savOpts+'</select>'+
       '<select id="qr-manual" style="width:100%;padding:12px;border:1px solid #e0e6ee;border-radius:12px;font-family:inherit;font-size:14px;background:#fff">'+
-        '<option value="">Sélectionner un lot…</option>'+opts+'</select>'+
+        '<option value="">2️⃣ Choisis d\'abord une saveur</option></select>'+
       '<button class="qr-btn qr-btn-primary" style="margin-top:12px" onclick="KookiQR.pickManual()">Continuer</button>';
     startCamera();
+  }
+  // Ne montre que les lots de la saveur choisie dans la liste manuelle
+  function filterManual(){
+    var savEl = document.getElementById('qr-manual-sav');
+    var sel = document.getElementById('qr-manual');
+    if(!sel) return;
+    var v = savEl ? savEl.value : '';
+    var L = lots().slice()
+      .filter(function(s){ return !v || s.saveur === v; })
+      .sort(function(a,b){ return String(a.code).localeCompare(String(b.code)); });
+    var opts = L.map(function(s){ return '<option value="'+s.code+'">'+s.code+' — '+s.saveur+' ('+s.big+' Big · '+s.small+' Small)</option>'; }).join('');
+    sel.innerHTML = '<option value="">'+(v ? '2️⃣ Choisir un lot…' : '2️⃣ Choisis d\'abord une saveur')+'</option>'+opts;
   }
   function startCamera(){
     var msg=document.getElementById('qr-scan-msg');
@@ -14813,6 +14830,7 @@ var qrcode = function() {
     changeDest: function(){ stepDest(); },
     pickDest: pickDest, pickLiv: pickLiv, confirmClient: confirmClient, confirmCustom: confirmCustom,
     pickManual: function(){ var v=(document.getElementById('qr-manual')||{}).value; if(!v){ toast('Choisis un lot','err'); return; } onCode(v); },
+    filterManual: filterManual,
     back: function(){ stepScan(); },
     addMore: function(){ stepScan(); },
     recap: recap, validate: validate, delItem: delItem, cancelCart: cancelCart, finalize: finalize,
