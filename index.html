@@ -4902,7 +4902,7 @@ if (type === 'autre') {
               title="Annuler et retourner au stock">↩️ Annuler</button></td>`;
           tbody.prepend(tr);
           // Sauvegarder dans localStorage
-          storedSorties.unshift({ id: sortieId, date: new Date().toISOString(), saveur, destination, lot: lot.code, big: lot.big||0, small: lot.small||0, boites: boites||0, producteur: livreur });
+          storedSorties.unshift({ id: sortieId, idGroupe, date: new Date().toISOString(), saveur, destination, lot: lot.code, big: lot.big||0, small: lot.small||0, boites: boites||0, producteur: livreur, bacs: (lot.bacs && lot.bacs.length) ? lot.bacs : null });
         });
       });
       localStorage.setItem('kooki_sorties', JSON.stringify(storedSorties));
@@ -8058,6 +8058,32 @@ function decrementBacs(code, distribution){
   _saveBacRestant(m);
   _saveBacsServer(srv);
 }
+// Inverse de decrementBacs : remet les cookies dans les bacs (annulation de sortie)
+function incrementBacs(code, distribution){
+  const m = _bacRestantMap();
+  const srv = _bacsServerMap();
+  distribution.forEach(function(d){
+    const key = code + '|' + d.lettre;
+    let base = (m[key] !== undefined) ? m[key] : null;
+    let sb = null;
+    if(srv[code]) sb = srv[code].find(function(b){ return b.lettre === d.lettre; });
+    if(sb){
+      const sr = parseInt(sb.restant,10)||0;
+      base = (base === null) ? sr : Math.max(base, sr);
+    }
+    if(base === null) base = 0;
+    const nouveau = base + (parseInt(d.qty,10)||0);
+    m[key] = nouveau;
+    if(sb) sb.restant = nouveau;
+    try{
+      fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+        action:'majStatutBac', lot: code, lettre: d.lettre, restant: nouveau, statut: 'en frigo'
+      })}).catch(function(){});
+    }catch(e){}
+  });
+  _saveBacRestant(m);
+  _saveBacsServer(srv);
+}
 
 async function saveProduction() {
   const nom=val('prod-nom'), pmx=val('prod-pmx'), code=val('prod-code'), saveur=val('prod-saveur');
@@ -9320,50 +9346,62 @@ function applyRecentInvoices(data) {
 // ── Sorties frigo ──
 function annulerSortieGroupe(idGroupe) {
   if (!confirm('Annuler cette sortie et retourner les cookies dans le stock ?')) return;
+
+  // Détails du groupe affiché (lots, date, destination)
+  const g = (window._sortieGroupes && window._sortieGroupes[idGroupe]) ? window._sortieGroupes[idGroupe] : null;
+  let lignes = [], date = '', destination = '';
+  if (g) {
+    date = g.date; destination = g.destination;
+    lignes = g.lots.map(l => ({ lot: l.lot, big: Number(l.big)||0, small: Number(l.small)||0, saveur: l.saveur }));
+  }
+
+  // Enregistrements locaux de ce groupe (pour restaurer les bacs si on les a)
   const sorties = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  
-  // Chercher par idGroupe ou par clé combinée
-  let groupe = sorties.filter(s => {
-    if (s.idGroupe && s.idGroupe === idGroupe) return true;
+  const locaux = sorties.filter(s => {
+    if (s.idGroupe && idGroupe && s.idGroupe === idGroupe) return true;
     const key = s.date + '_' + s.destination + '_' + (s.producteur || '');
     return key === idGroupe;
   });
-
-  // Fallback : chercher par destination uniquement
-  if (!groupe.length) {
-    const parts = idGroupe.split('_');
-    const dest = parts[1];
-    const dateApprox = parts[0];
-    if (dest) {
-      groupe = sorties.filter(s => 
-        s.destination === dest && 
-        !s.annule &&
-        Math.abs(new Date(s.date) - new Date(dateApprox)) < 3600000
-      );
-    }
+  if (!lignes.length && locaux.length) {
+    lignes = locaux.map(s => ({ lot: s.lot, big: Number(s.big)||0, small: Number(s.small)||0, saveur: s.saveur }));
+    date = locaux[0].date; destination = locaux[0].destination;
   }
+  if (!lignes.length) { alert('Sortie introuvable.'); return; }
 
-  if (!groupe.length) { alert('Sortie introuvable.'); return; }
+  // 1) Serveur : supprimer les lignes de la sortie + remettre le stock dans le Google Sheet
+  try {
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+      action: 'annulerSortie', idGroupe: idGroupe, date: date, destination: destination, lignes: lignes
+    })}).catch(()=>{});
+  } catch(e){}
 
-  groupe.forEach(s => {
-    const existing = stockLocal.find(l => l.code === s.lot);
-    if (existing) {
-      existing.big   += Number(s.big)   || 0;
-      existing.small += Number(s.small) || 0;
-    } else if (s.lot && s.lot !== '—') {
-      stockLocal.push({ code: s.lot, saveur: s.saveur, big: Number(s.big)||0, small: Number(s.small)||0 });
-    }
-    s.annule = true;
+  // 2) Local : remettre le stock immédiatement
+  lignes.forEach(l => {
+    const existing = stockLocal.find(s => s.code === l.lot);
+    if (existing) { existing.big += l.big; existing.small += l.small; }
+    else if (l.lot && l.lot !== '—') stockLocal.push({ code: l.lot, saveur: l.saveur, big: l.big, small: l.small });
   });
 
-  const nouvellesSorties = sorties.filter(s => !s.annule);
+  // 3) Restaurer les bacs si l'info locale est disponible
+  locaux.forEach(s => { if (s.bacs && s.bacs.length && typeof incrementBacs === 'function') incrementBacs(s.lot, s.bacs); });
+
+  // 4) Retirer du local + blacklister l'idGroupe (pour ne pas le revoir avant le prochain rechargement serveur)
+  const restants = sorties.filter(s => locaux.indexOf(s) === -1);
+  localStorage.setItem('kooki_sorties', JSON.stringify(restants));
+  if (idGroupe) {
+    const bl = JSON.parse(localStorage.getItem('kooki_sorties_deleted') || '[]');
+    if (bl.indexOf(idGroupe) === -1) bl.push(idGroupe);
+    localStorage.setItem('kooki_sorties_deleted', JSON.stringify(bl));
+  }
   localStorage.setItem('kooki_stock_local', JSON.stringify(stockLocal));
-  localStorage.setItem('kooki_sorties', JSON.stringify(nouvellesSorties));
+  if (window._sortieGroupes) delete window._sortieGroupes[idGroupe];
+
+  // 5) Rafraîchir l'affichage
   updateStockPage();
   updateDashboardStockTable();
   applySorties([]);
-  toast('sortie', '✓ Sortie supprimée — stock restauré !', 'ok');
-} 
+  toast('sortie', '✓ Sortie annulée — stock restauré', 'ok');
+}
   
 function annulerSortie(sortieId) {
   if (!confirm('Annuler cette sortie et retourner les cookies dans le stock ?')) return;
@@ -9413,10 +9451,27 @@ function applySorties(data) {
 
   // Charger depuis Google Sheets si disponible, sinon localStorage
   const local = JSON.parse(localStorage.getItem('kooki_sorties') || '[]');
-  const source = Array.isArray(data) && data.length ? data : local;
+  const fromServer = Array.isArray(data) && data.length;
+
+  // Sorties annulées (blacklist locale) : on les masque tant que le serveur ne les a pas encore supprimées
+  let blacklist = [];
+  try { blacklist = JSON.parse(localStorage.getItem('kooki_sorties_deleted') || '[]'); } catch(e) {}
+  const blSet = new Set(blacklist);
+  const source = (fromServer ? data : local).filter(r => {
+    const ig = r.idGroupe || '';
+    return !(ig && blSet.has(ig));
+  });
+
+  // Auto-nettoyage : si le serveur ne renvoie plus une sortie blacklistée, on la retire de la blacklist
+  if (fromServer && blacklist.length) {
+    const present = new Set(data.map(r => r.idGroupe || ''));
+    const cleaned = blacklist.filter(ig => present.has(ig));
+    if (cleaned.length !== blacklist.length) localStorage.setItem('kooki_sorties_deleted', JSON.stringify(cleaned));
+  }
 
   if (!source.length) {
     tbody.innerHTML = '<tr><td colspan="2" class="empty">Aucune sortie enregistrée.</td></tr>';
+    window._sortieGroupes = {};
     return;
   }
 
@@ -9441,6 +9496,9 @@ function applySorties(data) {
       small: r.small || 0
     });
   });
+
+  // Exposer les groupes pour l'annulation (annulerSortieGroupe)
+  window._sortieGroupes = groupes;
 
   // Déterminer le type de destination
   const getDestType = (dest) => {
