@@ -558,6 +558,31 @@
     #print-factures-zone, #print-factures-zone * { visibility: visible !important; }
     #print-factures-zone { position: fixed; inset: 0; padding: 28px 32px; background: #fff; font-family: 'Segoe UI', sans-serif; font-size: 12px; }
   }
+
+  /* ── PROPOSITIONS EN VRAIS BOUTONS (Que commande / Grands cookies / Type livraison) ── */
+  .kgrid{display:grid;gap:12px}
+  .kgrid.c3{grid-template-columns:1fr 1fr 1fr}
+  .kgrid.c2{grid-template-columns:1fr 1fr}
+  .koptlbl{font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em;margin:0 0 11px}
+  .kopt{position:relative;display:flex;flex-direction:column;gap:3px;background:#fff;border:1.5px solid #e2e7ec;border-radius:14px;padding:14px 15px;cursor:pointer;text-align:left;font-family:inherit;box-shadow:0 1px 2px rgba(20,30,45,.06);transition:transform .1s,box-shadow .12s,border-color .12s,background .12s;width:100%}
+  .kopt:hover{border-color:#c9d3de;box-shadow:0 3px 8px rgba(20,30,45,.10);transform:translateY(-1px)}
+  .kopt:active{transform:translateY(0)}
+  .kopt .kt{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:#1a2430}
+  .kopt .ks{font-size:11px;color:#9aa4ae;font-weight:600}
+  .kopt .kchk{position:absolute;top:11px;right:11px;width:19px;height:19px;border-radius:50%;border:2px solid #dfe4ea;background:#fff;display:flex;align-items:center;justify-content:center;transition:.12s}
+  .kopt .kchk svg{width:10px;height:10px;opacity:0}
+  .kopt.on{border-width:2px;box-shadow:0 3px 10px rgba(20,30,45,.12)}
+  .kopt.on .kchk svg{opacity:1}
+  .kopt.on-red{border-color:#d44218;background:#fdeee9}    .kopt.on-red .kt{color:#d44218}    .kopt.on-red .kchk{background:#d44218;border-color:#d44218}
+  .kopt.on-amber{border-color:#ba7517;background:#fbf3e2}  .kopt.on-amber .kt{color:#ba7517}  .kopt.on-amber .kchk{background:#ba7517;border-color:#ba7517}
+  .kopt.on-green{border-color:#2e7d46;background:#eaf5ee}  .kopt.on-green .kt{color:#2e7d46}  .kopt.on-green .kchk{background:#2e7d46;border-color:#2e7d46}
+  .kopt.on-blue{border-color:#0662aa;background:#e7f0f9}   .kopt.on-blue .kt{color:#0662aa}   .kopt.on-blue .kchk{background:#0662aa;border-color:#0662aa}
+  .kdlc{margin-top:9px;padding:8px 10px;background:#fff;border:1px solid #eef1f4;border-radius:9px;text-align:center}
+  .kopt.on .kdlc{background:rgba(255,255,255,.65)}
+  .kdlc .kk{font-size:9.5px;color:#9aa4ae;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .kdlc .kv{font-size:14px;font-weight:800;color:#1a2430}
+  .kdlc .kp{font-size:10px;color:#9aa4ae;margin-top:1px}
+  .kopt.on-red .kdlc .kv{color:#712b13}
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -1313,6 +1338,7 @@
             <option>Muse Co-stu</option>
             <option>ZIZI waterloo</option>
             <option>ZIZI Uccle</option>
+            <option>KAWA CLUB</option>
           </select>
         </div>
       </div>
@@ -1403,6 +1429,10 @@
       <div class="b2b-client-btn" data-client="ZIZI Uccle" onclick="selectClientBtn('ZIZI Uccle')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
         <div style="width:34px;height:34px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#27500A">ZU</div>
         <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">ZIZI Uccle</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Uccle</div></div>
+      </div>
+      <div class="b2b-client-btn" data-client="KAWA CLUB" onclick="selectClientBtn('KAWA CLUB')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#92400E">KC</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">KAWA CLUB</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nora NEUS</div></div>
       </div>
     </div>
   </div>
@@ -1508,7 +1538,7 @@
             <label for="boites-opt-toggle" style="font-size:13px;font-weight:700;color:#1a1a2e;cursor:pointer">📦 Utiliser des boîtes plastiques pour cette livraison ?</label>
           </div>
           <div id="boites-opt-detail" style="display:none">
-            <div style="font-size:11px;color:#888;margin-bottom:8px">Big : 1 boîte = 12 cookies · Small : 1 boîte = 25 cookies</div>
+            <div style="font-size:11px;color:#888;margin-bottom:8px">Big : 1 boîte = 12 cookies · Baby : 1 boîte = 25 cookies</div>
             <div style="font-size:24px;font-weight:700;color:#0662aa" id="boites-total-display-opt">0</div>
           </div>
         </div>
@@ -1519,7 +1549,7 @@
         <div style="background:#f0f7f0;border-radius:10px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
           <div>
             <div style="font-size:13px;font-weight:700;color:#1a7a3a">🗃️ Boîtes blanches — calculé automatiquement</div>
-            <div style="font-size:11px;color:#888;margin-top:2px">1 boîte blanche = 40 cookies (Big + Small confondus)</div>
+            <div style="font-size:11px;color:#888;margin-top:2px">1 boîte blanche = 40 cookies (Big + Baby confondus)</div>
           </div>
           <div style="font-size:28px;font-weight:700;color:#1a7a3a" id="boites-ixelles-display">0</div>
         </div>
@@ -1527,34 +1557,21 @@
 
 <!-- Sélecteur produit B2B : Cookie / Cake / Les deux -->
 <!-- Sélecteur produit B2B -->
-<div id="b2b-produit-section" style="display:none;margin-bottom:13px">
-  <div style="border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 14px;background:#f7f8fa;border-bottom:0.5px solid #e8e8e8;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em">
-      🛒 Que commande le client ?
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
-      <label id="label-prod-cookie" onclick="selectProduitB2B('cookie')" style="padding:14px 12px;cursor:pointer;border-right:0.5px solid #e8e8e8;background:#fbe8e2;border-bottom:2px solid #d44218">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <div id="dot-prod-cookie" style="width:14px;height:14px;border-radius:50%;border:2px solid #d44218;background:#d44218;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:5px;height:5px;border-radius:50%;background:#fff"></div></div>
-          <span style="font-size:13px;font-weight:700;color:#712b13">🍪 Cookies</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Big & Small</div>
-      </label>
-      <label id="label-prod-cake" onclick="selectProduitB2B('cake')" style="padding:14px 12px;cursor:pointer;border-right:0.5px solid #e8e8e8">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <div id="dot-prod-cake" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">🧁 Cakes</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Format unique</div>
-      </label>
-      <label id="label-prod-both" onclick="selectProduitB2B('both')" style="padding:14px 12px;cursor:pointer">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <div id="dot-prod-both" style="width:14px;height:14px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:13px;font-weight:700;color:#1a1a2e">🍪🧁 Les deux</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:22px">Cookies & Cakes</div>
-      </label>
-    </div>
+<div id="b2b-produit-section" style="display:none;margin-bottom:16px">
+  <div class="koptlbl">🛒 Que commande le client ?</div>
+  <div class="kgrid c3">
+    <button type="button" class="kopt on on-red" id="label-prod-cookie" onclick="selectProduitB2B('cookie')">
+      <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kt">🍪 Cookies</span><span class="ks">Big &amp; Baby</span>
+    </button>
+    <button type="button" class="kopt" id="label-prod-cake" onclick="selectProduitB2B('cake')">
+      <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kt">🧁 Cakes</span><span class="ks">Format unique</span>
+    </button>
+    <button type="button" class="kopt" id="label-prod-both" onclick="selectProduitB2B('both')">
+      <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kt">🍪🧁 Les deux</span><span class="ks">Cookies &amp; Cakes</span>
+    </button>
   </div>
 </div>
 
@@ -1566,50 +1583,32 @@
   <div style="padding:13px 14px">
     <div id="b2b-only-cookie-options">
     <!-- Grand/Baby -->
-    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Le client prend-il des grands cookies ?</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <label id="label-grands-oui" onclick="selectTypeCommande('oui')" style="padding:10px 12px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-          <div id="dot-grands-oui" style="width:13px;height:13px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:12.5px;font-weight:700;color:#1a1a2e">Oui — Grands + Baby</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:21px">Big ET Small cookies</div>
-      </label>
-      <label id="label-grands-non" onclick="selectTypeCommande('non')" style="padding:10px 12px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-          <div id="dot-grands-non" style="width:13px;height:13px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:12.5px;font-weight:700;color:#1a1a2e">Non — Baby seulement</span>
-        </div>
-        <div style="font-size:11px;color:#aaa;margin-left:21px">Uniquement Small cookies</div>
-      </label>
+    <div class="koptlbl" style="margin-bottom:9px">Le client prend-il des grands cookies ?</div>
+    <div class="kgrid c2" style="margin-bottom:16px">
+      <button type="button" class="kopt" id="label-grands-oui" onclick="selectTypeCommande('oui')">
+        <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kt">Oui — Grands + Baby</span><span class="ks">Big ET Baby cookies</span>
+      </button>
+      <button type="button" class="kopt" id="label-grands-non" onclick="selectTypeCommande('non')">
+        <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kt">Non — Baby seulement</span><span class="ks">Uniquement Baby cookies</span>
+      </button>
     </div>
     <!-- Type + DLC -->
-    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Type de livraison · DLC</div>
-    <div id="type-cookies-section" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <label id="label-cuits" style="padding:12px 14px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px;background:#fbe8e2;border-bottom:2px solid #d44218">
-        <input type="radio" name="type-cookies" value="cuits" id="cookies-cuits" onchange="updateTypeCookies()" style="display:none">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div id="dot-cuits" style="width:13px;height:13px;border-radius:50%;border:2px solid #d44218;background:#d44218;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:4px;height:4px;border-radius:50%;background:#fff"></div></div>
-          <span style="font-size:12.5px;font-weight:700;color:#712b13">🔥 Cookies cuits</span>
-        </div>
-        <div style="padding:7px 10px;background:#fff;border-radius:8px;text-align:center">
-          <div style="font-size:10px;color:#993c1d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">DLC</div>
-          <div id="dlc-cuits-display" style="font-size:14px;font-weight:700;color:#712b13">—</div>
-          <div style="font-size:10px;color:#b85d3a;margin-top:1px">+ 4 jours</div>
-        </div>
-      </label>
-      <label id="label-crus" style="padding:12px 14px;cursor:pointer;border:0.5px solid #e8e8e8;border-radius:10px">
+    <div class="koptlbl" style="margin-bottom:9px">Type de livraison · DLC</div>
+    <div id="type-cookies-section" class="kgrid c2" style="margin-bottom:16px">
+      <button type="button" class="kopt on on-red" id="label-cuits" onclick="var r=document.getElementById('cookies-cuits'); if(r){r.checked=true;} updateTypeCookies();">
+        <input type="radio" name="type-cookies" value="cuits" id="cookies-cuits" onchange="updateTypeCookies()" style="display:none" checked>
+        <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kt">🔥 Cookies cuits</span>
+        <div class="kdlc"><div class="kk">DLC</div><div class="kv" id="dlc-cuits-display">—</div><div class="kp">+ 4 jours</div></div>
+      </button>
+      <button type="button" class="kopt" id="label-crus" onclick="var r=document.getElementById('cookies-crus'); if(r){r.checked=true;} updateTypeCookies();">
         <input type="radio" name="type-cookies" value="crus" id="cookies-crus" onchange="updateTypeCookies()" style="display:none">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div id="dot-crus" style="width:13px;height:13px;border-radius:50%;border:2px solid #e8e8e8;flex-shrink:0"></div>
-          <span style="font-size:12.5px;font-weight:700;color:#1a1a2e">❄️ Cookies crus</span>
-        </div>
-        <div style="padding:7px 10px;background:#f7f8fa;border-radius:8px;text-align:center">
-          <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">DLC</div>
-          <div id="dlc-crus-display" style="font-size:14px;font-weight:700;color:#aaa">—</div>
-          <div style="font-size:10px;color:#aaa;margin-top:1px">+ 3 mois</div>
-        </div>
-      </label>
+        <span class="kchk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kt">❄️ Cookies crus</span>
+        <div class="kdlc"><div class="kk">DLC</div><div class="kv" id="dlc-crus-display">—</div><div class="kp">+ 3 mois</div></div>
+      </button>
     </div>
     </div><!-- /b2b-only-cookie-options -->
     <!-- Saveurs -->
@@ -2319,7 +2318,7 @@
     <div class="stat-card"><div class="stat-top"><div class="stat-label">BL ce mois-ci</div><div class="stat-icon ic-b">📦</div></div><div class="stat-value" id="bl-stat-count">0</div><span class="stat-badge badge-ok" id="bl-stat-mois">—</span></div>
     <div class="stat-card"><div class="stat-top"><div class="stat-label">Clients livrés</div><div class="stat-icon ic-o">🤝</div></div><div class="stat-value" id="bl-stat-clients">0</div><span class="stat-badge badge-ok">Cette semaine</span></div>
     <div class="stat-card"><div class="stat-top"><div class="stat-label">Big livrés</div><div class="stat-icon ic-o">🍪</div></div><div class="stat-value" id="bl-stat-big" style="color:#d44218">0</div><span class="stat-badge badge-ok">Ce mois-ci</span></div>
-    <div class="stat-card"><div class="stat-top"><div class="stat-label">Small livrés</div><div class="stat-icon ic-b">🍪</div></div><div class="stat-value" id="bl-stat-small" style="color:#0662aa">0</div><span class="stat-badge badge-ok">Ce mois-ci</span></div>
+    <div class="stat-card"><div class="stat-top"><div class="stat-label">Baby livrés</div><div class="stat-icon ic-b">🍪</div></div><div class="stat-value" id="bl-stat-small" style="color:#0662aa">0</div><span class="stat-badge badge-ok">Ce mois-ci</span></div>
   </div>
 
   <!-- Suivi boîtes B2B -->
@@ -2346,6 +2345,7 @@
             <tr><td><b>Muse Co-stu</b><div class="sub-text">Nour Elibol</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>ZIZI waterloo</b><div class="sub-text">02 344 70 81 · Uccle</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>ZIZI Uccle</b><div class="sub-text">02 344 70 81 · Uccle</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>KAWA CLUB</b><div class="sub-text">Nora NEUS · 0491 98 58 83 · Watermael-Boitsfort</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2371,6 +2371,7 @@
             <option>Muse Co-stu</option>
             <option>ZIZI waterloo</option>
             <option>ZIZI Uccle</option>
+            <option>KAWA CLUB</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:14px">
@@ -2667,7 +2668,7 @@
     <div class="card">
       <div class="card-header"><div><div class="card-title">Alertes actives</div><div class="card-sub">2 alertes</div></div></div>
       <div class="sortie-item"><div class="s-ico ico-o">⚠️</div><div style="flex:1"><div class="s-title">6 saveurs à stock zéro</div><div class="s-sub">MOLLY · WALLY · CHARLY · LENI · EMMY · DANNY</div></div><span class="status s-warn">À produire</span></div>
-      <div class="sortie-item"><div class="s-ico ico-b">📦</div><div style="flex:1"><div class="s-title">Stock Small SUZZY très faible</div><div class="s-sub">SUZ-260605-03 : seulement 5 Small restants</div></div><span class="status s-warn">5 restants</span></div>
+      <div class="sortie-item"><div class="s-ico ico-b">📦</div><div style="flex:1"><div class="s-title">Stock Baby SUZZY très faible</div><div class="s-sub">SUZ-260605-03 : seulement 5 Baby restants</div></div><span class="status s-warn">5 restants</span></div>
     </div>
   </div>
 
@@ -2677,7 +2678,7 @@
       <div class="card-header"><div><div class="card-title">Paramètres</div></div></div>
       <div class="sortie-item"><div class="s-ico ico-o">🔗</div><div><div class="s-title">Google Sheets connecté</div><div class="s-sub">ID : 1LtE-y_2FbNYDnhX6Vdl9pR03Cxsr6cqfaRUxwMGq6Yg</div></div><span class="status s-ok">Connecté</span></div>
       <div class="sortie-item"><div class="s-ico ico-b">🍪</div><div><div class="s-title">11 saveurs</div><div class="s-sub">SUZZY · JACKY · BENNY · DAVY · MOLLY · WALLY · CHARLY · LENI · EMMY · WOODY · DANNY</div></div><span class="status s-ok">Actif</span></div>
-      <div class="sortie-item"><div class="s-ico ico-o">📏</div><div><div class="s-title">Seuils minimum</div><div class="s-sub">Big (165g) : 135 · Small (80g) : 60</div></div><span class="status s-ok">Configuré</span></div>
+      <div class="sortie-item"><div class="s-ico ico-o">📏</div><div><div class="s-title">Seuils minimum</div><div class="s-sub">Big (165g) : 135 · Baby (80g) : 60</div></div><span class="status s-ok">Configuré</span></div>
     </div>
   </div>
 
@@ -3094,6 +3095,7 @@ const SEARCH_DB = [
   { cat:'Client B2B', icon:'🏪', ref:'Muse Co-stu',      detail:'Nour Elibol · Rue de la Reinette 4 · Bruxelles',  page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'ZIZI waterloo',    detail:'02 344 70 81 · Rue de la Mutualité 57A · Uccle',   page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'ZIZI Uccle',       detail:'02 344 70 81 · Rue de la Mutualité 57A · Uccle',   page:'frigo' },
+  { cat:'Client B2B', icon:'🏪', ref:'KAWA CLUB',        detail:'Nora NEUS · 0491 98 58 83 · Bd du Souverain 25 · Watermael-Boitsfort', page:'frigo' },
   // Fournisseurs
   { cat:'Fournisseur', icon:'🚛', ref:'Foodflow',        detail:'Fournisseur ingrédients', page:'reception' },
   { cat:'Fournisseur', icon:'🚛', ref:'Bruyerre',        detail:'Fournisseur ingrédients', page:'reception' },
@@ -3102,11 +3104,11 @@ const SEARCH_DB = [
   { cat:'Fournisseur', icon:'🚛', ref:'Makady',          detail:'Fournisseur ingrédients', page:'reception' },
   { cat:'Fournisseur', icon:'🚛', ref:'De Notten Shop',  detail:'Fournisseur emballages',  page:'reception' },
   // Saveurs
-  { cat:'Saveur', icon:'🍪', ref:'SUZZY',  detail:'Stock : 425 Big · 5 Small',  page:'stock' },
-  { cat:'Saveur', icon:'🍪', ref:'WOODY',  detail:'Stock : 335 Big · 65 Small', page:'stock' },
-  { cat:'Saveur', icon:'🍪', ref:'JACKY',  detail:'Stock : 135 Big · 30 Small', page:'stock' },
-  { cat:'Saveur', icon:'🍪', ref:'BENNY',  detail:'Stock : 135 Big · 30 Small', page:'stock' },
-  { cat:'Saveur', icon:'🍪', ref:'DAVY',   detail:'Stock : 135 Big · 60 Small', page:'stock' },
+  { cat:'Saveur', icon:'🍪', ref:'SUZZY',  detail:'Stock : 425 Big · 5 Baby',  page:'stock' },
+  { cat:'Saveur', icon:'🍪', ref:'WOODY',  detail:'Stock : 335 Big · 65 Baby', page:'stock' },
+  { cat:'Saveur', icon:'🍪', ref:'JACKY',  detail:'Stock : 135 Big · 30 Baby', page:'stock' },
+  { cat:'Saveur', icon:'🍪', ref:'BENNY',  detail:'Stock : 135 Big · 30 Baby', page:'stock' },
+  { cat:'Saveur', icon:'🍪', ref:'DAVY',   detail:'Stock : 135 Big · 60 Baby', page:'stock' },
   { cat:'Saveur', icon:'🍪', ref:'MOLLY',  detail:'Stock : 0 — à produire',     page:'stock' },
   { cat:'Saveur', icon:'🍪', ref:'WALLY',  detail:'Stock : 0 — à produire',     page:'stock' },
   { cat:'Saveur', icon:'🍪', ref:'CHARLY', detail:'Stock : 0 — à produire',     page:'stock' },
@@ -3431,6 +3433,7 @@ const B2B_CLIENTS = {
   'Muse Co-stu':     { adresse:'Rue de la Reinette 4, 1000 Bruxelles', contact:'Nour Elibol', tel:'' },
   'ZIZI waterloo':   { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
   'ZIZI Uccle':      { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
+  'KAWA CLUB':       { adresse:'Bd du Souverain 25, 1170 Watermael-Boitsfort', contact:'Nora NEUS', tel:'0491 98 58 83', email:'fox@kawa-club.com' },
 };
 
 function fillClientInfo() {
@@ -3704,7 +3707,7 @@ function updateDashboardClassement() {
       </div>
       <div class="rank-totals">
         <div class="rank-big" style="color:${color}">${big}</div>
-        <div class="rank-small">${small} Small</div>
+        <div class="rank-small">${small} Baby</div>
       </div>
     </div>`;
   }).join('');
@@ -3717,7 +3720,7 @@ function updateDashboardClassement() {
         <div class="rank-name" style="color:#ccc">${ZEROS.join(' · ')}</div>
         <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:0%"></div></div>
       </div>
-      <div class="rank-totals"><div class="rank-big" style="color:#ddd">0</div><div class="rank-small">0 Small</div></div>
+      <div class="rank-totals"><div class="rank-big" style="color:#ddd">0</div><div class="rank-small">0 Baby</div></div>
     </div>`;
   }
 
@@ -3829,7 +3832,7 @@ function calcBoites() {
 
   // Résumé optionnel
   const elOpt = document.getElementById('boites-total-display-opt');
-  if (elOpt) elOpt.innerHTML = `<span style="color:#d44218">${totalBigBoxes} Big</span> &nbsp;+&nbsp; <span style="color:#0662aa">${totalSmallBoxes} Small</span>`;
+  if (elOpt) elOpt.innerHTML = `<span style="color:#d44218">${totalBigBoxes} Big</span> &nbsp;+&nbsp; <span style="color:#0662aa">${totalSmallBoxes} Baby</span>`;
 
   // Boîtes blanches Ixelles
   const elIx = document.getElementById('boites-ixelles-display');
@@ -3921,7 +3924,7 @@ function loadLotsBlock(id) {
         </div>`;
     const smallCol = bigOnly ? '' : `
         <div class="lot-acc-col">
-          <div class="lot-acc-collbl small">Small (max)${isB2B ? ' · 📦' : ''}</div>
+          <div class="lot-acc-collbl small">Baby (max)${isB2B ? ' · 📦' : ''}</div>
           <input type="number" min="0" max="${l.small}" placeholder="0"
             id="b${id}-small-${l.code}"
             oninput="lotChanged('${id}','${l.code}')"
@@ -3939,7 +3942,7 @@ function loadLotsBlock(id) {
         <div class="lot-acc-hd" onclick="toggleLotAcc(this)">
           <div class="lot-acc-mid">
             <div class="lot-acc-code">${l.code}</div>
-            <div class="lot-acc-stock">Stock : ${l.big} Big${bigOnly ? '' : ' · ' + l.small + ' Small'}</div>
+            <div class="lot-acc-stock">Stock : ${l.big} Big${bigOnly ? '' : ' · ' + l.small + ' Baby'}</div>
           </div>
           <span class="lot-acc-chip" id="lotchip-${id}-${safe}">—</span>
           <span class="lot-acc-chev">›</span>
@@ -3998,7 +4001,7 @@ function updateLotChip(id, code){
   const small = smallEl ? (parseInt(smallEl.value,10)||0) : 0;
   const parts = [];
   if(big) parts.push(big+' big');
-  if(small) parts.push(small+' small');
+  if(small) parts.push(small+' baby');
   if(parts.length){ chip.className='lot-acc-chip fill'; chip.textContent = parts.join(' · '); }
   else { chip.className='lot-acc-chip'; chip.textContent='—'; }
 }
@@ -4081,13 +4084,12 @@ var CAKE_VAR_NAMES = ['Brownie','Banana bread','Carrot cake','Muffin myrtille','
 function selectProduitB2B(type) {
   window._b2bProduit = type;
   var _dlv = (document.body.classList.contains('mode-delivery'));
-  var lblOn  = _dlv ? {cookie:'#e0edf8',cake:'#e0edf8',both:'#e0edf8'} : {cookie:'#fbe8e2',cake:'#fffbf0',both:'#f0f7f0'};
-  var brdOn  = _dlv ? {cookie:'#0662aa',cake:'#0662aa',both:'#0662aa'} : {cookie:'#d44218',cake:'#ba7517',both:'#2e7d46'};
+  var col = {cookie:'on-red', cake:'on-amber', both:'on-green'};
   ['cookie','cake','both'].forEach(function(c){
-    var lbl=document.getElementById('label-prod-'+c), dot=document.getElementById('dot-prod-'+c);
-    var active=(c===type);
-    if(lbl){ lbl.style.background=active?lblOn[type]:''; lbl.style.borderBottom=active?'2px solid '+brdOn[type]:'none'; }
-    if(dot){ dot.style.border='2px solid '+(active?brdOn[type]:'#e8e8e8'); dot.style.background=active?brdOn[type]:''; dot.innerHTML=active?'<div style="width:5px;height:5px;border-radius:50%;background:#fff"></div>':''; }
+    var lbl=document.getElementById('label-prod-'+c);
+    if(!lbl) return;
+    lbl.classList.remove('on','on-red','on-amber','on-green','on-blue');
+    if(c===type){ lbl.classList.add('on', _dlv ? 'on-blue' : col[c]); }
   });
   var showCookies = (type==='cookie'||type==='both');
   var showCakes   = (type==='cake'  ||type==='both');
@@ -4095,6 +4097,7 @@ function selectProduitB2B(type) {
   var cakeCard   = document.getElementById('b2b-cake-section');
   if(cookieCard) cookieCard.style.display = showCookies ? '' : 'none';
   if(cakeCard){  cakeCard.style.display   = showCakes ? '' : 'none'; if(showCakes) loadCakeLots(); }
+  if(showCookies){ try{ updateTypeCookies(); }catch(e){} }
 }
 
 function loadCakeLots() {
@@ -4212,31 +4215,22 @@ function toggleDestination() {
 
   const lc = document.getElementById('label-cuits');
   const lr = document.getElementById('label-crus');
-  const dc = document.getElementById('dot-cuits');
-  const dr = document.getElementById('dot-crus');
   const dlcC = document.getElementById('dlc-cuits-display');
   const dlcR = document.getElementById('dlc-crus-display');
+  var _dlv = document.body.classList.contains('mode-delivery');
+  var cls = _dlv ? 'on-blue' : 'on-red';
+  [lc, lr].forEach(function(el){ if(el) el.classList.remove('on','on-red','on-amber','on-green','on-blue'); });
 
   if (val === 'cuits') {
-    var _dlv=document.body.classList.contains('mode-delivery');
-    var _bg=_dlv?'#e0edf8':'#fbe8e2', _bd=_dlv?'#0662aa':'#d44218', _tx=_dlv?'#0662aa':'#712b13';
-    lc.style.background = _bg; lc.style.borderBottom = '2px solid '+_bd;
-    lr.style.background = '#fff'; lr.style.borderBottom = 'none';
-    dc.style.background = _bd; dc.style.borderColor = _bd;
-    dr.style.background = 'transparent'; dr.style.borderColor = '#e8e8e8';
+    if (lc) lc.classList.add('on', cls);
     const d = new Date(now); d.setDate(now.getDate()+4);
-    dlcC.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
-    dlcC.style.color = _tx;
-    dlcR.textContent = '—'; dlcR.style.color = '#aaa';
+    if (dlcC) dlcC.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    if (dlcR) dlcR.textContent = '—';
   } else if (val === 'crus') {
-    lr.style.background = '#e6f1fb'; lr.style.borderBottom = '2px solid #185fa5';
-    lc.style.background = '#fff'; lc.style.borderBottom = 'none';
-    dr.style.background = '#185fa5'; dr.style.borderColor = '#185fa5';
-    dc.style.background = 'transparent'; dc.style.borderColor = '#e8e8e8';
+    if (lr) lr.classList.add('on', cls);
     const d = new Date(now); d.setMonth(now.getMonth()+3);
-    dlcR.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
-    dlcR.style.color = '#0c447c';
-    dlcC.textContent = '—'; dlcC.style.color = '#aaa';
+    if (dlcR) dlcR.textContent = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    if (dlcC) dlcC.textContent = '—';
   }
 }
 
@@ -4297,7 +4291,7 @@ function renderBoitesTable() {
   if (!tbody) return;
 
   const boites = JSON.parse(localStorage.getItem('kooki_boites') || '[]');
-  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
+  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
 
   tbody.innerHTML = B2B_LIST.map(client => {
     let envoyees = 0, retournees = 0;
@@ -4475,7 +4469,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
       + '<th style="'+thBase+'text-align:left">Code lot</th>'
       + '<th style="'+thBase+'text-align:left">Saveur</th>'
       + (showBig   ? '<th style="'+thBase+'text-align:right">Big (165g)</th>'   : '')
-      + (showSmall ? '<th style="'+thBase+'text-align:right">Small (80g)</th>' : '')
+      + (showSmall ? '<th style="'+thBase+'text-align:right">Baby (80g)</th>' : '')
       + (hasCakesInLots ? '<th style="'+thBase+'text-align:right">Qté</th>' : '')
       + '</tr>';
   }
@@ -6444,7 +6438,7 @@ function updateCalendrierProduction() {
         <span style="font-size:14px;font-weight:700">${it.sav}</span>
         <span class="cal-badge ${it.niveau}">${it.niveau === 'urgence' ? (it.big===0?'Urgent':'Critique') : it.niveau === 'priorite' ? 'Bientôt' : 'OK'}</span>
       </div>
-      <div style="font-size:11px;color:#888">Stock : <b>${it.big}</b> Big · ${it.small} Small</div>
+      <div style="font-size:11px;color:#888">Stock : <b>${it.big}</b> Big · ${it.small} Baby</div>
       <div style="font-size:11px;font-weight:600;margin-top:2px">${it.days === 0 ? '📌 Aujourd\'hui' : it.days === 1 ? '📌 Demain' : '📅 ' + it.date}</div>
     </div>`).join('');
 }
@@ -7740,7 +7734,7 @@ function renderBLTable(data) {
           <th>Client</th>
           <th>Lots livrés</th>
           <th>Big</th>
-          <th>Small</th>
+          <th>Baby</th>
           <th>Boîtes</th>
           <th>Sorti par</th>
           <th></th>
@@ -7783,7 +7777,7 @@ function renderBLTable(data) {
   totalBar.style.display = 'flex';
   document.getElementById('bl-total-label').textContent = `Total — ${data.length} livraison${data.length > 1 ? 's' : ''}`;
   document.getElementById('bl-total-big').textContent   = `Big : ${totalBig}`;
-  document.getElementById('bl-total-small').textContent = `Small : ${totalSmall}`;
+  document.getElementById('bl-total-small').textContent = `Baby : ${totalSmall}`;
   document.getElementById('bl-total-boites').textContent = `Boîtes : ${totalBoites}`;
 }
 
@@ -8643,7 +8637,7 @@ function tracaSearch(q) {
         </div>
         <span style="background:#fbe8e2;color:#d44218;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${prod.saveur}</span>
         <span style="background:#f7f8fa;border:1px solid #e0e0e0;color:#555;font-size:11px;padding:3px 10px;border-radius:20px">👤 ${prod.nom || '—'}</span>
-        ${prod.big || prod.small ? `<span style="font-size:12px;color:#555;margin-left:4px"><b>${prod.big||0}</b> Big · <b>${prod.small||0}</b> Small</span>` : ''}
+        ${prod.big || prod.small ? `<span style="font-size:12px;color:#555;margin-left:4px"><b>${prod.big||0}</b> Big · <b>${prod.small||0}</b> Baby</span>` : ''}
         <span style="margin-left:auto;background:${allLinked?'#e8f5e9':noneLinked?'#fbe8e2':'#fff8e1'};color:${statusColor};font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px">${statusLabel}</span>
       </div>
       <!-- Premix -->
@@ -9473,7 +9467,7 @@ function annulerSortie(sortieId) {
   applySorties([]);
 
   // Feedback
-  const msg = `✓ Sortie annulée — ${big > 0 ? big + ' Big' : ''} ${small > 0 ? small + ' Small' : ''} de ${saveur} retourné${big+small>1?'s':''} dans le stock`;
+  const msg = `✓ Sortie annulée — ${big > 0 ? big + ' Big' : ''} ${small > 0 ? small + ' Baby' : ''} de ${saveur} retourné${big+small>1?'s':''} dans le stock`;
   // Trouver un toast disponible
   const toastEl = document.getElementById('toast-sortie');
   if (toastEl) { toastEl.textContent = msg; toastEl.className = 'toast ok'; toastEl.style.display = 'inline-block'; setTimeout(() => toastEl.style.display = 'none', 4000); }
@@ -9537,7 +9531,7 @@ function applySorties(data) {
   // Déterminer le type de destination
   const getDestType = (dest) => {
     if (['Magasin Ixelles', 'Magasin Anderlecht'].includes(dest)) return { icon:'🏪', badge:'Magasin', color:'#fbe8e2', textColor:'#d44218' };
-    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
+    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
     if (b2b.includes(dest)) return { icon:'🤝', badge:'B2B', color:'#e8f8f0', textColor:'#1a8a4a' };
     return { icon:'📦', badge:'Autre', color:'#f0f0f0', textColor:'#888' };
   };
@@ -9568,7 +9562,7 @@ function applySorties(data) {
     const lignesDetail = g.lots.map(l => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:11.5px;color:#666">
         <span><b style="color:#1a1a2e;font-weight:600">${l.saveur}</b> · ${l.lot}</span>
-        <span>${l.big} Big · ${l.small} Small</span>
+        <span>${l.big} Big · ${l.small} Baby</span>
       </div>`).join('');
 
     return separateur + `
@@ -9578,7 +9572,7 @@ function applySorties(data) {
             <span style="font-size:11px;color:#aaa;width:44px;flex-shrink:0;font-variant-numeric:tabular-nums">${heure}</span>
             <span style="font-size:13.5px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${type.icon} ${g.destination}</span>
             <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${type.color};color:${type.textColor};flex-shrink:0">${type.badge}</span>
-            <span style="font-size:12px;color:#555;flex-shrink:0;width:130px;text-align:right">${totalBig} Big · ${totalSmall} Small</span>
+            <span style="font-size:12px;color:#555;flex-shrink:0;width:130px;text-align:right">${totalBig} Big · ${totalSmall} Baby</span>
             <span class="frig-arw" style="color:#ccc;font-size:13px;width:14px;text-align:center;flex-shrink:0;transition:transform .15s;display:inline-block">›</span>
           </div>
           <div id="${gid}" style="display:none;background:#fafafa;border-bottom:1px solid #f2f2f2;padding:6px 16px 10px 68px">
@@ -10173,7 +10167,7 @@ function renderRecapB2b(offset) {
   const b2b = sorties.filter(s => {
     const d = new Date(s.date);
     const clients = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière',
-      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
+      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
     return d >= monday && d <= sunday && clients.includes(s.destination);
   });
 
@@ -10229,14 +10223,14 @@ function renderRecapB2b(offset) {
             <div style="font-size:14px;font-weight:700;color:#1a1a2e">🤝 ${client}</div>
             <div style="display:flex;gap:10px">
               <span style="background:#e0edf8;color:#0662aa;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Big : ${totalBig}</span>
-              <span style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Small : ${totalSmall}</span>
+              <span style="background:#fbe8e2;color:#d44218;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">Baby : ${totalSmall}</span>
             </div>
           </div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <thead><tr style="color:#aaa;font-size:11px;text-transform:uppercase;letter-spacing:.04em">
               <th style="text-align:left;padding:3px 6px;font-weight:600">Saveur</th>
               <th style="text-align:center;padding:3px 6px;font-weight:600">Big (165g)</th>
-              <th style="text-align:center;padding:3px 6px;font-weight:600">Small (80g)</th>
+              <th style="text-align:center;padding:3px 6px;font-weight:600">Baby (80g)</th>
             </tr></thead>
             <tbody>`;
       for (const [saveur, qty] of Object.entries(saveurs)) {
@@ -10259,7 +10253,7 @@ function renderRecapB2b(offset) {
       <div style="font-size:13px;font-weight:700;color:#fff">Total semaine B2B</div>
       <div style="display:flex;gap:12px">
         <span style="background:#0662aa;color:#fff;border-radius:8px;padding:4px 13px;font-size:13px;font-weight:700">Big : ${totBig}</span>
-        <span style="background:#d44218;color:#fff;border-radius:8px;padding:4px 13px;font-size:13px;font-weight:700">Small : ${totSmall}</span>
+        <span style="background:#d44218;color:#fff;border-radius:8px;padding:4px 13px;font-size:13px;font-weight:700">Baby : ${totSmall}</span>
       </div>
     </div>`;
   html += '</div>';
@@ -10636,29 +10630,13 @@ _logoImg.onload = () => {
 
   function selectTypeCommande(type) {
   window._b2bTypeCommande = type;
-  const isOui = type === 'oui';
-
-  const labelOui = document.getElementById('label-grands-oui');
-  const labelNon = document.getElementById('label-grands-non');
-  const dotOui = document.getElementById('dot-grands-oui');
-  const dotNon = document.getElementById('dot-grands-non');
-
-  if (labelOui) {
-    labelOui.style.background = isOui ? '#f0faf4' : '#fff';
-    labelOui.style.borderBottom = isOui ? '2px solid #27ae60' : 'none';
-  }
-  if (labelNon) {
-    labelNon.style.background = !isOui ? '#fef7d6' : '#fff';
-    labelNon.style.borderBottom = !isOui ? '2px solid #e6a800' : 'none';
-  }
-  if (dotOui) {
-    dotOui.style.background = isOui ? '#27ae60' : 'transparent';
-    dotOui.style.borderColor = isOui ? '#27ae60' : '#e8e8e8';
-  }
-  if (dotNon) {
-    dotNon.style.background = !isOui ? '#e6a800' : 'transparent';
-    dotNon.style.borderColor = !isOui ? '#e6a800' : '#e8e8e8';
-  }
+  var _dlv = document.body.classList.contains('mode-delivery');
+  var cls = _dlv ? 'on-blue' : 'on-red';
+  var labelOui = document.getElementById('label-grands-oui');
+  var labelNon = document.getElementById('label-grands-non');
+  [labelOui, labelNon].forEach(function(el){ if(el) el.classList.remove('on','on-red','on-amber','on-green','on-blue'); });
+  var sel = (type === 'oui') ? labelOui : labelNon;
+  if (sel) { sel.classList.add('on', cls); }
 
   document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
     const bId = block.id.replace('saveur-block-', '');
@@ -11285,14 +11263,14 @@ async function renderRecapMois(){
     'Total '+_rmMonthName()+' — '+list.length+' clients · '+mBL+' bons de livraison';
   document.getElementById('rm-total-pills').innerHTML =
     '<div class="rm-pill"><div class="n">'+mBig+'</div><div class="l">Big</div></div>'+
-    '<div class="rm-pill"><div class="n">'+mSmall+'</div><div class="l">Small</div></div>'+
+    '<div class="rm-pill"><div class="n">'+mSmall+'</div><div class="l">Baby</div></div>'+
     '<div class="rm-pill"><div class="n">'+mBox+'</div><div class="l">Boîtes</div></div>';
 
   document.getElementById('rm-client-list').innerHTML = list.length ? list.map(function(c,i){
     return '<div class="rm-client" onclick="openRecapMoisClient('+i+')"><div class="rm-chead">'+
       '<div class="rm-cn">🏪 '+c.name+'</div><div class="rm-badges">'+
       '<span class="rm-badge rm-bBig">'+c.big+' Big</span>'+
-      '<span class="rm-badge rm-bSmall">'+c.small+' Small</span>'+
+      '<span class="rm-badge rm-bSmall">'+c.small+' Baby</span>'+
       (c.cakes>0 ? '<span class="rm-badge" style="background:#fff3cc;color:#a07000">'+c.cakes+' cake'+(c.cakes>1?'s':'')+'</span>' : '')+
       '<span class="rm-badge rm-bBox">'+c.boxes+' boîtes</span>'+
       '<span class="rm-chev">Voir le récap →</span></div></div>'+
@@ -11780,7 +11758,7 @@ function imprimerProductionSemaine(k){
       '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(r.small||'—')+'</td>'+
       '<td style="padding:11px 8px;border-bottom:1px solid #f2ecdf">'+r.nom+'</td></tr>'; }).join('');
     return '<div class="pgbrk"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a06a2c;margin:32px 0 12px">'+_cdDayFull(g.d)+'</div>'+
-      '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Code lot</th><th style="'+th+'">Saveur</th><th style="'+th+'">Premix</th><th style="'+thn+'">Big</th><th style="'+thn+'">Small</th><th style="'+th+'">Producteur</th></tr></thead><tbody>'+rws+'</tbody></table></div>'; }).join('');
+      '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="'+th+'">Code lot</th><th style="'+th+'">Saveur</th><th style="'+th+'">Premix</th><th style="'+thn+'">Big</th><th style="'+thn+'">Baby</th><th style="'+th+'">Producteur</th></tr></thead><tbody>'+rws+'</tbody></table></div>'; }).join('');
   var flavHTML=Object.keys(flav).map(function(fn){ var e=flav[fn]; return '<tr><td style="font-weight:700;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+fn+'</td>'+
     '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(e[0]||'—')+'</td>'+
     '<td style="text-align:right;font-weight:700;color:#4a3524;padding:11px 8px;border-bottom:1px solid #f2ecdf">'+(e[1]||'—')+'</td></tr>'; }).join('');
@@ -11794,7 +11772,7 @@ function imprimerProductionSemaine(k){
     '<div style="background:#f6efdd;border:1px solid #ece0c6;border-radius:10px;padding:15px 20px;margin:22px 0 30px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
     '<div style="font-size:13px;font-weight:700;color:#8a6a3f">'+arr.length+' lots · '+Object.keys(flav).length+' saveurs</div>'+
     '<div style="display:flex;gap:20px"><div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#4a3524">'+big+'</div><div style="font-size:10px">BIG</div></div>'+
-    '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#4a3524">'+small+'</div><div style="font-size:10px">SMALL</div></div></div></div>'+
+    '<div style="text-align:center"><div style="font-size:19px;font-weight:700;color:#4a3524">'+small+'</div><div style="font-size:10px">BABY</div></div></div></div>'+
     daysHTML+
     
     '</div><svg viewBox="0 0 794 20" preserveAspectRatio="none" style="display:block;width:100%;height:30px;margin-top:22px;margin-bottom:-1px" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 L794,20 L794,11 C635,-3 476,17 317,8 C198,2 99,15 0,7 Z" fill="#4a3524"/></svg><div style="background:#4a3524;padding:24px 40px 32px;text-align:center;font-size:12px;color:#e9dcc6;margin-top:0">KOOKI COMPANY SRL · anderlecht@kooki.be · Document interne de production (traçabilité AFSCA)</div></div>';
@@ -14563,7 +14541,7 @@ var qrcode = function() {
   var scanner = null, current = null;
   var _scanMode = null, _genericCb = null;
 
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
   var LIVREURS = ['Tarik','Shippr','Interne'];
   var DEST_TYPES = [
     { v:'b2b',        label:'🏬 Client B2B',       sub:'Livraison + BL',    client:true,  bl:true },
@@ -14726,7 +14704,7 @@ var qrcode = function() {
     if(!L.length){ host.innerHTML = '<div style="text-align:center;color:#8a97a5;font-size:12px;padding:8px">Aucun lot disponible</div>'; return; }
     host.innerHTML = L.map(function(s){
       var big = parseInt(s.big,10)||0, small = parseInt(s.small,10)||0;
-      var info = big+' Big'+(isIx ? '' : ' · '+small+' Small');
+      var info = big+' Big'+(isIx ? '' : ' · '+small+' Baby');
       return '<button type="button" onclick="KookiQR.pickLot(\''+esc(s.code)+'\')" style="text-align:left;border:1.5px solid #e6ebf1;border-radius:0;padding:17px 18px;background:#fff;cursor:pointer;display:flex;flex-direction:column;gap:3px">'+
         '<span style="font-size:18px;font-weight:800;color:#1a2430">'+s.code+'</span>'+
         '<span style="font-size:13.5px;color:#8a97a5">'+s.saveur+' · '+info+'</span>'+
@@ -14812,15 +14790,15 @@ var qrcode = function() {
       bannerHTML()+
       '<div style="background:#f7f9fc;border:1px solid #e6ebf1;border-radius:14px;padding:12px 14px;margin-bottom:12px">'+
         '<div style="font-size:18px;font-weight:800;color:#1a2430" class="qr-accent">'+lot.code+'</div>'+
-        '<div style="font-size:12px;color:#66727f;margin-top:2px">'+ (work.single?('Stock : '+lot.big+' Big'):(work.bacs.length+' bac(s) en frigo')) +' · '+smax+' Small dispo</div>'+
+        '<div style="font-size:12px;color:#66727f;margin-top:2px">'+ (work.single?('Stock : '+lot.big+' Big'):(work.bacs.length+' bac(s) en frigo')) +' · '+smax+' Baby dispo</div>'+
       '</div>'+
       '<div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">'+(work.single?'Big (165g)':'Bacs — choisis A, B, C…')+'</div>'+
       rowsHTML+
-      '<div style="font-size:11px;font-weight:800;color:#0662aa;text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px">Small 80g</div>'+
+      '<div style="font-size:11px;font-weight:800;color:#0662aa;text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px">Baby 80g</div>'+
       smallRow(smax)+
       '<div style="display:flex;justify-content:space-around;background:#fff;border:1.5px dashed #e3e8ee;border-radius:12px;padding:11px;margin-top:12px">'+
         '<div style="text-align:center"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Big</div><div style="font-size:16px;font-weight:800;color:#d44218"><span id="qr-tot-big">0</span> 🍪</div></div>'+
-        '<div style="text-align:center"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Small</div><div style="font-size:16px;font-weight:800;color:#0662aa"><span id="qr-tot-small">0</span></div></div>'+
+        '<div style="text-align:center"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Baby</div><div style="font-size:16px;font-weight:800;color:#0662aa"><span id="qr-tot-small">0</span></div></div>'+
       '</div>'+
       '<button class="qr-btn qr-btn-primary" style="margin-top:14px" id="qr-valbtn" onclick="KookiQR.validate(true)" disabled>Valider cette saveur →</button>'+
       '<button class="qr-btn qr-btn-ghost" style="margin-top:8px" onclick="KookiQR.validate(false)">+ Ajouter une autre saveur</button>'+
@@ -14844,7 +14822,7 @@ var qrcode = function() {
   function smallRow(max){
     return '<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid #dde7f0;border-radius:13px;background:#f6fafe">'+
       '<div style="width:36px;height:36px;border-radius:10px;background:#e0edf8;color:#0662aa;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center">80</div>'+
-      '<div style="flex:1"><div style="font-size:13px;font-weight:700">Small 80g</div><div style="font-size:11px;color:#8a97a5">max '+max+'</div></div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:700">Baby 80g</div><div style="font-size:11px;color:#8a97a5">max '+max+'</div></div>'+
       qtyControls('small', max, max<=0)+
     '</div>';
   }
@@ -14898,7 +14876,7 @@ var qrcode = function() {
       var chips='';
       if(it.bacs && it.bacs.length){ chips += it.bacs.map(function(b){return '<span style="font-size:11px;font-weight:700;background:#fbe8e2;color:#b3350f;padding:3px 9px;border-radius:20px;margin:2px">'+b.lettre+' · '+b.qty+'</span>';}).join(''); }
       else if(it.big>0){ chips += '<span style="font-size:11px;font-weight:700;background:#fbe8e2;color:#b3350f;padding:3px 9px;border-radius:20px;margin:2px">'+it.big+' Big</span>'; }
-      if(it.small>0){ chips += '<span style="font-size:11px;font-weight:700;background:#e0edf8;color:#054e86;padding:3px 9px;border-radius:20px;margin:2px">Small · '+it.small+'</span>'; }
+      if(it.small>0){ chips += '<span style="font-size:11px;font-weight:700;background:#e0edf8;color:#054e86;padding:3px 9px;border-radius:20px;margin:2px">Baby · '+it.small+'</span>'; }
       return '<div style="border:1.5px solid #eef0f3;border-radius:13px;padding:11px 13px;margin-bottom:9px">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-family:monospace;font-weight:800;font-size:13px">'+it.code+'</span>'+
         '<span style="font-size:9.5px;font-weight:800;color:#fff;background:#d44218;padding:3px 9px;border-radius:20px">'+it.saveur+'</span>'+
@@ -15014,7 +14992,7 @@ var qrcode = function() {
     { v:'interne', label:'🔧 Usage interne', client:false },
     { v:'autre', label:'🛒 Commande client', client:true }
   ];
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
   function body(){ return document.getElementById('ixelles-body'); }
   function _toast(msg){ try{ if(typeof toast==='function'){ toast('sortie', msg, 'err'); return; } }catch(e){} alert(msg); }
   function _pd(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(m) return new Date(+m[3],+m[2]-1,+m[1]); var d=new Date(s); return isNaN(d)?null:d; }
@@ -15071,7 +15049,7 @@ var qrcode = function() {
   function qbox(i,k,val,max){
     var col = k==='b' ? '#d44218' : '#0662aa';
     return '<div style="flex:1;background:#f7f9fc;border:1px solid #e6ebf1;border-radius:10px;padding:7px 9px">'+
-      '<div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10.5px;font-weight:800;text-transform:uppercase;color:'+col+'">'+(k==='b'?'Big':'Small')+'</span><span style="font-size:9.5px;color:#9aa4af">max '+max+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10.5px;font-weight:800;text-transform:uppercase;color:'+col+'">'+(k==='b'?'Big':'Baby')+'</span><span style="font-size:9.5px;color:#9aa4af">max '+max+'</span></div>'+
       '<div style="display:flex;gap:5px"><div style="display:flex;align-items:center;background:#fff;border:1.5px solid #e3e8ee;border-radius:9px;overflow:hidden">'+
         '<button onclick="IxellesBL.step('+i+',\''+k+'\',-1)" style="width:30px;height:34px;border:none;background:#fff;font-size:17px;font-weight:700;color:'+col+';cursor:pointer">−</button>'+
         '<input id="ix-'+k+'-'+i+'" type="text" inputmode="numeric" value="'+val+'" onchange="IxellesBL.typeQ('+i+',\''+k+'\',this.value)" style="width:36px;height:34px;border:none;border-left:1px solid #eef0f3;border-right:1px solid #eef0f3;text-align:center;font-size:14px;font-weight:800;font-family:inherit;outline:none">'+
