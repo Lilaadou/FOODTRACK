@@ -3903,7 +3903,9 @@ function loadLotsBlock(id) {
   // Les vieux lots sans système A/B/C ont un total Big = 0 (les bacs auto-générés
   // ne sont pas représentatifs) → on les masque.
   const lots = stockLocal.filter(l => l.saveur === saveur && (
-    bigOnly ? (parseInt(l.big,10)||0) > 0 : (l.big > 0 || l.small > 0)
+    bigOnly ? (parseInt(l.big,10)||0) > 0 :
+    b2bSeulementSmall ? (parseInt(l.small,10)||0) > 0 :
+    (l.big > 0 || l.small > 0)
   ));
 
   if (!lots.length) {
