@@ -1616,6 +1616,16 @@
       <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Saveurs & lots à sortir *</div>
       <div id="saveurs-blocks"></div>
       <button onclick="addSaveurBlock()" style="display:flex;align-items:center;gap:5px;background:#fbe8e2;color:#d44218;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px">+ Ajouter une saveur</button>
+      <div id="sortie-total-box" style="margin-top:14px;background:#eef5fc;border:1.5px solid #cfe0f3;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="font-size:19px">🍪</span>
+          <div>
+            <div style="font-size:10px;font-weight:800;color:#6b7885;text-transform:uppercase;letter-spacing:.05em">Total cookies à sortir</div>
+            <div id="sortie-total-breakdown" style="font-size:11px;color:#8a97a5;margin-top:1px">0 Big · 0 Baby</div>
+          </div>
+        </div>
+        <div id="sortie-total-count" style="font-size:28px;font-weight:900;color:#0662aa;line-height:1">0</div>
+      </div>
     </div>
   </div>
 </div>
@@ -3795,6 +3805,7 @@ function calcBoites() {
   const type = document.getElementById('sortie-type')?.value || '';
   const showPlastic = type === 'b2b' || ((type === 'evenement' || type === 'interne') && document.getElementById('boites-opt-toggle')?.checked);
   let totalBigBoxes = 0, totalSmallBoxes = 0, totalCookies = 0;
+  let totalBigCookies = 0, totalBabyCookies = 0;
 
   // Parcourir tous les blocs multi-saveurs
   document.querySelectorAll('[id^="saveur-block-"]').forEach(block => {
@@ -3806,6 +3817,7 @@ function calcBoites() {
       const small = parseInt(document.getElementById(`b${bId}-small-${l.code}`)?.value) || 0;
       if (!big && !small) return;
       totalCookies += big + small;
+      totalBigCookies += big; totalBabyCookies += small;
       if (showPlastic) {
         totalBigBoxes   += big;
         totalSmallBoxes += small;
@@ -3842,6 +3854,12 @@ function calcBoites() {
   window._boitesBig   = Math.ceil(totalBigBoxes / 14);
   window._boitesSmall = Math.ceil(totalSmallBoxes / 25);
   window._boitesIx    = totalCookies > 0 ? Math.ceil(totalCookies / 40) : 0;
+
+  // Total cookies en cours de sortie (toutes saveurs / lots confondus)
+  const totCountEl = document.getElementById('sortie-total-count');
+  if (totCountEl) totCountEl.textContent = totalCookies;
+  const totBrkEl = document.getElementById('sortie-total-breakdown');
+  if (totBrkEl) totBrkEl.textContent = totalBigCookies + ' Big · ' + totalBabyCookies + ' Baby';
 }
 
 // ─────────────────────────────────────
@@ -3956,6 +3974,7 @@ function loadLotsBlock(id) {
         </div>
       </div>`;
   }).join('');
+  if(typeof calcBoites==='function') calcBoites();
 }
 
 // Cellule « Big » de la sortie : par bac (option 2) si le lot a un détail, sinon champ unique
