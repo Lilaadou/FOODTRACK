@@ -4474,6 +4474,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   lots.forEach(l => { totalBig += l.big || 0; totalSmall += l.small || 0; });
   const showBig   = totalBig   > 0;
   const showSmall = totalSmall > 0;
+  const isIxelles = (client === 'Magasin Ixelles');   // colonne Température : BL Ixelles uniquement
 
   // Mettre à jour le header en fonction des colonnes réelles
   const bonHead = document.getElementById('bon-lots-head');
@@ -4484,6 +4485,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
   if (showBig)   colCount++;
   if (showSmall) colCount++;
   if (hasCakesInLots) colCount++; // colonne Qté (cakes)
+  if (isIxelles) colCount++;      // colonne Température (Ixelles)
   if (bonHead) {
     const thBase = 'padding:8px 14px;font-size:12px;font-weight:600;color:#000;border-bottom:1px solid #d9e7f4;';
     bonHead.innerHTML = '<tr>'
@@ -4491,6 +4493,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
       + '<th style="'+thBase+'text-align:left">Saveur</th>'
       + (showBig   ? '<th style="'+thBase+'text-align:right">Big (165g)</th>'   : '')
       + (showSmall ? '<th style="'+thBase+'text-align:right">Baby (80g)</th>' : '')
+      + (isIxelles ? '<th style="'+thBase+'text-align:center">Température</th>' : '')
       + (hasCakesInLots ? '<th style="'+thBase+'text-align:right">Qté</th>' : '')
       + '</tr>';
   }
@@ -4512,6 +4515,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
         + '<td style="'+tdBase+'">' + String(saveurLot).toUpperCase() + '</td>'
         + (showBig   ? '<td style="'+tdBase+'text-align:right">' + (l.big||0)   + '</td>' : '')
         + (showSmall ? '<td style="'+tdBase+'text-align:right">' + (l.small||0) + '</td>' : '')
+        + (isIxelles ? '<td style="'+tdBase+'text-align:center"><span style="display:inline-block;width:58px;height:22px;border:1px solid #cbd5e1;border-radius:4px;vertical-align:middle"></span> <span style="color:#8a97a5;font-size:11px">°C</span></td>' : '')
         + (hasCakesInLots ? '<td style="'+tdBase+'text-align:right;color:#aaa">—</td>' : '')
         + '</tr>';
     }).join('');
@@ -4526,6 +4530,7 @@ document.getElementById('bon-client-contact').textContent = clientInfo.contact
         +'<td style="'+tdBase+'">'+String(l.saveur).toUpperCase()+'</td>'
         +(showBig   ? '<td style="'+tdBase+'text-align:right;color:#aaa">—</td>' : '')
         +(showSmall ? '<td style="'+tdBase+'text-align:right;color:#aaa">—</td>' : '')
+        +(isIxelles ? '<td style="'+tdBase+'"></td>' : '')
         +'<td style="'+tdBase+'text-align:right">'+l.qte+'</td>'
         +'</tr>';
     }).join('');
@@ -4973,8 +4978,8 @@ if (type === 'autre') {
       updateDashboardStockTable();
       toast('sortie','✓ Sortie enregistrée !','ok');
       popKooki('Youpi la sortie est faite !');
-      // Bon de livraison avec tous les lots
-      if (type !== 'magasin' && type !== 'anderlecht') {
+      // Bon de livraison avec tous les lots (B2B, événement, interne, autre ET magasin Ixelles)
+      if (type !== 'anderlecht') {
         const allLotsForBon = [...allLotsAvecSaveur, ...cakeLots];
 showBonLivraison({ client: destination, saveur: allSaveur, lots: allLotsForBon, boites, typeBoite, livreur, numeroBL, typeCookies: typeCookiesSave });
       }
@@ -6743,7 +6748,7 @@ function resetPmx() {
 }
   const SAVEUR_BAC_CONFIG = {
   EMMY:{cpb:40,baby:true},SUZZY:{cpb:45,baby:true},JACKY:{cpb:40,baby:true},
-  BENNY:{cpb:40,baby:true},MOLLY:{cpb:45,baby:true},DAVY:{cpb:45,baby:false},
+  BENNY:{cpb:40,baby:true},MOLLY:{cpb:45,baby:true},DAVY:{cpb:45,baby:true},
   WOODY:{cpb:45,baby:true},WALLY:{cpb:35,baby:true},CHARLY:{cpb:35,baby:false},
   LENI:{cpb:35,baby:false},DANNY:{cpb:45,baby:false}
 };
