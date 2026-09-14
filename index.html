@@ -1763,6 +1763,8 @@
   <div style="background:#fff;border-radius:14px;width:min(94vw,760px);max-height:92vh;overflow-y:auto;position:relative">
 
     <div style="position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border-bottom:1px solid #f0f0f0">
+      <input id="bon-mail-to" type="email" placeholder="email destinataire" style="font-size:12px;padding:6px 10px;border:1.5px solid #cfe0f3;border-radius:8px;min-width:180px;outline:none;color:#1a2430">
+      <button id="bon-mail-btn" onclick="emailBon()" class="btn btn-primary" style="font-size:12px;padding:6px 14px">✉️ Envoyer</button>
       <button onclick="imprimerEtiquettesLot(currentBonLots, currentBonClient)" class="btn btn-secondary" style="font-size:12px;padding:6px 14px">🏷️ Étiquettes</button>
       <button onclick="printBon()" class="btn btn-primary" style="font-size:12px;padding:6px 14px">🖨️ Imprimer</button>
       <button onclick="document.getElementById('bon-overlay').style.display='none'" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">✕</button>
@@ -4358,7 +4360,7 @@ async function loadBoites() {
   renderBoitesTable();
 }
 
-function printBon() {
+function _buildBonPdf(_done) {
   function loadScript(src, cb) {
     if ([].slice.call(document.scripts).some(function(s){ return s.src === src; })) { cb(); return; }
     var s = document.createElement("script");
@@ -4407,8 +4409,8 @@ function printBon() {
           }
 
           var num = (document.getElementById("bon-numero").textContent || "BL").trim().replace(/[^a-zA-Z0-9\-]/g, "");
-          pdf.save("Bon-livraison-" + num + ".pdf");
-          document.body.removeChild(box);
+          if (box.parentNode) document.body.removeChild(box);
+          _done(pdf, num);
         })
         .catch(function(e) {
           if (box.parentNode) document.body.removeChild(box);
@@ -4429,11 +4431,54 @@ function printBon() {
   });
 }
 
+// Impression : construit le PDF puis le télécharge
+function printBon() {
+  _buildBonPdf(function(pdf, num) { pdf.save("Bon-livraison-" + num + ".pdf"); });
+}
+
+// Envoi par mail : construit le PDF et l'envoie en pièce jointe via Apps Script
+function emailBon() {
+  var mt  = document.getElementById('bon-mail-to');
+  var btn = document.getElementById('bon-mail-btn');
+  var to  = (mt && mt.value || '').trim();
+  var old = btn ? btn.textContent : '';
+  if (!to || to.indexOf('@') < 1) {
+    if (btn) { btn.textContent = '⚠️ Email ?'; setTimeout(function(){ btn.textContent = old; }, 2000); }
+    if (mt)  { mt.focus(); }
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi…'; }
+  _buildBonPdf(function(pdf, num) {
+    var b64 = pdf.output('datauristring').split(',')[1];
+    var client  = window.currentBonClient || '';
+    var subject = 'Bon de livraison KOOKI' + (num ? ' — ' + num : '') + (client ? ' — ' + client : '');
+    var body    = 'Bonjour,\n\nVeuillez trouver ci-joint le bon de livraison'
+                + (client ? ' pour ' + client : '') + '.\n\nBelle journée,\nL\'équipe KOOKI';
+    fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
+      action: 'envoyerBL', to: to, subject: subject, body: body,
+      filename: 'Bon-livraison-' + (num || 'BL') + '.pdf', pdfBase64: b64
+    }) })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = (j && j.success) ? '✅ Envoyé' : '❌ ' + ((j && j.error) ? 'Échec' : 'Échec');
+        setTimeout(function(){ if (btn) btn.textContent = old; }, 3500);
+      }
+    })
+    .catch(function(){
+      if (btn) { btn.disabled = false; btn.textContent = '❌ Échec'; setTimeout(function(){ if (btn) btn.textContent = old; }, 3500); }
+    });
+  });
+}
+
 
 
 function showBonLivraison({ client, saveur, lots, boites, typeBoite='plastique', livreur, numeroBL, typeCookies: _typeCookies }) {
   window.currentBonLots = lots;
   window.currentBonClient = client;
+  var _mailTo = document.getElementById('bon-mail-to');
+  if (_mailTo) _mailTo.value = (B2B_CLIENTS[client] && B2B_CLIENTS[client].email) ? B2B_CLIENTS[client].email : 'Lila@kooki.be';
   console.log('lots reçus:', lots);
   const now     = new Date();
   const dd      = ('0'+now.getDate()).slice(-2);
