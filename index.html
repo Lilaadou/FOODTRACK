@@ -11926,6 +11926,7 @@ function setBlSub(sub){
 var _PC_SAVEURS = ['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
 var _PC_NOBABY  = ['CHARLY','LENI'];
 var _pcFormType = 'cuit';
+var _pcFormLivreur = 'Tarik';
 
 function _pcClients(){
   try { if (typeof B2B_CLIENTS === 'object' && B2B_CLIENTS) return Object.keys(B2B_CLIENTS).sort(); } catch(e){}
@@ -11953,7 +11954,7 @@ function _pcRefresh(){
 function _pcPush(order){
   if(typeof API==='undefined') return;
   fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
-    action:'sauverPreCommande', id:order.id, date:order.date, client:order.client, type:order.type, lignes:order.lignes
+    action:'sauverPreCommande', id:order.id, date:order.date, client:order.client, type:order.type, livreur:order.livreur||'', lignes:order.lignes
   }) }).catch(function(){});
 }
 function _pcStockMap(){
@@ -11970,20 +11971,26 @@ function _pcToggleForm(){
   var f = document.getElementById('pc-form'); if(!f) return;
   var show = f.style.display==='none' || f.style.display==='';
   if(!show){ f.style.display='none'; return; }
-  _pcFormType='cuit';
+  _pcFormType='cuit'; _pcFormLivreur='Tarik';
   var clientOpts = '<option value="">— Choisir un client —</option>' + _pcClients().map(function(c){ return '<option>'+_pcEsc(c)+'</option>'; }).join('');
   f.innerHTML =
     '<div style="border:1.5px solid #f0d8d0;border-radius:12px;padding:14px 16px;background:#fdf7f5">'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'+
         '<div><div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Client</div>'+
-          '<select id="pc-client" style="width:100%;padding:9px 11px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff;outline:none">'+clientOpts+'</select></div>'+
+          '<select id="pc-client" style="width:100%;height:44px;box-sizing:border-box;padding:8px 11px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff;outline:none">'+clientOpts+'</select></div>'+
         '<div><div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Date de livraison souhaitée</div>'+
-          '<input type="date" id="pc-date" value="'+_pcTodayISO()+'" style="width:100%;padding:9px 11px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff;outline:none"></div>'+
+          '<input type="date" id="pc-date" value="'+_pcTodayISO()+'" style="width:100%;height:44px;box-sizing:border-box;padding:8px 11px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff;outline:none"></div>'+
       '</div>'+
       '<div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Type de cookies (toute la commande)</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
         '<button type="button" id="pc-seg-cuit" onclick="_pcSetType(\'cuit\')" style="border:1.5px solid #d44218;background:#fbe8e2;color:#d44218;border-radius:12px;padding:11px;cursor:pointer;font-size:13.5px;font-weight:800">🔥 Cuits</button>'+
         '<button type="button" id="pc-seg-cong" onclick="_pcSetType(\'cong\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px;cursor:pointer;font-size:13.5px;font-weight:800">❄️ Congelés</button>'+
+      '</div>'+
+      '<div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Livraison par</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">'+
+        '<button type="button" id="pc-liv-Tarik" onclick="_pcSetLivreur(\'Tarik\')" style="border:1.5px solid #0662aa;background:#e7f0f9;color:#0662aa;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">🚗 Tarik</button>'+
+        '<button type="button" id="pc-liv-Shippr" onclick="_pcSetLivreur(\'Shippr\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">📦 Shippr</button>'+
+        '<button type="button" id="pc-liv-interne" onclick="_pcSetLivreur(\'Livreur interne\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">🏠 Interne</button>'+
       '</div>'+
       '<div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Saveurs commandées</div>'+
       '<div style="display:grid;grid-template-columns:1fr 84px 84px 34px;gap:8px;font-size:9.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:0 2px 6px"><span>Saveur</span><span style="text-align:center">Big</span><span style="text-align:center">Baby</span><span></span></div>'+
@@ -12002,6 +12009,14 @@ function _pcSetType(t){
   var c=document.getElementById('pc-seg-cuit'), g=document.getElementById('pc-seg-cong');
   if(c) c.style.cssText='border:1.5px solid '+(t==='cuit'?'#d44218':'#e2e7ec')+';background:'+(t==='cuit'?'#fbe8e2':'#fff')+';color:'+(t==='cuit'?'#d44218':'#1f2937')+';border-radius:12px;padding:11px;cursor:pointer;font-size:13.5px;font-weight:800';
   if(g) g.style.cssText='border:1.5px solid '+(t==='cong'?'#0662aa':'#e2e7ec')+';background:'+(t==='cong'?'#e7f0f9':'#fff')+';color:'+(t==='cong'?'#0662aa':'#1f2937')+';border-radius:12px;padding:11px;cursor:pointer;font-size:13.5px;font-weight:800';
+}
+function _pcSetLivreur(v){
+  _pcFormLivreur=v;
+  [['Tarik','pc-liv-Tarik'],['Shippr','pc-liv-Shippr'],['Livreur interne','pc-liv-interne']].forEach(function(p){
+    var el=document.getElementById(p[1]); if(!el) return;
+    var on=(p[0]===v);
+    el.style.cssText='border:1.5px solid '+(on?'#0662aa':'#e2e7ec')+';background:'+(on?'#e7f0f9':'#fff')+';color:'+(on?'#0662aa':'#1f2937')+';border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800';
+  });
 }
 function _pcBabyCell(sav){
   var no = _PC_NOBABY.indexOf(sav)>=0;
@@ -12036,7 +12051,7 @@ function _pcSaveOrder(){
     if(big>0||baby>0) lignes.push({sav:sav,big:big,baby:baby});
   });
   if(!lignes.length){ toast('bl','⚠️ Ajoute au moins une saveur avec une quantité','err'); return; }
-  var order={ id: Date.now(), client:client, date:date, type:_pcFormType, lignes:lignes };
+  var order={ id: Date.now(), client:client, date:date, type:_pcFormType, livreur:_pcFormLivreur, lignes:lignes };
   var arr=_pcLoad(); arr.unshift(order);
   _pcSave(arr);
   _pcPush(order);                       // → Google Sheets (partagé)
@@ -12072,13 +12087,15 @@ function _pcRender(){
     var badge=o.type==='cuit'
       ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#fbe8e2;color:#d44218;text-transform:uppercase">🔥 Cuits</span>'
       : '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#e7f0f9;color:#0662aa;text-transform:uppercase">❄️ Congelés</span>';
+    var _livIc=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':'🚗');
+    var livBadge=o.livreur ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#eef2f6;color:#44515f">'+_livIc+' '+_pcEsc(o.livreur==='Livreur interne'?'Interne':o.livreur)+'</span>' : '';
     var summary= aProd>0
       ? '<span style="font-size:12.5px;font-weight:700;color:#b45309">🔥 À produire : '+aProd+' cookies avant livraison</span>'
       : '<span style="font-size:12.5px;font-weight:700;color:#2e7d46">✓ Tout est en stock — prêt à sortir</span>';
     return '<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">'+
       '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap">'+
         '<div><div style="font-size:16px;font-weight:800">'+_pcEsc(o.client)+'</div><div style="font-size:12px;color:#8a97a5">Livraison souhaitée : '+_pcFmtDate(o.date)+'</div></div>'+
-        badge+
+        badge+livBadge+
         '<div style="margin-left:auto;text-align:right"><div style="font-size:22px;font-weight:900;color:#0c447c">'+tot+'</div><div style="font-size:10px;color:#8a97a5;text-transform:uppercase">cookies</div></div>'+
       '</div>'+
       '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
@@ -12108,6 +12125,7 @@ function _pcFaireBL(id){
       if(typeof selectDestCard==='function') selectDestCard('b2b');
       var cs=document.getElementById('sortie-b2b-client');
       if(cs){ cs.value=o.client; if(typeof fillClientInfo==='function') fillClientInfo(); }
+      if(o.livreur && typeof setLivreurB2B==='function') setLivreurB2B(o.livreur);
       // type cuit / congelé
       var rc=document.getElementById(o.type==='cong'?'cookies-crus':'cookies-cuits');
       if(rc){ rc.checked=true; if(typeof updateTypeCookies==='function') updateTypeCookies(); }
@@ -12135,17 +12153,31 @@ function _pcBuildSheet(orders, titre){
   function tbl(rows){ return '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;font-size:10px;color:#8a97a5;padding:4px 8px;border-bottom:1px solid #e2e7ec">Saveur</th><th style="text-align:right;font-size:10px;color:#8a97a5;padding:4px 8px;border-bottom:1px solid #e2e7ec">Big</th><th style="text-align:right;font-size:10px;color:#8a97a5;padding:4px 8px;border-bottom:1px solid #e2e7ec">Baby</th></tr></thead><tbody>'+rows+'</tbody></table>'; }
   var ords=orders.map(function(o){
     var badge=o.type==='cuit'?'<span style="font-size:11px;font-weight:800;color:#d44218">🔥 Cuits</span>':'<span style="font-size:11px;font-weight:800;color:#0662aa">❄️ Congelés</span>';
+    var _li=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':'🚗');
+    var livTxt=o.livreur?'<span style="font-size:11px;font-weight:800;color:#44515f">'+_li+' '+_pcEsc(o.livreur==='Livreur interne'?'Interne':o.livreur)+'</span>':'';
     var rows=o.lignes.map(function(l){ var b=(_PC_NOBABY.indexOf(l.sav)>=0)?'X':l.baby; return '<tr><td style="text-align:left;font-weight:700;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+_pcEsc(l.sav)+'</td><td style="text-align:right;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+l.big+'</td><td style="text-align:right;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+b+'</td></tr>'; }).join('');
     var tot=o.lignes.reduce(function(a,l){return a+l.big+(_PC_NOBABY.indexOf(l.sav)>=0?0:l.baby);},0);
-    return '<div style="border:1px solid #e2e7ec;border-radius:10px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="font-size:15px;font-weight:800">'+_pcEsc(o.client)+'</span>'+badge+'<span style="margin-left:auto;font-size:12px;color:#8a97a5">'+tot+' cookies</span></div>'+tbl(rows)+'</div>';
+    return '<div style="border:1px solid #e2e7ec;border-radius:10px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="font-size:15px;font-weight:800">'+_pcEsc(o.client)+'</span>'+badge+livTxt+'<span style="margin-left:auto;font-size:12px;color:#8a97a5">'+tot+' cookies</span></div>'+tbl(rows)+'</div>';
   }).join('');
   var aggRows=Object.keys(agg).sort().map(function(s){ return '<tr><td style="text-align:left;font-weight:700;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+s+'</td><td style="text-align:right;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+agg[s].big+'</td><td style="text-align:right;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+(_PC_NOBABY.indexOf(s)>=0?'X':agg[s].baby)+'</td></tr>'; }).join('');
   var gtot=Object.keys(agg).reduce(function(a,s){return a+agg[s].big+(_PC_NOBABY.indexOf(s)>=0?0:agg[s].baby);},0);
+  // Récap : nombre de clients, de commandes, total cookies, répartition livreurs
+  var nbClients=(function(){ var set={}; orders.forEach(function(o){ set[o.client]=1; }); return Object.keys(set).length; })();
+  var livCount={Tarik:0,Shippr:0,'Livreur interne':0};
+  orders.forEach(function(o){ if(o.livreur && livCount[o.livreur]!==undefined) livCount[o.livreur]++; });
+  var livParts=[]; if(livCount.Tarik) livParts.push('🚗 Tarik : '+livCount.Tarik); if(livCount.Shippr) livParts.push('📦 Shippr : '+livCount.Shippr); if(livCount['Livreur interne']) livParts.push('🏠 Interne : '+livCount['Livreur interne']);
+  var recap='<div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px">'+
+    '<div style="flex:1;min-width:120px;background:#eef5fc;border-radius:10px;padding:10px 14px"><div style="font-size:22px;font-weight:900;color:#0c447c;line-height:1">'+nbClients+'</div><div style="font-size:11px;color:#5b6773">client'+(nbClients>1?'s':'')+'</div></div>'+
+    '<div style="flex:1;min-width:120px;background:#eef5fc;border-radius:10px;padding:10px 14px"><div style="font-size:22px;font-weight:900;color:#0c447c;line-height:1">'+orders.length+'</div><div style="font-size:11px;color:#5b6773">commande'+(orders.length>1?'s':'')+'</div></div>'+
+    '<div style="flex:1;min-width:120px;background:#eef5fc;border-radius:10px;padding:10px 14px"><div style="font-size:22px;font-weight:900;color:#0c447c;line-height:1">'+gtot+'</div><div style="font-size:11px;color:#5b6773">cookies au total</div></div>'+
+  '</div>'+
+  (livParts.length?'<div style="font-size:12px;color:#44515f;margin:6px 0 2px"><b>Livraison :</b> '+livParts.join('&nbsp;&nbsp;·&nbsp;&nbsp;')+'</div>':'');
   return '<div style="font-family:Segoe UI,Arial,sans-serif;color:#1f2937;max-width:760px;margin:0 auto;padding:24px">'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0c447c;padding-bottom:12px;margin-bottom:6px">'+
-      '<div style="font-size:26px;font-weight:900;color:#0c447c">KOOKI<div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#d44218">BAKED WITH LOVE</div></div>'+
+      '<img src="https://lilaadou.github.io/FOODTRACK/logo.png" alt="KOOKI" style="height:54px;width:auto;object-fit:contain">'+
       '<div style="text-align:right"><div style="font-size:18px;font-weight:800;color:#0c447c">'+titre+'</div></div>'+
     '</div>'+
+    recap+
     '<h3 style="font-size:12px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px">Détail par client</h3>'+ords+
     '<div style="border:2px solid #d44218;border-radius:10px;padding:12px 14px;margin-top:8px"><div style="font-size:12px;font-weight:800;color:#d44218;text-transform:uppercase;margin-bottom:6px">🔥 Total à produire par saveur — '+gtot+' cookies</div>'+tbl(aggRows)+'</div>'+
     '<div style="margin-top:22px;font-size:11px;color:#8a97a5">Feuille de préparation — KOOKI</div>'+
