@@ -2496,10 +2496,12 @@
       <div class="card-header" style="flex-wrap:wrap;gap:10px">
         <div><div class="card-title">🧾 Pré-Commandes B2B</div><div class="card-sub">Virginia saisit la commande &middot; tu la prépares le lendemain (cuisson + BL)</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="_pcRefresh()" style="font-size:12px;padding:8px 14px">🔄 Actualiser</button>
           <button class="btn btn-secondary" onclick="_pcPrintDay()" style="font-size:12px;padding:8px 14px">🖨️ Imprimer la commande du jour</button>
           <button class="btn btn-primary" onclick="_pcToggleForm()" id="pc-newbtn" style="font-size:12px;padding:8px 14px">+ Nouvelle commande</button>
         </div>
       </div>
+      <div id="pc-sync" style="font-size:11.5px;font-weight:700;color:#8a97a5;margin-top:8px"></div>
       <div id="pc-form" style="display:none;margin-top:12px"></div>
     </div>
     <div id="pc-list"></div>
@@ -2703,7 +2705,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbyUaF5myxTFVtgs1wCcP2pbp7MPozLw-gIQ7l8TlzmedkVHv9SeyUbLNMFUHnuj4Ubrfg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbz3mdsfuxTMb03UBDj56lgmu8v7H_sPdvpca1F_6XBrCE0awR1eIUpP9avmZmp0WglX6w/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -11939,16 +11941,27 @@ function _pcLoad(){
 }
 function _pcSave(arr){ _pcCache=arr; try{ localStorage.setItem('kooki_precommandes', JSON.stringify(arr)); }catch(e){} }
 /* Recharge depuis Google Sheets (partagé entre Virginia et Lila) */
+function _pcSyncStatus(txt,color){
+  var el=document.getElementById('pc-sync'); if(!el) return;
+  el.textContent=txt; el.style.color=color||'#8a97a5';
+}
 function _pcRefresh(){
   _pcRender(); // affichage immédiat depuis le cache local
-  if(typeof fetchAPI!=='function') return;
+  if(typeof fetchAPI!=='function'){ _pcSyncStatus('⚠️ Hors ligne','#b45309'); return; }
+  _pcSyncStatus('⏳ Synchronisation…','#8a97a5');
   fetchAPI('getPreCommandes').then(function(d){
     if(Array.isArray(d)){
-      // tri : plus récentes en premier (par id décroissant)
       d.sort(function(a,b){ return (Number(b.id)||0)-(Number(a.id)||0); });
       _pcSave(d); _pcRender();
+      var h=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      _pcSyncStatus('🟢 Synchronisé avec Google Sheets — '+d.length+' pré-commande'+(d.length>1?'s':'')+' · '+h, '#2e7d46');
+    } else {
+      // le serveur répond mais pas au format attendu → Apps Script pas (ou mal) déployé
+      _pcSyncStatus('🟠 Le serveur ne renvoie pas les pré-commandes — vérifie que l\'Apps Script (getPreCommandes) est déployé.', '#b45309');
     }
-  }).catch(function(){});
+  }).catch(function(){
+    _pcSyncStatus('🔴 Pas de connexion au serveur.', '#c0392b');
+  });
 }
 /* Écrit une pré-commande dans Google Sheets */
 function _pcPush(order){
