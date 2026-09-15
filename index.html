@@ -2733,7 +2733,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycby3thhR9HePllEyMBMcoQKw3uokgMXy1oF26SW6BLceliCY4DKaKqi99qJQn4yCwGRn_g/exec';
+const API = 'https://script.google.com/macros/s/AKfycbx4PQ6_bYAQCYcyuMM4O2Yp0E5Wo_Os0RsqHRl9OWl1efrfpAvQgeUd3QsYMRzqDw5aeg/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -12350,7 +12350,7 @@ function _occPush(o){
     action:'sauverCommandeOcc',
     id:o.id, date:o.date, nom:o.nom, email:o.email, tel:o.tel, adr:o.adr, instr:o.instr,
     lignes:o.lignes, format:o.format, cont:o.cont, indiv:o.indiv, perso:o.perso,
-    heure:o.heure, pay:o.pay, paynote:o.paynote, points:o.points
+    heure:o.heure, pay:o.pay, paynote:o.paynote, points:o.points, mode:o.mode, lieu:o.lieu
   }) }).catch(function(){});
 }
 function _occToggleForm(){
@@ -12398,6 +12398,20 @@ function _occBuildForm(){
         '</div>'+
 
         _occLbl('Livraison')+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px">'+
+          '<div><div style="font-size:11px;font-weight:700;color:#586372;margin-bottom:5px">Mode</div>'+
+            '<div style="display:flex;gap:8px" id="occ_seg_mode">'+
+              '<div data-v="Livraison" data-on="1" onclick="_occSetSeg(\'occ_seg_mode\',this)" style="'+_OCC_SEG_ON+'">🚚 Livraison</div>'+
+              '<div data-v="Retrait" onclick="_occSetSeg(\'occ_seg_mode\',this)" style="'+_OCC_SEG_BASE+'">🛍️ Retrait</div>'+
+            '</div>'+
+          '</div>'+
+          '<div><div style="font-size:11px;font-weight:700;color:#586372;margin-bottom:5px">Depuis</div>'+
+            '<div style="display:flex;gap:8px" id="occ_seg_lieu">'+
+              '<div data-v="KOOKI LABO" data-on="1" onclick="_occSetSeg(\'occ_seg_lieu\',this)" style="'+_OCC_SEG_ON+'">🏭 LABO</div>'+
+              '<div data-v="KOOKI Ixelles" onclick="_occSetSeg(\'occ_seg_lieu\',this)" style="'+_OCC_SEG_BASE+'">🏬 Ixelles</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">'+
           _occField('Date de livraison','<input type="date" id="occ_date" value="'+_pcTodayISO()+'" oninput="_occRender()" '+_occInp()+'>')+
           _occField('Heure d\'arrivée impérative','<input type="time" id="occ_heure" value="09:00" oninput="_occRender()" '+_occInp()+'>')+
@@ -12488,6 +12502,7 @@ function _occCollect(){
     nom:_occV('occ_nom'), email:_occV('occ_email'), tel:_occV('occ_tel'), adr:_occV('occ_adr'), instr:_occV('occ_instr'),
     lignes:lignes, format:_occV('occ_format'),
     cont:_occGetSeg('occ_seg_cont'), indiv:_occGetSeg('occ_seg_indiv'), perso:_occV('occ_perso'),
+    mode:_occGetSeg('occ_seg_mode'), lieu:_occGetSeg('occ_seg_lieu'),
     date:_occV('occ_date'), heure:_occV('occ_heure'),
     pay:_occGetSeg('occ_seg_pay'), paynote:_occV('occ_paynote'),
     points:_occV('occ_points').split('\n').filter(function(l){return l.trim();})
@@ -12516,6 +12531,7 @@ function _occRender(){
   var doc=document.getElementById('occ_doc'); if(doc) doc.innerHTML=_occBuildSheet(_occCollect());
 }
 function _occLineBB(l){ return { big: (l.big!=null?parseInt(l.big,10)||0:(parseInt(l.qty,10)||0)), baby: (parseInt(l.baby,10)||0) }; }
+function _occTime(h){ if(!h) return ''; h=String(h); if(/^\d{1,2}:\d{2}$/.test(h)) return h; var m=h.match(/T(\d{2}:\d{2})/); return m?m[1]:h; }
 function _occBuildSheet(d){
   var tot=0, rows='';
   (d.lignes||[]).forEach(function(l){ var bb=_occLineBB(l); if(!l.sav && !bb.big && !bb.baby) return; tot+=bb.big+bb.baby;
@@ -12533,9 +12549,10 @@ function _occBuildSheet(d){
     '</div>'+
     '<div style="display:flex;gap:10px;margin:12px 0">'+
       '<div style="flex:1;background:#e7f0f9;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Livraison le</div><div style="font-size:16px;font-weight:900;color:#0c447c;margin-top:3px">'+_pcFmtDate(d.date)+'</div></div>'+
-      '<div style="flex:1;background:#fbe8e2;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Arrivée impérative</div><div style="font-size:16px;font-weight:900;color:#d44218;margin-top:3px">'+_pcEsc(d.heure||'—')+'</div></div>'+
+      '<div style="flex:1;background:#fbe8e2;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Arrivée impérative</div><div style="font-size:16px;font-weight:900;color:#d44218;margin-top:3px">'+_pcEsc(_occTime(d.heure)||'—')+'</div></div>'+
       '<div style="flex:1;background:#e7f0f9;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Total</div><div style="font-size:16px;font-weight:900;color:#0c447c;margin-top:3px">'+tot+' cookies</div></div>'+
     '</div>'+
+    '<div style="margin-top:2px"><span style="display:inline-block;background:#0c447c;color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:800">'+((d.mode==='Retrait')?'🛍️ Retrait':'🚚 Livraison')+' — depuis '+_pcEsc(d.lieu||'KOOKI LABO')+'</span></div>'+
     '<div style="margin-top:14px"><div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e7ec;padding-bottom:5px;margin-bottom:8px">Client &amp; coordonnées</div>'+
       '<div style="display:grid;grid-template-columns:150px 1fr;gap:4px 12px;font-size:13px">'+
         '<div style="color:#6b7683;font-weight:600">Client</div><div style="font-weight:700">'+_pcEsc(d.nom||'—')+'</div>'+
@@ -12561,21 +12578,37 @@ function _occBuildSheet(d){
     '<div style="margin-top:14px;font-size:10.5px;color:#8a97a5;border-top:1px solid #e2e7ec;padding-top:8px;display:flex;justify-content:space-between"><span>KOOKI LABO — bon de commande B2B occasionnel</span><span>Contact : '+_pcEsc(d.nom||'')+' · '+_pcEsc(d.tel||'')+'</span></div>'+
   '</div>';
 }
-/* Impression A4 : le bon est mis à l'échelle pour tenir sur UNE page A4 */
+/* Impression A4 via cadre intégré (pas de pop-up : marche sur ordi ET tablette/téléphone) */
 function _occOpenPrint(inner){
-  var w=window.open('','_blank'); if(!w){ toast('bl','Autorise les pop-ups pour imprimer','err'); return; }
-  var doc='<!doctype html><html><head><meta charset="utf-8"><title>Bon de commande B2B occasionnel</title>'+
-    '<style>@page{size:A4;margin:8mm;}html,body{margin:0;padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
-    '#a4{width:194mm;transform-origin:top left;}#a4 *{box-sizing:border-box;}</style></head>'+
-    '<body><div id="a4">'+inner+'</div>'+
-    '<scr'+'ipt>window.onload=function(){'+
-    'var el=document.getElementById("a4");'+
-    'var pageH=277;'+ // hauteur imprimable A4 en mm (297 - 2*8 - petite marge)
-    'var mmH=el.getBoundingClientRect().height/ (96/25.4);'+ // px -> mm
-    'if(mmH>pageH){var s=Math.max(0.5,pageH/mmH); el.style.transform="scale("+s+")";}'+
-    'setTimeout(function(){window.print();},250);'+
-    '};</scr'+'ipt></body></html>';
-  w.document.write(doc); w.document.close();
+  try{
+    var old=document.getElementById('occ-print-frame'); if(old) old.parentNode.removeChild(old);
+    var f=document.createElement('iframe'); f.id='occ-print-frame';
+    f.setAttribute('aria-hidden','true');
+    f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    document.body.appendChild(f);
+    var d=f.contentWindow.document;
+    d.open();
+    d.write('<!doctype html><html><head><meta charset="utf-8"><title>Bon de commande B2B occasionnel</title>'+
+      '<style>@page{size:A4;margin:8mm;}html,body{margin:0;padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      '#a4{width:194mm;transform-origin:top left;}#a4 *{box-sizing:border-box;}</style></head>'+
+      '<body><div id="a4">'+inner+'</div></body></html>');
+    d.close();
+    var done=false;
+    var doPrint=function(){
+      if(done) return; done=true;
+      try{
+        var el=d.getElementById('a4');
+        var mmH=el.getBoundingClientRect().height/(96/25.4);
+        if(mmH>277){ var s=Math.max(0.5,277/mmH); el.style.transform='scale('+s+')'; }
+      }catch(e){}
+      try{ f.contentWindow.focus(); f.contentWindow.print(); }
+      catch(e){ if(typeof toast==='function') toast('bl','Impression impossible : '+e.message,'err'); }
+    };
+    // laisse le logo se charger avant d'imprimer
+    var img=d.querySelector('img');
+    if(img && !img.complete){ img.onload=doPrint; img.onerror=doPrint; setTimeout(doPrint,1200); }
+    else { setTimeout(doPrint,350); }
+  }catch(e){ if(typeof toast==='function') toast('bl','Impression impossible : '+e.message,'err'); }
 }
 function _occPrintCurrent(){
   var d=_occCollect();
@@ -12631,13 +12664,14 @@ function _occRenderList(){
         '<td style="text-align:right;padding:8px 14px;border-top:1px solid #f4f6f8">'+stkTxt+'</td></tr>';
     }).join('');
     var contBadge=o.cont ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#eef2f6;color:#44515f">'+_pcEsc(o.cont)+'</span>' : '';
+    var modeBadge=o.mode ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#e7f0f9;color:#0662aa">'+((o.mode==='Retrait')?'🛍️ Retrait':'🚚 Livraison')+' · '+_pcEsc(o.lieu||'KOOKI LABO')+'</span>' : '';
     var summary= aProd>0
       ? '<span style="font-size:12.5px;font-weight:700;color:#b45309">🔥 À produire : '+aProd+' cookies avant livraison</span>'
       : '<span style="font-size:12.5px;font-weight:700;color:#2e7d46">✓ Tout est en stock — prêt à sortir</span>';
     return dayHdr+'<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">'+
       '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap">'+
-        '<div><div style="font-size:16px;font-weight:800">'+_pcEsc(o.nom||'—')+'</div><div style="font-size:12px;color:#8a97a5">Livraison souhaitée : '+_pcFmtDate(o.date)+(o.heure?(' · arrivée '+_pcEsc(o.heure)):'')+'</div></div>'+
-        '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#fbe8e2;color:#d44218;text-transform:uppercase">🎁 Occasionnel</span>'+contBadge+
+        '<div><div style="font-size:16px;font-weight:800">'+_pcEsc(o.nom||'—')+'</div><div style="font-size:12px;color:#8a97a5">Livraison souhaitée : '+_pcFmtDate(o.date)+(o.heure?(' · arrivée '+_pcEsc(_occTime(o.heure))):'')+'</div></div>'+
+        '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#fbe8e2;color:#d44218;text-transform:uppercase">🎁 Occasionnel</span>'+modeBadge+contBadge+
         '<div style="margin-left:auto;text-align:right"><div style="font-size:22px;font-weight:900;color:#0c447c">'+tot+'</div><div style="font-size:10px;color:#8a97a5;text-transform:uppercase">cookies</div></div>'+
       '</div>'+
       '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
