@@ -2733,7 +2733,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzBPQKwaaDFHXrrYSnJsBlGaTKnw0LDEVTL8hYMkIvlc9UM2otOVbGSJyi5lb5S9Rj_Mw/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxCIpHyv1RxJs6nl93GOP0m8Ug4sGyqe5Tu-7Kcajkz4EK36cUulCvnV3VB6P6NfRzofA/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -12375,12 +12375,11 @@ function _occBuildForm(){
         _occField('Instruction d\'accès','<textarea id="occ_instr" oninput="_occRender()" '+_occInp()+' style="min-height:52px;'+_occInpS()+'"></textarea>')+
 
         _occLbl('Commande')+
-        '<div style="display:grid;grid-template-columns:1fr 70px minmax(110px,1fr) 30px;gap:8px;font-size:9.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:0 2px 6px"><span>Saveur</span><span style="text-align:center">Qté</span><span style="text-align:center">Stock</span><span></span></div>'+
+        '<div style="display:grid;grid-template-columns:1fr 56px 56px minmax(92px,1fr) 30px;gap:7px;font-size:9.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:0 2px 6px"><span>Saveur</span><span style="text-align:center">Big</span><span style="text-align:center">Baby</span><span style="text-align:center">Stock</span><span></span></div>'+
         '<div id="occ_flavs"></div>'+
         '<button type="button" onclick="_occAddFlav()" style="background:#fbe8e2;color:#d44218;border:none;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:800;cursor:pointer;margin-top:2px">+ Ajouter une saveur</button>'+
         '<div style="font-size:11px;color:#8a97a5;margin-top:5px">✓ assez en stock &nbsp; ⚠ à produire &nbsp; ✗ rupture</div>'+
-        _occField('Format','<input type="text" id="occ_format" value="Giant – 165 g" oninput="_occRender()" list="occ_fmts" '+_occInp()+'><datalist id="occ_fmts"><option>Giant – 165 g</option><option>Big</option><option>Baby</option></datalist>')+
-        '<div style="display:flex;align-items:center;gap:12px;margin-top:8px;padding:12px 16px;background:#0c447c;border-radius:12px;color:#fff"><span style="font-size:11px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.05em">Total</span><b id="occ_tot" style="margin-left:auto;font-size:24px;font-weight:900">0</b><span style="font-size:11px;opacity:.85">cookies</span></div>'+
+        '<div style="display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 16px;background:#0c447c;border-radius:12px;color:#fff"><span style="font-size:11px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.05em">Total</span><b id="occ_tot" style="margin-left:auto;font-size:24px;font-weight:900">0</b><span style="font-size:11px;opacity:.85">cookies</span></div>'+
 
         _occLbl('Conditionnement')+
         '<div style="font-size:11px;font-weight:700;color:#586372;margin-bottom:5px">Type de contenant</div>'+
@@ -12434,25 +12433,34 @@ function _occLbl(t){ return '<div style="font-size:10.5px;font-weight:800;color:
 function _occInpS(){ return 'width:100%;padding:9px 11px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff;outline:none;box-sizing:border-box;font-family:inherit'; }
 function _occInp(){ return 'style="'+_occInpS()+'"'; }
 function _occField(label,inner){ return '<div style="margin-bottom:11px"><label style="display:block;font-size:11px;font-weight:700;color:#586372;margin-bottom:5px">'+_pcEsc(label)+'</label>'+inner+'</div>'; }
-function _occAddFlav(nom,qty){
+function _occBabyCell(sav,val){
+  var no = _PC_NOBABY.indexOf(sav)>=0;
+  return no ? '<input type="number" min="0" class="occ-baby" placeholder="X" disabled style="text-align:center;'+_occInpS()+';background:#f4f6f8;color:#bbb">'
+            : '<input type="number" min="0" class="occ-baby" placeholder="0" value="'+(val!=null?val:'')+'" oninput="_occRender()" style="text-align:center;'+_occInpS()+'">';
+}
+function _occAddFlav(nom,big,baby){
   var host=document.getElementById('occ_flavs'); if(!host) return;
   var isCustom = nom && _OCC_SAVEURS.indexOf(nom)<0;
   var opts='<option value="">— saveur —</option>'+_OCC_SAVEURS.map(function(s){return '<option'+(s===nom?' selected':'')+'>'+s+'</option>';}).join('')+'<option value="__autre"'+(isCustom?' selected':'')+'>Autre…</option>';
   var d=document.createElement('div');
-  d.style.cssText='display:grid;grid-template-columns:1fr 70px minmax(110px,1fr) 30px;gap:8px;margin-bottom:8px;align-items:center';
+  d.style.cssText='display:grid;grid-template-columns:1fr 56px 56px minmax(92px,1fr) 30px;gap:7px;margin-bottom:8px;align-items:center';
   d.innerHTML=
     '<span style="display:flex;flex-direction:column;gap:5px">'+
       '<select onchange="_occOnSavSel(this)" style="width:100%;padding:9px 8px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff">'+opts+'</select>'+
       '<input type="text" class="occ-custom" placeholder="Saveur perso." value="'+_pcEsc(isCustom?nom:'')+'" oninput="_occRender()" style="display:'+(isCustom?'block':'none')+';'+_occInpS()+'">'+
     '</span>'+
-    '<input type="number" min="0" class="occ-qty" placeholder="0" value="'+(qty!=null?qty:'')+'" oninput="_occRender()" style="text-align:center;'+_occInpS()+'">'+
+    '<input type="number" min="0" class="occ-big" placeholder="0" value="'+(big!=null?big:'')+'" oninput="_occRender()" style="text-align:center;'+_occInpS()+'">'+
+    '<span class="occ-babycell">'+_occBabyCell(nom||_OCC_SAVEURS[0],baby)+'</span>'+
     '<span class="occ-stk" style="font-size:11px;font-weight:800;padding:6px 8px;border-radius:8px;text-align:center;background:#eef2f6;color:#8a97a5">—</span>'+
     '<button type="button" onclick="this.parentNode.remove();_occRender()" style="border:none;background:#fde8e8;color:#c0392b;border-radius:8px;padding:9px 0;font-size:13px;font-weight:800;cursor:pointer">✕</button>';
   host.appendChild(d);
 }
 function _occOnSavSel(sel){
+  var row=sel.parentNode.parentNode;
   var c=sel.parentNode.querySelector('.occ-custom');
   if(sel.value==='__autre'){ c.style.display='block'; if(!c.value) c.focus(); } else { c.style.display='none'; }
+  var cell=row.querySelector('.occ-babycell');
+  if(cell) cell.innerHTML=_occBabyCell(sel.value==='__autre'?'':sel.value);
   _occRender();
 }
 function _occFlavName(row){
@@ -12471,8 +12479,10 @@ function _occV(id){ var e=document.getElementById(id); return e?e.value:''; }
 function _occCollect(){
   var lignes=[];
   document.querySelectorAll('#occ_flavs > div').forEach(function(r){
-    var fn=_occFlavName(r); var q=parseInt(r.querySelector('.occ-qty').value,10)||0;
-    if(fn.nom||q) lignes.push({sav:fn.nom, qty:q, custom:fn.custom});
+    var fn=_occFlavName(r);
+    var big=parseInt(r.querySelector('.occ-big').value,10)||0;
+    var babyEl=r.querySelector('.occ-baby'); var baby=(babyEl && !babyEl.disabled)?(parseInt(babyEl.value,10)||0):0;
+    if(fn.nom||big||baby) lignes.push({sav:fn.nom, big:big, baby:baby, custom:fn.custom});
   });
   return {
     nom:_occV('occ_nom'), email:_occV('occ_email'), tel:_occV('occ_tel'), adr:_occV('occ_adr'), instr:_occV('occ_instr'),
@@ -12484,34 +12494,42 @@ function _occCollect(){
   };
 }
 function _occRender(){
-  var tot=0;
+  var tot=0; var stk=_occStockMap();
   document.querySelectorAll('#occ_flavs > div').forEach(function(r){
-    var fn=_occFlavName(r); var q=parseInt(r.querySelector('.occ-qty').value,10)||0;
+    var fn=_occFlavName(r);
+    var big=parseInt(r.querySelector('.occ-big').value,10)||0;
+    var babyEl=r.querySelector('.occ-baby'); var baby=(babyEl && !babyEl.disabled)?(parseInt(babyEl.value,10)||0):0;
+    var q=big+baby;
     var badge=r.querySelector('.occ-stk');
     if(fn.custom || !fn.nom){ badge.style.background='#eef2f6'; badge.style.color='#8a97a5'; badge.textContent=fn.custom?'perso.':'—'; }
     else {
-      var dispo=_occStock(fn.nom);
+      var s=stk[fn.nom]||{big:0,baby:0};
+      var need=Math.max(0,big-(parseInt(s.big,10)||0))+Math.max(0,baby-(parseInt(s.baby,10)||0));
+      var dispo=(parseInt(s.big,10)||0)+(parseInt(s.baby,10)||0);
       if(!q){ badge.style.background='#eef2f6'; badge.style.color='#8a97a5'; badge.textContent=dispo+' dispo'; }
-      else if(dispo<=0){ badge.style.background='#fde8e8'; badge.style.color='#c0392b'; badge.textContent='✗ rupture'; }
-      else if(dispo>=q){ badge.style.background='#eaf5ee'; badge.style.color='#2e7d46'; badge.textContent='✓ '+dispo+' dispo'; }
-      else { badge.style.background='#fff4e6'; badge.style.color='#b45309'; badge.textContent='⚠ à produire '+(q-dispo); }
+      else if(need>0){ badge.style.background='#fff4e6'; badge.style.color='#b45309'; badge.textContent='⚠ à produire '+need; }
+      else { badge.style.background='#eaf5ee'; badge.style.color='#2e7d46'; badge.textContent='✓ en stock'; }
     }
     tot+=q;
   });
   var t=document.getElementById('occ_tot'); if(t) t.textContent=tot;
   var doc=document.getElementById('occ_doc'); if(doc) doc.innerHTML=_occBuildSheet(_occCollect());
 }
+function _occLineBB(l){ return { big: (l.big!=null?parseInt(l.big,10)||0:(parseInt(l.qty,10)||0)), baby: (parseInt(l.baby,10)||0) }; }
 function _occBuildSheet(d){
   var tot=0, rows='';
-  (d.lignes||[]).forEach(function(l){ if(!l.sav && !l.qty) return; tot+=(parseInt(l.qty,10)||0);
-    rows+='<tr><td style="text-align:left;font-weight:700;font-size:13.5px;padding:7px 8px;border-bottom:1px solid #f2f4f6">'+_pcEsc(l.sav||'—')+'</td><td style="text-align:right;font-size:13.5px;padding:7px 8px;border-bottom:1px solid #f2f4f6">'+(parseInt(l.qty,10)||0)+'</td></tr>';
+  (d.lignes||[]).forEach(function(l){ var bb=_occLineBB(l); if(!l.sav && !bb.big && !bb.baby) return; tot+=bb.big+bb.baby;
+    var babyTxt=(_PC_NOBABY.indexOf(l.sav)>=0)?'<span style="color:#c9c9c9">X</span>':bb.baby;
+    rows+='<tr><td style="text-align:left;font-weight:700;font-size:13.5px;padding:7px 8px;border-bottom:1px solid #f2f4f6">'+_pcEsc(l.sav||'—')+'</td>'+
+      '<td style="text-align:right;font-size:13.5px;padding:7px 8px;border-bottom:1px solid #f2f4f6">'+bb.big+'</td>'+
+      '<td style="text-align:right;font-size:13.5px;padding:7px 8px;border-bottom:1px solid #f2f4f6">'+babyTxt+'</td></tr>';
   });
-  if(!rows) rows='<tr><td colspan="2" style="color:#bbb;font-weight:600;padding:7px 8px">—</td></tr>';
+  if(!rows) rows='<tr><td colspan="3" style="color:#bbb;font-weight:600;padding:7px 8px">—</td></tr>';
   var points=(d.points||[]).map(function(l){return '<li style="font-size:12.5px;margin-bottom:4px;line-height:1.35">'+_pcEsc(l)+'</li>';}).join('');
-  return '<div style="font-family:Segoe UI,Arial,sans-serif;color:#1f2937;padding:16px 22px;font-size:13px">'+
+  return '<div style="font-family:Calibri,Carlito,\'Segoe UI\',Arial,sans-serif;color:#1f2937;padding:16px 22px;font-size:13px">'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0c447c;padding-bottom:10px;margin-bottom:4px">'+
       '<img src="https://lilaadou.github.io/FOODTRACK/logo.png" alt="KOOKI" style="height:46px;width:auto;object-fit:contain">'+
-      '<div style="text-align:right"><div style="font-size:16px;font-weight:800;color:#0c447c">Bon de commande occasionnelle</div><div style="font-size:11px;color:#8a97a5">Émis le '+_pcFmtDate(_pcTodayISO())+'</div></div>'+
+      '<div style="text-align:right"><div style="font-size:16px;font-weight:800;color:#0c447c">Bon de commande B2B occasionnel</div><div style="font-size:11px;color:#8a97a5">Émis le '+_pcFmtDate(_pcTodayISO())+'</div></div>'+
     '</div>'+
     '<div style="display:flex;gap:10px;margin:12px 0">'+
       '<div style="flex:1;background:#e7f0f9;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Livraison le</div><div style="font-size:16px;font-weight:900;color:#0c447c;margin-top:3px">'+_pcFmtDate(d.date)+'</div></div>'+
@@ -12528,9 +12546,8 @@ function _occBuildSheet(d){
       (d.instr?'<div style="background:#fffbe9;border:1px solid #f2e3a8;border-radius:9px;padding:9px 12px;font-size:12.5px;color:#7a5a00;margin-top:8px">📌 '+_pcEsc(d.instr)+'</div>':'')+
     '</div>'+
     '<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e7ec;padding-bottom:5px;margin-bottom:8px">Commande</div>'+
-      '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:10px;color:#8a97a5;text-transform:uppercase;text-align:left;padding:6px 8px;border-bottom:1px solid #e2e7ec">Saveur</th><th style="font-size:10px;color:#8a97a5;text-transform:uppercase;text-align:right;padding:6px 8px;border-bottom:1px solid #e2e7ec">Quantité</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:10px;color:#8a97a5;text-transform:uppercase;text-align:left;padding:6px 8px;border-bottom:1px solid #e2e7ec">Saveur</th><th style="font-size:10px;color:#8a97a5;text-transform:uppercase;text-align:right;padding:6px 8px;border-bottom:1px solid #e2e7ec">Big</th><th style="font-size:10px;color:#8a97a5;text-transform:uppercase;text-align:right;padding:6px 8px;border-bottom:1px solid #e2e7ec">Baby</th></tr></thead><tbody>'+rows+'</tbody></table>'+
       '<div style="border:2px solid #d44218;border-radius:10px;padding:10px 14px;margin-top:10px;display:flex;align-items:center;font-weight:800;color:#d44218">Total à préparer<b style="margin-left:auto;font-size:20px">'+tot+' cookies</b></div>'+
-      '<div style="margin-top:6px"><span style="background:#eef2f6;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;color:#44515f">Format : '+_pcEsc(d.format||'—')+'</span></div>'+
     '</div>'+
     '<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e7ec;padding-bottom:5px;margin-bottom:8px">Conditionnement</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
@@ -12541,13 +12558,13 @@ function _occBuildSheet(d){
     '</div>'+
     '<div style="border:2px solid #0662aa;background:#f2f8fe;border-radius:11px;padding:10px 14px;margin-top:12px;font-size:13px"><div style="font-size:12px;font-weight:800;color:#0662aa;text-transform:uppercase;margin-bottom:5px">💳 Paiement</div><b>'+_pcEsc(d.pay||'—')+'</b> · '+_pcEsc(d.paynote||'')+'</div>'+
     (points?'<div style="border:2px solid #d44218;background:#fff8f5;border-radius:11px;padding:10px 14px;margin-top:12px"><div style="font-size:12px;font-weight:800;color:#d44218;text-transform:uppercase;margin-bottom:7px">⚠️ Points importants</div><ul style="margin:0;padding-left:18px">'+points+'</ul></div>':'')+
-    '<div style="margin-top:14px;font-size:10.5px;color:#8a97a5;border-top:1px solid #e2e7ec;padding-top:8px;display:flex;justify-content:space-between"><span>KOOKI LABO — bon de commande occasionnelle</span><span>Contact : '+_pcEsc(d.nom||'')+' · '+_pcEsc(d.tel||'')+'</span></div>'+
+    '<div style="margin-top:14px;font-size:10.5px;color:#8a97a5;border-top:1px solid #e2e7ec;padding-top:8px;display:flex;justify-content:space-between"><span>KOOKI LABO — bon de commande B2B occasionnel</span><span>Contact : '+_pcEsc(d.nom||'')+' · '+_pcEsc(d.tel||'')+'</span></div>'+
   '</div>';
 }
 /* Impression A4 : le bon est mis à l'échelle pour tenir sur UNE page A4 */
 function _occOpenPrint(inner){
   var w=window.open('','_blank'); if(!w){ toast('bl','Autorise les pop-ups pour imprimer','err'); return; }
-  var doc='<!doctype html><html><head><meta charset="utf-8"><title>Bon de commande occasionnelle</title>'+
+  var doc='<!doctype html><html><head><meta charset="utf-8"><title>Bon de commande B2B occasionnel</title>'+
     '<style>@page{size:A4;margin:8mm;}html,body{margin:0;padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
     '#a4{width:194mm;transform-origin:top left;}#a4 *{box-sizing:border-box;}</style></head>'+
     '<body><div id="a4">'+inner+'</div>'+
@@ -12568,7 +12585,7 @@ function _occPrintCurrent(){
 function _occSave(){
   var d=_occCollect();
   if(!d.nom){ toast('bl','⚠️ Indique le nom du client','err'); return; }
-  if(!d.lignes.filter(function(l){return l.sav&&l.qty;}).length){ toast('bl','⚠️ Ajoute au moins une saveur avec une quantité','err'); return; }
+  if(!d.lignes.filter(function(l){return l.sav&&((l.big||0)+(l.baby||0)>0);}).length){ toast('bl','⚠️ Ajoute au moins une saveur avec une quantité','err'); return; }
   d.id=Date.now();
   var arr=_occLoad(); arr.unshift(d); _occStore(arr);
   _occPush(d);                          // → Google Sheets (partagé)
@@ -12600,15 +12617,17 @@ function _occRenderList(){
       dayHdr='<div style="display:flex;align-items:center;gap:10px;margin:18px 2px 10px"><span style="font-size:13px;font-weight:900;color:#0c447c;text-transform:capitalize">📅 '+((typeof _pcDayLabel==='function')?_pcDayLabel(o.date):_pcFmtDate(o.date))+'</span><span style="flex:1;height:1px;background:#e2e7ec"></span></div>';
     }
     var tot=0, aProd=0;
-    var rows=(o.lignes||[]).filter(function(l){return l.sav&&l.qty;}).map(function(l){
-      var q=parseInt(l.qty,10)||0; tot+=q;
-      var s=stk[l.sav]||{big:0,baby:0}; var dispo=(parseInt(s.big,10)||0)+(parseInt(s.baby,10)||0);
-      var need=Math.max(0,q-dispo); aProd+=need;
+    var rows=(o.lignes||[]).filter(function(l){ var bb=_occLineBB(l); return l.sav&&(bb.big||bb.baby); }).map(function(l){
+      var bb=_occLineBB(l); tot+=bb.big+bb.baby;
+      var s=stk[l.sav]||{big:0,baby:0};
+      var need=Math.max(0,bb.big-(parseInt(s.big,10)||0))+Math.max(0,bb.baby-(parseInt(s.baby,10)||0)); aProd+=need;
+      var babyTxt=(_PC_NOBABY.indexOf(l.sav)>=0)?'<span style="color:#c9c9c9">X</span>':bb.baby;
       var stkTxt= need>0
         ? '<span style="font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:7px;background:#fff4e6;color:#b45309;white-space:nowrap">à produire '+need+'</span>'
         : '<span style="font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:7px;background:#eaf5ee;color:#2e7d46;white-space:nowrap">✓ en stock</span>';
       return '<tr><td style="text-align:left;font-weight:700;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+_pcEsc(l.sav)+'</td>'+
-        '<td style="text-align:right;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+q+'</td>'+
+        '<td style="text-align:right;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+bb.big+'</td>'+
+        '<td style="text-align:right;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+babyTxt+'</td>'+
         '<td style="text-align:right;padding:8px 14px;border-top:1px solid #f4f6f8">'+stkTxt+'</td></tr>';
     }).join('');
     var contBadge=o.cont ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#eef2f6;color:#44515f">'+_pcEsc(o.cont)+'</span>' : '';
@@ -12623,7 +12642,8 @@ function _occRenderList(){
       '</div>'+
       '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
         '<th style="text-align:left;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Saveur</th>'+
-        '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Quantité</th>'+
+        '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Big</th>'+
+        '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Baby</th>'+
         '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Stock</th>'+
       '</tr></thead><tbody>'+rows+'</tbody></table>'+
       '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
