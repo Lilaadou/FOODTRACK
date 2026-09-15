@@ -1339,6 +1339,7 @@
             <option>ZIZI waterloo</option>
             <option>ZIZI Uccle</option>
             <option>KAWA CLUB</option>
+            <option>Le Cocoon Institut</option>
           </select>
         </div>
       </div>
@@ -1434,6 +1435,10 @@
         <div style="width:34px;height:34px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#92400E">KC</div>
         <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">KAWA CLUB</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nora NEUS</div></div>
       </div>
+      <div class="b2b-client-btn" data-client="Le Cocoon Institut" onclick="selectClientBtn('Le Cocoon Institut')" style="border:0.5px solid #B5D4F4;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff">
+        <div style="width:34px;height:34px;border-radius:50%;background:#E9D5FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#6B21A8">CI</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:#1a1a2e">Le Cocoon Institut</div><div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Chaussée de Gand 426</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1516,6 +1521,7 @@
           <button type="button" id="livreur-opt-tarik" onclick="setLivreurB2B('Tarik')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#d44218;color:#fff">🚗 Tarik</button>
           <button type="button" id="livreur-opt-shippr" onclick="setLivreurB2B('Shippr')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;background:#fff;color:#666">📦 Shippr</button>
           <button type="button" id="livreur-opt-interne" onclick="setLivreurB2B('Livreur interne')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;background:#fff;color:#666">🏠 Livreur interne</button>
+          <button type="button" id="livreur-opt-labo" onclick="setLivreurB2B('Retrait au labo')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;background:#fff;color:#666">🏭 Retrait au labo</button>
         </div>
       </div>
       <div id="boites-section-b2b" style="display:none;margin-bottom:13px">
@@ -2349,6 +2355,7 @@
             <tr><td><b>ZIZI waterloo</b><div class="sub-text">02 344 70 81 · Uccle</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>ZIZI Uccle</b><div class="sub-text">02 344 70 81 · Uccle</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
             <tr><td><b>KAWA CLUB</b><div class="sub-text">Nora NEUS · 0491 98 58 83 · Watermael-Boitsfort</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
+            <tr><td><b>Le Cocoon Institut</b><div class="sub-text">0451 08 58 89 · Chaussée de Gand 426, 1080 Bruxelles</div></td><td>0</td><td>0</td><td style="color:#0662aa;font-weight:700">0</td><td><span class="status s-ok">À jour</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2375,6 +2382,7 @@
             <option>ZIZI waterloo</option>
             <option>ZIZI Uccle</option>
             <option>KAWA CLUB</option>
+            <option>Le Cocoon Institut</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:14px">
@@ -2497,7 +2505,10 @@
         <div><div class="card-title">🧾 Pré-Commandes B2B</div><div class="card-sub">Virginia saisit la commande &middot; tu la prépares le lendemain (cuisson + BL)</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-secondary" onclick="_pcRefresh()" style="font-size:12px;padding:8px 14px">🔄 Actualiser</button>
-          <button class="btn btn-secondary" onclick="_pcPrintDay()" style="font-size:12px;padding:8px 14px">🖨️ Imprimer la commande du jour</button>
+          <span style="display:inline-flex;align-items:center;gap:6px">
+            <select id="pc-print-day" style="font-size:12px;padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:9px;background:#fff;outline:none"><option value="">— aucun jour —</option></select>
+            <button class="btn btn-secondary" onclick="_pcPrintDay()" style="font-size:12px;padding:8px 14px">🖨️ Imprimer ce jour</button>
+          </span>
           <button class="btn btn-primary" onclick="_pcToggleForm()" id="pc-newbtn" style="font-size:12px;padding:8px 14px">+ Nouvelle commande</button>
         </div>
       </div>
@@ -3116,6 +3127,7 @@ const SEARCH_DB = [
   { cat:'Client B2B', icon:'🏪', ref:'ZIZI waterloo',    detail:'02 344 70 81 · Rue de la Mutualité 57A · Uccle',   page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'ZIZI Uccle',       detail:'02 344 70 81 · Rue de la Mutualité 57A · Uccle',   page:'frigo' },
   { cat:'Client B2B', icon:'🏪', ref:'KAWA CLUB',        detail:'Nora NEUS · 0491 98 58 83 · Bd du Souverain 25 · Watermael-Boitsfort', page:'frigo' },
+  { cat:'Client B2B', icon:'🏪', ref:'Le Cocoon Institut', detail:'0451 08 58 89 · Chaussée de Gand 426 · 1080 Bruxelles', page:'frigo' },
   // Fournisseurs
   { cat:'Fournisseur', icon:'🚛', ref:'Foodflow',        detail:'Fournisseur ingrédients', page:'reception' },
   { cat:'Fournisseur', icon:'🚛', ref:'Bruyerre',        detail:'Fournisseur ingrédients', page:'reception' },
@@ -3454,6 +3466,7 @@ const B2B_CLIENTS = {
   'ZIZI waterloo':   { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
   'ZIZI Uccle':      { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
   'KAWA CLUB':       { adresse:'Bd du Souverain 25, 1170 Watermael-Boitsfort', contact:'Nora NEUS', tel:'0491 98 58 83', email:'fox@kawa-club.com' },
+  'Le Cocoon Institut': { adresse:'Chaussée de Gand 426, 1080 Bruxelles', contact:'', tel:'0451 08 58 89', siege:'Avenue du Roi Albert 94, 1082 Berchem', tva:'BE1021.925.682' },
 };
 
 function fillClientInfo() {
@@ -4322,7 +4335,7 @@ function renderBoitesTable() {
   if (!tbody) return;
 
   const boites = JSON.parse(localStorage.getItem('kooki_boites') || '[]');
-  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
+  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
 
   tbody.innerHTML = B2B_LIST.map(client => {
     let envoyees = 0, retournees = 0;
@@ -9573,7 +9586,7 @@ function applySorties(data) {
   // Déterminer le type de destination
   const getDestType = (dest) => {
     if (['Magasin Ixelles', 'Magasin Anderlecht'].includes(dest)) return { icon:'🏪', badge:'Magasin', color:'#fbe8e2', textColor:'#d44218' };
-    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
+    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
     if (b2b.includes(dest)) return { icon:'🤝', badge:'B2B', color:'#e8f8f0', textColor:'#1a8a4a' };
     return { icon:'📦', badge:'Autre', color:'#f0f0f0', textColor:'#888' };
   };
@@ -10209,7 +10222,7 @@ function renderRecapB2b(offset) {
   const b2b = sorties.filter(s => {
     const d = new Date(s.date);
     const clients = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière',
-      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
+      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
     return d >= monday && d <= sunday && clients.includes(s.destination);
   });
 
@@ -11638,7 +11651,7 @@ function imprimerRecapMoisGlobal(){
 
 function setLivreurB2B(v){
   var inp=document.getElementById('sortie-livreur-b2b'); if(inp) inp.value=v;
-  var t=document.getElementById('livreur-opt-tarik'), s=document.getElementById('livreur-opt-shippr'), i=document.getElementById('livreur-opt-interne');
+  var t=document.getElementById('livreur-opt-tarik'), s=document.getElementById('livreur-opt-shippr'), i=document.getElementById('livreur-opt-interne'), l=document.getElementById('livreur-opt-labo');
   var base='padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;';
   var baseL='padding:8px 18px;font-size:13px;font-weight:700;border:none;border-left:1.5px solid #eee;cursor:pointer;';
   var _dlv=document.body.classList.contains('mode-delivery');
@@ -11646,6 +11659,7 @@ function setLivreurB2B(v){
   if(t) t.style.cssText=base +(v==='Tarik'?on:off);
   if(s) s.style.cssText=baseL+(v==='Shippr'?on:off);
   if(i) i.style.cssText=baseL+(v==='Livreur interne'?on:off);
+  if(l) l.style.cssText=baseL+(v==='Retrait au labo'?on:off);
 }
 
 /* ═══════════ CENTRE DE DOCUMENTS ═══════════ */
@@ -11932,7 +11946,7 @@ var _pcFormLivreur = 'Tarik';
 
 function _pcClients(){
   try { if (typeof B2B_CLIENTS === 'object' && B2B_CLIENTS) return Object.keys(B2B_CLIENTS).sort(); } catch(e){}
-  return ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
+  return ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
 }
 var _pcCache = null;
 function _pcLoad(){
@@ -12000,15 +12014,22 @@ function _pcToggleForm(){
         '<button type="button" id="pc-seg-cong" onclick="_pcSetType(\'cong\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px;cursor:pointer;font-size:13.5px;font-weight:800">❄️ Congelés</button>'+
       '</div>'+
       '<div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Livraison par</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
         '<button type="button" id="pc-liv-Tarik" onclick="_pcSetLivreur(\'Tarik\')" style="border:1.5px solid #0662aa;background:#e7f0f9;color:#0662aa;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">🚗 Tarik</button>'+
         '<button type="button" id="pc-liv-Shippr" onclick="_pcSetLivreur(\'Shippr\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">📦 Shippr</button>'+
         '<button type="button" id="pc-liv-interne" onclick="_pcSetLivreur(\'Livreur interne\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">🏠 Interne</button>'+
+        '<button type="button" id="pc-liv-labo" onclick="_pcSetLivreur(\'Retrait au labo\')" style="border:1.5px solid #e2e7ec;background:#fff;color:#1f2937;border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800">🏭 Retrait labo</button>'+
       '</div>'+
       '<div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Saveurs commandées</div>'+
       '<div style="display:grid;grid-template-columns:1fr 84px 84px 34px;gap:8px;font-size:9.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:0 2px 6px"><span>Saveur</span><span style="text-align:center">Big</span><span style="text-align:center">Baby</span><span></span></div>'+
       '<div id="pc-flavs"></div>'+
       '<button type="button" onclick="_pcAddFlav()" style="background:#fbe8e2;color:#d44218;border:none;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:800;cursor:pointer;margin-top:2px">+ Ajouter une saveur</button>'+
+      '<div id="pc-form-total" style="display:flex;align-items:center;gap:12px;margin-top:16px;padding:13px 18px;background:#0c447c;border-radius:12px;color:#fff">'+
+        '<span style="font-size:11px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.05em">Total commande</span>'+
+        '<span id="pc-total-split" style="margin-left:auto;font-size:13px;font-weight:700;opacity:.9">0 Big &middot; 0 Baby</span>'+
+        '<span id="pc-total-num" style="font-size:26px;font-weight:900;line-height:1">0</span>'+
+        '<span style="font-size:11px;opacity:.85">cookies</span>'+
+      '</div>'+
       '<div style="display:flex;gap:10px;margin-top:16px">'+
         '<button type="button" class="btn btn-primary" onclick="_pcSaveOrder()" style="padding:10px 16px;font-size:13px">✓ Enregistrer la commande</button>'+
         '<button type="button" class="btn btn-secondary" onclick="_pcToggleForm()" style="padding:10px 16px;font-size:13px">Annuler</button>'+
@@ -12025,7 +12046,7 @@ function _pcSetType(t){
 }
 function _pcSetLivreur(v){
   _pcFormLivreur=v;
-  [['Tarik','pc-liv-Tarik'],['Shippr','pc-liv-Shippr'],['Livreur interne','pc-liv-interne']].forEach(function(p){
+  [['Tarik','pc-liv-Tarik'],['Shippr','pc-liv-Shippr'],['Livreur interne','pc-liv-interne'],['Retrait au labo','pc-liv-labo']].forEach(function(p){
     var el=document.getElementById(p[1]); if(!el) return;
     var on=(p[0]===v);
     el.style.cssText='border:1.5px solid '+(on?'#0662aa':'#e2e7ec')+';background:'+(on?'#e7f0f9':'#fff')+';color:'+(on?'#0662aa':'#1f2937')+';border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800';
@@ -12034,7 +12055,18 @@ function _pcSetLivreur(v){
 function _pcBabyCell(sav){
   var no = _PC_NOBABY.indexOf(sav)>=0;
   return no ? '<input type="number" min="0" placeholder="X" disabled style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;background:#f4f6f8;color:#bbb">'
-            : '<input type="number" min="0" placeholder="0" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">';
+            : '<input type="number" min="0" placeholder="0" oninput="_pcFormTotal()" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">';
+}
+function _pcFormTotal(){
+  var big=0, baby=0;
+  document.querySelectorAll('#pc-flavs > div').forEach(function(row){
+    var sav=row.querySelector('select').value;
+    var ins=row.querySelectorAll('input');
+    big+=parseInt(ins[0].value,10)||0;
+    if(_PC_NOBABY.indexOf(sav)<0) baby+=parseInt(ins[1].value,10)||0;
+  });
+  var n=document.getElementById('pc-total-num'); if(n) n.textContent=(big+baby);
+  var s=document.getElementById('pc-total-split'); if(s) s.innerHTML=big+' Big &middot; '+baby+' Baby';
 }
 function _pcAddFlav(){
   var host=document.getElementById('pc-flavs'); if(!host) return;
@@ -12042,14 +12074,15 @@ function _pcAddFlav(){
   d.style.cssText='display:grid;grid-template-columns:1fr 84px 84px 34px;gap:8px;margin-bottom:8px;align-items:center';
   d.innerHTML =
     '<select onchange="_pcOnSav(this)" style="padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:8px;font-size:13px;background:#fff;outline:none">'+_PC_SAVEURS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select>'+
-    '<input type="number" min="0" placeholder="0" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">'+
+    '<input type="number" min="0" placeholder="0" oninput="_pcFormTotal()" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">'+
     '<span class="pc-babycell">'+_pcBabyCell(_PC_SAVEURS[0])+'</span>'+
-    '<button type="button" onclick="this.parentNode.remove()" style="border:none;background:#fde8e8;color:#c0392b;border-radius:8px;padding:8px 0;font-size:13px;font-weight:800;cursor:pointer">✕</button>';
+    '<button type="button" onclick="this.parentNode.remove();_pcFormTotal()" style="border:none;background:#fde8e8;color:#c0392b;border-radius:8px;padding:8px 0;font-size:13px;font-weight:800;cursor:pointer">✕</button>';
   host.appendChild(d);
 }
 function _pcOnSav(sel){
   var cell = sel.parentNode.querySelector('.pc-babycell');
   if(cell) cell.innerHTML=_pcBabyCell(sel.value);
+  _pcFormTotal();
 }
 function _pcSaveOrder(){
   var client=(document.getElementById('pc-client')||{}).value||'';
@@ -12077,12 +12110,50 @@ function _pcDelete(id){
   _pcSave(arr); _pcRender();
   if(typeof API!=='undefined') fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerPreCommande', id:id }) }).catch(function(){});
 }
+function _pcDayLabel(iso){
+  if(!iso) return '';
+  var p=String(iso).split('-'); if(p.length!==3) return iso;
+  var dt=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));
+  var j=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'][dt.getDay()];
+  return j+' '+p[2]+'/'+p[1];
+}
+function _pcFillPrintDays(disp){
+  var sel=document.getElementById('pc-print-day'); if(!sel) return;
+  var prev=sel.value;
+  var seen={}, days=[];
+  disp.forEach(function(o){ if(o.date && !seen[o.date]){ seen[o.date]=0; days.push(o.date); } seen[o.date]++; });
+  days.sort();
+  sel.innerHTML = days.length
+    ? days.map(function(d){ return '<option value="'+d+'">'+_pcDayLabel(d)+' ('+seen[d]+')</option>'; }).join('')
+    : '<option value="">— aucun jour —</option>';
+  if(prev && seen[prev]!==undefined) sel.value=prev;
+}
 function _pcRender(){
   var list=document.getElementById('pc-list'); if(!list) return;
-  var arr=_pcLoad();
-  if(!arr.length){ list.innerHTML='<div class="empty" style="text-align:center;color:#aab3bd;font-size:13px;padding:34px 10px;background:#fff;border:1px dashed #e2e7ec;border-radius:14px">Aucune pré-commande.<br>Clique « + Nouvelle commande » pour en créer une.</div>'; return; }
+  var all=_pcLoad();
+  var today=_pcTodayISO();
+  // on masque (sans supprimer du Google Sheet) les commandes dont le jour de livraison est passé
+  var arr=all.filter(function(o){ return !o.date || o.date>=today; });
+  // classement par jour de livraison : du plus proche au plus loin
+  arr.sort(function(a,b){ var da=a.date||'9999', db=b.date||'9999'; if(da<db) return -1; if(da>db) return 1; return (Number(a.id)||0)-(Number(b.id)||0); });
+  _pcFillPrintDays(arr);
+  if(!arr.length){
+    var passees=all.length - arr.length;
+    var extra = passees>0 ? '<br><span style="font-size:11.5px;color:#c0c8d0">('+passees+' commande'+(passees>1?'s':'')+' passée'+(passees>1?'s':'')+' masquée'+(passees>1?'s':'')+' — toujours dans Google Sheets)</span>' : '';
+    list.innerHTML='<div class="empty" style="text-align:center;color:#aab3bd;font-size:13px;padding:34px 10px;background:#fff;border:1px dashed #e2e7ec;border-radius:14px">Aucune pré-commande à venir.'+extra+'<br>Clique « + Nouvelle commande » pour en créer une.</div>'; return;
+  }
   var stk=_pcStockMap();
+  var _lastDay=null;
   list.innerHTML = arr.map(function(o){
+    var dayHdr='';
+    if(o.date!==_lastDay){ _lastDay=o.date;
+      dayHdr='<div style="display:flex;align-items:center;gap:10px;margin:18px 2px 10px"><span style="font-size:13px;font-weight:900;color:#0c447c;text-transform:capitalize">📅 '+_pcDayLabel(o.date)+'</span><span style="flex:1;height:1px;background:#e2e7ec"></span></div>';
+    }
+    return dayHdr+_pcRenderCard(o,stk);
+  }).join('');
+}
+function _pcRenderCard(o,stk){
+  return (function(o){
     var tot=0, aProd=0;
     var rows=o.lignes.map(function(l){
       var s=stk[l.sav]||{big:0,baby:0};
@@ -12100,7 +12171,7 @@ function _pcRender(){
     var badge=o.type==='cuit'
       ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#fbe8e2;color:#d44218;text-transform:uppercase">🔥 Cuits</span>'
       : '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#e7f0f9;color:#0662aa;text-transform:uppercase">❄️ Congelés</span>';
-    var _livIc=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':'🚗');
+    var _livIc=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':((o.livreur==='Retrait au labo')?'🏭':'🚗'));
     var livBadge=o.livreur ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#eef2f6;color:#44515f">'+_livIc+' '+_pcEsc(o.livreur==='Livreur interne'?'Interne':o.livreur)+'</span>' : '';
     var summary= aProd>0
       ? '<span style="font-size:12.5px;font-weight:700;color:#b45309">🔥 À produire : '+aProd+' cookies avant livraison</span>'
@@ -12126,7 +12197,7 @@ function _pcRender(){
         '</span>'+
       '</div>'+
     '</div>';
-  }).join('');
+  })(o);
 }
 
 /* Pré-remplir la sortie frigo à partir d'une pré-commande → BL */
@@ -12166,7 +12237,7 @@ function _pcBuildSheet(orders, titre){
   function tbl(rows){ return '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;font-size:10px;color:#8a97a5;padding:4px 8px;border-bottom:1px solid #e2e7ec">Saveur</th><th style="text-align:right;font-size:10px;color:#8a97a5;padding:4px 8px;border-bottom:1px solid #e2e7ec">Big</th><th style="text-align:right;font-size:10px;color:#8a97a5;padding:4px 8px;border-bottom:1px solid #e2e7ec">Baby</th></tr></thead><tbody>'+rows+'</tbody></table>'; }
   var ords=orders.map(function(o){
     var badge=o.type==='cuit'?'<span style="font-size:11px;font-weight:800;color:#d44218">🔥 Cuits</span>':'<span style="font-size:11px;font-weight:800;color:#0662aa">❄️ Congelés</span>';
-    var _li=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':'🚗');
+    var _li=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':((o.livreur==='Retrait au labo')?'🏭':'🚗'));
     var livTxt=o.livreur?'<span style="font-size:11px;font-weight:800;color:#44515f">'+_li+' '+_pcEsc(o.livreur==='Livreur interne'?'Interne':o.livreur)+'</span>':'';
     var rows=o.lignes.map(function(l){ var b=(_PC_NOBABY.indexOf(l.sav)>=0)?'X':l.baby; return '<tr><td style="text-align:left;font-weight:700;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+_pcEsc(l.sav)+'</td><td style="text-align:right;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+l.big+'</td><td style="text-align:right;font-size:13px;padding:5px 8px;border-bottom:1px solid #f2f4f6">'+b+'</td></tr>'; }).join('');
     var tot=o.lignes.reduce(function(a,l){return a+l.big+(_PC_NOBABY.indexOf(l.sav)>=0?0:l.baby);},0);
@@ -12176,9 +12247,9 @@ function _pcBuildSheet(orders, titre){
   var gtot=Object.keys(agg).reduce(function(a,s){return a+agg[s].big+(_PC_NOBABY.indexOf(s)>=0?0:agg[s].baby);},0);
   // Récap : nombre de clients, de commandes, total cookies, répartition livreurs
   var nbClients=(function(){ var set={}; orders.forEach(function(o){ set[o.client]=1; }); return Object.keys(set).length; })();
-  var livCount={Tarik:0,Shippr:0,'Livreur interne':0};
+  var livCount={Tarik:0,Shippr:0,'Livreur interne':0,'Retrait au labo':0};
   orders.forEach(function(o){ if(o.livreur && livCount[o.livreur]!==undefined) livCount[o.livreur]++; });
-  var livParts=[]; if(livCount.Tarik) livParts.push('🚗 Tarik : '+livCount.Tarik); if(livCount.Shippr) livParts.push('📦 Shippr : '+livCount.Shippr); if(livCount['Livreur interne']) livParts.push('🏠 Interne : '+livCount['Livreur interne']);
+  var livParts=[]; if(livCount.Tarik) livParts.push('🚗 Tarik : '+livCount.Tarik); if(livCount.Shippr) livParts.push('📦 Shippr : '+livCount.Shippr); if(livCount['Livreur interne']) livParts.push('🏠 Interne : '+livCount['Livreur interne']); if(livCount['Retrait au labo']) livParts.push('🏭 Retrait labo : '+livCount['Retrait au labo']);
   var recap='<div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px">'+
     '<div style="flex:1;min-width:120px;background:#eef5fc;border-radius:10px;padding:10px 14px"><div style="font-size:22px;font-weight:900;color:#0c447c;line-height:1">'+nbClients+'</div><div style="font-size:11px;color:#5b6773">client'+(nbClients>1?'s':'')+'</div></div>'+
     '<div style="flex:1;min-width:120px;background:#eef5fc;border-radius:10px;padding:10px 14px"><div style="font-size:22px;font-weight:900;color:#0c447c;line-height:1">'+orders.length+'</div><div style="font-size:11px;color:#5b6773">commande'+(orders.length>1?'s':'')+'</div></div>'+
@@ -12204,10 +12275,11 @@ function _pcOpenPrint(html){
 function _pcPrintDay(){
   var arr=_pcLoad();
   if(!arr.length){ toast('bl','Aucune pré-commande à imprimer','err'); return; }
-  var today=_pcTodayISO();
-  var jour=arr.filter(function(o){ return o.date===today; });
-  if(!jour.length) jour=arr; // si rien daté aujourd'hui, on imprime tout ce qui est en attente
-  _pcOpenPrint(_pcBuildSheet(jour, 'Commandes B2B du '+_pcFmtDate(jour[0].date)));
+  var sel=document.getElementById('pc-print-day');
+  var jourISO=(sel && sel.value) ? sel.value : _pcTodayISO();
+  var jour=arr.filter(function(o){ return o.date===jourISO; });
+  if(!jour.length){ toast('bl','Aucune commande pour le '+_pcFmtDate(jourISO),'err'); return; }
+  _pcOpenPrint(_pcBuildSheet(jour, 'Commandes B2B — livraison du '+_pcFmtDate(jourISO)));
 }
 function _pcPrintOne(id){
   var o=_pcLoad().filter(function(x){return x.id===id;})[0]; if(!o) return;
@@ -14882,7 +14954,7 @@ var qrcode = function() {
   var scanner = null, current = null;
   var _scanMode = null, _genericCb = null;
 
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
   var LIVREURS = ['Tarik','Shippr','Interne'];
   var DEST_TYPES = [
     { v:'b2b',        label:'🏬 Client B2B',       sub:'Livraison + BL',    client:true,  bl:true },
@@ -15333,7 +15405,7 @@ var qrcode = function() {
     { v:'interne', label:'🔧 Usage interne', client:false },
     { v:'autre', label:'🛒 Commande client', client:true }
   ];
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
   function body(){ return document.getElementById('ixelles-body'); }
   function _toast(msg){ try{ if(typeof toast==='function'){ toast('sortie', msg, 'err'); return; } }catch(e){} alert(msg); }
   function _pd(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(m) return new Date(+m[3],+m[2]-1,+m[1]); var d=new Date(s); return isNaN(d)?null:d; }
