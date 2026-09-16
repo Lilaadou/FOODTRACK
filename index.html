@@ -2733,7 +2733,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxuo12vC9-nzxHKEcIIm4dJJanlOlTP49BAN0RppX4anWT9OSslPGhasMqoaqIni49zpQ/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxA4ffqpuDuShjnuHrWCBxcPI2d_CiScp7ZP1FK7EogrxEVs1S8cHUY_07YjzRgE7Ry-Q/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -11940,7 +11940,8 @@ function setBlSub(sub){
   var OFF = 'border:none;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em;padding:8px 18px;border-radius:8px;background:transparent;color:#999;box-shadow:none';
   if(!liv||!tar) return;
   function hideAll(){ liv.style.display='none'; tar.style.display='none'; if(pcm)pcm.style.display='none'; if(occ)occ.style.display='none';
-    if(bL)bL.style.cssText=OFF; if(bT)bT.style.cssText=OFF; if(bP)bP.style.cssText=OFF; if(bO)bO.style.cssText=OFF; }
+    if(bL)bL.style.cssText=OFF; if(bT)bT.style.cssText=OFF; if(bP)bP.style.cssText=OFF; if(bO)bO.style.cssText=OFF;
+    if(typeof _pcStopAuto==='function') _pcStopAuto(); }
   if(sub==='tarik'){
     hideAll(); tar.style.display=''; if(bT)bT.style.cssText=ON;
     renderTarikTracker();
@@ -11948,6 +11949,7 @@ function setBlSub(sub){
   } else if(sub==='precommandes'){
     hideAll(); if(pcm)pcm.style.display=''; if(bP)bP.style.cssText=ON;
     if(typeof _pcRefresh==='function') _pcRefresh();
+    if(typeof _pcStartAuto==='function') _pcStartAuto();
   } else if(sub==='occasionnel'){
     hideAll(); if(occ)occ.style.display=''; if(bO)bO.style.cssText=ON;
     if(typeof _occRefresh==='function') _occRefresh(); else if(typeof _occRenderList==='function') _occRenderList();
@@ -11981,6 +11983,14 @@ function _pcSyncStatus(txt,color){
   var el=document.getElementById('pc-sync'); if(!el) return;
   el.textContent=txt; el.style.color=color||'#8a97a5';
 }
+var _pcAutoTimer=null;
+function _pcStartAuto(){ _pcStopAuto(); _pcAutoTimer=setInterval(function(){
+  var a=document.activeElement;
+  if(a && (a.tagName==='INPUT'||a.tagName==='SELECT'||a.tagName==='TEXTAREA')){ return; } // ne pas interrompre une saisie
+  var f=document.getElementById('pc-form'); if(f && f.style.display!=='none') return; // ni pendant une création/édition
+  if(typeof _pcRefresh==='function') _pcRefresh();
+}, 25000); }
+function _pcStopAuto(){ if(_pcAutoTimer){ clearInterval(_pcAutoTimer); _pcAutoTimer=null; } }
 function _pcRefresh(){
   _pcRender(); // affichage immédiat depuis le cache local
   if(typeof fetchAPI!=='function'){ _pcSyncStatus('⚠️ Hors ligne','#b45309'); return; }
@@ -12003,7 +12013,8 @@ function _pcRefresh(){
 function _pcPush(order){
   if(typeof API==='undefined') return;
   fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
-    action:'sauverPreCommande', id:order.id, date:order.date, client:order.client, type:order.type, livreur:order.livreur||'', lignes:order.lignes, statut:order.statut||''
+    action:'sauverPreCommande', id:order.id, date:order.date, client:order.client, type:order.type, livreur:order.livreur||'', lignes:order.lignes, statut:order.statut||'',
+    numero:order.numero||'', commentaire:(order.commentaire!=null?order.commentaire:''), messageKooki:(order.messageKooki!=null?order.messageKooki:'')
   }) }).catch(function(){});
 }
 function _pcStockMap(){
@@ -12174,6 +12185,15 @@ function _pcSetStatut(id,st){
   if(order) _pcPush(order);   // met à jour le statut côté Google Sheets (visible par le client)
   toast('bl','Statut mis à jour : '+st,'ok');
 }
+function _pcSetMessage(id){
+  var inp=document.getElementById('pc-msg-'+id); if(!inp) return;
+  var msg=inp.value||'';
+  var arr=_pcLoad(); var order=null;
+  arr=arr.map(function(o){ if(o.id===id){ o.messageKooki=msg; order=o; } return o; });
+  _pcSave(arr); _pcRender();
+  if(order) _pcPush(order);   // le client verra le message dans son espace
+  toast('bl', msg?'✉️ Message envoyé au client':'Message effacé','ok');
+}
 function _pcDayLabel(iso){
   if(!iso) return '';
   var p=String(iso).split('-'); if(p.length!==3) return iso;
@@ -12244,7 +12264,7 @@ function _pcRenderCard(o,stk){
       : '<span style="font-size:12.5px;font-weight:700;color:#2e7d46">✓ Tout est en stock — prêt à sortir</span>';
     return '<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden'+(aVal?';border:1.5px solid #f0c98a':'')+'">'+
       '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap'+(aVal?';background:#fffdf7':'')+'">'+
-        '<div><div style="font-size:16px;font-weight:800">'+_pcEsc(o.client)+'</div><div style="font-size:12px;color:#8a97a5">Livraison souhaitée : '+_pcFmtDate(o.date)+'</div></div>'+
+        '<div><div style="font-size:16px;font-weight:800">'+_pcEsc(o.client)+(o.numero?' <span style="font-size:11px;font-weight:700;color:#8a97a5">N° '+_pcEsc(o.numero)+'</span>':'')+'</div><div style="font-size:12px;color:#8a97a5">Livraison souhaitée : '+_pcFmtDate(o.date)+'</div></div>'+
         stBadge+badge+livBadge+
         '<div style="margin-left:auto;text-align:right"><div style="font-size:22px;font-weight:900;color:#0c447c">'+tot+'</div><div style="font-size:10px;color:#8a97a5;text-transform:uppercase">cookies</div></div>'+
       '</div>'+
@@ -12254,6 +12274,10 @@ function _pcRenderCard(o,stk){
         '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Baby</th>'+
         '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Stock</th>'+
       '</tr></thead><tbody>'+rows+'</tbody></table>'+
+      (((o.commentaire||'')||(o.numero||'')||(o.statut||'')) ? ('<div style="padding:12px 18px;border-top:1px solid #f0f2f5">'+
+        ((o.commentaire||'')?'<div style="background:#f4f6f8;border-radius:8px;padding:8px 11px;font-size:12px;color:#55606b;margin-bottom:8px">💬 Client : '+_pcEsc(o.commentaire)+'</div>':'')+
+        (((o.numero||'')||(o.statut||''))?'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="pc-msg-'+o.id+'" value="'+_pcEsc(o.messageKooki||'')+'" placeholder="Message au client (ex. Livraison 9h confirmée)" style="flex:1;min-width:170px;padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:8px;font-size:12.5px;outline:none"><button class="btn btn-secondary" onclick="_pcSetMessage('+o.id+')" style="font-size:12px;padding:8px 12px">✉️ Envoyer au client</button></div>':'')+
+      '</div>') : '')+
       '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
         summary+
         (o.statut?'<span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#8a97a5;font-weight:700">Statut :<select onchange="_pcSetStatut('+o.id+',this.value)" style="font-size:12px;padding:6px 8px;border:1.5px solid #e2e7ec;border-radius:8px;background:#fff;font-weight:700">'+_PC_STATUTS.map(function(s){return '<option'+(s===o.statut?' selected':'')+'>'+s+'</option>';}).join('')+'</select></span>':'')+
