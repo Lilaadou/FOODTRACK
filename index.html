@@ -2733,7 +2733,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzWB9XlleaYyJpB_TslwB6c1wvOWSmNAo5aOCqMbaNRAPVs3-6iA4PfuQ6X4kX944jkgw/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxuo12vC9-nzxHKEcIIm4dJJanlOlTP49BAN0RppX4anWT9OSslPGhasMqoaqIni49zpQ/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -12153,12 +12153,26 @@ function _pcDelete(id){
   _pcSave(arr); _pcRender();
   if(typeof API!=='undefined') fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({ action:'supprimerPreCommande', id:id }) }).catch(function(){});
 }
-function _pcValider(id){
+var _PC_STATUTS=['À valider','Approuvée','En préparation','Envoyée','Livrée'];
+function _pcStatutBadge(st){
+  if(!st) return '';
+  var m={
+    'À valider':['#fff4e6','#b45309','⏳ À valider · commande client'],
+    'Approuvée':['#eaf5ee','#2e7d46','✅ Approuvée'],
+    'En préparation':['#e7f0f9','#0662aa','👨‍🍳 En préparation'],
+    'Envoyée':['#e7f0f9','#0662aa','🚚 Envoyée'],
+    'Livrée':['#eef2f6','#44515f','✓ Livrée']
+  };
+  var s=m[st]||['#eef2f6','#44515f',st];
+  return '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:'+s[0]+';color:'+s[1]+'">'+s[2]+'</span>';
+}
+function _pcValider(id){ _pcSetStatut(id,'Approuvée'); }
+function _pcSetStatut(id,st){
   var arr=_pcLoad(); var order=null;
-  arr=arr.map(function(o){ if(o.id===id){ o.statut='Validée'; order=o; } return o; });
+  arr=arr.map(function(o){ if(o.id===id){ o.statut=st; order=o; } return o; });
   _pcSave(arr); _pcRender();
-  if(order) _pcPush(order);   // met à jour le statut côté Google Sheets
-  toast('bl','✓ Commande validée — prête à préparer','ok');
+  if(order) _pcPush(order);   // met à jour le statut côté Google Sheets (visible par le client)
+  toast('bl','Statut mis à jour : '+st,'ok');
 }
 function _pcDayLabel(iso){
   if(!iso) return '';
@@ -12224,7 +12238,7 @@ function _pcRenderCard(o,stk){
     var _livIc=(o.livreur==='Shippr')?'📦':((o.livreur==='Livreur interne')?'🏠':((o.livreur==='Retrait au labo')?'🏭':'🚗'));
     var livBadge=o.livreur ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#eef2f6;color:#44515f">'+_livIc+' '+_pcEsc(o.livreur==='Livreur interne'?'Interne':o.livreur)+'</span>' : '';
     var aVal=(o.statut==='À valider');
-    var stBadge=aVal ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#fff4e6;color:#b45309">⏳ À valider · commande client</span>' : '';
+    var stBadge=(typeof _pcStatutBadge==='function')?_pcStatutBadge(o.statut):'';
     var summary= aProd>0
       ? '<span style="font-size:12.5px;font-weight:700;color:#b45309">🔥 À produire : '+aProd+' cookies avant livraison</span>'
       : '<span style="font-size:12.5px;font-weight:700;color:#2e7d46">✓ Tout est en stock — prêt à sortir</span>';
@@ -12242,8 +12256,9 @@ function _pcRenderCard(o,stk){
       '</tr></thead><tbody>'+rows+'</tbody></table>'+
       '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
         summary+
+        (o.statut?'<span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#8a97a5;font-weight:700">Statut :<select onchange="_pcSetStatut('+o.id+',this.value)" style="font-size:12px;padding:6px 8px;border:1.5px solid #e2e7ec;border-radius:8px;background:#fff;font-weight:700">'+_PC_STATUTS.map(function(s){return '<option'+(s===o.statut?' selected':'')+'>'+s+'</option>';}).join('')+'</select></span>':'')+
         '<span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">'+
-          (aVal?'<button class="btn btn-primary" onclick="_pcValider('+o.id+')" style="font-size:12px;padding:8px 14px;background:#2e7d46">✓ Valider</button>':'')+
+          (aVal?'<button class="btn btn-primary" onclick="_pcValider('+o.id+')" style="font-size:12px;padding:8px 14px;background:#2e7d46">✓ Approuver</button>':'')+
           '<button class="btn btn-secondary" onclick="_pcEdit('+o.id+')" style="font-size:12px;padding:8px 12px">✏️ Modifier</button>'+
           '<button class="btn btn-secondary" onclick="_pcPrintOne('+o.id+')" style="font-size:12px;padding:8px 12px">🖨️ Imprimer</button>'+
           (aVal?'':'<button class="btn btn-primary" onclick="_pcFaireBL('+o.id+')" style="font-size:12px;padding:8px 12px">📄 Faire le BL</button>')+
