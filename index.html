@@ -11964,6 +11964,7 @@ var _PC_SAVEURS = ['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI
 var _PC_NOBABY  = ['CHARLY','LENI'];
 var _pcFormType = 'cuit';
 var _pcFormLivreur = 'Tarik';
+var _pcEditId = null;
 
 function _pcClients(){
   try { if (typeof B2B_CLIENTS === 'object' && B2B_CLIENTS) return Object.keys(B2B_CLIENTS).sort(); } catch(e){}
@@ -12019,10 +12020,11 @@ function _pcToggleForm(){
   var f = document.getElementById('pc-form'); if(!f) return;
   var show = f.style.display==='none' || f.style.display==='';
   if(!show){ f.style.display='none'; return; }
-  _pcFormType='cuit'; _pcFormLivreur='Tarik';
+  _pcFormType='cuit'; _pcFormLivreur='Tarik'; _pcEditId=null;
   var clientOpts = '<option value="">— Choisir un client —</option>' + _pcClients().map(function(c){ return '<option>'+_pcEsc(c)+'</option>'; }).join('');
   f.innerHTML =
     '<div style="border:1.5px solid #f0d8d0;border-radius:12px;padding:14px 16px;background:#fdf7f5">'+
+      '<div id="pc-form-title" style="font-size:14px;font-weight:800;color:#0c447c;margin-bottom:12px">Nouvelle pré-commande</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'+
         '<div><div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Client</div>'+
           '<select id="pc-client" style="width:100%;height:44px;box-sizing:border-box;padding:8px 11px;border:1.5px solid #e2e7ec;border-radius:9px;font-size:13.5px;background:#fff;outline:none">'+clientOpts+'</select></div>'+
@@ -12073,10 +12075,10 @@ function _pcSetLivreur(v){
     el.style.cssText='border:1.5px solid '+(on?'#0662aa':'#e2e7ec')+';background:'+(on?'#e7f0f9':'#fff')+';color:'+(on?'#0662aa':'#1f2937')+';border-radius:12px;padding:11px 6px;cursor:pointer;font-size:13px;font-weight:800';
   });
 }
-function _pcBabyCell(sav){
+function _pcBabyCell(sav,val){
   var no = _PC_NOBABY.indexOf(sav)>=0;
   return no ? '<input type="number" min="0" placeholder="X" disabled style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;background:#f4f6f8;color:#bbb">'
-            : '<input type="number" min="0" placeholder="0" oninput="_pcFormTotal()" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">';
+            : '<input type="number" min="0" placeholder="0" value="'+(val!=null?val:'')+'" oninput="_pcFormTotal()" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">';
 }
 function _pcFormTotal(){
   var big=0, baby=0;
@@ -12089,14 +12091,14 @@ function _pcFormTotal(){
   var n=document.getElementById('pc-total-num'); if(n) n.textContent=(big+baby);
   var s=document.getElementById('pc-total-split'); if(s) s.innerHTML=big+' Big &middot; '+baby+' Baby';
 }
-function _pcAddFlav(){
+function _pcAddFlav(sav,big,baby){
   var host=document.getElementById('pc-flavs'); if(!host) return;
   var d=document.createElement('div');
   d.style.cssText='display:grid;grid-template-columns:1fr 84px 84px 34px;gap:8px;margin-bottom:8px;align-items:center';
   d.innerHTML =
-    '<select onchange="_pcOnSav(this)" style="padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:8px;font-size:13px;background:#fff;outline:none">'+_PC_SAVEURS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select>'+
-    '<input type="number" min="0" placeholder="0" oninput="_pcFormTotal()" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">'+
-    '<span class="pc-babycell">'+_pcBabyCell(_PC_SAVEURS[0])+'</span>'+
+    '<select onchange="_pcOnSav(this)" style="padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:8px;font-size:13px;background:#fff;outline:none">'+_PC_SAVEURS.map(function(s){return '<option'+(s===sav?' selected':'')+'>'+s+'</option>';}).join('')+'</select>'+
+    '<input type="number" min="0" placeholder="0" value="'+(big!=null?big:'')+'" oninput="_pcFormTotal()" style="width:100%;padding:8px;border:1.5px solid #e2e7ec;border-radius:8px;text-align:center;outline:none">'+
+    '<span class="pc-babycell">'+_pcBabyCell(sav||_PC_SAVEURS[0],baby)+'</span>'+
     '<button type="button" onclick="this.parentNode.remove();_pcFormTotal()" style="border:none;background:#fde8e8;color:#c0392b;border-radius:8px;padding:8px 0;font-size:13px;font-weight:800;cursor:pointer">✕</button>';
   host.appendChild(d);
 }
@@ -12118,13 +12120,33 @@ function _pcSaveOrder(){
     if(big>0||baby>0) lignes.push({sav:sav,big:big,baby:baby});
   });
   if(!lignes.length){ toast('bl','⚠️ Ajoute au moins une saveur avec une quantité','err'); return; }
-  var order={ id: Date.now(), client:client, date:date, type:_pcFormType, livreur:_pcFormLivreur, lignes:lignes };
-  var arr=_pcLoad(); arr.unshift(order);
+  var editing=_pcEditId;
+  var order={ id: editing||Date.now(), client:client, date:date, type:_pcFormType, livreur:_pcFormLivreur, lignes:lignes };
+  var arr=_pcLoad();
+  if(editing){ arr=arr.map(function(o){ return (o.id===editing)?order:o; }); }
+  else { arr.unshift(order); }
   _pcSave(arr);
-  _pcPush(order);                       // → Google Sheets (partagé)
+  _pcPush(order);                       // → Google Sheets (partagé, met à jour si même id)
+  _pcEditId=null;
   document.getElementById('pc-form').style.display='none';
   _pcRender();
-  toast('bl','✓ Pré-commande enregistrée','ok');
+  toast('bl', editing?'✓ Pré-commande modifiée':'✓ Pré-commande enregistrée','ok');
+}
+function _pcEdit(id){
+  var o=_pcLoad().filter(function(x){return x.id===id;})[0]; if(!o) return;
+  var f=document.getElementById('pc-form'); if(f) f.style.display='none';
+  _pcToggleForm();          // construit un formulaire vierge et l'affiche
+  _pcEditId=id;
+  var t=document.getElementById('pc-form-title'); if(t) t.textContent='✏️ Modifier la pré-commande';
+  var cs=document.getElementById('pc-client'); if(cs) cs.value=o.client||'';
+  var ds=document.getElementById('pc-date'); if(ds) ds.value=o.date||_pcTodayISO();
+  _pcSetType(o.type||'cuit');
+  _pcSetLivreur(o.livreur||'Tarik');
+  var host=document.getElementById('pc-flavs'); if(host) host.innerHTML='';
+  (o.lignes||[]).forEach(function(l){ _pcAddFlav(l.sav, l.big, l.baby); });
+  if(!(o.lignes||[]).length) _pcAddFlav();
+  _pcFormTotal();
+  if(f) f.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function _pcDelete(id){
   var arr=_pcLoad().filter(function(o){ return o.id!==id; });
@@ -12212,6 +12234,7 @@ function _pcRenderCard(o,stk){
       '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
         summary+
         '<span style="margin-left:auto;display:flex;gap:8px">'+
+          '<button class="btn btn-secondary" onclick="_pcEdit('+o.id+')" style="font-size:12px;padding:8px 12px">✏️ Modifier</button>'+
           '<button class="btn btn-secondary" onclick="_pcPrintOne('+o.id+')" style="font-size:12px;padding:8px 12px">🖨️ Imprimer</button>'+
           '<button class="btn btn-primary" onclick="_pcFaireBL('+o.id+')" style="font-size:12px;padding:8px 12px">📄 Faire le BL</button>'+
           '<button class="btn btn-secondary" onclick="if(confirm(\'Supprimer cette pré-commande ?\'))_pcDelete('+o.id+')" style="font-size:12px;padding:8px 10px">🗑️</button>'+
@@ -12312,6 +12335,7 @@ function _pcPrintOne(id){
    Le patron remplit → bon de commande imprimable. Stockage local.
    ═══════════════════════════════════════════════════════════════ */
 var _OCC_SAVEURS = ['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
+var _occEditId = null;
 var _OCC_POINTS_DEF = [
   "Prévenir et confirmer le livreur la veille.",
   "La commande doit ARRIVER chez le client à l'heure indiquée (pas l'heure de départ du labo).",
@@ -12357,7 +12381,7 @@ function _occToggleForm(){
   var f=document.getElementById('occ-form'); if(!f) return;
   var show=f.style.display==='none'||f.style.display==='';
   if(!show){ f.style.display='none'; return; }
-  _occBuildForm(); f.style.display='';
+  _occEditId=null; _occBuildForm(); f.style.display='';
 }
 function _occBuildForm(){
   var f=document.getElementById('occ-form'); if(!f) return;
@@ -12365,6 +12389,7 @@ function _occBuildForm(){
     '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">'+
       // ---- colonne formulaire ----
       '<div style="flex:1;min-width:320px;border:1.5px solid #f0d8d0;border-radius:12px;padding:14px 16px;background:#fdf7f5">'+
+        '<div id="occ-form-title" style="font-size:14px;font-weight:800;color:#0c447c;margin-bottom:12px">Nouvelle commande occasionnelle</div>'+
         _occLbl('Client / coordonnées')+
         _occField('Nom du client','<input type="text" id="occ_nom" oninput="_occRender()" '+_occInp()+'>')+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">'+
@@ -12619,12 +12644,36 @@ function _occSave(){
   var d=_occCollect();
   if(!d.nom){ toast('bl','⚠️ Indique le nom du client','err'); return; }
   if(!d.lignes.filter(function(l){return l.sav&&((l.big||0)+(l.baby||0)>0);}).length){ toast('bl','⚠️ Ajoute au moins une saveur avec une quantité','err'); return; }
-  d.id=Date.now();
-  var arr=_occLoad(); arr.unshift(d); _occStore(arr);
-  _occPush(d);                          // → Google Sheets (partagé)
+  var editing=_occEditId;
+  d.id=editing||Date.now();
+  var arr=_occLoad();
+  if(editing){ arr=arr.map(function(o){ return (o.id===editing)?d:o; }); }
+  else { arr.unshift(d); }
+  _occStore(arr);
+  _occPush(d);                          // → Google Sheets (partagé, met à jour si même id)
+  _occEditId=null;
   document.getElementById('occ-form').style.display='none';
   _occRenderList();
-  toast('bl','✓ Commande occasionnelle enregistrée','ok');
+  toast('bl', editing?'✓ Commande occasionnelle modifiée':'✓ Commande occasionnelle enregistrée','ok');
+}
+function _occEdit(id){
+  var o=_occLoad().filter(function(x){return x.id===id;})[0]; if(!o) return;
+  var f=document.getElementById('occ-form'); if(f) f.style.display='none';
+  _occEditId=null; _occBuildForm(); if(f) f.style.display='';
+  _occEditId=id;
+  var t=document.getElementById('occ-form-title'); if(t) t.textContent='✏️ Modifier la commande occasionnelle';
+  var setv=function(id,v){ var e=document.getElementById(id); if(e) e.value=v||''; };
+  setv('occ_nom',o.nom); setv('occ_email',o.email); setv('occ_tel',o.tel); setv('occ_adr',o.adr); setv('occ_instr',o.instr);
+  setv('occ_perso',o.perso); setv('occ_paynote',o.paynote); setv('occ_date',o.date||_pcTodayISO()); setv('occ_heure',_occTime(o.heure)||'09:00');
+  var pts=document.getElementById('occ_points'); if(pts && o.points) pts.value=(o.points||[]).join('\n');
+  var pickSeg=function(g,v){ var w=document.getElementById(g); if(!w||!v) return; for(var i=0;i<w.children.length;i++){ if(w.children[i].getAttribute('data-v')===v){ _occSetSeg(g,w.children[i]); return; } } };
+  pickSeg('occ_seg_cont',o.cont); pickSeg('occ_seg_indiv',o.indiv); pickSeg('occ_seg_pay',o.pay);
+  pickSeg('occ_seg_mode',o.mode); pickSeg('occ_seg_lieu',o.lieu);
+  var host=document.getElementById('occ_flavs'); if(host) host.innerHTML='';
+  (o.lignes||[]).forEach(function(l){ var bb=_occLineBB(l); _occAddFlav(l.sav, bb.big, bb.baby); });
+  if(!(o.lignes||[]).length) _occAddFlav();
+  _occRender();
+  if(f) f.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function _occDelete(id){
   var arr=_occLoad().filter(function(o){ return o.id!==id; });
@@ -12683,6 +12732,7 @@ function _occRenderList(){
       '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
         summary+
         '<span style="margin-left:auto;display:flex;gap:8px">'+
+          '<button class="btn btn-secondary" onclick="_occEdit('+o.id+')" style="font-size:12px;padding:8px 12px">✏️ Modifier</button>'+
           '<button class="btn btn-secondary" onclick="_occPrintOne('+o.id+')" style="font-size:12px;padding:8px 12px">🖨️ Imprimer</button>'+
           '<button class="btn btn-secondary" onclick="if(confirm(\'Supprimer cette commande occasionnelle ?\'))_occDelete('+o.id+')" style="font-size:12px;padding:8px 10px">🗑️</button>'+
         '</span>'+
