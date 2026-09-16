@@ -2733,7 +2733,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbx4PQ6_bYAQCYcyuMM4O2Yp0E5Wo_Os0RsqHRl9OWl1efrfpAvQgeUd3QsYMRzqDw5aeg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxCIpHyv1RxJs6nl93GOP0m8Ug4sGyqe5Tu-7Kcajkz4EK36cUulCvnV3VB6P6NfRzofA/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -12423,7 +12423,7 @@ function _occBuildForm(){
           '<div data-v="Par facture" data-on="1" onclick="_occSetSeg(\'occ_seg_pay\',this)" style="'+_OCC_SEG_ON+'">🧾 Par facture</div>'+
           '<div data-v="À encaisser sur place" onclick="_occSetSeg(\'occ_seg_pay\',this)" style="'+_OCC_SEG_BASE+'">💶 Sur place</div>'+
         '</div>'+
-        _occField('Note paiement','<input type="text" id="occ_paynote" value="Rien à encaisser sur place. Facture envoyée au client au plus tard J-1." oninput="_occRender()" '+_occInp()+'>')+
+        _occField('Note paiement (facultatif)','<input type="text" id="occ_paynote" value="" placeholder="Laisser vide ou ajouter une précision" oninput="_occRender()" '+_occInp()+'>')+
 
         _occLbl('Points importants (imprimés sur le bon)')+
         '<textarea id="occ_points" oninput="_occRender()" '+_occInp()+' style="min-height:120px;'+_occInpS()+'">'+_pcEsc(_OCC_POINTS_DEF.join('\n'))+'</textarea>'+
@@ -12552,7 +12552,7 @@ function _occBuildSheet(d){
       '<div style="flex:1;background:#fbe8e2;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Arrivée impérative</div><div style="font-size:16px;font-weight:900;color:#d44218;margin-top:3px">'+_pcEsc(_occTime(d.heure)||'—')+'</div></div>'+
       '<div style="flex:1;background:#e7f0f9;border-radius:11px;padding:11px 14px"><div style="font-size:10px;font-weight:800;color:#8a97a5;text-transform:uppercase">Total</div><div style="font-size:16px;font-weight:900;color:#0c447c;margin-top:3px">'+tot+' cookies</div></div>'+
     '</div>'+
-    '<div style="margin-top:2px"><span style="display:inline-block;background:#0c447c;color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:800">'+((d.mode==='Retrait')?'🛍️ Retrait':'🚚 Livraison')+' — depuis '+_pcEsc(d.lieu||'KOOKI LABO')+'</span></div>'+
+    '<div style="margin-top:2px"><span style="display:inline-block;background:#0c447c;color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:800">'+((d.mode==='Retrait')?'🛍️ Retrait':'🚚 Livraison')+' — '+_pcEsc(d.lieu||'KOOKI LABO')+'</span></div>'+
     '<div style="margin-top:14px"><div style="font-size:11px;font-weight:800;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e7ec;padding-bottom:5px;margin-bottom:8px">Client &amp; coordonnées</div>'+
       '<div style="display:grid;grid-template-columns:150px 1fr;gap:4px 12px;font-size:13px">'+
         '<div style="color:#6b7683;font-weight:600">Client</div><div style="font-weight:700">'+_pcEsc(d.nom||'—')+'</div>'+
@@ -12573,7 +12573,7 @@ function _occBuildSheet(d){
         '<span style="background:#eef2f6;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;color:#44515f">Personnalisation : '+_pcEsc(d.perso||'Aucune')+'</span>'+
       '</div>'+
     '</div>'+
-    '<div style="border:2px solid #0662aa;background:#f2f8fe;border-radius:11px;padding:10px 14px;margin-top:12px;font-size:13px"><div style="font-size:12px;font-weight:800;color:#0662aa;text-transform:uppercase;margin-bottom:5px">💳 Paiement</div><b>'+_pcEsc(d.pay||'—')+'</b> · '+_pcEsc(d.paynote||'')+'</div>'+
+    '<div style="border:2px solid #0662aa;background:#f2f8fe;border-radius:11px;padding:10px 14px;margin-top:12px;font-size:13px"><div style="font-size:12px;font-weight:800;color:#0662aa;text-transform:uppercase;margin-bottom:5px">💳 Paiement</div><b>'+_pcEsc(d.pay||'—')+'</b>'+(d.paynote?(' · '+_pcEsc(d.paynote)):'')+'</div>'+
     (points?'<div style="border:2px solid #d44218;background:#fff8f5;border-radius:11px;padding:10px 14px;margin-top:12px"><div style="font-size:12px;font-weight:800;color:#d44218;text-transform:uppercase;margin-bottom:7px">⚠️ Points importants</div><ul style="margin:0;padding-left:18px">'+points+'</ul></div>':'')+
     '<div style="margin-top:14px;font-size:10.5px;color:#8a97a5;border-top:1px solid #e2e7ec;padding-top:8px;display:flex;justify-content:space-between"><span>KOOKI LABO — bon de commande B2B occasionnel</span><span>Contact : '+_pcEsc(d.nom||'')+' · '+_pcEsc(d.tel||'')+'</span></div>'+
   '</div>';
