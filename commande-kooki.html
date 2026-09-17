@@ -204,7 +204,7 @@
 
 <script>
 /* ===== URL /exec de ton Apps Script ===== */
-var API = 'https://script.google.com/macros/s/AKfycbzILb7N_UmxilXulEP4EH8o01keWPlCosLdwXdEKmi5MglbHQ8C3fgdFEefKhb43Vd9Dg/exec';
+var API = 'https://script.google.com/macros/s/AKfycbwJfPautpufk2hflTiWnQYsvj4wktd72o2tVByePLgQa2HhOK8Dx3jjg1frUVRQE0HQCA/exec';
 
 var SAVEURS_ALL=['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
 var NOBABY=['CHARLY','LENI'];
@@ -216,7 +216,7 @@ var STATUT_MAP={
   'Envoyée':['#e7f0f9','#0662aa','🚚 Envoyée'],
   'Livrée':['#eef2f6','#44515f','✓ Livrée']
 };
-var CLIENT='', CODE='', SAVEURS=[], qty={}, PRIX={big:0,baby:0,livraison:0};
+var CLIENT='', CODE='', SAVEURS=[], qty={}, PRIX={big:0,baby:0,livraison:8};
 function curMode(){ var e=document.querySelector('#seg-mode .opt.on'); return e?e.getAttribute('data-v'):'Livraison'; }
 var histCache=null, histTimer=null, editId=null, editNumero='';
 
@@ -246,7 +246,7 @@ function login(){
       document.getElementById('clientName').innerHTML=esc(CLIENT)+'<small>Espace commande</small>';
       document.getElementById('login').hidden=true;
       document.getElementById('order').hidden=false;
-      apiGet('getTarifs').then(function(t){ if(t){ PRIX.big=Number(t.big)||0; PRIX.baby=Number(t.baby)||0; PRIX.livraison=Number(t.livraison)||0; } build(); calc(); }).catch(function(){});
+      apiGet('getTarifs').then(function(t){ if(t){ PRIX.big=Number(t.big)||0; PRIX.baby=Number(t.baby)||0; PRIX.livraison=(Number(t.livraison)>0?Number(t.livraison):8); } build(); calc(); }).catch(function(){});
       showTab('shop');
       var d=new Date(Date.now()+864e5); document.getElementById('ddate').value=d.toISOString().slice(0,10);
       loadDispo();
@@ -432,8 +432,33 @@ function renderHistory(){
       (canEdit
         ? '<div class="hlock open">🔓 Modifiable jusqu\'au '+deadlineLabel(o.date)+'</div><button class="hedit" onclick="editOrder(\''+o.id+'\')">✏️ Modifier</button>'
         : '<div class="hlock closed">🔒 Non modifiable (date limite dépassée)</div>')+
+      (((o.statut==='Envoyée'||o.statut==='Livrée') && o.blDispo)
+        ? '<button onclick="dlBL(\''+o.id+'\')" style="width:100%;margin-top:8px;background:var(--or);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">📄 Télécharger le bon de livraison'+(o.blNumero?(' · '+esc(o.blNumero)):'')+'</button>'
+        : '')+
     '</div>';
   }).join('');
+}
+
+/* ---- Téléchargement du bon de livraison (copie exacte, avec DLC + traçabilité) ---- */
+function dlBL(id){
+  apiGet('getBLClient',{id:id}).then(function(r){
+    if(!r || !r.html){ alert('Le bon de livraison n\'est pas encore disponible.'); return; }
+    _openBLPrint(r.html, r.numero||id);
+  }).catch(function(){ alert('Impossible de récupérer le bon de livraison. Réessaie dans un instant.'); });
+}
+function _openBLPrint(html, numero){
+  var old=document.getElementById('bl-print-frame'); if(old) old.remove();
+  var ifr=document.createElement('iframe'); ifr.id='bl-print-frame';
+  ifr.style.position='fixed'; ifr.style.right='0'; ifr.style.bottom='0'; ifr.style.width='0'; ifr.style.height='0'; ifr.style.border='0';
+  document.body.appendChild(ifr);
+  var base=location.href.replace(/[^/]*$/,''); // dossier courant → pour que logo.png se charge
+  var doc=ifr.contentWindow.document; doc.open();
+  doc.write('<!doctype html><html><head><meta charset="utf-8"><base href="'+base+'">'+
+    '<title>Bon de livraison '+(numero||'')+'</title>'+
+    '<style>@media print{@page{margin:12mm}} body{font-family:Calibri,Carlito,Arial,sans-serif;margin:16px;color:#000;-webkit-font-smoothing:antialiased}</style>'+
+    '</head><body>'+html+'</body></html>');
+  doc.close();
+  setTimeout(function(){ try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }catch(e){ alert('Impression bloquée par le navigateur — autorise les pop-ups pour télécharger le PDF.'); } }, 450);
 }
 </script>
 </body>
