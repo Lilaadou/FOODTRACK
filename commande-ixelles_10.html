@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>KOOKI — Commande Magasin Ixelles</title>
+<style>
+  /* couleurs de marque inversées : l'accent principal est maintenant BLEU, les titres/totaux en ROUGE */
+  :root{--or:#0662aa;--or-d:#0c447c;--or-l:#e7f0f9;--bl:#d44218;--bl2:#e2622f;--bl-l:#fbe8e2;--ln:#ece7e3;--mut:#8a97a5;--ink:#2a2118;--cream:#fbf7f2;--ok:#2e7d46;--ok-l:#eaf5ee;--warn:#b45309;--warn-l:#fff4e6;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Segoe UI',system-ui,Arial,sans-serif;font-size:15px}
+  .wrap{max-width:880px;margin:0 auto;padding:16px 16px 150px}
+  .btn{border:none;border-radius:14px;padding:15px 20px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+  .btn-primary{background:var(--or);color:#fff;box-shadow:0 4px 14px rgba(6,98,170,.3)}
+  .btn-primary:disabled{opacity:.5;cursor:default}
+  .btn-ghost{background:#fff;border:1.5px solid var(--ln);color:#5b5248}
+  .top{display:flex;align-items:center;gap:14px;background:#fff;border-radius:20px;padding:14px 20px;margin-bottom:16px;box-shadow:0 3px 16px rgba(60,40,20,.06)}
+  .top img.brand-logo{height:52px;width:auto;object-fit:contain}
+  .top .who{font-weight:900;font-size:18px}
+  .top .who small{display:block;font-weight:600;color:var(--mut);font-size:12px;margin-top:1px}
+  .tabs{display:flex;gap:6px;background:#fff;border-radius:14px;padding:5px;margin-bottom:16px;box-shadow:0 3px 14px rgba(60,40,20,.05)}
+  .tab{flex:1;border:none;background:transparent;border-radius:10px;padding:13px;font-size:15px;font-weight:800;color:var(--mut);cursor:pointer;font-family:inherit}
+  .tab.on{background:var(--or-l);color:var(--or)}
+  .hero{background:linear-gradient(135deg,#0662aa,#0c447c);color:#fff;border-radius:20px;padding:20px 24px;margin-bottom:16px;box-shadow:0 8px 24px rgba(6,98,170,.25)}
+  .hero h1{margin:0 0 4px;font-size:22px}
+  .hero p{margin:0;font-size:14px;opacity:.92}
+  .capbar{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 20px;margin-bottom:16px;box-shadow:0 3px 14px rgba(60,40,20,.05)}
+  .capbar .lab{font-size:12px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+  .capbar .big{font-size:30px;font-weight:900;color:var(--bl);line-height:1}
+  .capbar .track{flex:1;height:12px;background:#eef1f4;border-radius:99px;overflow:hidden;min-width:120px}
+  .capbar .fill{height:100%;background:linear-gradient(90deg,#2e7d46,#4bb56b);border-radius:99px;transition:width .15s}
+  .capbar.full .fill{background:linear-gradient(90deg,#d44218,#e2622f)}
+  .capwarn{background:var(--warn-l);border:1px solid #f0c98a;border-radius:12px;padding:10px 15px;font-size:13px;color:var(--warn);font-weight:700;margin-bottom:14px;display:none}
+  .capwarn.show{display:block}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:13px}
+  .tile{background:#fff;border-radius:18px;padding:16px;box-shadow:0 3px 16px rgba(60,40,20,.06);border:2px solid #fff;transition:.12s;display:flex;align-items:center;gap:12px}
+  .tile.active{border-color:var(--or);box-shadow:0 6px 20px rgba(6,98,170,.16)}
+  .tile .fn{font-weight:900;font-size:16px;flex:1;min-width:0;overflow-wrap:break-word}
+  #extras,#supplies{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+  #extras .fn,#supplies .fn{font-size:17px}
+  .stepper{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .stepper button{width:42px;height:42px;border:none;border-radius:12px;background:var(--cream);color:var(--or);font-size:24px;font-weight:800;cursor:pointer;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .stepper button:active{transform:scale(.92)}
+  .stepper input{width:54px;height:44px;border:1.5px solid var(--ln);border-radius:12px;text-align:center;font-size:20px;font-weight:900;font-family:inherit;outline:none;-moz-appearance:textfield;background:#fff}
+  .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .commentbox{width:100%;padding:12px 14px;border:1.5px solid var(--ln);border-radius:12px;font-size:15px;outline:none;background:#fff;font-family:inherit;min-height:56px;resize:vertical}
+  .shoptitle{font-size:16px;font-weight:900;color:var(--bl);margin:20px 4px 10px}
+  .cartbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -6px 24px rgba(60,40,20,.10);padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px))}
+  .cartbar .in{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:16px}
+  .cartbar .n{font-size:13px;color:var(--mut);font-weight:700}
+  .cartbar .n b{display:block;font-size:24px;color:var(--bl);font-weight:900}
+  .cartbar .btn{margin-left:auto;padding:16px 26px}
+  .loading{text-align:center;color:var(--mut);padding:40px 10px;font-weight:700}
+  .empty{text-align:center;color:var(--mut);background:#fff;border:1px dashed var(--ln);border-radius:16px;padding:34px 14px;font-weight:700}
+  .hcard{background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:12px;box-shadow:0 3px 16px rgba(60,40,20,.06)}
+  .hcard .hh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:13px;border-bottom:1px solid #f0f2f5}
+  .hcard .hd{font-weight:800;font-size:15px;color:var(--ink)}
+  .hcard .hnum{font-size:12px;color:var(--mut);font-weight:700;margin-top:2px}
+  .hst{font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px}
+  .htot{margin-left:auto;text-align:right}
+  .htot b{display:block;font-size:26px;font-weight:900;color:var(--bl);line-height:1}
+  .htot small{font-size:10px;color:var(--mut);text-transform:uppercase;font-weight:800;letter-spacing:.03em}
+  .hsec{font-size:10.5px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin:14px 2px 8px}
+  .hitems{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+  .hitem{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f7f9fb;border-radius:10px;padding:9px 13px}
+  .hitem .nm{font-weight:800;font-size:13.5px;color:var(--ink)}
+  .hitem .qt{font-weight:900;font-size:13px;color:var(--or);white-space:nowrap}
+  .hmsg{margin-top:13px;background:var(--or-l);border-radius:10px;padding:10px 13px;font-size:13px;font-weight:700;color:var(--or-d)}
+  #done{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(251,247,242,.92)}
+  #done .card{text-align:center;padding:40px 28px;background:#fff;border-radius:22px;box-shadow:0 12px 40px rgba(60,40,20,.14);max-width:460px;width:100%;margin:0}
+  #done .big{width:78px;height:78px;border-radius:50%;background:var(--ok-l);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 16px}
+  #done h2{color:var(--bl);margin:0 0 8px;font-size:24px}
+  #done p{color:#6a6055;font-size:15px;margin:0 0 6px}
+  #done .num{display:inline-block;background:var(--bl);color:#fff;font-weight:900;font-size:26px;padding:8px 20px;border-radius:14px;margin:12px 0}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <img class="brand-logo" src="logo.png" alt="KOOKI" onerror="this.style.display='none'">
+    <div class="who">Magasin Ixelles<small>Commande stock frigo</small></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="tab-shop" onclick="showTab('shop')">🗃️ Commander</button>
+    <button class="tab" id="tab-hist" onclick="showTab('hist')">📋 Commandes passées</button>
+  </div>
+
+  <!-- ===== COMMANDER ===== -->
+  <div id="shopview">
+    <div class="hero">
+      <h1>Remplir le frigo 🍪</h1>
+      <p>Choisis le nombre de bacs par saveur. 1 bac = 40 cookies · maximum 14 bacs (capacité voiture).</p>
+    </div>
+
+    <div class="capbar" id="capbar">
+      <div><div class="lab">Total bacs</div><div class="big"><span id="capnum">0</span> <span style="font-size:16px;color:var(--mut)">/ 14</span></div></div>
+      <div class="track"><div class="fill" id="capfill" style="width:0%"></div></div>
+    </div>
+    <div class="capwarn" id="capwarn">⚠️ Limite de 14 bacs atteinte — capacité maximale de la voiture.</div>
+
+    <div class="grid" id="flavs"></div>
+
+    <div class="shoptitle">Autres produits alimentaires</div>
+    <div class="grid" id="extras"></div>
+
+    <div class="shoptitle">Autres produits</div>
+    <div class="grid" id="supplies"></div>
+
+    <div class="shoptitle">Un mot pour le labo ? (facultatif)</div>
+    <textarea class="commentbox" id="comment" placeholder="Précision, urgence, remarque…"></textarea>
+  </div>
+
+  <!-- ===== HISTORIQUE ===== -->
+  <div id="histview" hidden>
+    <div class="shoptitle">Commandes passées</div>
+    <div id="histlist"><div class="loading">Chargement…</div></div>
+  </div>
+</div>
+
+<div class="cartbar" id="cartbar">
+  <div class="in">
+    <div class="n">Commande<b><span id="tot">0</span> bac<span id="tots"></span></b></div>
+    <button class="btn btn-primary" id="sendbtn" onclick="send()">Envoyer la commande →</button>
+  </div>
+</div>
+
+<!-- ===== CONFIRMATION ===== -->
+<div id="done" hidden>
+  <div class="card">
+    <img class="brand-logo" src="logo.png" alt="KOOKI" onerror="this.style.display='none'" style="height:46px;width:auto;object-fit:contain;margin:0 auto 16px;display:block">
+    <div class="big">✓</div>
+    <h2>Commande envoyée !</h2>
+    <p>Ta commande a bien été transmise au labo KOOKI.</p>
+    <button class="btn btn-primary" style="width:100%;margin:18px 0 10px" onclick="goHist()">📋 Voir les commandes passées</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="reset()">← Nouvelle commande</button>
+  </div>
+</div>
+
+<script>
+/* URL /exec de ton Apps Script (la même que ton app) */
+var API = 'https://script.google.com/macros/s/AKfycbzILb7N_UmxilXulEP4EH8o01keWPlCosLdwXdEKmi5MglbHQ8C3fgdFEefKhb43Vd9Dg/exec';
+var SAVEURS=['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
+var MAX_BACS=14;
+/* Autres produits alimentaires — nom, unité, taille du lot, nb de lots pré-rempli.
+   La quantité choisie = nombre de LOTS. Total réel = lots × lot. */
+var EXTRAS=[
+  {nom:'Topping pistache',     unite:'sac',   lot:3,  def:0},  // 1 lot = 3 sacs
+  {nom:'Beurre de cacahuètes', unite:'pot',   lot:12, def:0},  // 1 lot = 12 pots
+  {nom:'Cacahuètes',           unite:'boîte', lot:1,  def:0}   // à la boîte (lot de 1)
+];
+/* Autres produits (fournitures / emballages) — simple quantité, 0 par défaut */
+var SUPPLIES=['Stickers','Enveloppe cookie','Sachet cookies','Boîtes carton','Menu','Cups espresso','Cups cappuccino','Cup latte','Cup iced drinks','Support 2 cups','Support 4 cups','Paille','Mouchoir'];
+var qty={}, exq={}, spq={}, histCache=null, histTimer=null;
+
+function genNumero(){
+  var d=new Date();
+  var jj=('0'+d.getDate()).slice(-2), mm=('0'+(d.getMonth()+1)).slice(-2), aa=(''+d.getFullYear()).slice(-2);
+  var xx=('0'+Math.floor(Math.random()*90+10)).slice(-2);
+  return 'IX'+jj+mm+aa+'-'+xx;
+}
+
+function apiGet(action){ return fetch(API+'?action='+encodeURIComponent(action)).then(function(r){return r.json();}); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+function build(){
+  qty={};
+  document.getElementById('flavs').innerHTML=SAVEURS.map(function(s,i){
+    qty[i]=0;
+    return '<div class="tile" id="tile-'+i+'"><div class="fn">'+esc(s)+'</div>'+
+      '<div class="stepper">'+
+        '<button onclick="chg('+i+',-1)">−</button>'+
+        '<input type="number" min="0" max="'+MAX_BACS+'" value="0" id="q-'+i+'" oninput="setQty('+i+',this.value)">'+
+        '<button onclick="chg('+i+',1)">+</button>'+
+      '</div></div>';
+  }).join('');
+  exq={};
+  document.getElementById('extras').innerHTML=EXTRAS.map(function(e,i){
+    exq[i]=e.def;
+    return '<div class="tile'+(e.def>0?' active':'')+'" id="etile-'+i+'"><div class="fn">'+esc(e.nom)+
+      '<div style="font-size:12px;font-weight:700;color:var(--mut)">'+_extraSub(e)+'</div>'+
+      '<div style="font-size:12px;font-weight:800;color:var(--or)" id="etot-'+i+'"></div></div>'+
+      '<div class="stepper">'+
+        '<button onclick="echg('+i+',-1)">−</button>'+
+        '<input type="number" min="0" value="'+e.def+'" id="eq-'+i+'" oninput="esetQty('+i+',this.value)">'+
+        '<button onclick="echg('+i+',1)">+</button>'+
+      '</div></div>';
+  }).join('');
+  EXTRAS.forEach(function(e,i){ eupd(i); });
+  spq={};
+  document.getElementById('supplies').innerHTML=SUPPLIES.map(function(nom,i){
+    spq[i]=0;
+    return '<div class="tile" id="stile-'+i+'"><div class="fn">'+esc(nom)+'</div>'+
+      '<div class="stepper">'+
+        '<button onclick="schg('+i+',-1)">−</button>'+
+        '<input type="number" min="0" value="0" id="sq-'+i+'" oninput="ssetQty('+i+',this.value)">'+
+        '<button onclick="schg('+i+',1)">+</button>'+
+      '</div></div>';
+  }).join('');
+  calc();
+}
+function schg(i,delta){
+  var n=Math.max(0,(spq[i]||0)+delta);
+  spq[i]=n; document.getElementById('sq-'+i).value=n;
+  document.getElementById('stile-'+i).classList.toggle('active',n>0);
+}
+function ssetQty(i,val){
+  var n=Math.max(0,parseInt(val,10)||0);
+  spq[i]=n; document.getElementById('stile-'+i).classList.toggle('active',n>0);
+}
+function suppliesTotal(){ var t=0; for(var k in spq){ t+=spq[k]||0; } return t; }
+function _extraSub(e){ return e.lot>1 ? ('par lot de '+e.lot+' '+e.unite+'s') : ('à la '+e.unite); }
+function eupd(i){
+  var e=EXTRAS[i], lots=exq[i]||0, el=document.getElementById('etot-'+i);
+  if(el) el.textContent = (e.lot>1 && lots>0) ? ('= '+(lots*e.lot)+' '+e.unite+((lots*e.lot)>1?'s':'')) : '';
+  var t=document.getElementById('etile-'+i); if(t) t.classList.toggle('active',lots>0);
+}
+function echg(i,delta){
+  var n=Math.max(0,(exq[i]||0)+delta);
+  exq[i]=n; document.getElementById('eq-'+i).value=n; eupd(i);
+}
+function esetQty(i,val){
+  var n=Math.max(0,parseInt(val,10)||0);
+  exq[i]=n; eupd(i);
+}
+function extrasTotal(){ var t=0; for(var k in exq){ t+=exq[k]||0; } return t; }
+function total(){ var t=0; for(var k in qty){ t+=qty[k]||0; } return t; }
+function chg(i,delta){
+  var next=Math.max(0,(qty[i]||0)+delta);
+  if(delta>0 && total()+delta>MAX_BACS){ next=qty[i]; flashWarn(); } // ne pas dépasser 14
+  qty[i]=next;
+  document.getElementById('q-'+i).value=next;
+  document.getElementById('tile-'+i).classList.toggle('active',next>0);
+  calc();
+}
+function setQty(i,val){
+  var n=Math.max(0,parseInt(val,10)||0);
+  var others=total()-(qty[i]||0);
+  if(others+n>MAX_BACS){ n=Math.max(0,MAX_BACS-others); document.getElementById('q-'+i).value=n; flashWarn(); }
+  qty[i]=n;
+  document.getElementById('tile-'+i).classList.toggle('active',n>0);
+  calc();
+}
+function flashWarn(){ var w=document.getElementById('capwarn'); w.classList.add('show'); }
+function calc(){
+  var t=total();
+  document.getElementById('tot').textContent=t;
+  document.getElementById('tots').textContent=t>1?'s':'';
+  document.getElementById('capnum').textContent=t;
+  document.getElementById('capfill').style.width=Math.min(100,(t/MAX_BACS)*100)+'%';
+  document.getElementById('capbar').classList.toggle('full',t>=MAX_BACS);
+  document.getElementById('capwarn').classList.toggle('show',t>=MAX_BACS);
+}
+
+function showTab(tab){
+  var shop=(tab==='shop');
+  document.getElementById('shopview').hidden=!shop;
+  document.getElementById('histview').hidden=shop;
+  document.getElementById('cartbar').hidden=!shop;
+  document.getElementById('tab-shop').classList.toggle('on',shop);
+  document.getElementById('tab-hist').classList.toggle('on',!shop);
+  if(!shop){ renderHist(); loadHist(true); }
+  window.scrollTo(0,0);
+}
+function goHist(){ clearTimeout(window._doneTimer); document.getElementById('done').hidden=true; showTab('hist'); }
+
+function send(){
+  var t=total(), et=extrasTotal(), st=suppliesTotal();
+  if(!t && !et && !st){ alert('Ajoute au moins 1 bac ou 1 produit.'); return; }
+  var cookies=[]; SAVEURS.forEach(function(s,i){ if(qty[i]>0) cookies.push({saveur:s, bacs:qty[i]}); });
+  var extras=[]; EXTRAS.forEach(function(e,i){ if(exq[i]>0) extras.push({nom:e.nom, unite:e.unite, lot:e.lot, lots:exq[i], qte:exq[i]*e.lot, cat:'alim'}); });
+  SUPPLIES.forEach(function(nom,i){ if(spq[i]>0) extras.push({nom:nom, qte:spq[i], cat:'four'}); });
+  var comment=document.getElementById('comment').value||'';
+  var numero=genNumero();
+  var btn=document.getElementById('sendbtn'); btn.disabled=true; btn.textContent='Envoi…';
+  fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({
+    action:'sauverShopIxelles',
+    id:'ix'+Date.now(), numero:numero, date:new Date().toISOString(),
+    statut:'À valider', cookies:cookies, extras:extras, commentaire:comment
+  })}).then(function(r){return r.json();}).then(function(){ showDone(); }).catch(function(){ showDone(); });
+}
+function showDone(){
+  var btn=document.getElementById('sendbtn'); btn.disabled=false; btn.textContent='Envoyer la commande →';
+  histCache=null;
+  document.getElementById('shopview').hidden=true; document.getElementById('cartbar').hidden=true;
+  document.getElementById('done').hidden=false; window.scrollTo(0,0);
+  // le message disparaît tout seul au bout de 10 s → retour à une nouvelle commande
+  clearTimeout(window._doneTimer);
+  window._doneTimer=setTimeout(function(){ if(!document.getElementById('done').hidden) reset(); }, 10000);
+}
+function reset(){ clearTimeout(window._doneTimer); document.getElementById('done').hidden=true; document.getElementById('comment').value=''; showTab('shop'); build(); window.scrollTo(0,0); }
+
+/* ---- historique ---- */
+function statBadge(st){
+  var s=String(st||'').toLowerCase();
+  if(s.indexOf('valider')>=0||s.indexOf('attente')>=0) return ['#fff4e6','#b45309','⏳ À valider'];
+  if(s.indexOf('approuv')>=0||s.indexOf('confirm')>=0) return ['#eaf5ee','#2e7d46','✅ Approuvée'];
+  if(s.indexOf('prep')>=0) return ['#e7f0f9','#0662aa','👨‍🍳 En préparation'];
+  if(s.indexOf('envoy')>=0) return ['#e7f0f9','#0662aa','🚚 Envoyée'];
+  if(s.indexOf('livr')>=0) return ['#eaf5ee','#2e7d46','📦 Livrée'];
+  return ['#eef2f6','#44515f', st||'Reçue'];
+}
+function fmtDate(d){ if(!d) return ''; var dt=new Date(d); if(isNaN(dt)) return String(d); return dt.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function loadHist(silent){
+  var host=document.getElementById('histlist');
+  if(!silent && !histCache) host.innerHTML='<div class="loading">Chargement…</div>';
+  apiGet('getShopIxelles').then(function(res){
+    // toujours sortir de l'état « Chargement… », même si la réponse n'est pas une liste
+    histCache = Array.isArray(res) ? res : [];
+    if(!document.getElementById('histview').hidden) renderHist();
+  }).catch(function(){
+    if(!document.getElementById('histview').hidden){
+      if(histCache && histCache.length) renderHist();
+      else host.innerHTML='<div class="empty">Impossible de charger l\'historique pour le moment. Réessaie dans un instant.</div>';
+    }
+  });
+}
+function renderHist(){
+  var host=document.getElementById('histlist');
+  if(histCache===null){ host.innerHTML='<div class="loading">Chargement…</div>'; return; }
+  if(!histCache.length){ host.innerHTML='<div class="empty">Aucune commande pour le moment.</div>'; return; }
+  host.innerHTML=histCache.slice(0,20).map(function(o){
+    var st=statBadge(o.statut);
+    var cookies=(o.cookies||[]).filter(function(l){return (l.bacs||0)>0;});
+    var extras=(o.extras||[]);
+    var alim=extras.filter(function(e){return (e.qte||0)>0 && e.cat!=='four';});
+    var four=extras.filter(function(e){return (e.qte||0)>0 && e.cat==='four';});
+    var tot=cookies.reduce(function(a,l){return a+(l.bacs||0);},0);
+    function item(nm,qt){ return '<div class="hitem"><span class="nm">'+nm+'</span><span class="qt">'+qt+'</span></div>'; }
+    function sec(label,html){ return html?('<div class="hsec">'+label+'</div><div class="hitems">'+html+'</div>'):''; }
+    var cHtml=cookies.map(function(l){ return item(esc(l.saveur), l.bacs+' bac'+(l.bacs>1?'s':'')); }).join('');
+    var aHtml=alim.map(function(e){ return item(esc(e.nom), e.qte+' '+esc(e.unite||'')+((e.qte>1&&e.unite)?'s':'')); }).join('');
+    var fHtml=four.map(function(e){ return item(esc(e.nom), '× '+e.qte); }).join('');
+    var msg=o.messageKooki?('<div class="hmsg">💬 '+esc(o.messageKooki)+'</div>'):'';
+    return '<div class="hcard">'+
+      '<div class="hh">'+
+        '<div><div class="hd">'+fmtDate(o.date)+'</div>'+(o.numero?'<div class="hnum">N° '+esc(o.numero)+'</div>':'')+'</div>'+
+        '<span class="hst" style="background:'+st[0]+';color:'+st[1]+'">'+st[2]+'</span>'+
+        '<div class="htot"><b>'+tot+'</b><small>bac'+(tot>1?'s':'')+'</small></div>'+
+      '</div>'+
+      sec('Cookies',cHtml)+sec('Autres produits alimentaires',aHtml)+sec('Autres produits',fHtml)+
+      msg+
+    '</div>';
+  }).join('');
+}
+
+/* init */
+build();
+setInterval(function(){ if(!document.getElementById('histview').hidden){ var a=document.activeElement; if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'))) loadHist(true); } }, 20000);
+</script>
+</body>
+</html>
