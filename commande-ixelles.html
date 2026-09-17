@@ -90,6 +90,10 @@
 
   <!-- ===== COMMANDER ===== -->
   <div id="shopview">
+    <div id="editbanner" style="display:none;align-items:center;gap:10px;background:#fff4e6;border:1.5px solid #f0c98a;border-radius:14px;padding:12px 15px;margin-bottom:14px;font-size:13.5px;color:#7a5a00;font-weight:700">
+      <span class="txt" style="flex:1"></span>
+      <button onclick="cancelEdit()" style="background:#fff;border:1px solid #e0c68a;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;font-size:12.5px;color:#7a5a00">Annuler</button>
+    </div>
     <div class="hero">
       <h1>Remplir le frigo 🍪</h1>
       <p>Choisis le nombre de bacs par saveur. 1 bac = 40 cookies · maximum 14 bacs (capacité voiture).</p>
@@ -141,7 +145,7 @@
 
 <script>
 /* URL /exec de ton Apps Script (la même que ton app) */
-var API = 'https://script.google.com/macros/s/AKfycbzILb7N_UmxilXulEP4EH8o01keWPlCosLdwXdEKmi5MglbHQ8C3fgdFEefKhb43Vd9Dg/exec';
+var API = 'https://script.google.com/macros/s/AKfycbwJfPautpufk2hflTiWnQYsvj4wktd72o2tVByePLgQa2HhOK8Dx3jjg1frUVRQE0HQCA/exec';
 var SAVEURS=['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
 var MAX_BACS=14;
 /* Autres produits alimentaires — nom, unité, taille du lot, nb de lots pré-rempli.
@@ -153,7 +157,7 @@ var EXTRAS=[
 ];
 /* Autres produits (fournitures / emballages) — simple quantité, 0 par défaut */
 var SUPPLIES=['Stickers','Enveloppe cookie','Sachet cookies','Boîtes carton','Menu','Cups espresso','Cups cappuccino','Cup latte','Cup iced drinks','Support 2 cups','Support 4 cups','Paille','Mouchoir'];
-var qty={}, exq={}, spq={}, histCache=null, histTimer=null;
+var qty={}, exq={}, spq={}, histCache=null, histTimer=null, editId=null, editNumero='';
 
 function genNumero(){
   var d=new Date();
@@ -273,15 +277,20 @@ function send(){
   var extras=[]; EXTRAS.forEach(function(e,i){ if(exq[i]>0) extras.push({nom:e.nom, unite:e.unite, lot:e.lot, lots:exq[i], qte:exq[i]*e.lot, cat:'alim'}); });
   SUPPLIES.forEach(function(nom,i){ if(spq[i]>0) extras.push({nom:nom, qte:spq[i], cat:'four'}); });
   var comment=document.getElementById('comment').value||'';
-  var numero=genNumero();
+  var isEdit=!!editId;
+  var id=isEdit?editId:('ix'+Date.now());
+  var numero=isEdit?(editNumero||genNumero()):genNumero();
   var btn=document.getElementById('sendbtn'); btn.disabled=true; btn.textContent='Envoi…';
   fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({
     action:'sauverShopIxelles',
-    id:'ix'+Date.now(), numero:numero, date:new Date().toISOString(),
+    id:id, numero:numero, date:new Date().toISOString(),
     statut:'À valider', cookies:cookies, extras:extras, commentaire:comment
-  })}).then(function(r){return r.json();}).then(function(){ showDone(); }).catch(function(){ showDone(); });
+  })}).then(function(r){return r.json();}).then(function(){ showDone(isEdit); }).catch(function(){ showDone(isEdit); });
 }
-function showDone(){
+function showDone(isEdit){
+  editId=null; editNumero='';
+  var eb=document.getElementById('editbanner'); if(eb) eb.style.display='none';
+  var d2=document.getElementById('done'); var h2=d2.querySelector('h2'); if(h2) h2.textContent=isEdit?'Commande modifiée !':'Commande envoyée !';
   var btn=document.getElementById('sendbtn'); btn.disabled=false; btn.textContent='Envoyer la commande →';
   histCache=null;
   document.getElementById('shopview').hidden=true; document.getElementById('cartbar').hidden=true;
@@ -290,7 +299,35 @@ function showDone(){
   clearTimeout(window._doneTimer);
   window._doneTimer=setTimeout(function(){ if(!document.getElementById('done').hidden) reset(); }, 10000);
 }
-function reset(){ clearTimeout(window._doneTimer); document.getElementById('done').hidden=true; document.getElementById('comment').value=''; showTab('shop'); build(); window.scrollTo(0,0); }
+function reset(){ clearTimeout(window._doneTimer); editId=null; editNumero=''; var eb=document.getElementById('editbanner'); if(eb) eb.style.display='none'; var sb=document.getElementById('sendbtn'); if(sb) sb.textContent='Envoyer la commande →'; document.getElementById('done').hidden=true; document.getElementById('comment').value=''; showTab('shop'); build(); window.scrollTo(0,0); }
+function cancelEdit(){ reset(); }
+function editShopOrder(id){
+  var o=(histCache||[]).filter(function(x){return String(x.id)===String(id);})[0];
+  if(!o){ return; }
+  if(o.statut && o.statut!=='À valider'){ alert('Cette commande est déjà prise en charge par le labo — elle ne peut plus être modifiée. Contacte KOOKI si besoin.'); return; }
+  reset();                          // repart d'un formulaire vide
+  // cookies
+  (o.cookies||[]).forEach(function(l){
+    var i=SAVEURS.indexOf(l.saveur);
+    if(i>=0){ qty[i]=l.bacs||0; var el=document.getElementById('q-'+i); if(el) el.value=qty[i]; var t=document.getElementById('tile-'+i); if(t) t.classList.toggle('active',qty[i]>0); }
+  });
+  // autres produits (alimentaires + fournitures)
+  (o.extras||[]).forEach(function(e){
+    if(e.cat==='four'){
+      var si=SUPPLIES.indexOf(e.nom);
+      if(si>=0){ spq[si]=e.qte||0; var el=document.getElementById('sq-'+si); if(el) el.value=spq[si]; var t=document.getElementById('stile-'+si); if(t) t.classList.toggle('active',spq[si]>0); }
+    } else {
+      var ai=-1; for(var k=0;k<EXTRAS.length;k++){ if(EXTRAS[k].nom===e.nom){ ai=k; break; } }
+      if(ai>=0){ exq[ai]=(e.lots!=null?e.lots:(EXTRAS[ai].lot?Math.round((e.qte||0)/EXTRAS[ai].lot):(e.qte||0))); var el=document.getElementById('eq-'+ai); if(el) el.value=exq[ai]; eupd(ai); }
+    }
+  });
+  document.getElementById('comment').value=o.commentaire||'';
+  editId=o.id; editNumero=o.numero||'';
+  calc();
+  var bn=document.getElementById('editbanner'); if(bn){ bn.style.display='flex'; var tx=bn.querySelector('.txt'); if(tx) tx.textContent='✏️ Modification de la commande N° '+(o.numero||o.id); }
+  var sb=document.getElementById('sendbtn'); if(sb) sb.textContent='Mettre à jour la commande →';
+  window.scrollTo(0,0);
+}
 
 /* ---- historique ---- */
 function statBadge(st){
@@ -342,6 +379,9 @@ function renderHist(){
       '</div>'+
       sec('Cookies',cHtml)+sec('Autres produits alimentaires',aHtml)+sec('Autres produits',fHtml)+
       msg+
+      (o.statut==='À valider'
+        ? '<button onclick="editShopOrder(\''+esc(o.id)+'\')" style="width:100%;margin-top:13px;background:var(--or);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">✏️ Modifier cette commande</button>'
+        : '<div style="margin-top:12px;font-size:12px;color:var(--mut);font-weight:700;text-align:center">🔒 Commande prise en charge — non modifiable</div>')+
     '</div>';
   }).join('');
 }
