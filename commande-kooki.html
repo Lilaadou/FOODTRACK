@@ -60,15 +60,18 @@
   .disp.ok{background:var(--ok-l);color:var(--ok)}
   .disp.warn{background:var(--warn-l);color:var(--warn)}
   .disp.no{background:var(--no-l);color:var(--no)}
-  .stepgrid{display:flex;gap:10px}
-  .step{flex:1;background:var(--cream);border-radius:12px;padding:8px}
+  .stepgrid{display:flex;gap:8px}
+  .step{flex:1;min-width:0;background:var(--cream);border-radius:12px;padding:8px 6px}
   .step .sl{font-size:10px;font-weight:800;color:var(--mut);text-transform:uppercase;text-align:center;margin-bottom:5px}
-  .stepper{display:flex;align-items:center;justify-content:space-between;gap:4px}
-  .stepper button{width:30px;height:30px;border:none;border-radius:9px;background:#fff;color:var(--or);font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);line-height:1}
+  .stepper{display:flex;align-items:center;gap:2px}
+  .stepper button{width:30px;height:30px;flex-shrink:0;border:none;border-radius:9px;background:#fff;color:var(--or);font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);line-height:1}
   .stepper button:active{transform:scale(.92)}
   .stepper button:disabled{color:#ccc;cursor:default}
-  .stepper .val{font-size:16px;font-weight:900;min-width:24px;text-align:center}
+  .stepper .val{flex:1;min-width:0;font-size:16px;font-weight:900;text-align:center}
+  .stepper input.val{width:auto;flex:1;min-width:0;border:none;background:transparent;outline:none;font-family:inherit;-moz-appearance:textfield}
+  .stepper input.val::-webkit-outer-spin-button,.stepper input.val::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .step.dis{opacity:.45}.step.dis .stepper button{color:#ccc;cursor:default}
+  .feeline{display:flex;justify-content:space-between;font-size:12.5px;color:#6a6055;padding:4px 6px;font-weight:700}
   .cartbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -6px 24px rgba(60,40,20,.10);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
   .cartbar .in{max-width:840px;margin:0 auto;display:flex;align-items:center;gap:14px}
   .cartbar .n{font-size:12px;color:var(--mut);font-weight:700}
@@ -155,6 +158,14 @@
         <div class="lbl">Date de livraison souhaitée</div>
         <input type="date" class="datefield" id="ddate">
       </div>
+      <div class="ctl">
+        <div class="lbl">Mode</div>
+        <div class="seg" id="seg-mode">
+          <div class="opt on" data-v="Livraison" onclick="pick('seg-mode',this);calc()">🚚 Livraison</div>
+          <div class="opt" data-v="Retrait au labo" onclick="pick('seg-mode',this);calc()">🏭 Retrait au labo</div>
+        </div>
+        <div id="feehint" style="font-size:11px;color:var(--mut);margin-top:7px;font-weight:700"></div>
+      </div>
     </div>
     <div class="shoptitle">Nos saveurs</div>
     <div class="legend">✅ Disponible · ⚠️ Sur commande (petit délai) · ❌ Épuisé</div>
@@ -193,7 +204,7 @@
 
 <script>
 /* ===== URL /exec de ton Apps Script ===== */
-var API = 'https://script.google.com/macros/s/AKfycbxA4ffqpuDuShjnuHrWCBxcPI2d_CiScp7ZP1FK7EogrxEVs1S8cHUY_07YjzRgE7Ry-Q/exec';
+var API = 'https://script.google.com/macros/s/AKfycbzILb7N_UmxilXulEP4EH8o01keWPlCosLdwXdEKmi5MglbHQ8C3fgdFEefKhb43Vd9Dg/exec';
 
 var SAVEURS_ALL=['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
 var NOBABY=['CHARLY','LENI'];
@@ -205,7 +216,8 @@ var STATUT_MAP={
   'Envoyée':['#e7f0f9','#0662aa','🚚 Envoyée'],
   'Livrée':['#eef2f6','#44515f','✓ Livrée']
 };
-var CLIENT='', CODE='', SAVEURS=[], qty={}, PRIX={big:0,baby:0};
+var CLIENT='', CODE='', SAVEURS=[], qty={}, PRIX={big:0,baby:0,livraison:0};
+function curMode(){ var e=document.querySelector('#seg-mode .opt.on'); return e?e.getAttribute('data-v'):'Livraison'; }
 var histCache=null, histTimer=null, editId=null, editNumero='';
 
 function apiGet(action, params){
@@ -234,7 +246,7 @@ function login(){
       document.getElementById('clientName').innerHTML=esc(CLIENT)+'<small>Espace commande</small>';
       document.getElementById('login').hidden=true;
       document.getElementById('order').hidden=false;
-      apiGet('getTarifs').then(function(t){ if(t){ PRIX.big=Number(t.big)||0; PRIX.baby=Number(t.baby)||0; } calc(); }).catch(function(){});
+      apiGet('getTarifs').then(function(t){ if(t){ PRIX.big=Number(t.big)||0; PRIX.baby=Number(t.baby)||0; PRIX.livraison=Number(t.livraison)||0; } build(); calc(); }).catch(function(){});
       showTab('shop');
       var d=new Date(Date.now()+864e5); document.getElementById('ddate').value=d.toISOString().slice(0,10);
       loadDispo();
@@ -278,7 +290,7 @@ function build(preset){
     function stepper(kind,disabled){
       return '<div class="step'+(disabled?' dis':'')+'"><div class="sl">'+(kind==='big'?'Big':'Baby')+'</div>'+
         '<div class="stepper"><button onclick="chg('+i+',\''+kind+'\',-1)" '+(disabled?'disabled':'')+'>−</button>'+
-        '<span class="val" id="v-'+i+'-'+kind+'">'+(disabled?'—':'0')+'</span>'+
+        (disabled?'<span class="val" id="v-'+i+'-'+kind+'">—</span>':'<input class="val" id="v-'+i+'-'+kind+'" type="number" min="0" value="0" oninput="setQty('+i+',\''+kind+'\',this.value)">')+
         '<button onclick="chg('+i+',\''+kind+'\',1)" '+(disabled?'disabled':'')+'>+</button></div></div>';
     }
     return '<div class="tile'+(ep?' epuise':'')+'" id="tile-'+i+'"><div class="thead">'+
@@ -290,8 +302,8 @@ function build(preset){
     (preset||[]).forEach(function(l){ var idx=SAVEURS.map(function(s){return s.n;}).indexOf(l.sav); if(idx<0) return;
       var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0;
       qty[idx]={big:big,baby:baby};
-      var vb=document.getElementById('v-'+idx+'-big'); if(vb) vb.textContent=big;
-      var vy=document.getElementById('v-'+idx+'-baby'); if(vy && SAVEURS[idx] && !SAVEURS[idx].nobaby) vy.textContent=baby;
+      var vb=document.getElementById('v-'+idx+'-big'); if(vb){ if(vb.tagName==='INPUT') vb.value=big; else vb.textContent=big; }
+      var vy=document.getElementById('v-'+idx+'-baby'); if(vy && SAVEURS[idx] && !SAVEURS[idx].nobaby){ if(vy.tagName==='INPUT') vy.value=baby; else vy.textContent=baby; }
       var t=document.getElementById('tile-'+idx); if(t) t.classList.toggle('active',(big+baby)>0);
     });
   }
@@ -300,23 +312,42 @@ function build(preset){
 function chg(i,kind,delta){
   var s=SAVEURS[i]; if(!s||s.d==='no') return; if(kind==='baby'&&s.nobaby) return;
   qty[i][kind]=Math.max(0,(qty[i][kind]||0)+delta);
-  document.getElementById('v-'+i+'-'+kind).textContent=qty[i][kind];
+  var el=document.getElementById('v-'+i+'-'+kind); if(el){ if(el.tagName==='INPUT') el.value=qty[i][kind]; else el.textContent=qty[i][kind]; }
   var tile=document.getElementById('tile-'+i); if(tile) tile.classList.toggle('active',(qty[i].big+qty[i].baby)>0);
   calc();
 }
-function totals(){ var big=0,baby=0; for(var k in qty){ big+=qty[k].big; baby+=qty[k].baby; } return {big:big,baby:baby,n:big+baby,eur:big*PRIX.big+baby*PRIX.baby}; }
-function calc(){ var t=totals(); document.getElementById('tot').textContent=t.n; document.getElementById('toteur').textContent=eur(t.eur); return t.n; }
+function setQty(i,kind,val){
+  var s=SAVEURS[i]; if(!s||s.d==='no') return; if(kind==='baby'&&s.nobaby) return;
+  var n=Math.max(0,parseInt(val,10)||0); qty[i][kind]=n;
+  var tile=document.getElementById('tile-'+i); if(tile) tile.classList.toggle('active',(qty[i].big+qty[i].baby)>0);
+  calc();
+}
+function totals(){
+  var big=0,baby=0; for(var k in qty){ big+=qty[k].big; baby+=qty[k].baby; }
+  var fee=(curMode()==='Livraison')?PRIX.livraison:0;
+  return {big:big,baby:baby,n:big+baby,cookies:big*PRIX.big+baby*PRIX.baby,fee:fee,eur:big*PRIX.big+baby*PRIX.baby+fee};
+}
+function calc(){
+  var t=totals();
+  document.getElementById('tot').textContent=t.n;
+  document.getElementById('toteur').textContent=eur(t.eur);
+  var fh=document.getElementById('feehint'); if(fh) fh.textContent=(curMode()==='Livraison')?('+ '+eur(PRIX.livraison)+' de livraison (HTVA)'):'Aucun frais de livraison';
+  return t.n;
+}
 
 /* tableau récap prix (utilisé confirmation + historique) */
-function recapTable(lignes){
+function recapTable(lignes,mode){
   var rows='', tot=0;
   (lignes||[]).forEach(function(l){
     var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0;
     if(big>0){ var t=big*PRIX.big; tot+=t; rows+='<tr><td>'+esc(l.sav)+'</td><td>Big</td><td class="r">'+big+'</td><td class="r">'+eur(PRIX.big)+'</td><td class="r">'+eur(t)+'</td></tr>'; }
     if(baby>0 && NOBABY.indexOf(l.sav)<0){ var t2=baby*PRIX.baby; tot+=t2; rows+='<tr><td>'+esc(l.sav)+'</td><td>Baby</td><td class="r">'+baby+'</td><td class="r">'+eur(PRIX.baby)+'</td><td class="r">'+eur(t2)+'</td></tr>'; }
   });
+  var fee=(mode==='Livraison')?PRIX.livraison:0; var grand=tot+fee;
+  var feeHtml=(mode==='Livraison')?'<div class="feeline"><span>🚚 Frais de livraison (HTVA)</span><span>'+eur(fee)+'</span></div>':'<div class="feeline"><span>🏭 Retrait au labo</span><span>gratuit</span></div>';
   return '<table class="rc"><thead><tr><th>Produit</th><th>Unité</th><th class="r">Qté</th><th class="r">Prix unit.</th><th class="r">Total</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<div class="rc-tot">Total<b>'+eur(tot)+'</b></div>';
+    feeHtml+
+    '<div class="rc-tot">Total<b>'+eur(grand)+'</b></div>';
 }
 
 /* ---- modification d'une commande existante ---- */
@@ -327,6 +358,7 @@ function editOrder(id){
   showTab('shop');
   // type + date + commentaire
   var segType=document.getElementById('seg-type'); Array.prototype.forEach.call(segType.children,function(c){ c.classList.toggle('on', c.getAttribute('data-v')===(o.type||'cuit')); });
+  var segMode=document.getElementById('seg-mode'); var wantMode=o.mode||'Livraison'; Array.prototype.forEach.call(segMode.children,function(c){ c.classList.toggle('on', c.getAttribute('data-v')===wantMode); });
   document.getElementById('ddate').value=o.date||'';
   document.getElementById('comment').value=o.commentaire||'';
   document.getElementById('sendbtn').textContent='Enregistrer →';
@@ -349,11 +381,11 @@ function send(){
   var date=document.getElementById('ddate').value;
   var comment=document.getElementById('comment').value||'';
   var isEdit=!!editId;
-  var order={ id:isEdit?editId:Date.now(), numero:isEdit?editNumero:genNumero(), client:CLIENT, date:date, type:type, lignes:lignes, commentaire:comment };
+  var order={ id:isEdit?editId:Date.now(), numero:isEdit?editNumero:genNumero(), client:CLIENT, date:date, type:type, lignes:lignes, commentaire:comment, mode:curMode() };
   if(isEdit && !order.numero) order.numero=genNumero();
   var btn=document.getElementById('sendbtn'); btn.disabled=true; btn.textContent='Envoi…';
   fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({
-    action:'sauverCommandeClient', id:order.id, numero:order.numero, client:order.client, date:order.date, type:order.type, lignes:order.lignes, commentaire:order.commentaire
+    action:'sauverCommandeClient', id:order.id, numero:order.numero, client:order.client, date:order.date, type:order.type, lignes:order.lignes, commentaire:order.commentaire, mode:order.mode
   })}).then(function(r){return r.json();}).then(function(){ showDone(order,isEdit); }).catch(function(){ showDone(order,isEdit); });
 }
 function showDone(order,isEdit){
@@ -363,8 +395,9 @@ function showDone(order,isEdit){
   document.getElementById('recap').innerHTML=
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Commande</span><b>'+esc(order.numero)+'</b></div>'+
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Type</span><b>'+typeTxt+'</b></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:#6a6055">Livraison</span><b>'+fmtD(order.date)+'</b></div>'+
-    recapTable(order.lignes)+
+    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Livraison</span><b>'+fmtD(order.date)+'</b></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:#6a6055">Mode</span><b>'+(order.mode==='Retrait au labo'?'🏭 Retrait au labo':'🚚 Livraison')+'</b></div>'+
+    recapTable(order.lignes,order.mode)+
     (order.commentaire?'<div class="hcom">💬 '+esc(order.commentaire)+'</div>':'');
   var btn=document.getElementById('sendbtn'); btn.disabled=false; btn.textContent='Envoyer →';
   cancelEdit();
@@ -392,8 +425,8 @@ function renderHistory(){
     return '<div class="hcard">'+
       '<div class="hh"><span class="hnum">N° '+esc(o.numero||o.id)+'</span>'+
         '<span class="hst" style="background:'+st[0]+';color:'+st[1]+'">'+st[2]+'</span></div>'+
-      '<div class="hd">'+typeTxt+' · livraison '+fmtD(o.date)+'</div>'+
-      recapTable(o.lignes)+
+      '<div class="hd">'+typeTxt+' · '+(o.mode==='Retrait au labo'?'🏭 Retrait':'🚚 Livraison')+' · '+fmtD(o.date)+'</div>'+
+      recapTable(o.lignes,o.mode)+
       (o.commentaire?'<div class="hcom">💬 Toi : '+esc(o.commentaire)+'</div>':'')+
       (o.messageKooki?'<div class="hmsg">📣 KOOKI : '+esc(o.messageKooki)+'</div>':'')+
       (canEdit
