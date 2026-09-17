@@ -15,7 +15,7 @@
   .btn-ghost{background:#fff;border:1.5px solid var(--ln);color:#5b5248}
 
   /* LOGIN — fond rouge, cadre centré, logo */
-  #login{position:fixed;inset:0;background:var(--or);display:flex;align-items:center;justify-content:center;padding:20px}
+  #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--or);background-image:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.46)),url('login-bg.jpg');background-size:cover;background-position:center;background-repeat:no-repeat}
   #login .card{width:100%;max-width:380px;text-align:center;padding:32px 26px;background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(120,30,10,.35)}
   #login .logo{height:64px;width:auto;object-fit:contain;margin:0 auto 16px;display:block}
   #login h1{font-size:20px;margin:0 0 4px;color:var(--bl)}
@@ -452,13 +452,20 @@ function _openBLPrint(html, numero){
   ifr.style.position='fixed'; ifr.style.right='0'; ifr.style.bottom='0'; ifr.style.width='0'; ifr.style.height='0'; ifr.style.border='0';
   document.body.appendChild(ifr);
   var base=location.href.replace(/[^/]*$/,''); // dossier courant → pour que logo.png se charge
+  var css='@page{ size:A4; margin:0 }'+
+    'html,body{ margin:0; padding:0; background:#fff; color:#000; font-family:Calibri,Carlito,Arial,sans-serif; -webkit-font-smoothing:antialiased; -webkit-print-color-adjust:exact; print-color-adjust:exact; }'+
+    '#blroot{ width:210mm; margin:0 auto; box-sizing:border-box; }'+
+    '#blroot *{ box-sizing:border-box; }'+
+    '#blroot img{ max-width:100%; }'+
+    '#blroot table{ width:100%; }'+
+    'tr,td,th{ page-break-inside:avoid; }';
   var doc=ifr.contentWindow.document; doc.open();
   doc.write('<!doctype html><html><head><meta charset="utf-8"><base href="'+base+'">'+
     '<title>Bon de livraison '+(numero||'')+'</title>'+
-    '<style>@media print{@page{margin:12mm}} body{font-family:Calibri,Carlito,Arial,sans-serif;margin:16px;color:#000;-webkit-font-smoothing:antialiased}</style>'+
-    '</head><body>'+html+'</body></html>');
+    '<style>'+css+'</style>'+
+    '</head><body><div id="blroot">'+html+'</div></body></html>');
   doc.close();
-  setTimeout(function(){ try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }catch(e){ alert('Impression bloquée par le navigateur — autorise les pop-ups pour télécharger le PDF.'); } }, 450);
+  setTimeout(function(){ try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }catch(e){ alert('Impression bloquée par le navigateur — autorise les pop-ups pour télécharger le PDF.'); } }, 550);
 }
 </script>
 </body>
