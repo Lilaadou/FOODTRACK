@@ -509,6 +509,10 @@
       /* Tables scrollables */
       .card{ padding:14px; overflow-x:auto; }
       table{ min-width:500px; }
+      /* Onglet KOOKI Shop Ixelles : tableaux adaptés au téléphone (pas de scroll horizontal) */
+      #shopix-list .card{ overflow:visible; padding:0; }
+      #shopix-list table{ min-width:0; width:100%; }
+      #shopix-list td, #shopix-list th{ padding:10px 12px; font-size:15px; }
 
       /* Formulaires — inputs plus grands */
       .form-group input, .form-group select{
@@ -670,8 +674,9 @@
   <button class="bottom-nav-item" onclick="showPage('ixelles',this);closeSidebar()">
   <span class="bn-icon">🏪</span>Ixelles
   </button>
-  <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
-  
+  <button class="bottom-nav-item" onclick="showPage('shopixelles',this);closeSidebar()">
+  <span class="bn-icon">🛒</span>Shop
+  </button>
 </div>
 
 <!-- SIDEBAR -->
@@ -695,6 +700,7 @@
   <button class="nav-item" id="nav-recap-mois" onclick="showPage('recap-mois',this)"><i class="ti ti-calendar-stats nav-icon" aria-hidden="true"></i> Récap mensuel</button>
   <button class="nav-item" id="nav-centre-docs" onclick="showPage('centre-docs',this)"><i class="ti ti-folders nav-icon" aria-hidden="true"></i> Documents</button>
   <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
+  <button class="nav-item" id="nav-shopixelles" onclick="showPage('shopixelles',this)"><i class="ti ti-shopping-cart nav-icon" aria-hidden="true"></i> KOOKI Shop Ixelles</button>
 
   <div class="sidebar-bottom">
 
@@ -2711,6 +2717,20 @@
   </div>
 </div>
 
+  <!-- ══════════════════ KOOKI SHOP IXELLES ══════════════════ -->
+  <div id="page-shopixelles" class="page">
+    <div class="card">
+      <div class="card-header" style="flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="card-title">🛒 Commandes KOOKI Shop Ixelles</div>
+          <div class="card-sub">Commandes passées depuis la tablette du magasin (bacs de cookies + autres produits)</div>
+        </div>
+        <button class="btn btn-secondary" onclick="loadShopIxelles()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
+      </div>
+    </div>
+    <div id="shopix-list"><div class="empty">Chargement…</div></div>
+  </div>
+
   <!-- ══════════════════ ALERTES ══════════════════ -->
   <div id="page-alertes" class="page">
     <div class="card">
@@ -2733,14 +2753,14 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxA4ffqpuDuShjnuHrWCBxcPI2d_CiScp7ZP1FK7EogrxEVs1S8cHUY_07YjzRgE7Ry-Q/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzILb7N_UmxilXulEP4EH8o01keWPlCosLdwXdEKmi5MglbHQ8C3fgdFEefKhb43Vd9Dg/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles'];
 const ANDERLECHT_PAGES = ['frigo'];
-const ALL_PAGES = ['premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons'];
+const ALL_PAGES = ['premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons','shopixelles'];
 const PROD_PAGES = ['premix','production','stock','ingredients','frigo','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
@@ -2765,7 +2785,7 @@ const PROFILES = {
 PROFILES.frigo = { color:'#0662aa', initial:'SF', role:'Sortie frigo', pages:['stock','frigo'] };
 PROFILES.prod  = { color:'#e8956a', initial:'PR', role:'Production',   pages:['premix','production'] };
 
-const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Sorties frigo', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles' };
+const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Sorties frigo', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles', shopixelles:'KOOKI Shop Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder', Production:'Production',
@@ -2838,9 +2858,9 @@ let currentProfile = 'Lila';
 // ─────────────────────────────────────
 const MODE_PAGES = {
   production: ['premix','production','stock','ingredients','reception','factures','centre-docs'],
-  delivery:   ['frigo','bl','recap-mois','ixelles-livraisons','centre-docs']
+  delivery:   ['frigo','bl','recap-mois','ixelles-livraisons','shopixelles','centre-docs']
 };
-const MODE_NAV_IDS = ['premix','production','stock','ingredients','frigo','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons'];
+const MODE_NAV_IDS = ['premix','production','stock','ingredients','frigo','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons','shopixelles'];
 let currentMode = null; // 'production' | 'delivery' | null (aucun filtre de mode)
 
 // Un profil « dual » = accès aux deux univers → il voit l'écran de choix
@@ -2971,7 +2991,7 @@ function selectProfile(name) {
 }
 
 // ── Entrée par RÔLE (remplace la sélection par personne) ──
-var ALL_NAV_IDS = ['premix','production','stock','ingredients','frigo','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons','alertes','parametres'];
+var ALL_NAV_IDS = ['premix','production','stock','ingredients','frigo','reception','factures','bl','recap-mois','centre-docs','ixelles-livraisons','shopixelles','alertes','parametres'];
 var ROLE_NAV = {
   admin: ALL_NAV_IDS.slice(),
   frigo: ['stock','frigo'],
@@ -3077,6 +3097,7 @@ function showPage(name, btn) {
   if (name === 'ingredients') setTimeout(() => { initIngredientsPage(); }, 60);
   if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
   if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
+  if (name === 'shopixelles') setTimeout(() => { loadShopIxelles(); }, 60);
   if (name === 'premix') setTimeout(async () => {
     const data = await fetchAPI('getPremix');
     applyPremix(data);
@@ -12014,7 +12035,7 @@ function _pcPush(order){
   if(typeof API==='undefined') return;
   fetch(API, { method:'POST', redirect:'follow', body: JSON.stringify({
     action:'sauverPreCommande', id:order.id, date:order.date, client:order.client, type:order.type, livreur:order.livreur||'', lignes:order.lignes, statut:order.statut||'',
-    numero:order.numero||'', commentaire:(order.commentaire!=null?order.commentaire:''), messageKooki:(order.messageKooki!=null?order.messageKooki:'')
+    numero:order.numero||'', commentaire:(order.commentaire!=null?order.commentaire:''), messageKooki:(order.messageKooki!=null?order.messageKooki:''), mode:order.mode||''
   }) }).catch(function(){});
 }
 function _pcStockMap(){
@@ -12259,13 +12280,14 @@ function _pcRenderCard(o,stk){
     var livBadge=o.livreur ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#eef2f6;color:#44515f">'+_livIc+' '+_pcEsc(o.livreur==='Livreur interne'?'Interne':o.livreur)+'</span>' : '';
     var aVal=(o.statut==='À valider');
     var stBadge=(typeof _pcStatutBadge==='function')?_pcStatutBadge(o.statut):'';
+    var modeBadge=o.mode ? '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:#e7f0f9;color:#0662aa">'+(o.mode==='Retrait au labo'?'🏭 Retrait labo':'🚚 Livraison')+'</span>' : '';
     var summary= aProd>0
       ? '<span style="font-size:12.5px;font-weight:700;color:#b45309">🔥 À produire : '+aProd+' cookies avant livraison</span>'
       : '<span style="font-size:12.5px;font-weight:700;color:#2e7d46">✓ Tout est en stock — prêt à sortir</span>';
     return '<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden'+(aVal?';border:1.5px solid #f0c98a':'')+'">'+
       '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap'+(aVal?';background:#fffdf7':'')+'">'+
         '<div><div style="font-size:16px;font-weight:800">'+_pcEsc(o.client)+(o.numero?' <span style="font-size:11px;font-weight:700;color:#8a97a5">N° '+_pcEsc(o.numero)+'</span>':'')+'</div><div style="font-size:12px;color:#8a97a5">Livraison souhaitée : '+_pcFmtDate(o.date)+'</div></div>'+
-        stBadge+badge+livBadge+
+        stBadge+modeBadge+badge+livBadge+
         '<div style="margin-left:auto;text-align:right"><div style="font-size:22px;font-weight:900;color:#0c447c">'+tot+'</div><div style="font-size:10px;color:#8a97a5;text-transform:uppercase">cookies</div></div>'+
       '</div>'+
       '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
@@ -12291,6 +12313,106 @@ function _pcRenderCard(o,stk){
       '</div>'+
     '</div>';
   })(o);
+}
+
+/* ══════════════════ KOOKI SHOP IXELLES (commandes tablette magasin) ══════════════════ */
+var _SHOP_STATUTS=['À valider','Approuvée','En préparation','Envoyée','Livrée'];
+var _shopCache=null;
+function _shopEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function _shopFmtDate(d){ if(!d) return ''; var dt=new Date(d); if(isNaN(dt)) return String(d); return dt.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function _shopStatutBadge(st){
+  var m={
+    'À valider':['#fff4e6','#b45309','⏳ À valider'],
+    'Approuvée':['#eaf5ee','#2e7d46','✅ Approuvée'],
+    'En préparation':['#e7f0f9','#0662aa','👨‍🍳 En préparation'],
+    'Envoyée':['#e7f0f9','#0662aa','🚚 Envoyée'],
+    'Livrée':['#eef2f6','#44515f','✓ Livrée']
+  };
+  var s=m[st]||['#eef2f6','#44515f',st||'Reçue'];
+  return '<span style="font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px;background:'+s[0]+';color:'+s[1]+'">'+s[2]+'</span>';
+}
+function loadShopIxelles(){
+  var host=document.getElementById('shopix-list'); if(!host) return;
+  if(!_shopCache) host.innerHTML='<div class="empty">Chargement…</div>';
+  fetchAPI('getShopIxelles').then(function(res){
+    _shopCache=Array.isArray(res)?res:[];
+    renderShopIxelles();
+  }).catch(function(){ if(!_shopCache) host.innerHTML='<div class="empty">Impossible de charger les commandes.</div>'; });
+}
+function _shopPush(o){
+  return fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({
+    action:'sauverShopIxelles', id:o.id, numero:o.numero, date:o.date,
+    statut:o.statut, cookies:o.cookies, extras:o.extras,
+    commentaire:o.commentaire, messageKooki:o.messageKooki
+  })});
+}
+function _shopSetStatut(id,st){
+  var o=null; (_shopCache||[]).forEach(function(x){ if(x.id===id){ x.statut=st; o=x; } });
+  renderShopIxelles();
+  if(o) _shopPush(o);
+  popKooki('Statut mis à jour : '+st,'✅');
+}
+function _shopSetMessage(id){
+  var inp=document.getElementById('shop-msg-'+id); if(!inp) return;
+  var o=null; (_shopCache||[]).forEach(function(x){ if(x.id===id){ x.messageKooki=inp.value||''; o=x; } });
+  renderShopIxelles();
+  if(o) _shopPush(o);
+  popKooki((inp.value?'Message envoyé au magasin':'Message effacé'),'✉️');
+}
+function renderShopIxelles(){
+  var host=document.getElementById('shopix-list'); if(!host) return;
+  var arr=_shopCache||[];
+  if(!arr.length){ host.innerHTML='<div class="empty" style="text-align:center;color:#aab3bd;font-size:13px;padding:34px 10px;background:#fff;border:1px dashed #e2e7ec;border-radius:14px">Aucune commande du magasin pour le moment.</div>'; return; }
+  host.innerHTML=arr.map(function(o){
+    var cookies=(o.cookies||[]).filter(function(l){return (l.bacs||0)>0;});
+    var extras=(o.extras||[]).filter(function(e){return (e.qte||0)>0;});
+    var totBacs=cookies.reduce(function(a,l){return a+(l.bacs||0);},0);
+    var totCookies=totBacs*40;
+    var aVal=(o.statut==='À valider');
+    var cookieRows=cookies.map(function(l){
+      return '<tr><td style="text-align:left;font-weight:700;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+_shopEsc(l.saveur)+'</td>'+
+        '<td style="text-align:right;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+l.bacs+' bac'+(l.bacs>1?'s':'')+'</td>'+
+        '<td style="text-align:right;font-size:12.5px;color:#8a97a5;padding:8px 14px;border-top:1px solid #f4f6f8">'+(l.bacs*40)+' cookies</td></tr>';
+    }).join('');
+    var alim=extras.filter(function(e){return e.cat!=='four';});
+    var four=extras.filter(function(e){return e.cat==='four';});
+    function _extraRow(e){
+      var lotTxt=(e.lot>1 && e.lots)?(' <span style="color:#8a97a5;font-weight:600">('+e.lots+' lot'+(e.lots>1?'s':'')+' de '+e.lot+')</span>'):'';
+      var qtxt = e.unite ? (e.qte+' '+_shopEsc(e.unite)+(e.qte>1?'s':'')+lotTxt) : ('× '+e.qte);
+      return '<tr><td style="text-align:left;font-weight:700;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8">'+_shopEsc(e.nom)+'</td>'+
+        '<td style="text-align:right;font-size:13.5px;padding:8px 14px;border-top:1px solid #f4f6f8" colspan="2">'+qtxt+'</td></tr>';
+    }
+    function _extraBlock(list,titre){
+      if(!list.length) return '';
+      return '<div style="font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:12px 14px 2px">'+titre+'</div>'+
+        '<table style="width:100%;border-collapse:collapse"><tbody>'+list.map(_extraRow).join('')+'</tbody></table>';
+    }
+    var cookieTable = cookies.length ? (
+      '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
+        '<th style="text-align:left;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Saveur</th>'+
+        '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Bacs</th>'+
+        '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">= cookies</th>'+
+      '</tr></thead><tbody>'+cookieRows+'</tbody></table>') : '';
+    var extraTable = _extraBlock(alim,'Autres produits alimentaires')+_extraBlock(four,'Autres produits');
+    return '<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden'+(aVal?';border:1.5px solid #f0c98a':'')+'">'+
+      '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap'+(aVal?';background:#fffdf7':'')+'">'+
+        '<div><div style="font-size:16px;font-weight:800">🏪 Magasin Ixelles'+(o.numero?' <span style="font-size:11px;font-weight:700;color:#8a97a5">N° '+_shopEsc(o.numero)+'</span>':'')+'</div><div style="font-size:12px;color:#8a97a5">Commandé le '+_shopFmtDate(o.date)+'</div></div>'+
+        _shopStatutBadge(o.statut)+
+        '<div style="margin-left:auto;text-align:right"><div style="font-size:22px;font-weight:900;color:#0c447c">'+totBacs+'</div><div style="font-size:10px;color:#8a97a5;text-transform:uppercase">bac'+(totBacs>1?'s':'')+' · '+totCookies+' cookies</div></div>'+
+      '</div>'+
+      cookieTable+extraTable+
+      '<div style="padding:12px 18px;border-top:1px solid #f0f2f5">'+
+        ((o.commentaire||'')?'<div style="background:#f4f6f8;border-radius:8px;padding:8px 11px;font-size:12px;color:#55606b;margin-bottom:8px">💬 Magasin : '+_shopEsc(o.commentaire)+'</div>':'')+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="shop-msg-'+_shopEsc(o.id)+'" value="'+_shopEsc(o.messageKooki||'')+'" placeholder="Message au magasin (ex. Prêt jeudi 14h)" style="flex:1;min-width:170px;padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:8px;font-size:12.5px;outline:none"><button class="btn btn-secondary" onclick="_shopSetMessage(\''+_shopEsc(o.id)+'\')" style="font-size:12px;padding:8px 12px">✉️ Envoyer au magasin</button></div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
+        '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#8a97a5;font-weight:700">Statut :<select onchange="_shopSetStatut(\''+_shopEsc(o.id)+'\',this.value)" style="font-size:12px;padding:6px 8px;border:1.5px solid #e2e7ec;border-radius:8px;background:#fff;font-weight:700">'+_SHOP_STATUTS.map(function(s){return '<option'+(s===o.statut?' selected':'')+'>'+s+'</option>';}).join('')+'</select></span>'+
+        '<span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">'+
+          (aVal?'<button class="btn btn-primary" onclick="_shopSetStatut(\''+_shopEsc(o.id)+'\',\'Approuvée\')" style="font-size:12px;padding:8px 14px;background:#2e7d46">✓ Approuver</button>':'')+
+        '</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
 }
 
 /* Pré-remplir la sortie frigo à partir d'une pré-commande → BL */
