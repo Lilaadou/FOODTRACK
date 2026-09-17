@@ -527,14 +527,16 @@
         display:flex;
         position:fixed;bottom:0;left:0;right:0;
         background:#fff;border-top:1px solid #efefef;
-        z-index:400;padding:6px 0 10px;
-        justify-content:space-around;
+        z-index:400;padding:6px 4px 10px;
+        justify-content:flex-start;
+        overflow-x:auto;-webkit-overflow-scrolling:touch;
       }
+      #bottom-nav::-webkit-scrollbar{ display:none; }
       .bottom-nav-item{
         display:flex;flex-direction:column;align-items:center;gap:3px;
         font-size:10px;font-weight:600;color:#aaa;cursor:pointer;
-        padding:4px 8px;border-radius:8px;transition:color .15s;
-        border:none;background:none;flex:1;
+        padding:4px 6px;border-radius:8px;transition:color .15s;
+        border:none;background:none;flex:1 0 auto;min-width:60px;
       }
       .bottom-nav-item .bn-icon{ font-size:20px;line-height:1; }
       .bottom-nav-item.active{ color:#d44218; }
@@ -659,6 +661,9 @@
 
 <!-- Barre navigation mobile (bas d'écran) -->
 <div id="bottom-nav">
+  <button class="bottom-nav-item" onclick="showPage('home',this);closeSidebar()">
+    <span class="bn-icon">🏠</span>Accueil
+  </button>
   <button class="bottom-nav-item" onclick="showPage('production',this);closeSidebar()">
     <span class="bn-icon">🏭</span>Production
   </button>
@@ -684,6 +689,8 @@
   <div class="logo">
     <img id="app-logo" src="logo.png" alt="Kooki" style="height:46px;width:100%;object-fit:contain;object-position:center;">
   </div>
+
+  <button class="nav-item" id="nav-home" onclick="showPage('home',this)"><i class="ti ti-home nav-icon" aria-hidden="true"></i> Accueil</button>
 
   <div class="nav-label">Principal</div>
   <button class="nav-item" id="nav-premix" onclick="showPage('premix',this)"><i class="ti ti-flask nav-icon" aria-hidden="true"></i> Premix</button>
@@ -2717,6 +2724,11 @@
   </div>
 </div>
 
+  <!-- ══════════════════ HOME — PROGRAMME DU JOUR ══════════════════ -->
+  <div id="page-home" class="page">
+    <div id="home-content"><div class="empty">Chargement…</div></div>
+  </div>
+
   <!-- ══════════════════ KOOKI SHOP IXELLES ══════════════════ -->
   <div id="page-shopixelles" class="page">
     <div class="card">
@@ -2753,14 +2765,14 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzILb7N_UmxilXulEP4EH8o01keWPlCosLdwXdEKmi5MglbHQ8C3fgdFEefKhb43Vd9Dg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbwJfPautpufk2hflTiWnQYsvj4wktd72o2tVByePLgQa2HhOK8Dx3jjg1frUVRQE0HQCA/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
 const IXELLES_PAGES = ['ixelles'];
 const DAVID_PAGES = ['ixelles'];
 const ANDERLECHT_PAGES = ['frigo'];
-const ALL_PAGES = ['premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons','shopixelles'];
+const ALL_PAGES = ['home','premix','production','stock','ingredients','frigo','ixelles','reception','factures','alertes','parametres','bl','ixelles-livraisons','shopixelles'];
 const PROD_PAGES = ['premix','production','stock','ingredients','frigo','ixelles'];
 const PROD_PAGES_STRICT = ['premix','production','stock','ingredients'];
 const FRIGO_PAGES = ['dashboard','frigo','ixelles','bl'];
@@ -2785,7 +2797,7 @@ const PROFILES = {
 PROFILES.frigo = { color:'#0662aa', initial:'SF', role:'Sortie frigo', pages:['stock','frigo'] };
 PROFILES.prod  = { color:'#e8956a', initial:'PR', role:'Production',   pages:['premix','production'] };
 
-const titles = { dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Sorties frigo', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles', shopixelles:'KOOKI Shop Ixelles' };
+const titles = { home:'🏠 Programme du jour', dashboard:'Dashboard', premix:'Premix', production:'Production', stock:'Stock', frigo:'Sorties frigo', ixelles:'Commandes Magasin Ixelles', ingredients:'Stock Ingrédients', reception:'Réception de facture', factures:'Factures', historique:'Historique', alertes:'Alertes', parametres:'Paramètres', taches:'Tâches', bl:'B2B', 'recap-mois':'Récap mensuel B2B', 'centre-docs':'📁 Centre de documents', 'ixelles-livraisons':'Livraisons Ixelles', shopixelles:'KOOKI Shop Ixelles' };
 const FULL_NAMES = {
   Lila:'Lila Doudou', Virginia:'Virginia Kunnen', Abenazer:'Abenazer Hailu',
   Sebastien:'Sebastien Kunnen', DavidD:'David Deridder', Production:'Production',
@@ -3098,6 +3110,7 @@ function showPage(name, btn) {
   if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
   if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
   if (name === 'shopixelles') setTimeout(() => { loadShopIxelles(); }, 60);
+  if (name === 'home') setTimeout(() => { loadHome(); }, 60);
   if (name === 'premix') setTimeout(async () => {
     const data = await fetchAPI('getPremix');
     applyPremix(data);
@@ -4680,6 +4693,15 @@ if(dlcCakeRow && dlcCakeVal){
     dlcCakeRow.style.display = 'none';
   }
 }
+
+// Mémorise le dernier BON DE LIVRAISON généré (pas les bons de commande) —
+// sert à le publier dans l'espace client B2B (téléchargeable par le client).
+try{
+  if(!isCommande){
+    var _bc=document.getElementById('bon-content');
+    if(_bc){ window._lastBL={ html:_bc.innerHTML, numero:num, client:(client||cmdNom||'') }; }
+  }
+}catch(e){}
 
 } // fermeture de showBonLivraison
 
@@ -12308,6 +12330,7 @@ function _pcRenderCard(o,stk){
           '<button class="btn btn-secondary" onclick="_pcEdit('+o.id+')" style="font-size:12px;padding:8px 12px">✏️ Modifier</button>'+
           '<button class="btn btn-secondary" onclick="_pcPrintOne('+o.id+')" style="font-size:12px;padding:8px 12px">🖨️ Imprimer</button>'+
           (aVal?'':'<button class="btn btn-primary" onclick="_pcFaireBL('+o.id+')" style="font-size:12px;padding:8px 12px">📄 Faire le BL</button>')+
+          (aVal?'':'<button class="btn btn-secondary" onclick="_pcPublishBL('+o.id+')" style="font-size:12px;padding:8px 12px">📤 Publier BL au client</button>')+
           '<button class="btn btn-secondary" onclick="if(confirm(\'Supprimer cette pré-commande ?\'))_pcDelete('+o.id+')" style="font-size:12px;padding:8px 10px">🗑️</button>'+
         '</span>'+
       '</div>'+
@@ -12415,9 +12438,104 @@ function renderShopIxelles(){
   }).join('');
 }
 
+/* ══════════════════ HOME — PROGRAMME DU JOUR ══════════════════ */
+function _homeTodayLabel(){
+  var d=new Date();
+  try { return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }
+  catch(e){ return _pcFmtDate(_pcTodayISO()); }
+}
+function loadHome(){
+  renderHome();
+  if(typeof fetchAPI!=='function') return;
+  fetchAPI('getPreCommandes').then(function(d){ if(Array.isArray(d)){ d.sort(function(a,b){return (Number(b.id)||0)-(Number(a.id)||0);}); _pcSave(d); renderHome(); } }).catch(function(){});
+  fetchAPI('getShopIxelles').then(function(r){ _shopCache=Array.isArray(r)?r:[]; renderHome(); }).catch(function(){});
+}
+function _homeTile(icon,label,color,count,sub,page){
+  return '<button onclick="showPage(\''+page+'\',document.getElementById(\'nav-'+page+'\'))" style="text-align:left;cursor:pointer;background:#fff;border:1.5px solid #eef0f2;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;font-family:inherit">'+
+    '<div style="font-size:30px">'+icon+'</div>'+
+    '<div><div style="font-size:30px;font-weight:900;color:'+color+';line-height:1">'+count+'</div>'+
+    '<div style="font-size:13px;font-weight:800;color:#44515f;margin-top:4px">'+label+'</div>'+
+    '<div style="font-size:11px;color:#8a97a5">'+sub+'</div></div>'+
+  '</button>';
+}
+function _homeB2BRow(o){
+  var NB=(typeof _PC_NOBABY!=='undefined')?_PC_NOBABY:[];
+  var tot=(o.lignes||[]).reduce(function(a,l){ return a + (l.big||0) + (NB.indexOf(l.sav)>=0?0:(l.baby||0)); },0);
+  var savs=(o.lignes||[]).filter(function(l){return (l.big||0)+(l.baby||0)>0;}).map(function(l){return _shopEsc(l.sav);}).join(', ');
+  var modeTxt = o.mode ? (o.mode==='Retrait au labo'?'🏭 Retrait labo':'🚚 Livraison') : '';
+  var livTxt = o.livreur ? _shopEsc(o.livreur==='Livreur interne'?'Interne':o.livreur) : '';
+  var typeTxt = (o.type==='cuit')?'🔥 Cuits':'❄️ Congelés';
+  var st=(typeof _pcStatutBadge==='function')?_pcStatutBadge(o.statut):'';
+  return '<div onclick="showPage(\'bl\',document.getElementById(\'nav-bl\'))" style="cursor:pointer;padding:13px 4px;border-top:1px solid #f0f2f5">'+
+    '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+
+      '<span style="font-weight:800;font-size:15px">'+_shopEsc(o.client||'Client')+'</span>'+
+      (o.numero?'<span style="font-size:11px;color:#8a97a5;font-weight:700">N° '+_shopEsc(o.numero)+'</span>':'')+
+      st+
+      '<span style="margin-left:auto;font-weight:900;color:#0c447c">'+tot+' <span style="font-size:11px;color:#8a97a5;font-weight:700">cookies</span></span>'+
+    '</div>'+
+    '<div style="font-size:12.5px;color:#6a6055;margin-top:5px;font-weight:600">'+typeTxt+(modeTxt?(' · '+modeTxt):'')+(livTxt?(' · '+livTxt):'')+'</div>'+
+    (savs?'<div style="font-size:12px;color:#8a97a5;margin-top:3px">'+savs+'</div>':'')+
+  '</div>';
+}
+function _homeIxRow(o){
+  var cookies=(o.cookies||[]).filter(function(l){return (l.bacs||0)>0;});
+  var totBacs=cookies.reduce(function(a,l){return a+(l.bacs||0);},0);
+  var extras=(o.extras||[]).filter(function(e){return (e.qte||0)>0;});
+  var savs=cookies.map(function(l){return _shopEsc(l.saveur)+' ×'+l.bacs;}).join(', ');
+  return '<div onclick="showPage(\'shopixelles\',document.getElementById(\'nav-shopixelles\'))" style="cursor:pointer;padding:13px 4px;border-top:1px solid #f0f2f5">'+
+    '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+
+      '<span style="font-weight:800;font-size:15px">🏪 Magasin Ixelles</span>'+
+      (o.numero?'<span style="font-size:11px;color:#8a97a5;font-weight:700">N° '+_shopEsc(o.numero)+'</span>':'')+
+      '<span style="margin-left:auto;font-weight:900;color:#d44218">'+totBacs+' <span style="font-size:11px;color:#8a97a5;font-weight:700">bac'+(totBacs>1?'s':'')+' · '+(totBacs*40)+' cookies</span></span>'+
+    '</div>'+
+    (savs?'<div style="font-size:12px;color:#8a97a5;margin-top:5px">'+savs+'</div>':'')+
+    (extras.length?'<div style="font-size:12px;color:#8a97a5;margin-top:3px">+ '+extras.length+' autre'+(extras.length>1?'s':'')+' produit'+(extras.length>1?'s':'')+'</div>':'')+
+  '</div>';
+}
+function renderHome(){
+  var host=document.getElementById('home-content'); if(!host) return;
+  var today=_pcTodayISO();
+  var b2b=(_pcLoad()||[]).filter(function(o){ return o.date===today; });
+  var ix=(_shopCache||[]).filter(function(o){ return o.statut==='À valider'; });
+  var totalAFaire=b2b.length+ix.length;
+  var html='';
+  html+='<div class="card" style="background:linear-gradient(135deg,#d44218,#e2622f);color:#fff;border:none">'+
+    '<div style="font-size:23px;font-weight:900">Bonjour 👋</div>'+
+    '<div style="opacity:.93;font-size:14px;text-transform:capitalize;margin-top:2px">'+_homeTodayLabel()+'</div>'+
+    '<div style="margin-top:10px;font-size:14px;font-weight:700">'+
+      (totalAFaire? ('👉 '+totalAFaire+' chose'+(totalAFaire>1?'s':'')+' à traiter aujourd\'hui') : '✅ Rien d\'urgent pour aujourd\'hui')+
+    '</div>'+
+  '</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:14px 0">'+
+    _homeTile('🚚','Commandes B2B à livrer','#0c447c',b2b.length,'aujourd\'hui','bl')+
+    _homeTile('🛒','Commandes Ixelles à valider','#d44218',ix.length,'en attente','shopixelles')+
+  '</div>';
+  html+='<div class="card"><div class="card-header"><div><div class="card-title">🚚 B2B — à livrer aujourd\'hui</div><div class="card-sub">'+b2b.length+' commande'+(b2b.length!==1?'s':'')+'</div></div></div>';
+  html+= b2b.length ? b2b.map(_homeB2BRow).join('') : '<div class="empty" style="border:none;background:transparent;color:#8a97a5;text-align:center;padding:18px">Rien à livrer aujourd\'hui 🎉</div>';
+  html+='</div>';
+  html+='<div class="card" style="margin-top:14px"><div class="card-header"><div><div class="card-title">🛒 KOOKI Shop Ixelles — à valider</div><div class="card-sub">'+ix.length+' commande'+(ix.length!==1?'s':'')+'</div></div></div>';
+  html+= ix.length ? ix.map(_homeIxRow).join('') : '<div class="empty" style="border:none;background:transparent;color:#8a97a5;text-align:center;padding:18px">Aucune commande à valider ✅</div>';
+  html+='</div>';
+  host.innerHTML=html;
+}
+
 /* Pré-remplir la sortie frigo à partir d'une pré-commande → BL */
+/* Publier manuellement le dernier BL généré vers l'espace client d'une commande */
+function _pcPublishBL(id){
+  var o=_pcLoad().filter(function(x){return x.id===id;})[0]; if(!o) return;
+  var L=window._lastBL;
+  if(!L || !L.html){ alert('Génère d\'abord le bon de livraison (bouton « 📄 Faire le BL » ou sortie frigo), puis reviens ici pour le publier.'); return; }
+  if(L.client && o.client && String(L.client).trim().toLowerCase()!==String(o.client).trim().toLowerCase()){
+    if(!confirm('Le dernier bon de livraison généré concerne « '+L.client+' », mais cette commande est « '+o.client+' ».\n\nPublier quand même ce BL pour '+o.client+' ?')) return;
+  }
+  if(typeof API==='undefined' || !API){ alert('Pas de connexion au serveur.'); return; }
+  fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({ action:'sauverBLClient', id:id, numero:L.numero||o.numero||'', date:new Date().toISOString(), html:L.html })})
+    .then(function(){ if(typeof popKooki==='function') popKooki('BL publié pour le client 📄'); else toast('bl','BL publié pour le client','ok'); })
+    .catch(function(){ alert('Échec de la publication du BL. Réessaie.'); });
+}
 function _pcFaireBL(id){
   var o=_pcLoad().filter(function(x){return x.id===id;})[0]; if(!o) return;
+  window._blOrderId = id;   // pour rattacher le BL généré à cette commande client
   showPage('frigo', document.getElementById('nav-frigo'));
   setTimeout(function(){
     try{
@@ -15977,6 +16095,17 @@ var qrcode = function() {
       try{ window._cmdDocType='livraison'; }catch(e){}
       close();
       try{ if(typeof showBonLivraison==='function'){ showBonLivraison({ client:client, saveur:allSaveurs, lots:bonLots, boites:0, typeBoite:'plastique', livreur:livreur, numeroBL:numeroBL, typeCookies:'cuits' }); } }catch(e){ toast('Sortie enregistrée, BL non affiché','err'); }
+      // Rattache automatiquement le BL à la commande client (si on est venu via « Faire le BL »)
+      try{
+        if(window._blOrderId){
+          var _bc=document.getElementById('bon-content');
+          if(_bc && typeof API!=='undefined' && API){
+            fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({ action:'sauverBLClient', id:window._blOrderId, numero:numeroBL, date:new Date().toISOString(), html:_bc.innerHTML })})
+              .then(function(){ if(typeof popKooki==='function') popKooki('BL disponible pour le client 📄'); }).catch(function(){});
+          }
+          window._blOrderId=null;
+        }
+      }catch(e){}
       toast('✓ BL '+numeroBL+' généré','ok');
     }
     try{ if(typeof fetchAPI==='function'){ Promise.resolve(fetchAPI('getNextBLNumber')).then(function(n){withBL(n);}).catch(function(){withBL(null);}); } else withBL(null); }catch(e){ withBL(null); }
