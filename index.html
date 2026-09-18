@@ -703,11 +703,11 @@
   <div class="nav-label" id="nav-label-gestion" style="margin-top:12px">Gestion</div>
   <button class="nav-item" id="nav-reception" onclick="showPage('reception',this)"><i class="ti ti-file-download nav-icon" aria-hidden="true"></i> Réception facture</button>
   <button class="nav-item" id="nav-factures" onclick="showPage('factures',this)"><i class="ti ti-receipt nav-icon" aria-hidden="true"></i> Factures</button>
-  <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><i class="ti ti-truck-delivery nav-icon" aria-hidden="true"></i> B2B</button>
+  <button class="nav-item" id="nav-bl" onclick="showPage('bl',this)"><i class="ti ti-truck-delivery nav-icon" aria-hidden="true"></i> B2B <span id="bl-badge" style="display:none;margin-left:auto;background:#d44218;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px">0</span></button>
   <button class="nav-item" id="nav-recap-mois" onclick="showPage('recap-mois',this)"><i class="ti ti-calendar-stats nav-icon" aria-hidden="true"></i> Récap mensuel</button>
   <button class="nav-item" id="nav-centre-docs" onclick="showPage('centre-docs',this)"><i class="ti ti-folders nav-icon" aria-hidden="true"></i> Documents</button>
   <button class="nav-item" id="nav-ixelles-livraisons" onclick="showPage('ixelles-livraisons',this)"><i class="ti ti-building-store nav-icon" aria-hidden="true"></i> Livraisons Ixelles</button>
-  <button class="nav-item" id="nav-shopixelles" onclick="showPage('shopixelles',this)"><i class="ti ti-shopping-cart nav-icon" aria-hidden="true"></i> KOOKI Shop Ixelles</button>
+  <button class="nav-item" id="nav-shopixelles" onclick="showPage('shopixelles',this)"><i class="ti ti-shopping-cart nav-icon" aria-hidden="true"></i> KOOKI Shop Ixelles <span id="shopix-badge" style="display:none;margin-left:auto;background:#d44218;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px">0</span></button>
 
   <div class="sidebar-bottom">
 
@@ -2765,7 +2765,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzg7V9RXtxXfxi6VuqnH8HYOElWnigG3B9cTr7OUZoxGzmO8PcviYFldIYgyvBoPv2hwQ/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzfJhjm_YVPRwpjrKTCUIktEF9-P0FoQVJhnl87DR02-2y0r7Gi5hWsiWHpv3s98virew/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -12255,7 +12255,14 @@ function _pcFillPrintDays(disp){
     : '<option value="">— aucun jour —</option>';
   if(prev && seen[prev]!==undefined) sel.value=prev;
 }
+function updateNavBadges(){
+  try{ var n=(_pcLoad()||[]).filter(function(o){return o.statut==='À valider';}).length;
+    var b=document.getElementById('bl-badge'); if(b){ b.textContent=n; b.style.display=n>0?'inline-block':'none'; } }catch(e){}
+  try{ var m=((typeof _shopCache!=='undefined'&&_shopCache)||[]).filter(function(o){return o.statut==='À valider';}).length;
+    var s=document.getElementById('shopix-badge'); if(s){ s.textContent=m; s.style.display=m>0?'inline-block':'none'; } }catch(e){}
+}
 function _pcRender(){
+  updateNavBadges();
   var list=document.getElementById('pc-list'); if(!list) return;
   var all=_pcLoad();
   var today=_pcTodayISO();
@@ -12384,6 +12391,7 @@ function _shopSetMessage(id){
   popKooki((inp.value?'Message envoyé au magasin':'Message effacé'),'✉️');
 }
 function renderShopIxelles(){
+  updateNavBadges();
   var host=document.getElementById('shopix-list'); if(!host) return;
   var arr=_shopCache||[];
   if(!arr.length){ host.innerHTML='<div class="empty" style="text-align:center;color:#aab3bd;font-size:13px;padding:34px 10px;background:#fff;border:1px dashed #e2e7ec;border-radius:14px">Aucune commande du magasin pour le moment.</div>'; return; }
@@ -12448,8 +12456,8 @@ function _homeTodayLabel(){
 function loadHome(){
   renderHome();
   if(typeof fetchAPI!=='function') return;
-  fetchAPI('getPreCommandes').then(function(d){ if(Array.isArray(d)){ d.sort(function(a,b){return (Number(b.id)||0)-(Number(a.id)||0);}); _pcSave(d); renderHome(); } }).catch(function(){});
-  fetchAPI('getShopIxelles').then(function(r){ _shopCache=Array.isArray(r)?r:[]; renderHome(); }).catch(function(){});
+  fetchAPI('getPreCommandes').then(function(d){ if(Array.isArray(d)){ d.sort(function(a,b){return (Number(b.id)||0)-(Number(a.id)||0);}); _pcSave(d); renderHome(); } updateNavBadges(); }).catch(function(){});
+  fetchAPI('getShopIxelles').then(function(r){ _shopCache=Array.isArray(r)?r:[]; renderHome(); updateNavBadges(); }).catch(function(){});
 }
 function _homeTile(icon,label,color,count,sub,page){
   return '<button onclick="showPage(\''+page+'\',document.getElementById(\'nav-'+page+'\'))" style="text-align:left;cursor:pointer;background:#fff;border:1.5px solid #eef0f2;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;font-family:inherit">'+
