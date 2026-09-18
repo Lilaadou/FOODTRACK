@@ -12320,6 +12320,7 @@ function _pcRenderCard(o,stk){
       '</tr></thead><tbody>'+rows+'</tbody></table>'+
       (((o.commentaire||'')||(o.numero||'')||(o.statut||'')) ? ('<div style="padding:12px 18px;border-top:1px solid #f0f2f5">'+
         ((o.commentaire||'')?'<div style="background:#f4f6f8;border-radius:8px;padding:8px 11px;font-size:12px;color:#55606b;margin-bottom:8px">💬 Client : '+_pcEsc(o.commentaire)+'</div>':'')+
+        ((o.remarque||'')?'<div style="background:#eef5fc;border-radius:8px;padding:8px 11px;font-size:12px;color:#0c447c;margin-bottom:8px;font-weight:600">📝 Remarque après livraison : '+_pcEsc(o.remarque)+'</div>':'')+
         (((o.numero||'')||(o.statut||''))?'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="pc-msg-'+o.id+'" value="'+_pcEsc(o.messageKooki||'')+'" placeholder="Message au client (ex. Livraison 9h confirmée)" style="flex:1;min-width:170px;padding:8px 10px;border:1.5px solid #e2e7ec;border-radius:8px;font-size:12.5px;outline:none"><button class="btn btn-secondary" onclick="_pcSetMessage('+o.id+')" style="font-size:12px;padding:8px 12px">✉️ Envoyer au client</button></div>':'')+
       '</div>') : '')+
       '<div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;flex-wrap:wrap">'+
