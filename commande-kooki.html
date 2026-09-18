@@ -432,7 +432,7 @@ function renderHistory(){
       (canEdit
         ? '<div class="hlock open">🔓 Modifiable jusqu\'au '+deadlineLabel(o.date)+'</div><button class="hedit" onclick="editOrder(\''+o.id+'\')">✏️ Modifier</button>'
         : '<div class="hlock closed">🔒 Non modifiable (date limite dépassée)</div>')+
-      (((o.statut==='Envoyée'||o.statut==='Livrée') && o.blDispo)
+      (o.blDispo
         ? '<button onclick="dlBL(\''+o.id+'\')" style="width:100%;margin-top:8px;background:var(--or);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">📄 Télécharger le bon de livraison'+(o.blNumero?(' · '+esc(o.blNumero)):'')+'</button>'
         : '')+
     '</div>';
