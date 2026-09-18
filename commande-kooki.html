@@ -55,6 +55,9 @@
   .tile.epuise{opacity:.6}
   .tile .thead{margin-bottom:12px}
   .tile .fn{font-weight:900;font-size:16px;line-height:1.1}
+  .favstar{background:none;border:none;font-size:21px;line-height:1;cursor:pointer;color:#c8ccd2;padding:0;flex-shrink:0}
+  .favstar.on{color:#f0b429}
+  .cat-title{font-size:14px;font-weight:900;color:var(--bl);margin:16px 2px 9px}
   .tile .pr{font-size:11px;color:var(--mut);font-weight:700;margin-top:3px}
   .tile .disp{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;margin-top:6px;display:inline-block}
   .disp.ok{background:var(--ok-l);color:var(--ok)}
@@ -117,7 +120,7 @@
 <!-- ===== CONNEXION ===== -->
 <div id="login">
   <div class="card">
-    <img class="logo" src="logo.png" alt="KOOKI" onerror="this.style.display='none'">
+    <img class="logo" src="Kooki_texte_transparent.png" alt="KOOKI" onerror="this.onerror=null;this.src='logo.png';">
     <h1>Espace commande KOOKI</h1>
     <p>Réservé aux clients professionnels</p>
     <input id="code" type="text" placeholder="CODE D'ACCÈS" maxlength="14" autocomplete="off" onkeydown="if(event.key==='Enter')login()">
@@ -138,6 +141,7 @@
   <div class="tabs">
     <button class="tab on" id="tab-shop" onclick="showTab('shop')">🛒 Commander</button>
     <button class="tab" id="tab-hist" onclick="showTab('hist')">📋 Mes commandes</button>
+    <button class="tab" id="tab-rec" onclick="showTab('rec')">🔁 Récurrent</button>
   </div>
 
   <div id="shopview">
@@ -150,29 +154,37 @@
       <div class="ctl">
         <div class="lbl">Type de cookies</div>
         <div class="seg" id="seg-type">
-          <div class="opt on" data-v="cuit" onclick="pick('seg-type',this)">🔥 Cuits</div>
-          <div class="opt" data-v="cong" onclick="pick('seg-type',this)">❄️ Congelés</div>
+          <div class="opt on" data-v="cuit" onclick="pick('seg-type',this)">Cuits</div>
+          <div class="opt" data-v="cong" onclick="pick('seg-type',this)">Congelés</div>
         </div>
       </div>
       <div class="ctl">
         <div class="lbl">Date de livraison souhaitée</div>
         <input type="date" class="datefield" id="ddate">
+        <div style="font-size:11px;color:var(--mut);margin-top:6px;font-weight:700">Livraisons : lun · mer · ven — commande jusqu'à la veille 16h</div>
       </div>
       <div class="ctl">
         <div class="lbl">Mode</div>
         <div class="seg" id="seg-mode">
-          <div class="opt on" data-v="Livraison" onclick="pick('seg-mode',this);calc()">🚚 Livraison</div>
-          <div class="opt" data-v="Retrait au labo" onclick="pick('seg-mode',this);calc()">🏭 Retrait au labo</div>
+          <div class="opt on" data-v="Livraison" onclick="pick('seg-mode',this);calc()">Livraison</div>
+          <div class="opt" data-v="Retrait au labo" onclick="pick('seg-mode',this);calc()">Retrait au labo KOOKI</div>
         </div>
         <div id="feehint" style="font-size:11px;color:var(--mut);margin-top:7px;font-weight:700"></div>
       </div>
     </div>
     <div class="shoptitle">Nos saveurs</div>
     <div class="legend">✅ Disponible · ⚠️ Sur commande (petit délai) · ❌ Épuisé</div>
-    <div class="grid" id="flavs"><div class="loading">Chargement…</div></div>
+    <div id="flavs"><div class="loading">Chargement…</div></div>
     <div class="shoptitle">Un mot pour nous ? (facultatif)</div>
     <textarea class="commentbox" id="comment" placeholder="Précision, demande particulière, horaire…"></textarea>
     <div class="note">📌 Ta commande sera <b>envoyée à KOOKI pour validation</b>. Tu pourras la modifier jusqu'à la <b>veille de la livraison, 11h</b>.</div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="openRecModal()">🔁 Enregistrer comme commande récurrente</button>
+  </div>
+
+  <div id="recview" hidden>
+    <div class="shoptitle">Commandes récurrentes</div>
+    <div class="legend">Elles sont envoyées automatiquement à KOOKI chaque semaine, aux jours choisis (statut « à valider »).</div>
+    <div id="reclist"><div class="loading">Chargement…</div></div>
   </div>
 
   <div id="histview" hidden>
@@ -184,7 +196,7 @@
 
 <div class="cartbar" id="cartbar" hidden>
   <div class="in">
-    <div class="n">Total<b><span id="tot">0</span> cookies</b><span class="eur" id="toteur">0,00 €</span></div>
+    <div class="n">Total<b><span id="tot">0</span> cookies</b></div>
     <button class="btn btn-primary" id="sendbtn" onclick="send()">Envoyer →</button>
   </div>
 </div>
@@ -230,9 +242,13 @@ function pick(g,el){ var w=document.getElementById(g); Array.prototype.forEach.c
 function eur(n){ return (Math.round(n*100)/100).toFixed(2).replace('.',',')+' €'; }
 function fmtD(iso){ return iso? iso.split('-').reverse().join('/') : '—'; }
 var JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-function deadlineFor(iso){ var p=String(iso).split('-'); if(p.length!==3) return null; var d=new Date(+p[0],+p[1]-1,+p[2]); d.setDate(d.getDate()-1); d.setHours(11,0,0,0); return d; }
+function deadlineFor(iso){ var p=String(iso).split('-'); if(p.length!==3) return null; var d=new Date(+p[0],+p[1]-1,+p[2]); d.setDate(d.getDate()-1); d.setHours(16,0,0,0); return d; }
 function editable(iso){ var dl=deadlineFor(iso); return dl? (new Date() < dl) : false; }
-function deadlineLabel(iso){ var dl=deadlineFor(iso); if(!dl) return ''; return JOURS[dl.getDay()]+' '+('0'+dl.getDate()).slice(-2)+'/'+('0'+(dl.getMonth()+1)).slice(-2)+' à 11h'; }
+function deadlineLabel(iso){ var dl=deadlineFor(iso); if(!dl) return ''; return JOURS[dl.getDay()]+' '+('0'+dl.getDate()).slice(-2)+'/'+('0'+(dl.getMonth()+1)).slice(-2)+' à 16h'; }
+/* Livraisons : lundi (1), mercredi (3), vendredi (5) uniquement */
+var DELIVERY_DAYS=[1,3,5];
+function isDeliveryDay(iso){ var p=String(iso).split('-'); if(p.length!==3) return false; var d=new Date(+p[0],+p[1]-1,+p[2]); return DELIVERY_DAYS.indexOf(d.getDay())>=0; }
+function nextDeliveryDate(){ var d=new Date(); for(var k=0;k<14;k++){ var t=new Date(d.getTime()+k*86400000); var iso=t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2); if(DELIVERY_DAYS.indexOf(t.getDay())>=0 && editable(iso)) return iso; } return ''; }
 
 function login(){
   var code=(document.getElementById('code').value||'').trim().toUpperCase();
@@ -248,7 +264,7 @@ function login(){
       document.getElementById('order').hidden=false;
       apiGet('getTarifs').then(function(t){ if(t){ PRIX.big=Number(t.big)||0; PRIX.baby=Number(t.baby)||0; PRIX.livraison=(Number(t.livraison)>0?Number(t.livraison):8); } build(); calc(); }).catch(function(){});
       showTab('shop');
-      var d=new Date(Date.now()+864e5); document.getElementById('ddate').value=d.toISOString().slice(0,10);
+      document.getElementById('ddate').value=nextDeliveryDate();
       loadDispo();
       loadHistory(true); // pré-charge l'historique en arrière-plan
       startAutoRefresh();
@@ -257,16 +273,19 @@ function login(){
     }
   }).catch(function(){ btn.disabled=false; btn.textContent='Se connecter'; err.textContent='Connexion impossible. Réessaie.'; });
 }
-function logout(){ stopAutoRefresh(); histCache=null; cancelEdit(); ['order','done','cartbar'].forEach(function(id){document.getElementById(id).hidden=true;}); document.getElementById('login').hidden=false; document.getElementById('code').value=''; }
+function logout(){ stopAutoRefresh(); histCache=null; recCache=null; cancelEdit(); ['order','done','cartbar'].forEach(function(id){document.getElementById(id).hidden=true;}); document.getElementById('login').hidden=false; document.getElementById('code').value=''; }
 
 function showTab(t){
-  var shop=(t==='shop');
+  var shop=(t==='shop'), hist=(t==='hist'), rec=(t==='rec');
   document.getElementById('shopview').hidden=!shop;
-  document.getElementById('histview').hidden=shop;
+  document.getElementById('histview').hidden=!hist;
+  var rv=document.getElementById('recview'); if(rv) rv.hidden=!rec;
   document.getElementById('cartbar').hidden=!shop;
   document.getElementById('tab-shop').classList.toggle('on',shop);
-  document.getElementById('tab-hist').classList.toggle('on',!shop);
-  if(!shop){ renderHistory(); loadHistory(true); }
+  document.getElementById('tab-hist').classList.toggle('on',hist);
+  var tr=document.getElementById('tab-rec'); if(tr) tr.classList.toggle('on',rec);
+  if(hist){ renderHistory(); loadHistory(true); }
+  if(rec){ renderRecurrentes(); loadRecurrentes(); }
   window.scrollTo(0,0);
 }
 function goHist(){ document.getElementById('done').hidden=true; document.getElementById('order').hidden=false; showTab('hist'); }
@@ -284,9 +303,10 @@ function loadDispo(){
 }
 function build(preset){
   qty={};
-  document.getElementById('flavs').innerHTML=SAVEURS.map(function(s,i){
+  var favs=getFavs();
+  function tileHtml(s,i){
     var dd=DISP[s.d]||DISP.ok; var ep=s.d==='no'; qty[i]={big:0,baby:0};
-    var pr='Big '+eur(PRIX.big)+(s.nobaby?'':(' · Baby '+eur(PRIX.baby)));
+    var fav=favs.indexOf(s.n)>=0;
     function stepper(kind,disabled){
       return '<div class="step'+(disabled?' dis':'')+'"><div class="sl">'+(kind==='big'?'Big':'Baby')+'</div>'+
         '<div class="stepper"><button onclick="chg('+i+',\''+kind+'\',-1)" '+(disabled?'disabled':'')+'>−</button>'+
@@ -294,10 +314,20 @@ function build(preset){
         '<button onclick="chg('+i+',\''+kind+'\',1)" '+(disabled?'disabled':'')+'>+</button></div></div>';
     }
     return '<div class="tile'+(ep?' epuise':'')+'" id="tile-'+i+'"><div class="thead">'+
-      '<div class="fn">'+esc(s.n)+'</div><div class="pr">'+pr+'</div>'+
+      '<div style="display:flex;align-items:flex-start;gap:8px"><div class="fn" style="flex:1">'+esc(s.n)+'</div>'+
+      '<button class="favstar'+(fav?' on':'')+'" onclick="toggleFav('+i+')" aria-label="Favori">'+(fav?'★':'☆')+'</button></div>'+
       '<span class="disp '+dd[0]+'">'+dd[1]+'</span></div>'+
       '<div class="stepgrid">'+stepper('big',ep)+stepper('baby',ep||s.nobaby)+'</div></div>';
-  }).join('');
+  }
+  var favIdx=[], restIdx=[];
+  SAVEURS.forEach(function(s,i){ (favs.indexOf(s.n)>=0?favIdx:restIdx).push(i); });
+  var html='';
+  if(favIdx.length){
+    html+='<div class="cat-title">⭐ Vos favoris</div><div class="grid">'+favIdx.map(function(i){return tileHtml(SAVEURS[i],i);}).join('')+'</div>';
+    html+='<div class="cat-title">Toutes nos saveurs</div>';
+  }
+  html+='<div class="grid">'+restIdx.map(function(i){return tileHtml(SAVEURS[i],i);}).join('')+'</div>';
+  document.getElementById('flavs').innerHTML=html;
   if(preset){ // pré-remplissage (modification d'une commande)
     (preset||[]).forEach(function(l){ var idx=SAVEURS.map(function(s){return s.n;}).indexOf(l.sav); if(idx<0) return;
       var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0;
@@ -324,31 +354,32 @@ function setQty(i,kind,val){
 }
 function totals(){
   var big=0,baby=0; for(var k in qty){ big+=qty[k].big; baby+=qty[k].baby; }
-  var fee=(curMode()==='Livraison')?PRIX.livraison:0;
-  return {big:big,baby:baby,n:big+baby,cookies:big*PRIX.big+baby*PRIX.baby,fee:fee,eur:big*PRIX.big+baby*PRIX.baby+fee};
+  return {big:big,baby:baby,n:big+baby};
 }
 function calc(){
   var t=totals();
   document.getElementById('tot').textContent=t.n;
-  document.getElementById('toteur').textContent=eur(t.eur);
-  var fh=document.getElementById('feehint'); if(fh) fh.textContent=(curMode()==='Livraison')?('+ '+eur(PRIX.livraison)+' de livraison (HTVA)'):'Aucun frais de livraison';
+  var fh=document.getElementById('feehint'); if(fh) fh.textContent=(curMode()==='Livraison')?'Livraison à ton adresse':'À retirer au labo KOOKI';
   return t.n;
 }
 
-/* tableau récap prix (utilisé confirmation + historique) */
+/* tableau récap (quantités uniquement — pas de prix) */
 function recapTable(lignes,mode){
-  var rows='', tot=0;
+  var rows='';
   (lignes||[]).forEach(function(l){
     var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0;
-    if(big>0){ var t=big*PRIX.big; tot+=t; rows+='<tr><td>'+esc(l.sav)+'</td><td>Big</td><td class="r">'+big+'</td><td class="r">'+eur(PRIX.big)+'</td><td class="r">'+eur(t)+'</td></tr>'; }
-    if(baby>0 && NOBABY.indexOf(l.sav)<0){ var t2=baby*PRIX.baby; tot+=t2; rows+='<tr><td>'+esc(l.sav)+'</td><td>Baby</td><td class="r">'+baby+'</td><td class="r">'+eur(PRIX.baby)+'</td><td class="r">'+eur(t2)+'</td></tr>'; }
+    if(big>0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Big</td><td class="r">'+big+'</td></tr>'; }
+    if(baby>0 && NOBABY.indexOf(l.sav)<0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Baby</td><td class="r">'+baby+'</td></tr>'; }
   });
-  var fee=(mode==='Livraison')?PRIX.livraison:0; var grand=tot+fee;
-  var feeHtml=(mode==='Livraison')?'<div class="feeline"><span>🚚 Frais de livraison (HTVA)</span><span>'+eur(fee)+'</span></div>':'<div class="feeline"><span>🏭 Retrait au labo</span><span>gratuit</span></div>';
-  return '<table class="rc"><thead><tr><th>Produit</th><th>Unité</th><th class="r">Qté</th><th class="r">Prix unit.</th><th class="r">Total</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-    feeHtml+
-    '<div class="rc-tot">Total<b>'+eur(grand)+'</b></div>';
+  var modeHtml='<div class="feeline"><span>'+(mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+'</span></div>';
+  return '<table class="rc"><thead><tr><th>Produit</th><th>Unité</th><th class="r">Qté</th></tr></thead><tbody>'+rows+'</tbody></table>'+modeHtml;
 }
+
+/* ---- favoris (par code client, stockés sur l'appareil) ---- */
+function favKey(){ return 'kooki_fav_'+(CODE||''); }
+function getFavs(){ try{ return JSON.parse(localStorage.getItem(favKey())||'[]'); }catch(e){ return []; } }
+function saveFavs(a){ try{ localStorage.setItem(favKey(), JSON.stringify(a)); }catch(e){} }
+function toggleFav(i){ var s=SAVEURS[i]; if(!s) return; var f=getFavs(); var k=f.indexOf(s.n); if(k>=0) f.splice(k,1); else f.push(s.n); saveFavs(f); build(_curLignes()); }
 
 /* ---- modification d'une commande existante ---- */
 function editOrder(id){
@@ -379,6 +410,9 @@ function send(){
   var lignes=[]; SAVEURS.forEach(function(s,i){ var q=qty[i]; if(q&&(q.big||q.baby)) lignes.push({sav:s.n, big:q.big||0, baby:q.baby||0}); });
   var type=document.querySelector('#seg-type .opt.on').getAttribute('data-v');
   var date=document.getElementById('ddate').value;
+  if(!date){ alert('Choisis une date de livraison.'); return; }
+  if(!isDeliveryDay(date)){ alert('Les livraisons ont lieu uniquement le lundi, le mercredi ou le vendredi. Choisis un de ces jours.'); return; }
+  if(!editable(date)){ alert('Trop tard pour commander pour cette date : la limite est la veille de la livraison à 16h.'); return; }
   var comment=document.getElementById('comment').value||'';
   var isEdit=!!editId;
   var order={ id:isEdit?editId:Date.now(), numero:isEdit?editNumero:genNumero(), client:CLIENT, date:date, type:type, lignes:lignes, commentaire:comment, mode:curMode() };
@@ -391,12 +425,12 @@ function send(){
 function showDone(order,isEdit){
   document.getElementById('donetitle').textContent=isEdit?'Commande modifiée !':'Commande envoyée !';
   document.getElementById('donemsg').textContent='Merci '+CLIENT+'. Commande n° '+order.numero+' bien '+(isEdit?'mise à jour':'transmise')+'.';
-  var typeTxt=order.type==='cong'?'❄️ Congelés':'🔥 Cuits';
+  var typeTxt=order.type==='cong'?'Congelés':'Cuits';
   document.getElementById('recap').innerHTML=
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Commande</span><b>'+esc(order.numero)+'</b></div>'+
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Type</span><b>'+typeTxt+'</b></div>'+
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Livraison</span><b>'+fmtD(order.date)+'</b></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:#6a6055">Mode</span><b>'+(order.mode==='Retrait au labo'?'🏭 Retrait au labo':'🚚 Livraison')+'</b></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:#6a6055">Mode</span><b>'+(order.mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+'</b></div>'+
     recapTable(order.lignes,order.mode)+
     (order.commentaire?'<div class="hcom">💬 '+esc(order.commentaire)+'</div>':'');
   var btn=document.getElementById('sendbtn'); btn.disabled=false; btn.textContent='Envoyer →';
@@ -405,6 +439,77 @@ function showDone(order,isEdit){
   document.getElementById('order').hidden=true; document.getElementById('done').hidden=false; window.scrollTo(0,0);
 }
 function reset(){ document.getElementById('done').hidden=true; document.getElementById('order').hidden=false; cancelEdit(); document.getElementById('comment').value=''; showTab('shop'); loadDispo(); window.scrollTo(0,0); }
+
+/* ---- commandes récurrentes ---- */
+var recCache=null;
+var JOURS_LBL=['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
+function _curLignes(){ var l=[]; SAVEURS.forEach(function(s,i){ var q=qty[i]; if(q&&(q.big||q.baby)) l.push({sav:s.n,big:q.big||0,baby:q.baby||0}); }); return l; }
+function openRecModal(){
+  var lignes=_curLignes();
+  if(!lignes.length){ alert('Choisis d\'abord tes saveurs et quantités dans « Commander », puis clique ici.'); return; }
+  var days=[[1,'Lundi'],[2,'Mardi'],[3,'Mercredi'],[4,'Jeudi'],[5,'Vendredi'],[6,'Samedi'],[0,'Dimanche']];
+  var chk=days.map(function(d){ return '<label style="display:flex;align-items:center;gap:11px;padding:11px 13px;border:1.5px solid var(--ln);border-radius:11px;margin-bottom:7px;font-weight:700;cursor:pointer"><input type="checkbox" value="'+d[0]+'" style="width:20px;height:20px"> '+d[1]+'</label>'; }).join('');
+  var sumTxt=lignes.map(function(l){ return esc(l.sav)+' ('+(l.big||0)+(l.baby?(' + '+l.baby+' baby'):'')+')'; }).join(', ');
+  var ov=document.getElementById('rec-modal'); if(ov) ov.remove();
+  ov=document.createElement('div'); ov.id='rec-modal';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML='<div style="background:#fff;border-radius:18px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:22px">'+
+    '<div style="font-size:18px;font-weight:900;color:var(--bl);margin-bottom:4px">🔁 Commande récurrente</div>'+
+    '<div style="font-size:12.5px;color:var(--mut);margin-bottom:14px">Elle sera envoyée automatiquement à KOOKI chaque semaine, aux jours choisis.</div>'+
+    '<div style="background:var(--cream);border-radius:11px;padding:11px 13px;font-size:12.5px;color:#55606b;margin-bottom:14px"><b>Contenu :</b> '+sumTxt+'<br><b>Mode :</b> '+(curMode()==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+'</div>'+
+    '<div style="font-size:12px;font-weight:800;color:var(--mut);text-transform:uppercase;margin-bottom:8px">Jours de livraison</div>'+
+    chk+
+    '<div style="display:flex;gap:8px;margin-top:14px"><button onclick="document.getElementById(\'rec-modal\').remove()" class="btn btn-ghost" style="flex:1">Annuler</button><button onclick="saveRecFromModal()" class="btn btn-primary" style="flex:1">Enregistrer</button></div>'+
+  '</div>';
+  ov.addEventListener('click', function(e){ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+function saveRecFromModal(){
+  var ov=document.getElementById('rec-modal'); if(!ov) return;
+  var days=Array.prototype.slice.call(ov.querySelectorAll('input[type=checkbox]:checked')).map(function(c){return Number(c.value);});
+  if(!days.length){ alert('Choisis au moins un jour de livraison.'); return; }
+  var lignes=_curLignes(); if(!lignes.length){ ov.remove(); return; }
+  var type=document.querySelector('#seg-type .opt.on').getAttribute('data-v');
+  fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({ action:'sauverRecurrente', id:'rec'+Date.now(), client:CLIENT, jours:days, lignes:lignes, type:type, mode:curMode(), actif:true })})
+    .then(function(r){return r.json();}).then(function(){ ov.remove(); recCache=null; alert('✅ Commande récurrente enregistrée ! Retrouve-la dans l\'onglet « Récurrent ».'); showTab('rec'); })
+    .catch(function(){ alert('Échec de l\'enregistrement. Réessaie.'); });
+}
+function loadRecurrentes(){
+  var host=document.getElementById('reclist');
+  if(!recCache) host.innerHTML='<div class="loading">Chargement…</div>';
+  apiGet('getRecurrentes',{code:CODE}).then(function(res){ recCache=Array.isArray(res)?res:[]; if(!document.getElementById('recview').hidden) renderRecurrentes(); })
+   .catch(function(){ if(!recCache) host.innerHTML='<div class="empty">Impossible de charger.</div>'; });
+}
+function renderRecurrentes(){
+  var host=document.getElementById('reclist'); if(!host) return;
+  if(recCache===null){ host.innerHTML='<div class="loading">Chargement…</div>'; return; }
+  if(!recCache.length){ host.innerHTML='<div class="empty">Aucune commande récurrente.<br>Prépare une commande dans « Commander » puis clique « 🔁 Enregistrer comme commande récurrente ».</div>'; return; }
+  host.innerHTML=recCache.map(function(r){
+    var jours=(r.jours||[]).slice().sort(function(a,b){return ((a===0?7:a)-(b===0?7:b));}).map(function(d){return JOURS_LBL[d];}).join(', ');
+    var items=(r.lignes||[]).map(function(l){ return esc(l.sav)+' '+(l.big||0)+(l.baby?(' +'+l.baby+'b'):''); }).join(' · ');
+    var modeTxt=(r.mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison');
+    var typeTxt=(r.type==='cong'?'Congelés':'Cuits');
+    return '<div class="hcard">'+
+      '<div class="hh"><span class="hnum">🔁 '+jours+'</span><span class="hst" style="background:'+(r.actif?'#eaf5ee':'#eef2f6')+';color:'+(r.actif?'#2e7d46':'#8a97a5')+'">'+(r.actif?'Active':'En pause')+'</span></div>'+
+      '<div class="hd">'+typeTxt+' · '+modeTxt+'</div>'+
+      '<div style="font-size:12.5px;color:#55606b;margin:8px 0">'+items+'</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button onclick="toggleRec(\''+esc(String(r.id))+'\','+(r.actif?'false':'true')+')" class="btn btn-ghost" style="flex:1;font-size:13px;padding:10px">'+(r.actif?'⏸ Mettre en pause':'▶️ Réactiver')+'</button>'+
+        '<button onclick="deleteRec(\''+esc(String(r.id))+'\')" class="btn btn-ghost" style="font-size:13px;padding:10px;color:var(--no)">🗑️</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function toggleRec(id,actif){
+  var r=(recCache||[]).filter(function(x){return String(x.id)===String(id);})[0]; if(!r) return;
+  fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'sauverRecurrente', id:r.id, client:r.client, jours:r.jours, lignes:r.lignes, type:r.type, mode:r.mode, actif:(actif===true||actif==='true')})})
+    .then(function(){ recCache=null; loadRecurrentes(); }).catch(function(){ alert('Échec.'); });
+}
+function deleteRec(id){
+  if(!confirm('Supprimer cette commande récurrente ?')) return;
+  fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'supprimerRecurrente', id:id})})
+    .then(function(){ recCache=null; loadRecurrentes(); }).catch(function(){ alert('Échec.'); });
+}
 
 /* ---- historique ---- */
 function loadHistory(silent){
@@ -420,12 +525,20 @@ function renderHistory(){
   if(!histCache.length){ host.innerHTML='<div class="empty">Pas encore de commande.<br>Passe ta première commande 🍪</div>'; return; }
   host.innerHTML=histCache.map(function(o){
     var st=STATUT_MAP[o.statut]||['#eef2f6','#44515f',o.statut||'Reçue'];
-    var typeTxt=o.type==='cong'?'❄️ Congelés':'🔥 Cuits';
+    var typeTxt=o.type==='cong'?'Congelés':'Cuits';
     var canEdit=editable(o.date);
+    var delivered=(o.statut==='Livrée');
+    var remBlock = delivered ? (
+      '<div style="margin-top:10px;border-top:1px solid #f0f2f5;padding-top:10px">'+
+        '<div style="font-size:12px;font-weight:800;color:var(--mut);margin-bottom:6px">📝 Ta remarque sur cette livraison</div>'+
+        '<textarea id="rem-'+o.id+'" class="commentbox" style="min-height:44px" placeholder="Qualité, quantité, un mot pour KOOKI…">'+esc(o.remarque||'')+'</textarea>'+
+        '<button onclick="sendRemarque(\''+o.id+'\')" class="btn btn-ghost" style="width:100%;margin-top:6px">'+(o.remarque?'Mettre à jour ma remarque':'Envoyer ma remarque')+'</button>'+
+      '</div>'
+    ) : '';
     return '<div class="hcard">'+
       '<div class="hh"><span class="hnum">N° '+esc(o.numero||o.id)+'</span>'+
         '<span class="hst" style="background:'+st[0]+';color:'+st[1]+'">'+st[2]+'</span></div>'+
-      '<div class="hd">'+typeTxt+' · '+(o.mode==='Retrait au labo'?'🏭 Retrait':'🚚 Livraison')+' · '+fmtD(o.date)+'</div>'+
+      '<div class="hd">'+typeTxt+' · '+(o.mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+' · '+fmtD(o.date)+'</div>'+
       recapTable(o.lignes,o.mode)+
       (o.commentaire?'<div class="hcom">💬 Toi : '+esc(o.commentaire)+'</div>':'')+
       (o.messageKooki?'<div class="hmsg">📣 KOOKI : '+esc(o.messageKooki)+'</div>':'')+
@@ -435,8 +548,15 @@ function renderHistory(){
       (o.blDispo
         ? '<button onclick="dlBL(\''+o.id+'\')" style="width:100%;margin-top:8px;background:var(--or);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">📄 Télécharger le bon de livraison'+(o.blNumero?(' · '+esc(o.blNumero)):'')+'</button>'
         : '')+
+      remBlock+
     '</div>';
   }).join('');
+}
+function sendRemarque(id){
+  var el=document.getElementById('rem-'+id); if(!el) return; var txt=el.value||'';
+  fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'sauverRemarqueClient', id:id, remarque:txt})})
+    .then(function(){ histCache=null; alert('✅ Merci, ta remarque a bien été transmise à KOOKI.'); loadHistory(true); })
+    .catch(function(){ alert('Échec de l\'envoi. Réessaie.'); });
 }
 
 /* ---- Téléchargement du bon de livraison (copie exacte, avec DLC + traçabilité) ---- */
