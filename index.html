@@ -2748,25 +2748,106 @@
   </div>
 
   <!-- ══════════════════ PRODUCTEURS ══════════════════ -->
+  <style>
+  #page-producteurs{--pt-rouge:#d44218;--pt-rouge2:#b5330f;--pt-encre:#2a1a12;--pt-bleu:#0662aa;--pt-vert:#1a9b54;background:#fff7ef;padding:14px;border-radius:16px}
+  #page-producteurs .pt-hero{background:linear-gradient(140deg,#d44218,#b5330f);color:#fff;border-radius:20px;padding:20px 18px 22px;position:relative;overflow:hidden;margin-bottom:14px}
+  #page-producteurs .pt-cookie{position:absolute;font-size:110px;opacity:.12;right:-12px;top:-22px;transform:rotate(-12deg)}
+  #page-producteurs .pt-hello{font-size:13px;font-weight:700;opacity:.92}
+  #page-producteurs .pt-htitle{font-size:23px;font-weight:900;margin-top:2px;line-height:1.05}
+  #page-producteurs .pt-hero-sub{font-size:12px;font-weight:600;opacity:.9;margin-top:6px}
+  #page-producteurs .pt-hero-row{display:flex;align-items:center;justify-content:space-between;margin-top:16px;gap:12px}
+  #page-producteurs .pt-datepill{background:rgba(255,255,255,.20);border:1.5px solid rgba(255,255,255,.35);border-radius:13px;padding:8px 13px;font-size:13px;font-weight:800;display:inline-flex;align-items:center;gap:6px}
+  #page-producteurs .pt-ring{width:74px;height:74px;position:relative;flex-shrink:0}
+  #page-producteurs .pt-ring svg{transform:rotate(-90deg)}
+  #page-producteurs .pt-ring circle{transition:stroke-dashoffset .5s ease}
+  #page-producteurs .pt-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:18px;line-height:1}
+  #page-producteurs .pt-pct small{font-size:8px;font-weight:700;opacity:.85;letter-spacing:.06em}
+  #page-producteurs .pt-seg{display:flex;background:#efe4da;border-radius:16px;padding:4px;gap:3px;margin-bottom:16px}
+  #page-producteurs .pt-seg button{flex:1;border:none;background:transparent;color:#9a7a66;font-size:12px;font-weight:800;padding:9px 4px;border-radius:12px;cursor:pointer;font-family:inherit}
+  #page-producteurs .pt-seg button.on{background:#fff;color:var(--pt-rouge);box-shadow:0 2px 8px rgba(210,90,40,.15)}
+  #page-producteurs .pt-sav{background:#fff;border:2px solid #f1e6dc;border-radius:18px;padding:13px 14px;margin-bottom:11px;transition:.15s;box-shadow:0 4px 14px rgba(210,90,40,.06)}
+  #page-producteurs .pt-sav.on{border-color:var(--sc,#d44218);background:var(--scbg,#fff6f1)}
+  #page-producteurs .pt-sav-top{display:flex;align-items:center;gap:11px}
+  #page-producteurs .pt-check{width:26px;height:26px;border-radius:9px;border:2.5px solid #e0cfc2;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;background:#fff}
+  #page-producteurs .pt-sav.on .pt-check{background:var(--sc,#d44218);border-color:var(--sc,#d44218)}
+  #page-producteurs .pt-sav-name{flex:1;min-width:0}
+  #page-producteurs .pt-sav-name .n{font-size:15.5px;font-weight:900;display:flex;align-items:center;gap:7px;color:var(--pt-encre)}
+  #page-producteurs .pt-dot{width:10px;height:10px;border-radius:50%;background:var(--sc,#ccc);flex-shrink:0}
+  #page-producteurs .pt-sav-name .meta{font-size:10.5px;color:#a58a78;font-weight:600;margin-top:1px}
+  #page-producteurs .pt-lots{display:flex;background:#f1e7de;border-radius:11px;padding:3px;gap:2px;flex-shrink:0}
+  #page-producteurs .pt-lots button{border:none;background:transparent;color:#a58a78;font-size:12px;font-weight:800;padding:6px 10px;border-radius:9px;cursor:pointer;font-family:inherit}
+  #page-producteurs .pt-lots button.on{background:var(--sc,#d44218);color:#fff}
+  #page-producteurs .pt-petits{display:flex;align-items:center;gap:9px;margin-top:11px;padding-top:11px;border-top:1.5px dashed #efe0d4}
+  #page-producteurs .pt-petits .pl{font-size:12px;font-weight:800;color:var(--pt-rouge);display:flex;align-items:center;gap:5px;flex:1}
+  #page-producteurs .pt-stepper{display:flex;align-items:center;background:#f6ece3;border-radius:11px;overflow:hidden}
+  #page-producteurs .pt-stepper button{width:34px;height:34px;border:none;background:transparent;font-size:18px;font-weight:800;color:var(--pt-rouge);cursor:pointer;font-family:inherit}
+  #page-producteurs .pt-stepper input{width:48px;border:none;background:#fff;text-align:center;font-size:15px;font-weight:800;padding:8px 0;outline:none;font-family:inherit;color:var(--pt-encre)}
+  #page-producteurs .pt-publish{width:100%;margin-top:6px;background:linear-gradient(135deg,#d44218,#b5330f);color:#fff;border:none;border-radius:15px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px rgba(210,90,40,.28)}
+  #page-producteurs .pt-foot{font-size:11px;color:#a58a78;text-align:center;margin-top:10px;line-height:1.5}
+  #page-producteurs .pt-datebar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  #page-producteurs .pt-datebar .lab{font-size:13px;font-weight:800;color:var(--pt-rouge);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  #page-producteurs .pt-datebar input{border:2px solid #f0ddd0;border-radius:12px;padding:8px 10px;font-size:13px;font-family:inherit;font-weight:700;outline:none;color:var(--pt-encre)}
+  #page-producteurs .pt-newbtn{background:var(--pt-encre);color:#ffe;border:none;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  #page-producteurs .pt-hint{font-size:12px;color:#a58a78;font-weight:600;margin:0 2px 14px}
+  #page-producteurs .pt-scard{background:#fff;border:2px solid #f1e6dc;border-radius:18px;overflow:hidden;box-shadow:0 6px 22px rgba(210,90,40,.08);margin-bottom:12px}
+  #page-producteurs .pt-scard.done{opacity:.72}
+  #page-producteurs .pt-scard-top{display:flex;align-items:center;justify-content:space-between;padding:13px 15px}
+  #page-producteurs .pt-scard-top .nm{font-size:18px;font-weight:900;color:var(--pt-rouge)}
+  #page-producteurs .pt-lotpill{background:#fff1e9;color:var(--pt-rouge);font-size:12px;font-weight:800;padding:5px 12px;border-radius:20px}
+  #page-producteurs .pt-scard-body{padding:0 15px 15px}
+  #page-producteurs .pt-bac{display:flex;align-items:center;gap:11px;border:2px solid #eee3d9;border-radius:13px;padding:10px 12px;margin-bottom:8px}
+  #page-producteurs .pt-bac.first{border-color:var(--pt-rouge);background:#fff6f1}
+  #page-producteurs .pt-bac.empty{opacity:.6;background:#faf6f2}
+  #page-producteurs .pt-bacnum{width:46px;height:46px;border-radius:12px;background:#f3e8df;color:var(--pt-rouge);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
+  #page-producteurs .pt-bac.first .pt-bacnum{background:var(--pt-rouge);color:#fff}
+  #page-producteurs .pt-bacnum small{font-size:8px;font-weight:800;letter-spacing:.1em;opacity:.8}
+  #page-producteurs .pt-bacnum b{font-size:21px;font-weight:900;margin-top:1px}
+  #page-producteurs .pt-bac .bi{flex:1;min-width:0}
+  #page-producteurs .pt-bac .bi .code{font-size:13px;font-weight:800;color:#2a1a12}
+  #page-producteurs .pt-bac .bi .sub{font-size:10px;color:#a58a78;margin-top:1px}
+  #page-producteurs .pt-btag{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;padding:4px 9px;border-radius:13px;flex-shrink:0}
+  #page-producteurs .pt-btag.f{background:var(--pt-rouge);color:#fff}
+  #page-producteurs .pt-btag.n{background:#f1e7de;color:#a58a78}
+  #page-producteurs .pt-btag.v{background:#f1f1f1;color:#b0b0b0}
+  #page-producteurs .pt-stats{display:flex;gap:10px;margin-top:11px}
+  #page-producteurs .pt-stat{flex:1;background:#faf1ea;border-radius:13px;padding:12px 8px;text-align:center}
+  #page-producteurs .pt-stat b{font-size:24px;font-weight:900;line-height:1;display:block}
+  #page-producteurs .pt-stat span{font-size:10px;font-weight:800;color:#a58a78;text-transform:uppercase;letter-spacing:.03em;margin-top:4px;display:block}
+  #page-producteurs .pt-donebtn{width:100%;margin-top:12px;border:none;border-radius:13px;padding:12px;font-size:13.5px;font-weight:900;cursor:pointer;font-family:inherit}
+  #page-producteurs .pt-donebtn.todo{background:linear-gradient(135deg,#d44218,#b5330f);color:#fff}
+  #page-producteurs .pt-donebtn.done{background:#eafaf0;color:var(--pt-vert);border:2px solid #b6e6c8}
+  #page-producteurs .pt-donebar{background:var(--pt-vert);color:#fff;font-size:11px;font-weight:800;text-align:center;padding:6px}
+  #page-producteurs .pt-warn{background:#fdecec;color:#c0392b;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:700}
+  #page-producteurs .pt-panel{background:#fff;border-radius:16px;padding:14px;box-shadow:0 6px 22px rgba(210,90,40,.08);border:1px solid #f1e6dc;margin-bottom:12px}
+  #page-producteurs .pt-empty{background:#fff;border-radius:16px;padding:30px 16px;text-align:center;color:#a58a78;font-weight:600;box-shadow:0 6px 22px rgba(210,90,40,.08)}
+  </style>
   <div id="page-producteurs" class="page">
-    <div class="card">
-      <div class="card-header" style="flex-wrap:wrap;gap:8px">
-        <div>
-          <div class="card-title">👨‍🍳 Producteurs</div>
-          <div class="card-sub">Plan du jour, suivi d'avancement et rotation des bacs (FIFO)</div>
+    <div class="pt-hero">
+      <div class="pt-cookie">🍪</div>
+      <div class="pt-hello">Hellooo 👋</div>
+      <div class="pt-htitle">Production du jour</div>
+      <div class="pt-hero-sub" id="pt-hero-sub">—</div>
+      <div class="pt-hero-row">
+        <div class="pt-datepill" id="pt-datepill">📅 —</div>
+        <div class="pt-ring">
+          <svg width="74" height="74">
+            <circle cx="37" cy="37" r="31" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="7"/>
+            <circle id="pt-ring-fg" cx="37" cy="37" r="31" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="194.8" stroke-dashoffset="194.8"/>
+          </svg>
+          <div class="pt-pct"><span id="pt-pct-num">0%</span><small>FAIT</small></div>
         </div>
-        <button class="btn btn-secondary" onclick="loadProducteursTab()" style="font-size:11px;padding:5px 12px">🔄 Actualiser</button>
       </div>
-      <div id="pt-progress" style="margin-top:4px"></div>
-      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <button id="pt-chip-plan" class="pt-chip" onclick="ptShow('plan')" style="flex:1;min-width:96px;border:1.5px solid #0662aa;background:#0662aa;color:#fff;border-radius:10px;padding:9px 10px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit">📋 Plan du jour</button>
-        <button id="pt-chip-suivi" class="pt-chip" onclick="ptShow('suivi')" style="flex:1;min-width:96px;border:1.5px solid #d6e3f0;background:#fff;color:#0662aa;border-radius:10px;padding:9px 10px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit">✅ Suivi</button>
-        <button id="pt-chip-bacs" class="pt-chip" onclick="ptShow('bacs')" style="flex:1;min-width:96px;border:1.5px solid #d6e3f0;background:#fff;color:#0662aa;border-radius:10px;padding:9px 10px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit">🥣 Bacs / premix</button>
-      </div>
+    </div>
+    <div class="pt-seg">
+      <button id="pt-chip-plan" class="on" onclick="ptShow('plan')">📋 Plan</button>
+      <button id="pt-chip-suivi" onclick="ptShow('suivi')">✅ Suivi</button>
+      <button id="pt-chip-bacs" onclick="ptShow('bacs')">🥣 Bacs</button>
+      <button id="pt-chip-hist" onclick="ptShow('hist')">🕘 Histo</button>
     </div>
     <div id="pt-view-plan"><div class="empty">Chargement…</div></div>
     <div id="pt-view-suivi" style="display:none"></div>
     <div id="pt-view-bacs" style="display:none"></div>
+    <div id="pt-view-hist" style="display:none"></div>
   </div>
 
   <!-- ══════════════════ ALERTES ══════════════════ -->
@@ -2791,7 +2872,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbwg4HRMLf64LFxnLAosp5PQz6ibqELON6sHSBPz62aWpy5C4IB_88opkZA9fzvXY04omg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzqZADgM4R4g15nfIq7_HNar4gl7_DuPQ3rkuycj2200_aEF7UNPSmRczdRI7bUHkFEsA/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -3136,7 +3217,8 @@ function showPage(name, btn) {
   if (name === 'taches') setTimeout(() => { loadTaches(); }, 60);
   if (name === 'ixelles-livraisons') setTimeout(() => { loadIxellesLivraisons(); }, 60);
   if (name === 'shopixelles') setTimeout(() => { loadShopIxelles(); }, 60);
-  if (name === 'producteurs') setTimeout(() => { loadProducteursTab(); }, 60);
+  if (name === 'producteurs') setTimeout(() => { loadProducteursTab(); startProdPolling(); }, 60);
+  else stopProdPolling();
   if (name === 'home') setTimeout(() => { loadHome(); }, 60);
   if (name === 'premix') setTimeout(async () => {
     const data = await fetchAPI('getPremix');
@@ -7036,19 +7118,36 @@ async function publishPlanProducteurs(){
 
 // ══════════════════ ONGLET PRODUCTEURS (dans l'app) ══════════════════
 let _ptData = { lignes:[], inventaire:{}, date:'' };
+let _ptSelDate = '';   // date de production sélectionnée (YYYY-MM-DD)
+let _ptForceBlank = false;  // true = éditeur vierge (tout décoché) pour une nouvelle production
+function _ptTodayKey(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function _ptAddDays(key, n){ var p=String(key).split('-'); var d=new Date(+p[0], +p[1]-1, +p[2]); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
 
 function _ptEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function _ptColor(sav){ return (typeof SAVEUR_COULEURS!=='undefined' && SAVEUR_COULEURS[sav]) ? SAVEUR_COULEURS[sav] : {bg:'#eef2f7',border:'#cbd5e1',text:'#334155'}; }
 // Un bac est "disponible" comme dans l'onglet Production : statut dispo ET un vrai code premix
 function _ptAvail(s){ var c=s&&s.pmx!=null?String(s.pmx).trim():''; return s&&s.statut==='dispo'&&c!==''&&c!=='—'; }
+var _MOIS_FR=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function _ptFmtDate(d){
+  var dt=null;
+  if(d){
+    var isoD=String(d).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(isoD){ dt=new Date(+isoD[1],+isoD[2]-1,+isoD[3]); }
+    else { var t=Date.parse(d); if(!isNaN(t)) dt=new Date(t);
+      else { var m=String(d).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/); if(m){ var yy=m[3].length===2?'20'+m[3]:m[3]; dt=new Date(+yy,+m[2]-1,+m[1]); } } }
+  }
+  if(!dt||isNaN(dt.getTime())) return '';
+  return dt.getDate()+' '+_MOIS_FR[dt.getMonth()]+' '+dt.getFullYear();
+}
 function _ptToTs(d){ if(!d) return Infinity; var t=Date.parse(d); if(!isNaN(t)) return t; var m=String(d).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/); if(m){var yy=m[3].length===2?'20'+m[3]:m[3]; return new Date(+yy,+m[2]-1,+m[1]).getTime();} return Infinity; }
 function _ptShort(d){ if(!d) return ''; var t=Date.parse(d); var dt=!isNaN(t)?new Date(t):null; if(!dt){var m=String(d).match(/(\d{1,2})[\/\-](\d{1,2})/); if(m) return m[1].padStart(2,'0')+'/'+m[2].padStart(2,'0'); return String(d);} return String(dt.getDate()).padStart(2,'0')+'/'+String(dt.getMonth()+1).padStart(2,'0'); }
 function _ptDateInput(d){ if(!d) return ''; var t=Date.parse(d); var dt=!isNaN(t)?new Date(t):null; if(!dt){ var m=String(d).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/); if(m){ var yy=m[3].length===2?'20'+m[3]:m[3]; dt=new Date(+yy,+m[2]-1,+m[1]); } } if(!dt||isNaN(dt.getTime())) return ''; return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
 
 async function loadProducteursTab(){
+  if(!_ptSelDate) _ptSelDate=_ptTodayKey();
   let data=null;
-  try { data = await fetchAPI('getPlanJour'); } catch(e){}
-  if(!data || data.error) data = { lignes:[], inventaire:{}, date:'' };
+  try { data = await fetchAPI('getPlanJour','date='+encodeURIComponent(_ptSelDate)); } catch(e){}
+  if(!data || data.error) data = { lignes:[], inventaire:{}, date:_ptSelDate };
   if(!Array.isArray(data.lignes)) data.lignes=[];
   if(!data.inventaire) data.inventaire={};
   _ptData = data;
@@ -7056,27 +7155,50 @@ async function loadProducteursTab(){
   renderProdPlanEditor();
   renderProdSuivi();
   renderPtBacs();
+  renderProdHistorique();
   updateProdBadge();
 }
+function ptChangePlanDate(v){ _ptSelDate = v || _ptTodayKey(); loadProducteursTab(); }
+function ptNewProduction(){ _ptSelDate = _ptAddDays(_ptTodayKey(), 1); _ptForceBlank = true; ptShow('plan'); loadProducteursTab(); }
 
 function ptShow(which){
-  ['plan','suivi','bacs'].forEach(function(k){
+  ['plan','suivi','bacs','hist'].forEach(function(k){
     var v=document.getElementById('pt-view-'+k); if(v) v.style.display=(k===which)?'':'none';
-    var c=document.getElementById('pt-chip-'+k);
-    if(c){ var on=(k===which); c.style.background=on?'#0662aa':'#fff'; c.style.color=on?'#fff':'#0662aa'; c.style.borderColor=on?'#0662aa':'#d6e3f0'; }
+    var c=document.getElementById('pt-chip-'+k); if(c) c.classList.toggle('on', k===which);
   });
 }
 
+// ── Rafraîchissement auto (sync instantanée avec les producteurs) ──
+var _ptPollTimer=null;
+function startProdPolling(){ stopProdPolling(); _ptPollTimer=setInterval(refreshProdData, 8000); }
+function stopProdPolling(){ if(_ptPollTimer){ clearInterval(_ptPollTimer); _ptPollTimer=null; } }
+async function refreshProdData(){
+  if(!_ptSelDate) _ptSelDate=_ptTodayKey();
+  var data=null;
+  try{ data=await fetchAPI('getPlanJour','date='+encodeURIComponent(_ptSelDate)); }catch(e){ return; }
+  if(!data||data.error||!Array.isArray(data.lignes)) return;
+  if(!data.inventaire) data.inventaire={};
+  _ptData=data;
+  // On ne touche PAS à l'éditeur de plan (pour ne pas effacer une saisie en cours)
+  renderProdProgress();
+  renderProdSuivi();
+  renderPtBacs();
+  updateProdBadge();
+}
+
 function renderProdProgress(){
-  var el=document.getElementById('pt-progress'); if(!el) return;
   var lignes=_ptData.lignes||[];
-  if(!lignes.length){ el.innerHTML='<div style="font-size:12px;color:#94a3b8;background:#f6f8fb;border-radius:9px;padding:9px 12px">Aucun plan publié pour le moment.</div>'; return; }
+  var dp=document.getElementById('pt-datepill');
+  var joli=_ptFmtDate(_ptData.date||_ptSelDate)||'—';
+  if(dp) dp.textContent='📅 '+joli;
+  var sub=document.getElementById('pt-hero-sub');
   var done=lignes.filter(function(l){return !!l.fait;}).length;
-  var pct=Math.round(done/lignes.length*100);
-  el.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f2f8ff;border:1px solid #d6e8fb;border-radius:10px;padding:10px 13px">'
-    +'<div><div style="font-size:12px;color:#0662aa;font-weight:800">'+(_ptData.date?('📅 '+_ptEsc(_ptData.date)):'Plan du jour')+'</div>'
-    +'<div style="font-size:11px;color:#5a86b3;margin-top:1px">'+done+' / '+lignes.length+' saveur'+(lignes.length>1?'s':'')+' faite'+(done>1?'s':'')+'</div></div>'
-    +'<div style="font-size:22px;font-weight:900;color:'+(pct===100?'#1a7a3a':'#0662aa')+'">'+pct+'%</div></div>';
+  var total=lignes.length;
+  var pct=total?Math.round(done/total*100):0;
+  if(sub) sub.textContent = total ? (done+' / '+total+' saveur'+(total>1?'s':'')+' faite'+(done>1?'s':'')) : 'Aucune production planifiée';
+  var C=194.8;
+  var fg=document.getElementById('pt-ring-fg'); if(fg) fg.setAttribute('stroke-dashoffset', String(C*(1-pct/100)));
+  var pn=document.getElementById('pt-pct-num'); if(pn) pn.textContent=pct+'%';
 }
 
 function updateProdBadge(){
@@ -7088,22 +7210,59 @@ function updateProdBadge(){
 
 function renderProdPlanEditor(){
   var v=document.getElementById('pt-view-plan'); if(!v) return;
-  var planMap={}; (_ptData.lignes||[]).forEach(function(l){ planMap[l.saveur]=l.bacs; });
+  var planMap={}; if(!_ptForceBlank){ (_ptData.lignes||[]).forEach(function(l){ planMap[l.saveur]={bacs:l.bacs,baby:l.baby}; }); }
   var rows=PLAN_SAVEURS.map(function(sav){
-    var inPlan=planMap[sav]!==undefined; var lots=inPlan?Math.min(2,Math.max(1,planMap[sav]||1)):1; var cpb=planCpb(sav);
-    return '<div style="display:grid;grid-template-columns:26px 1fr 84px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f4f4f4">'
-      +'<input type="checkbox" id="pt-chk-'+sav+'" '+(inPlan?'checked':'')+' style="width:17px;height:17px;accent-color:#0662aa;cursor:pointer">'
-      +'<div><span style="font-size:13.5px;font-weight:800;color:#1a1a2e">'+sav+'</span> <span style="font-size:10px;color:#bbb">max '+cpb+'/bac'+(planBaby(sav)?'':' · sans Baby')+'</span></div>'
-      +'<select id="pt-bac-'+sav+'" style="width:84px;padding:6px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:13.5px;text-align:center;outline:none;font-family:inherit;background:#fff">'
-        +'<option value="1"'+(lots===1?' selected':'')+'>1 lot</option>'
-        +'<option value="2"'+(lots===2?' selected':'')+'>2 lots</option>'
-      +'</select>'
+    var pm=planMap[sav]; var inPlan=pm!==undefined; var lots=inPlan?Math.min(2,Math.max(1,pm.bacs||1)):1; var cpb=planCpb(sav);
+    var baby=planBaby(sav);
+    var petitVal=(inPlan && typeof pm.baby==='number')?pm.baby:'';
+    var sc='#d44218'; var scbg='#fff6f1';
+    var petitRow = baby
+      ? '<div class="pt-petits"><div class="pl">🍪 Petits (Baby)</div>'
+          +'<div class="pt-stepper"><button type="button" onclick="ptStep(\''+sav+'\',-5)">−</button>'
+          +'<input id="pt-petit-'+sav+'" value="'+petitVal+'" placeholder="0" inputmode="numeric">'
+          +'<button type="button" onclick="ptStep(\''+sav+'\',5)">+</button></div></div>'
+      : '';
+    return '<div class="pt-sav'+(inPlan?' on':'')+'" id="pt-sav-'+sav+'" style="--sc:'+sc+';--scbg:'+scbg+'">'
+      +'<input type="checkbox" id="pt-chk-'+sav+'" '+(inPlan?'checked':'')+' style="display:none">'
+      +'<div class="pt-sav-top">'
+        +'<div class="pt-check" onclick="ptToggleSav(\''+sav+'\')">'+(inPlan?'✓':'')+'</div>'
+        +'<div class="pt-sav-name"><div class="n">'+sav+'</div><div class="meta">max '+cpb+' / bac'+(baby?'':' · sans Baby')+'</div></div>'
+        +'<div class="pt-lots" id="pt-lots-'+sav+'">'
+          +'<button type="button" class="'+(lots===1?'on':'')+'" onclick="ptPickLots(\''+sav+'\',1)">1</button>'
+          +'<button type="button" class="'+(lots===2?'on':'')+'" onclick="ptPickLots(\''+sav+'\',2)">2 lots</button>'
+        +'</div>'
+        +'<input type="hidden" id="pt-bac-'+sav+'" value="'+lots+'">'
+      +'</div>'
+      +petitRow
       +'</div>';
   }).join('');
-  v.innerHTML='<div class="card"><div style="font-size:12px;font-weight:700;color:#0662aa;margin-bottom:6px">Coche les saveurs à produire aujourd\'hui et le nombre de lots (2 max — 1 par bac)</div>'
+  var selDate=_ptSelDate||_ptTodayKey();
+  var isToday=(selDate===_ptTodayKey());
+  v.innerHTML=
+    '<div class="pt-datebar"><div class="lab">📅 Production du <input type="date" id="pt-plan-date" value="'+selDate+'" onchange="ptChangePlanDate(this.value)"></div>'
+      +'<button class="pt-newbtn" onclick="ptNewProduction()">➕ Nouvelle production</button></div>'
+    +'<div class="pt-hint">Coche les saveurs, choisis les lots et les petits 🍪</div>'
     +rows
-    +'<button id="pt-publish-btn" onclick="publishPlanFromTab()" style="width:100%;margin-top:14px;background:#0662aa;color:#fff;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">📤 Publier / Mettre à jour le plan</button>'
-    +'<div style="font-size:10.5px;color:#aaa;text-align:center;margin-top:6px;line-height:1.4">Les producteurs verront aussitôt le plan : bac le plus ancien en 1er, max cookies/bac, reste en Baby.</div></div>';
+    +'<button id="pt-publish-btn" class="pt-publish" onclick="publishPlanFromTab()">🚀 Publier '+(isToday?'le plan':'pour le '+_ptFmtDate(selDate))+'</button>'
+    +'<div class="pt-foot">Choisis la date, coche les saveurs et publie. Les producteurs verront le plan le jour venu.</div>';
+  _ptForceBlank=false;
+}
+function ptToggleSav(sav){
+  var chk=document.getElementById('pt-chk-'+sav); if(!chk) return;
+  chk.checked=!chk.checked;
+  var card=document.getElementById('pt-sav-'+sav); if(card) card.classList.toggle('on', chk.checked);
+  var ck=card?card.querySelector('.pt-check'):null; if(ck) ck.textContent=chk.checked?'✓':'';
+}
+function ptPickLots(sav,n){
+  var h=document.getElementById('pt-bac-'+sav); if(h) h.value=n;
+  var box=document.getElementById('pt-lots-'+sav);
+  if(box){ var bs=box.querySelectorAll('button'); bs.forEach(function(b,i){ b.classList.toggle('on', (i===0)===(n===1)); }); }
+  var chk=document.getElementById('pt-chk-'+sav); if(chk && !chk.checked) ptToggleSav(sav); // sélectionner la saveur au passage
+}
+function ptStep(sav,d){
+  var i=document.getElementById('pt-petit-'+sav); if(!i) return;
+  var v=Math.max(0,(parseInt(i.value)||0)+d); i.value=v;
+  var chk=document.getElementById('pt-chk-'+sav); if(chk && !chk.checked) ptToggleSav(sav);
 }
 
 async function publishPlanFromTab(){
@@ -7111,13 +7270,22 @@ async function publishPlanFromTab(){
   PLAN_SAVEURS.forEach(function(sav){
     var chk=document.getElementById('pt-chk-'+sav);
     var bac=Math.min(2, Math.max(0, parseInt((document.getElementById('pt-bac-'+sav)||{}).value)||0));
-    if(chk && chk.checked && bac>0){ lignes.push({saveur:sav,bacs:bac,maxBig:planCpb(sav),baby:planBaby(sav)?'':null}); }
+    if(chk && chk.checked && bac>0){
+      var baby=null;
+      if(planBaby(sav)){
+        var pe=document.getElementById('pt-petit-'+sav);
+        var pv=pe?String(pe.value).trim():'';
+        baby=(pv==='')?'':Math.max(0,parseInt(pv)||0);
+      }
+      lignes.push({saveur:sav,bacs:bac,maxBig:planCpb(sav),baby:baby});
+    }
   });
   var btn=document.getElementById('pt-publish-btn');
   if(!lignes.length){ if(btn){var t=btn.textContent; btn.textContent='⚠️ Coche au moins une saveur'; setTimeout(function(){btn.textContent=t;},2500);} return; }
   if(btn){ btn.disabled=true; btn.textContent='⏳ Publication...'; }
   try{
-    var dateStr=new Date().toLocaleDateString('fr-FR');
+    var dateStr=(document.getElementById('pt-plan-date')||{}).value||_ptSelDate||_ptTodayKey();
+    _ptSelDate=dateStr;
     await fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'sauverPlanJour',date:dateStr,lignes:lignes})});
     if(btn){ btn.textContent='✅ Plan publié !'; }
     setTimeout(function(){ if(btn){btn.disabled=false;} loadProducteursTab(); }, 900);
@@ -7127,40 +7295,76 @@ async function publishPlanFromTab(){
 function renderProdSuivi(){
   var v=document.getElementById('pt-view-suivi'); if(!v) return;
   var lignes=_ptData.lignes||[]; var inv=_ptData.inventaire||{};
-  if(!lignes.length){ v.innerHTML='<div class="card"><div class="empty">Aucun plan publié. Va dans « Plan du jour » pour le créer.</div></div>'; return; }
+  if(!lignes.length){ v.innerHTML='<div class="pt-empty">🥣 Aucun plan publié pour cette date.<br>Va dans « Plan » pour le créer.</div>'; return; }
   v.innerHTML=lignes.map(function(l){ return _ptCard(l,inv); }).join('');
 }
 
 function _ptCard(l,inv){
-  var sav=l.saveur; var col=_ptColor(sav); var maxBig=l.maxBig||0; var bacs=l.bacs||0;
+  var sav=l.saveur; var maxBig=l.maxBig||0; var bacs=l.bacs||0;
   var isBaby=(l.baby!==null); var isDone=!!l.fait;
   var e=inv[sav]||{}; var b1=e['1']||e[1]||{statut:'vide'}; var b2=e['2']||e[2]||{statut:'vide'};
   var slots=[{label:'Bac 1',statut:b1.statut,pmx:b1.codePremix,date:b1.date},{label:'Bac 2',statut:b2.statut,pmx:b2.codePremix,date:b2.date}];
   var dispos=slots.filter(_ptAvail);
   var firstLabel=null; if(dispos.length){ dispos.sort(function(a,b){return _ptToTs(a.date)-_ptToTs(b.date);}); firstLabel=dispos[0].label; }
   var bacsHtml;
-  if(!dispos.length){ bacsHtml='<div style="background:#fdecec;color:#c0392b;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:700">⚠️ Aucun bac premix dispo — voir onglet « Bacs / premix ».</div>'; }
+  if(!dispos.length){ bacsHtml='<div class="pt-warn">⚠️ Aucun bac premix dispo — enregistre un code premix dans l\'onglet Premix.</div>'; }
   else {
     bacsHtml=slots.map(function(s){
       var isFirst=(s.label===firstLabel); var isEmpty=!_ptAvail(s);
-      var bg=isFirst?'#f2f8ff':(isEmpty?'#fafafa':'#fff'); var bd=isFirst?'#0662aa':'#e6ebf2';
-      var tag=isEmpty?'<span style="font-size:10px;font-weight:800;color:#b0b0b0;background:#f1f1f1;padding:3px 8px;border-radius:12px">Vide</span>':(isFirst?'<span style="font-size:10px;font-weight:800;color:#fff;background:#0662aa;padding:3px 8px;border-radius:12px">⬅️ En 1er</span>':'<span style="font-size:10px;font-weight:800;color:#94a3b8;background:#eef1f5;padding:3px 8px;border-radius:12px">Ensuite</span>');
-      var pmx=isEmpty?'<span style="color:#b8b8b8">— vide —</span>':_ptEsc(s.pmx||'sans code');
-      return '<div style="display:flex;align-items:center;gap:10px;border:1.5px solid '+bd+';background:'+bg+';border-radius:10px;padding:9px 11px;margin-bottom:6px"><div style="font-weight:800;font-size:11px;color:'+(isFirst?'#0662aa':'#94a3b8')+';width:40px">'+s.label+'</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#1a1a2e">'+pmx+'</div>'+(isEmpty?'':'<div style="font-size:10px;color:#8a97a5">rempli le '+_ptShort(s.date)+'</div>')+'</div>'+tag+'</div>';
+      var num=s.label.replace(/[^0-9]/g,'');
+      var cls='pt-bac'+(isFirst?' first':'')+(isEmpty?' empty':'');
+      var tag=isEmpty?'<span class="pt-btag v">Vide</span>':(isFirst?'<span class="pt-btag f">⬅ En 1er</span>':'<span class="pt-btag n">Ensuite</span>');
+      var code=isEmpty?'<span style="color:#b8b8b8">— vide —</span>':_ptEsc(s.pmx||'sans code');
+      var sub=isEmpty?'Pas de premix':('Premix'+(s.date?(' · rempli le '+_ptShort(s.date)):''));
+      return '<div class="'+cls+'"><div class="pt-bacnum"><small>BAC</small><b>'+num+'</b></div>'
+        +'<div class="bi"><div class="code">'+code+'</div><div class="sub">'+sub+'</div></div>'+tag+'</div>';
     }).join('');
   }
-  var babyNum=(typeof l.baby==='number'&&l.baby>0)?(' (≈ '+l.baby+')'):'';
-  var babyHtml=isBaby?'<div style="background:#fff6ec;color:#9a5b13;border:1px dashed #f0c489;border-radius:9px;padding:8px 11px;font-size:11.5px;font-weight:700;margin-top:4px">🍪 Baby'+babyNum+' : reste de pâte → Baby (jamais moins)</div>':'<div style="background:#f4f4f6;color:#9aa0aa;border-radius:9px;padding:8px 11px;font-size:11.5px;font-weight:700;margin-top:4px">Pas de Baby</div>';
-  var doneBtn=isDone?'<button onclick="ptMarkDone(\''+sav+'\',false)" style="width:100%;margin-top:10px;background:#eafaf0;color:#1a7a3a;border:1.5px solid #b6e6c8;border-radius:10px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">✅ Fait — annuler</button>':'<button onclick="ptMarkDone(\''+sav+'\',true)" style="width:100%;margin-top:10px;background:#0662aa;color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">✓ Marquer comme fait</button>';
-  return '<div class="card" style="'+(isDone?'opacity:.72;':'')+'padding:0;overflow:hidden">'
-    +(isDone?'<div style="background:#1a7a3a;color:#fff;font-size:11px;font-weight:800;text-align:center;padding:5px">✅ Production faite</div>':'')
-    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:'+col.bg+';border-bottom:2px solid '+col.border+'"><span style="font-size:17px;font-weight:900;color:'+col.text+'">'+_ptEsc(sav)+'</span><span style="font-size:12px;font-weight:800;color:#0662aa;background:#fff;padding:5px 11px;border-radius:18px">'+bacs+' lot'+(bacs>1?'s':'')+'</span></div>'
-    +'<div style="padding:12px 14px"><div style="font-size:12.5px;font-weight:700;color:#334155;background:#f6f8fb;border-radius:9px;padding:8px 11px;margin-bottom:10px">📏 Max <b style="color:#0662aa">'+maxBig+'</b> Big/bac · multiples de 5</div>'+bacsHtml+babyHtml+doneBtn+'</div></div>';
+  var petitVal=isBaby?((typeof l.baby==='number'&&l.baby>0)?String(l.baby):'reste'):'—';
+  var petitColor=isBaby?'#d44218':'#c9ced6';
+  var statHtml='<div class="pt-stats"><div class="pt-stat"><b style="color:'+petitColor+'">'+petitVal+'</b><span>Petits (Baby)</span></div>'
+    +'<div class="pt-stat"><b style="color:#0662aa">'+maxBig+'</b><span>Cookies / bac max</span></div></div>';
+  var doneBtn=isDone?'<button class="pt-donebtn done" onclick="ptMarkDone(\''+sav+'\',false)">✅ Fait — annuler</button>':'<button class="pt-donebtn todo" onclick="ptMarkDone(\''+sav+'\',true)">✓ Marquer comme fait</button>';
+  return '<div class="pt-scard'+(isDone?' done':'')+'">'
+    +(isDone?'<div class="pt-donebar">✅ Production faite</div>':'')
+    +'<div class="pt-scard-top"><span class="nm">'+_ptEsc(sav)+'</span><span class="pt-lotpill">'+bacs+' lot'+(bacs>1?'s':'')+'</span></div>'
+    +'<div class="pt-scard-body">'+bacsHtml+statHtml+doneBtn+'</div></div>';
 }
 
 async function ptMarkDone(sav,fait){
-  try{ await fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'majAvancementProd',saveur:sav,fait:fait})}); }catch(e){}
+  try{ await fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'majAvancementProd',saveur:sav,fait:fait,dateKey:(_ptData.dateKey||_ptSelDate||'')})}); }catch(e){}
   loadProducteursTab();
+}
+
+async function renderProdHistorique(){
+  var v=document.getElementById('pt-view-hist'); if(!v) return;
+  var hist=null;
+  try{ hist=await fetchAPI('getHistoriqueProd'); }catch(e){}
+  if(!Array.isArray(hist)||!hist.length){ v.innerHTML='<div class="card"><div class="empty">Aucune production dans l\'historique pour le moment.</div></div>'; return; }
+  v.innerHTML='<div class="card"><div style="font-size:12px;color:#5a86b3;line-height:1.5">Pour chaque date : <b>Demandé</b> = ce que tu as planifié pour tes producteurs · <b>Produit</b> = ce qui a réellement été enregistré en production ce jour-là.</div></div>'
+    +hist.map(function(h){
+    var planMap={}; h.lignes.forEach(function(l){ planMap[l.saveur]=l; });
+    var prodMap={}; (h.produit||[]).forEach(function(p){ prodMap[p.saveur]=p; });
+    var savs={}; h.lignes.forEach(function(l){savs[l.saveur]=1;}); (h.produit||[]).forEach(function(p){savs[p.saveur]=1;});
+    var savList=Object.keys(savs);
+    var rowsH=savList.map(function(sav){
+      var pl=planMap[sav]; var pr=prodMap[sav];
+      var planTxt = pl ? (pl.bacs+' lot'+(pl.bacs>1?'s':'')+((typeof pl.baby==='number'&&pl.baby>0)?(' · '+pl.baby+' baby'):(pl.baby===''?' · +baby':''))) : '<span style="color:#c9ced6">—</span>';
+      var prodTxt = pr ? (pr.big+' big'+(pr.small?(' · '+pr.small+' baby'):'')) : '<span style="color:#c0392b;font-weight:700">non produit</span>';
+      return '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid #f4f4f4;font-size:11.5px">'
+        +'<div style="font-weight:800;color:#d44218">'+_ptEsc(sav)+'</div>'
+        +'<div style="color:#334155">'+planTxt+'</div>'
+        +'<div style="color:#334155">'+prodTxt+'</div>'
+      +'</div>';
+    }).join('');
+    var done=h.done||0, total=h.total||h.lignes.length;
+    return '<div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">'
+      +'<div style="padding:11px 14px;background:#fff6ec;border-bottom:1px solid #f0e0cf;display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px;font-weight:900;color:#1a1a2e">'+_ptEsc(_ptFmtDate(h.date)||h.date)+'</span><span style="font-size:11px;font-weight:800;color:#9a5b13">'+done+'/'+total+' faites</span></div>'
+      +'<div style="padding:10px 14px">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:9px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:.04em;padding-bottom:5px;border-bottom:1px solid #eee"><div>Saveur</div><div>Demandé</div><div>Produit</div></div>'
+        +rowsH
+      +'</div></div>';
+  }).join('');
 }
 
 // Lecture seule : les bacs viennent automatiquement des codes premix (Inventaire_Premix)
@@ -12497,6 +12701,32 @@ function _pcRender(){
     return dayHdr+_pcRenderCard(o,stk);
   }).join('');
 }
+/* Toppings B2B (cookies congelés) — mêmes règles que l'app cliente */
+var _PC_TOP={ 'JACKY':['Pâte de spéculoos'], 'BENNY':['Cacahuètes','Pâte de cacahuètes'], 'DAVY':['Pâte de pistache'] };
+var _PC_TOPGRAM_DEF={big:30,baby:15};
+var _PC_TOPGRAM={ 'Cacahuètes':{big:3,baby:3} };
+function _pcTopGram(g){ if(g>=1000){ var kg=g/1000; return (Math.round(kg*100)/100).toString().replace('.',',')+' kg'; } return g+' g'; }
+function _pcTopHtml(o){
+  if(!o || o.type!=='cong') return '';
+  var rows='';
+  (o.lignes||[]).forEach(function(l){
+    var sav=String(l.sav||'').toUpperCase(); var tops=_PC_TOP[sav]; if(!tops) return;
+    var big=l.big||0, baby=l.baby||0; if((big+baby)<=0) return;
+    tops.forEach(function(nom){
+      var r=_PC_TOPGRAM[nom]||_PC_TOPGRAM_DEF; var g=big*r.big+baby*r.baby; if(g<=0) return;
+      rows+='<tr><td style="text-align:left;font-weight:700;font-size:13px;padding:7px 14px;border-top:1px solid #f4f6f8">'+_pcEsc(sav)+'</td>'+
+            '<td style="text-align:left;font-size:13px;padding:7px 14px;border-top:1px solid #f4f6f8">'+_pcEsc(nom)+'</td>'+
+            '<td style="text-align:right;font-size:13px;font-weight:700;padding:7px 14px;border-top:1px solid #f4f6f8">'+_pcTopGram(g)+'</td></tr>';
+    });
+  });
+  if(!rows) return '';
+  return '<div style="padding:12px 18px 2px;border-top:1px solid #f0f2f5"><div style="font-size:10.5px;font-weight:800;color:#b3350f;text-transform:uppercase;letter-spacing:.05em">🍫 Toppings à ajouter</div></div>'+
+    '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
+      '<th style="text-align:left;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:4px 14px 6px">Saveur</th>'+
+      '<th style="text-align:left;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:4px 14px 6px">Topping</th>'+
+      '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:4px 14px 6px">Grammage</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table>';
+}
 function _pcRenderCard(o,stk){
   return (function(o){
     var tot=0, aProd=0;
@@ -12536,6 +12766,7 @@ function _pcRenderCard(o,stk){
         '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Baby</th>'+
         '<th style="text-align:right;font-size:10.5px;font-weight:800;color:#8a97a5;text-transform:uppercase;padding:10px 14px 6px">Stock</th>'+
       '</tr></thead><tbody>'+rows+'</tbody></table>'+
+      _pcTopHtml(o)+
       (((o.commentaire||'')||(o.numero||'')||(o.statut||'')) ? ('<div style="padding:12px 18px;border-top:1px solid #f0f2f5">'+
         ((o.commentaire||'')?'<div style="background:#f4f6f8;border-radius:8px;padding:8px 11px;font-size:12px;color:#55606b;margin-bottom:8px">💬 Client : '+_pcEsc(o.commentaire)+'</div>':'')+
         ((o.remarque||'')?'<div style="background:#eef5fc;border-radius:8px;padding:8px 11px;font-size:12px;color:#0c447c;margin-bottom:8px;font-weight:600">📝 Remarque après livraison : '+_pcEsc(o.remarque)+'</div>':'')+
