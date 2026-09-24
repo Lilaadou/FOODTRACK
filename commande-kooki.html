@@ -4,114 +4,157 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>KOOKI — Espace commande</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--or:#d44218;--or-d:#b3350f;--or-l:#fbe8e2;--bl:#0c447c;--bl2:#0662aa;--bl-l:#e7f0f9;--ln:#ece7e3;--mut:#8a97a5;--ink:#2a2118;--cream:#fbf7f2;--ok:#2e7d46;--ok-l:#eaf5ee;--warn:#b45309;--warn-l:#fff4e6;--no:#c0392b;--no-l:#fbeaea;}
+  :root{
+    --ground:#f4f4f4;--surface:#ffffff;--surface2:#fafafa;
+    --or:#d44218;--or-d:#b3350f;--or-l:#fbe8e2;
+    --bl:#0c447c;--bl2:#0662aa;--bl-l:#e7f0f9;
+    --ln:#e7e3e0;--line-strong:#cdc7c2;--mut:#7c7570;--ink:#0d0d0d;--ink2:#3c3c3c;
+    --cream:#faf2e3;--cream-line:#ecdfc4;
+    --ok:#2e7d46;--ok-l:#eaf5ee;--warn:#b3350f;--warn-l:#fbe8e2;--no:#c0392b;--no-l:#fbeaea;
+    --r:8px;
+    --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Segoe UI',system-ui,Arial,sans-serif;font-size:14px}
-  .wrap{max-width:840px;margin:0 auto;padding:16px 16px 130px}
-  .btn{border:none;border-radius:13px;padding:14px 18px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
-  .btn-primary{background:var(--or);color:#fff;box-shadow:0 4px 14px rgba(212,66,24,.3)}
-  .btn-primary:disabled{opacity:.6;cursor:default}
-  .btn-ghost{background:#fff;border:1.5px solid var(--ln);color:#5b5248}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:16px 16px 130px}
+  .btn{border:none;border-radius:6px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn-primary{background:var(--or);color:#fff}
+  .btn-primary:disabled{opacity:.5;cursor:default}
+  .btn-ghost{background:var(--surface);border:1px solid var(--line-strong);color:var(--ink2)}
 
-  /* LOGIN — fond rouge, cadre centré, logo */
+  /* LOGIN */
   #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--or);background-image:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.46)),url('ecran.jpg');background-size:cover;background-position:center;background-repeat:no-repeat}
-  #login .card{width:100%;max-width:380px;text-align:center;padding:32px 26px;background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(120,30,10,.35)}
-  #login .logo{height:64px;width:auto;object-fit:contain;margin:0 auto 16px;display:block}
+  #login .card{width:100%;max-width:380px;text-align:center;padding:32px 26px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  #login .logo{height:60px;width:auto;object-fit:contain;margin:0 auto 16px;display:block}
   #login h1{font-size:20px;margin:0 0 4px;color:var(--bl)}
   #login p{color:var(--mut);font-size:13px;margin:0 0 22px}
-  #login input{width:100%;text-align:center;letter-spacing:4px;font-size:19px;font-weight:800;padding:14px;border:1.5px solid var(--ln);border-radius:13px;outline:none;margin-bottom:12px;background:var(--cream);text-transform:uppercase}
+  #login input{width:100%;text-align:center;letter-spacing:4px;font-size:19px;font-weight:600;font-family:var(--mono);padding:14px;border:1px solid var(--line-strong);border-radius:8px;outline:none;margin-bottom:12px;background:var(--surface2);text-transform:uppercase}
   #login input:focus{border-color:var(--or);background:#fff}
   #login .btn{width:100%}
   .err{color:var(--no);font-size:12.5px;font-weight:700;margin-top:10px;min-height:16px}
   .hint{font-size:11.5px;color:var(--mut);margin-top:14px;line-height:1.5}
 
-  .top{display:flex;align-items:center;gap:13px;background:#fff;border-radius:20px;padding:13px 18px;margin-bottom:16px;box-shadow:0 3px 16px rgba(60,40,20,.06)}
-  .top img{height:34px;width:auto;object-fit:contain}
-  .top .who{font-weight:900;font-size:16px}
-  .top .who small{display:block;font-weight:600;color:var(--mut);font-size:11.5px;margin-top:1px}
-  .top .out{margin-left:auto;font-size:12px;color:#7a6f64;background:var(--cream);border:1px solid var(--ln);border-radius:10px;padding:9px 13px;cursor:pointer;font-weight:700}
-  .tabs{display:flex;gap:6px;background:#fff;border-radius:14px;padding:5px;margin-bottom:16px;box-shadow:0 3px 14px rgba(60,40,20,.05)}
-  .tab{flex:1;border:none;background:transparent;border-radius:10px;padding:11px;font-size:13.5px;font-weight:800;color:var(--mut);cursor:pointer;font-family:inherit}
-  .tab.on{background:var(--or-l);color:var(--or)}
-  .hero{background:linear-gradient(135deg,#d44218,#e2622f);color:#fff;border-radius:20px;padding:18px 22px;margin-bottom:18px;box-shadow:0 8px 24px rgba(212,66,24,.25)}
-  .hero h1{margin:0 0 4px;font-size:20px}
-  .hero p{margin:0;font-size:13px;opacity:.92}
-  .editbanner{background:#fff4e6;border:1.5px solid #f0c98a;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#7a5a00;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .editbanner button{margin-left:auto;background:#fff;border:1px solid #e0c68a;border-radius:9px;padding:7px 12px;font-weight:800;cursor:pointer;font-size:12px;color:#7a5a00}
-  .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
-  .ctl{flex:1;min-width:180px;background:#fff;border-radius:16px;padding:13px 15px;box-shadow:0 3px 14px rgba(60,40,20,.05)}
-  .ctl .lbl{font-size:10.5px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-  .seg{display:flex;gap:7px}
-  .seg .opt{flex:1;text-align:center;border:1.5px solid var(--ln);background:#fff;border-radius:11px;padding:10px;font-weight:800;cursor:pointer;font-size:13px}
-  .seg .opt.on{border-color:var(--or);background:var(--or-l);color:var(--or)}
-  .datefield,.commentbox{width:100%;padding:10px 12px;border:1.5px solid var(--ln);border-radius:11px;font-size:14px;outline:none;background:#fff;font-family:inherit}
-  .commentbox{min-height:56px;resize:vertical}
-  .shoptitle{font-size:15px;font-weight:900;color:var(--bl);margin:20px 4px 4px}
-  .legend{font-size:12px;color:var(--mut);margin:0 4px 12px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:13px}
-  .tile{background:#fff;border-radius:18px;padding:14px;box-shadow:0 3px 16px rgba(60,40,20,.06);border:1.5px solid #fff;transition:.12s}
-  .tile.active{border-color:var(--or);box-shadow:0 6px 20px rgba(212,66,24,.16)}
-  .tile.epuise{opacity:.6}
-  .tile .thead{margin-bottom:12px}
-  .tile .fn{font-weight:900;font-size:16px;line-height:1.1}
-  .favstar{background:none;border:none;font-size:21px;line-height:1;cursor:pointer;color:#c8ccd2;padding:0;flex-shrink:0}
-  .favstar.on{color:#f0b429}
-  .cat-title{font-size:14px;font-weight:900;color:var(--bl);margin:16px 2px 9px}
-  .tile .pr{font-size:11px;color:var(--mut);font-weight:700;margin-top:3px}
-  .tile .disp{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;margin-top:6px;display:inline-block}
-  .disp.ok{background:var(--ok-l);color:var(--ok)}
-  .disp.warn{background:var(--warn-l);color:var(--warn)}
-  .disp.no{background:var(--no-l);color:var(--no)}
-  .stepgrid{display:flex;gap:8px}
-  .step{flex:1;min-width:0;background:var(--cream);border-radius:12px;padding:8px 6px}
-  .step .sl{font-size:10px;font-weight:800;color:var(--mut);text-transform:uppercase;text-align:center;margin-bottom:5px}
-  .stepper{display:flex;align-items:center;gap:2px}
-  .stepper button{width:30px;height:30px;flex-shrink:0;border:none;border-radius:9px;background:#fff;color:var(--or);font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);line-height:1}
-  .stepper button:active{transform:scale(.92)}
-  .stepper button:disabled{color:#ccc;cursor:default}
-  .stepper .val{flex:1;min-width:0;font-size:16px;font-weight:900;text-align:center}
-  .stepper input.val{width:auto;flex:1;min-width:0;border:none;background:transparent;outline:none;font-family:inherit;-moz-appearance:textfield}
-  .stepper input.val::-webkit-outer-spin-button,.stepper input.val::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .step.dis{opacity:.45}.step.dis .stepper button{color:#ccc;cursor:default}
-  .feeline{display:flex;justify-content:space-between;font-size:12.5px;color:#6a6055;padding:4px 6px;font-weight:700}
-  .cartbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -6px 24px rgba(60,40,20,.10);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
-  .cartbar .in{max-width:840px;margin:0 auto;display:flex;align-items:center;gap:14px}
-  .cartbar .n{font-size:12px;color:var(--mut);font-weight:700}
-  .cartbar .n b{display:block;font-size:20px;color:var(--bl);font-weight:900}
-  .cartbar .n .eur{font-size:12px;color:var(--or);font-weight:800}
-  .cartbar .btn{margin-left:auto}
-  .note{background:#fffbe9;border:1px solid #f2e3a8;border-radius:13px;padding:12px 15px;font-size:12.5px;color:#7a5a00;margin:16px 0 0}
-  .loading{text-align:center;color:var(--mut);padding:40px 10px;font-weight:700}
-  .empty{text-align:center;color:var(--mut);background:#fff;border:1px dashed var(--ln);border-radius:16px;padding:34px 14px;font-weight:700}
+  /* HEADER */
+  .top{position:relative;overflow:hidden;display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);padding:15px 18px;margin-bottom:16px}
+  .top::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--or) 0%,var(--or) 45%,var(--bl2) 55%,var(--bl2) 100%)}
+  .top img{height:36px;width:auto;object-fit:contain}
+  .top .who{font-weight:800;font-size:16px}
+  .top .who small{display:block;font-weight:500;color:var(--mut);font-size:10px;margin-top:2px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .top .out{margin-left:auto;font-size:12.5px;color:var(--ink2);background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:8px 13px;cursor:pointer;font-weight:600}
 
-  /* tableau récap prix */
-  table.rc{width:100%;border-collapse:collapse;margin-top:4px}
-  table.rc th{font-size:9.5px;color:var(--mut);text-transform:uppercase;text-align:left;padding:6px 6px;border-bottom:1px solid var(--ln)}
-  table.rc th.r,table.rc td.r{text-align:right}
-  table.rc td{font-size:12.5px;padding:6px 6px;border-bottom:1px solid #f2f4f6}
-  .rc-tot{display:flex;align-items:center;font-weight:900;color:var(--or);padding:10px 6px 2px;font-size:15px}
-  .rc-tot b{margin-left:auto}
+  /* TABS */
+  .tabs{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--ln);border-radius:8px;padding:3px;margin-bottom:18px}
+  .tab{flex:1;border:none;background:transparent;border-radius:5px;padding:10px;font-size:13.5px;font-weight:500;color:var(--ink2);cursor:pointer;font-family:inherit}
+  .tab.on{background:var(--bl2);color:#fff;font-weight:600}
+
+  .hero{display:none}
+  .editbanner{background:var(--or-l);border:1px solid var(--or);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--or-d);font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .editbanner button{margin-left:auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:12px;color:var(--or-d)}
+
+  /* CONTROLS */
+  .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:8px}
+  @media(max-width:640px){ .controls{grid-template-columns:1fr} }
+  .ctl{background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px;display:flex;flex-direction:column}
+  .ctl .lbl{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--mut);text-transform:uppercase;letter-spacing:.13em;margin-bottom:9px}
+  .chint{font-family:var(--mono);font-size:10.5px;color:var(--mut);line-height:1.4;margin-top:auto;padding-top:9px}
+  .seg{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--ln);border-radius:7px;padding:3px}
+  .seg .opt{flex:1;display:flex;align-items:center;justify-content:center;min-height:38px;line-height:1.15;text-align:center;border:none;background:transparent;border-radius:5px;padding:6px 8px;font-weight:500;cursor:pointer;font-size:13px;color:var(--ink2)}
+  .seg .opt.on{background:var(--or);color:#fff;font-weight:600}
+  .datefield,.commentbox{width:100%;padding:9px 11px;border:1px solid var(--line-strong);border-radius:6px;font-size:14px;font-family:var(--mono);outline:none;background:var(--surface)}
+  .datefield{min-height:44px}
+  .datefield:focus,.commentbox:focus{border-color:var(--bl2)}
+  .commentbox{min-height:56px;resize:vertical;font-family:var(--sans)}
+
+  /* SECTION TITLES */
+  .shoptitle{font-size:17px;font-weight:800;color:var(--bl);letter-spacing:.05em;text-transform:uppercase;margin:24px 4px 6px}
+  .legend{font-size:12px;color:var(--mut);margin:0 4px 12px}
+
+  /* TOPPINGS */
+  .topcard{background:var(--cream);border:1px solid var(--cream-line);border-radius:var(--r);padding:12px 15px;margin-bottom:9px}
+  .topcard .topsav{font-family:var(--mono);font-weight:700;color:var(--or-d);font-size:12.5px;letter-spacing:.06em;margin-bottom:8px}
+  .topline{display:flex;align-items:center;gap:12px;padding:5px 0}
+  .topline+.topline{border-top:1px solid var(--cream-line)}
+  .topline .topname{flex:1;font-size:13.5px;color:var(--ink);font-weight:600}
+  .topline .topgram{font-family:var(--mono);font-size:12.5px;color:var(--mut);font-weight:600;white-space:nowrap}
+
+  /* GRID + TILES */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:11px}
+  .cat-title{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--mut);margin:18px 2px 9px}
+  .tile{background:var(--surface);border:2px solid var(--ln);border-radius:var(--r);padding:13px 13px 12px;transition:.12s}
+  .tile.active{border-color:var(--or)}
+  .tile.epuise{opacity:.55}
+  .tile .thead{margin-bottom:10px}
+  .tile .fn{font-weight:700;font-size:15px;line-height:1.1;letter-spacing:-.01em}
+  .favstar{background:none;border:none;font-size:18px;line-height:1;cursor:pointer;color:var(--line-strong);padding:0;flex-shrink:0}
+  .favstar.on{color:var(--or)}
+  .cat-title+.grid{margin-top:0}
+  .tile .pr{font-size:11px;color:var(--mut);font-weight:600;margin-top:3px}
+  .tile .disp{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;margin-top:8px;display:inline-flex;align-items:center;gap:5px;vertical-align:middle}
+  .tile .disp::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+  .disp.ok{background:var(--bl-l);color:var(--bl2)}
+  .disp.warn{background:var(--or-l);color:var(--or-d)}
+  .disp.no{background:transparent;color:var(--or-d);border:1px solid rgba(212,66,24,.4)}
+  .stockhint{font-family:var(--mono);font-size:10.5px;color:var(--or-d);font-weight:600;margin-top:8px}
+  .stepgrid{display:flex;gap:8px}
+  .step{flex:1;min-width:0}
+  .step .sl{font-family:var(--mono);font-size:9.5px;font-weight:500;color:var(--mut);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}
+  .stepper{display:flex;align-items:center}
+  .stepper button{width:30px;height:32px;flex-shrink:0;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink2);font-size:15px;cursor:pointer;line-height:1}
+  .stepper button:first-child{border-radius:5px 0 0 5px}
+  .stepper button:last-child{border-radius:0 5px 5px 0}
+  .stepper button:active{background:var(--surface2)}
+  .stepper button:disabled{opacity:.4;cursor:default}
+  .stepper .val{flex:1;min-width:0;height:32px;font-family:var(--mono);font-size:14px;font-weight:600;text-align:center;line-height:32px}
+  .stepper input.val{width:100%;border:1px solid var(--line-strong);border-left:0;border-right:0;background:var(--surface);outline:none;font-family:var(--mono);font-weight:600;-moz-appearance:textfield;padding:0}
+  .stepper input.val::-webkit-outer-spin-button,.stepper input.val::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .step.dis{opacity:.4}
+  .step.dis .stepper button{cursor:default}
+  .feeline{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;color:var(--mut);padding:4px 6px;font-weight:600}
+  .cartbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--ln);box-shadow:0 -6px 20px rgba(0,0,0,.06);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+  .cartbar .in{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .cartbar .n{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);font-weight:500}
+  .cartbar .n b{display:block;font-family:var(--mono);font-size:22px;color:var(--ink);font-weight:700;letter-spacing:-.02em}
+  .cartbar .btn{margin-left:auto}
+  .note{background:var(--surface2);border:1px solid var(--ln);border-left:3px solid var(--or);border-radius:var(--r);padding:13px 15px;font-size:13px;color:var(--ink2);margin:18px 0 0;line-height:1.5}
+  .loading{text-align:center;color:var(--mut);padding:40px 10px;font-weight:600}
+  .empty{text-align:center;color:var(--mut);background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--r);padding:34px 14px;font-weight:600}
+
+  /* tableau récap */
+  table.rc{width:100%;border-collapse:collapse;margin-top:4px;table-layout:fixed}
+  table.rc th{font-family:var(--mono);font-size:9.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:6px 6px;border-bottom:1px solid var(--ln)}
+  table.rc th.r,table.rc td.r{text-align:right;font-family:var(--mono)}
+  table.rc td{font-size:12.5px;padding:6px 6px;border-bottom:1px solid var(--surface2);overflow-wrap:anywhere}
+  table.rc th:nth-child(1),table.rc td:nth-child(1){width:34%}
+  table.rc th:nth-child(2),table.rc td:nth-child(2){width:44%}
+  table.rc th:nth-child(3),table.rc td:nth-child(3){width:22%}
+  .rc-tot{display:flex;align-items:center;font-weight:700;color:var(--or);padding:10px 6px 2px;font-size:15px}
+  .rc-tot b{margin-left:auto;font-family:var(--mono)}
+  .rc-toptitle{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--or-d);text-transform:uppercase;letter-spacing:.1em;margin:12px 6px 2px}
 
   /* cartes historique */
-  .hcard{background:#fff;border-radius:16px;padding:15px 17px;margin-bottom:12px;box-shadow:0 3px 16px rgba(60,40,20,.06)}
+  .hcard{background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);padding:15px 16px;margin-bottom:11px}
   .hcard .hh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-  .hcard .hnum{font-weight:900;font-size:14px;color:var(--bl)}
-  .hcard .hd{font-size:12px;color:var(--mut);font-weight:700}
-  .hst{font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px}
-  .hmsg{background:var(--bl-l);border-left:3px solid var(--bl2);border-radius:8px;padding:9px 12px;font-size:12.5px;color:#0c447c;margin-top:10px}
-  .hcom{background:var(--cream);border-radius:8px;padding:8px 11px;font-size:12px;color:#6a6055;margin-top:8px}
-  .hlock{font-size:11.5px;font-weight:700;margin-top:10px}
+  .hcard .hnum{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.03em}
+  .hcard .hd{font-family:var(--mono);font-size:11.5px;color:var(--mut);font-weight:500}
+  .hst{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px}
+  .hmsg{background:var(--bl-l);border-left:3px solid var(--bl2);border-radius:6px;padding:9px 12px;font-size:12.5px;color:var(--bl);margin-top:10px}
+  .hcom{background:var(--surface2);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--ink2);margin-top:8px}
+  .hlock{font-family:var(--mono);font-size:11px;font-weight:600;margin-top:10px}
   .hlock.open{color:var(--ok)} .hlock.closed{color:var(--mut)}
-  .hedit{background:var(--or);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-top:10px}
+  .hedit{background:var(--or);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer;margin-top:10px}
 
-  #done{position:fixed;inset:0;overflow:auto;background:var(--cream);padding:16px}
-  #done .card{text-align:center;padding:30px 22px;background:#fff;border-radius:22px;box-shadow:0 12px 40px rgba(60,40,20,.10);max-width:480px;margin:5vh auto 0}
-  #done .big{width:70px;height:70px;border-radius:50%;background:var(--ok-l);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 14px}
+  #done{position:fixed;inset:0;overflow:auto;background:var(--ground);padding:16px}
+  #done .card{text-align:center;padding:30px 22px;background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);max-width:480px;margin:5vh auto 0}
+  #done .big{width:64px;height:64px;border-radius:50%;background:var(--ok-l);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 14px}
   #done h2{color:var(--bl);margin:0 0 6px}
-  #done p{color:#6a6055;font-size:13.5px;margin:0 0 4px}
-  .badge-att{display:inline-block;background:var(--warn-l);color:var(--warn);font-weight:800;font-size:12px;padding:6px 14px;border-radius:999px;margin-bottom:8px}
-  .recap{background:var(--cream);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;text-align:left;margin:16px 0}
+  #done p{color:var(--ink2);font-size:13.5px;margin:0 0 4px}
+  .badge-att{display:inline-block;background:var(--or-l);color:var(--or-d);font-weight:700;font-size:12px;padding:6px 14px;border-radius:99px;margin-bottom:8px}
+  .recap{background:var(--surface2);border:1px solid var(--ln);border-radius:var(--r);padding:14px 16px;text-align:left;margin:16px 0}
   [hidden]{display:none!important}
 </style>
 </head>
@@ -139,29 +182,26 @@
   </div>
 
   <div class="tabs">
-    <button class="tab on" id="tab-shop" onclick="showTab('shop')">🛒 Commander</button>
-    <button class="tab" id="tab-hist" onclick="showTab('hist')">📋 Mes commandes</button>
-    <button class="tab" id="tab-rec" onclick="showTab('rec')">🔁 Récurrent</button>
+    <button class="tab on" id="tab-shop" onclick="showTab('shop')">Commander</button>
+    <button class="tab" id="tab-hist" onclick="showTab('hist')">Mes commandes</button>
+    <button class="tab" id="tab-rec" onclick="showTab('rec')">Récurrent</button>
   </div>
 
   <div id="shopview">
     <div class="editbanner" id="editbanner" hidden></div>
-    <div class="hero" id="hero">
-      <h1>Passe ta commande</h1>
-      <p>Choisis tes saveurs, on s'occupe du reste. Fraîchement préparé au labo KOOKI.</p>
-    </div>
     <div class="controls">
       <div class="ctl">
         <div class="lbl">Type de cookies</div>
         <div class="seg" id="seg-type">
-          <div class="opt on" data-v="cuit" onclick="pick('seg-type',this)">Cuits</div>
-          <div class="opt" data-v="cong" onclick="pick('seg-type',this)">Congelés</div>
+          <div class="opt on" data-v="cuit" onclick="pick('seg-type',this);renderToppings()">Cuits</div>
+          <div class="opt" data-v="cong" onclick="pick('seg-type',this);renderToppings()">Congelés</div>
         </div>
+        <div class="chint">Cuits : prêts à déguster · Congelés : à cuire chez toi</div>
       </div>
       <div class="ctl">
         <div class="lbl">Date de livraison souhaitée</div>
         <input type="date" class="datefield" id="ddate">
-        <div style="font-size:11px;color:var(--mut);margin-top:6px;font-weight:700">Livraisons : lun · mer · ven — commande jusqu'à la veille 16h</div>
+        <div class="chint">Livraisons : lun · mer · ven — commande jusqu'à la veille 16h</div>
       </div>
       <div class="ctl">
         <div class="lbl">Mode</div>
@@ -169,16 +209,24 @@
           <div class="opt on" data-v="Livraison" onclick="pick('seg-mode',this);calc()">Livraison</div>
           <div class="opt" data-v="Retrait au labo" onclick="pick('seg-mode',this);calc()">Retrait au labo KOOKI</div>
         </div>
-        <div id="feehint" style="font-size:11px;color:var(--mut);margin-top:7px;font-weight:700"></div>
+        <div id="feehint" class="chint"></div>
       </div>
     </div>
-    <div class="shoptitle">Nos saveurs</div>
-    <div class="legend">✅ Disponible · ⚠️ Sur commande (petit délai) · ❌ Épuisé</div>
+    <div class="shoptitle">Nos cookies</div>
     <div id="flavs"><div class="loading">Chargement…</div></div>
-    <div class="shoptitle">Un mot pour nous ? (facultatif)</div>
-    <textarea class="commentbox" id="comment" placeholder="Précision, demande particulière, horaire…"></textarea>
-    <div class="note">📌 Ta commande sera <b>envoyée à KOOKI pour validation</b>. Tu pourras la modifier jusqu'à la <b>veille de la livraison, 11h</b>.</div>
-    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="openRecModal()">🔁 Enregistrer comme commande récurrente</button>
+    <div id="toppingsec" hidden>
+      <div class="shoptitle">Topping</div>
+      <div class="legend">Fourni à part avec tes cookies congelés — à ajouter avant la cuisson.</div>
+      <div id="toppings"></div>
+    </div>
+    <div class="shoptitle">Une question ?</div>
+    <div style="background:var(--surface);border:1px solid var(--ln);border-radius:8px;padding:15px 16px">
+      <div style="font-size:13.5px;color:var(--ink2);line-height:1.5">Pour toute question concernant votre <b>commande</b> ou votre <b>livraison</b>, écrivez-nous — on vous répond rapidement.</div>
+      <button type="button" style="width:100%;margin-top:12px;background:var(--bl2);color:#fff;border:none;border-radius:6px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit" onclick="contactKooki()">Écrire à KOOKI</button>
+      <div style="text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--mut);margin-top:8px">lila@kooki.be</div>
+    </div>
+    <div class="note">Ta commande sera <b>envoyée à KOOKI pour validation</b>. Tu pourras la modifier jusqu'à la <b>veille de la livraison, 16h</b>.</div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="openRecModal()">Enregistrer comme commande récurrente</button>
   </div>
 
   <div id="recview" hidden>
@@ -189,7 +237,7 @@
 
   <div id="histview" hidden>
     <div class="shoptitle">Mes commandes</div>
-    <div class="legend">Le statut se met à jour automatiquement. Modifiable jusqu'à la veille 11h.</div>
+    <div class="legend">Le statut se met à jour automatiquement.</div>
     <div id="histlist"><div class="loading">Chargement…</div></div>
   </div>
 </div>
@@ -205,30 +253,99 @@
 <div id="done" hidden>
   <div class="card">
     <div class="big">✓</div>
-    <div class="badge-att" id="donebadge">⏳ En attente de validation</div>
+    <div class="badge-att" id="donebadge">En attente de validation</div>
     <h2 id="donetitle">Commande envoyée !</h2>
     <p id="donemsg">Merci. Ta commande a bien été transmise à KOOKI.</p>
     <div class="recap" id="recap"></div>
-    <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="goHist()">📋 Voir mes commandes</button>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="goHist()">Voir mes commandes</button>
     <button class="btn btn-ghost" style="width:100%" onclick="reset()">← Nouvelle commande</button>
   </div>
 </div>
 
 <script>
 /* ===== URL /exec de ton Apps Script ===== */
-var API = 'https://script.google.com/macros/s/AKfycbwg4HRMLf64LFxnLAosp5PQz6ibqELON6sHSBPz62aWpy5C4IB_88opkZA9fzvXY04omg/exec';
+var API = 'https://script.google.com/macros/s/AKfycbzqZADgM4R4g15nfIq7_HNar4gl7_DuPQ3rkuycj2200_aEF7UNPSmRczdRI7bUHkFEsA/exec';
 
 var SAVEURS_ALL=['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
 var NOBABY=['CHARLY','LENI'];
-var DISP={ok:['ok','✅ Disponible'], warn:['warn','⚠️ Sur commande'], no:['no','❌ Épuisé']};
-var STATUT_MAP={
-  'À valider':['#fff4e6','#b45309','⏳ En attente de validation'],
-  'Approuvée':['#eaf5ee','#2e7d46','✅ Approuvée'],
-  'En préparation':['#e7f0f9','#0662aa','👨‍🍳 En préparation'],
-  'Envoyée':['#e7f0f9','#0662aa','🚚 Envoyée'],
-  'Livrée':['#eef2f6','#44515f','✓ Livrée']
+/* Adresse du labo (retrait) */
+var LABO_ADR='Avenue Emile Gryson 2D, 1070 Bruxelles';
+/* Point de retrait par client. Par défaut = labo KOOKI.
+   Exceptions : certains clients retirent ailleurs (ex. ZIZI Waterloo au KOOKI Shop Ixelles). */
+var RETRAIT_DEFAUT={ mode:'Retrait au labo', label:'Retrait au labo KOOKI', court:'labo KOOKI', adr:LABO_ADR };
+var RETRAIT_CLIENT={
+  'zizi waterloo':{ mode:'Retrait KOOKI Ixelles', label:'KOOKI Shop Ixelles', court:'KOOKI Shop Ixelles', adr:'Chaussée de Waterloo 391, 1050 Bruxelles' }
 };
-var CLIENT='', CODE='', SAVEURS=[], qty={}, PRIX={big:0,baby:0,livraison:8};
+function retraitCfg(){ return RETRAIT_CLIENT[String(CLIENT||'').trim().toLowerCase()] || RETRAIT_DEFAUT; }
+/* libellé d'affichage d'un mode, quelle que soit sa valeur stockée */
+function modeLabel(mode){
+  if(mode==='Livraison') return 'Livraison';
+  if(mode==='Retrait KOOKI Ixelles') return 'KOOKI Shop Ixelles';
+  if(mode==='Retrait au labo') return 'Retrait au labo KOOKI';
+  return mode || 'Livraison';
+}
+/* adapte le 2e bouton du mode (retrait) au client connecté */
+function applyModeOptions(){
+  var seg=document.getElementById('seg-mode'); if(!seg) return;
+  var cfg=retraitCfg(); var opts=seg.querySelectorAll('.opt');
+  if(opts[1]){ opts[1].setAttribute('data-v',cfg.mode); opts[1].textContent=cfg.label; }
+}
+/* Toppings à fournir avec les cookies CONGELÉS, par saveur.
+   (le grammage sera calculé plus tard selon le nombre de cookies) */
+var TOPPINGS={
+  'JACKY':['Pâte de spéculoos'],
+  'BENNY':['Cacahuètes','Pâte de cacahuètes'],
+  'DAVY':['Pâte de pistache']
+};
+/* Grammage par topping (g par cookie).
+   Par défaut : 30 g / Big et 15 g / Baby (les pâtes).
+   Exceptions par nom de topping : cacahuètes = 3 g / cookie (Big comme Baby). */
+var GRAM_DEFAUT={big:30, baby:15};
+var GRAM_TOPPING={ 'Cacahuètes':{big:3, baby:3} };
+function fmtGram(g){
+  if(g>=1000){ var kg=g/1000; return (Math.round(kg*100)/100).toString().replace('.',',')+' kg'; }
+  return g+' g';
+}
+function gramTopping(sav, topping, nbBig, nbBaby){
+  var r=GRAM_TOPPING[topping]||GRAM_DEFAUT;
+  var g=(nbBig||0)*r.big+(nbBaby||0)*r.baby;
+  return g>0?fmtGram(g):'';
+}
+function isCong(){ var e=document.querySelector('#seg-type .opt.on'); return !!(e && e.getAttribute('data-v')==='cong'); }
+function renderToppings(){
+  var sec=document.getElementById('toppingsec'); var box=document.getElementById('toppings');
+  if(!sec||!box) return;
+  if(!isCong()){ sec.hidden=true; box.innerHTML=''; return; }
+  var rows='';
+  SAVEURS.forEach(function(s,i){
+    var tops=TOPPINGS[s.n]; if(!tops) return;
+    var q=qty[i]; var big=q?(q.big||0):0, baby=q?(q.baby||0):0; if((big+baby)<=0) return;
+    var lines='';
+    tops.forEach(function(nom){
+      var g=gramTopping(s.n,nom,big,baby);
+      lines+='<div class="topline"><div class="topname">'+esc(nom)+'</div>'+
+             '<div class="topgram">'+(g?esc(g):'')+'</div></div>';
+    });
+    rows+='<div class="topcard"><div class="topsav">'+esc(s.n)+'</div>'+lines+'</div>';
+  });
+  if(!rows){ sec.hidden=true; box.innerHTML=''; return; }
+  sec.hidden=false; box.innerHTML=rows;
+}
+var DISP={ok:['ok','Disponible'], warn:['warn','Sur commande'], no:['no','Épuisé']};
+function contactKooki(){
+  var who=(typeof CLIENT!=='undefined' && CLIENT)?CLIENT:'';
+  var sujet='Question — commande KOOKI'+(who?(' · '+who):'');
+  var corps='Bonjour KOOKI,\n\n(Votre question concernant votre commande ou votre livraison)\n\n'+(who?('— '+who):'');
+  window.location.href='mailto:lila@kooki.be?subject='+encodeURIComponent(sujet)+'&body='+encodeURIComponent(corps);
+}
+var STATUT_MAP={
+  'À valider':['#fff4e6','#b45309','En attente de validation'],
+  'Approuvée':['#eaf5ee','#2e7d46','Approuvée'],
+  'En préparation':['#e7f0f9','#0662aa','En préparation'],
+  'Envoyée':['#e7f0f9','#0662aa','Envoyée'],
+  'Livrée':['#eef2f6','#44515f','Livrée']
+};
+var CLIENT='', CODE='', CLIENT_ADR='', SAVEURS=[], qty={}, PRIX={big:0,baby:0,livraison:8};
 function curMode(){ var e=document.querySelector('#seg-mode .opt.on'); return e?e.getAttribute('data-v'):'Livraison'; }
 var histCache=null, histTimer=null, editId=null, editNumero='';
 
@@ -258,8 +375,9 @@ function login(){
   apiGet('checkClientCode',{code:code}).then(function(res){
     btn.disabled=false; btn.textContent='Se connecter';
     if(res && res.ok){
-      CLIENT=res.client||code; CODE=code;
+      CLIENT=res.client||code; CODE=code; CLIENT_ADR=res.adresse||'';
       document.getElementById('clientName').innerHTML=esc(CLIENT)+'<small>Espace commande</small>';
+      applyModeOptions();
       document.getElementById('login').hidden=true;
       document.getElementById('order').hidden=false;
       apiGet('getTarifs').then(function(t){ if(t){ PRIX.big=Number(t.big)||0; PRIX.baby=Number(t.baby)||0; PRIX.livraison=(Number(t.livraison)>0?Number(t.livraison):8); } build(); calc(); }).catch(function(){});
@@ -296,17 +414,24 @@ function stopAutoRefresh(){ if(histTimer){ clearInterval(histTimer); histTimer=n
 
 function loadDispo(){
   apiGet('getDispoClient').then(function(res){
-    var map={}; if(Array.isArray(res)) res.forEach(function(x){ map[String(x.saveur).toUpperCase()]=x.etat; });
-    SAVEURS=SAVEURS_ALL.map(function(s){ return {n:s, d:(map[s]||'ok'), nobaby:NOBABY.indexOf(s)>=0}; });
+    var map={}; if(Array.isArray(res)) res.forEach(function(x){ map[String(x.saveur).toUpperCase()]={etat:x.etat, reste:(x.reste==null?null:Number(x.reste))}; });
+    SAVEURS=SAVEURS_ALL.map(function(s){ var m=map[s]||{}; return {n:s, d:(m.etat||'ok'), reste:(m.reste==null?null:m.reste), nobaby:NOBABY.indexOf(s)>=0}; });
     build();
-  }).catch(function(){ SAVEURS=SAVEURS_ALL.map(function(s){ return {n:s, d:'ok', nobaby:NOBABY.indexOf(s)>=0}; }); build(); });
+  }).catch(function(){ SAVEURS=SAVEURS_ALL.map(function(s){ return {n:s, d:'ok', reste:null, nobaby:NOBABY.indexOf(s)>=0}; }); build(); });
 }
+/* stock max commandable pour une saveur en stock limité (sinon illimité) */
+function stockMax(s){ return (s && s.d==='low' && s.reste!=null) ? s.reste : Infinity; }
 function build(preset){
   qty={};
   var favs=getFavs();
   function tileHtml(s,i){
-    var dd=DISP[s.d]||DISP.ok; var ep=s.d==='no'; qty[i]={big:0,baby:0};
+    var ep=s.d==='no'; qty[i]={big:0,baby:0};
     var fav=favs.indexOf(s.n)>=0;
+    var pillCls, pillTxt;
+    if(s.d==='no'){ pillCls='no'; pillTxt='Épuisé'; }
+    else if(s.d==='low' && s.reste!=null){ pillCls='warn'; pillTxt='Plus que '+s.reste; }
+    else { pillCls='ok'; pillTxt='Disponible'; }
+    var hint=(s.d==='low' && s.reste!=null)?'<div class="stockhint">Commande limitée au stock ('+s.reste+' max)</div>':'';
     function stepper(kind,disabled){
       return '<div class="step'+(disabled?' dis':'')+'"><div class="sl">'+(kind==='big'?'Big':'Baby')+'</div>'+
         '<div class="stepper"><button onclick="chg('+i+',\''+kind+'\',-1)" '+(disabled?'disabled':'')+'>−</button>'+
@@ -316,15 +441,15 @@ function build(preset){
     return '<div class="tile'+(ep?' epuise':'')+'" id="tile-'+i+'"><div class="thead">'+
       '<div style="display:flex;align-items:flex-start;gap:8px"><div class="fn" style="flex:1">'+esc(s.n)+'</div>'+
       '<button class="favstar'+(fav?' on':'')+'" onclick="toggleFav('+i+')" aria-label="Favori">'+(fav?'★':'☆')+'</button></div>'+
-      '<span class="disp '+dd[0]+'">'+dd[1]+'</span></div>'+
-      '<div class="stepgrid">'+stepper('big',ep)+stepper('baby',ep||s.nobaby)+'</div></div>';
+      '<span class="disp '+pillCls+'">'+pillTxt+'</span></div>'+
+      '<div class="stepgrid">'+stepper('big',ep)+stepper('baby',ep||s.nobaby)+'</div>'+hint+'</div>';
   }
   var favIdx=[], restIdx=[];
   SAVEURS.forEach(function(s,i){ (favs.indexOf(s.n)>=0?favIdx:restIdx).push(i); });
   var html='';
   if(favIdx.length){
-    html+='<div class="cat-title">⭐ Vos favoris</div><div class="grid">'+favIdx.map(function(i){return tileHtml(SAVEURS[i],i);}).join('')+'</div>';
-    html+='<div class="cat-title">Toutes nos saveurs</div>';
+    html+='<div class="cat-title">Vos favoris</div><div class="grid">'+favIdx.map(function(i){return tileHtml(SAVEURS[i],i);}).join('')+'</div>';
+    html+='<div class="cat-title">Tous nos cookies</div>';
   }
   html+='<div class="grid">'+restIdx.map(function(i){return tileHtml(SAVEURS[i],i);}).join('')+'</div>';
   document.getElementById('flavs').innerHTML=html;
@@ -341,14 +466,20 @@ function build(preset){
 }
 function chg(i,kind,delta){
   var s=SAVEURS[i]; if(!s||s.d==='no') return; if(kind==='baby'&&s.nobaby) return;
-  qty[i][kind]=Math.max(0,(qty[i][kind]||0)+delta);
+  var other=(kind==='big')?(qty[i].baby||0):(qty[i].big||0);
+  var next=Math.max(0,(qty[i][kind]||0)+delta);
+  var mx=stockMax(s); if(next+other>mx) next=Math.max(0,mx-other);
+  qty[i][kind]=next;
   var el=document.getElementById('v-'+i+'-'+kind); if(el){ if(el.tagName==='INPUT') el.value=qty[i][kind]; else el.textContent=qty[i][kind]; }
   var tile=document.getElementById('tile-'+i); if(tile) tile.classList.toggle('active',(qty[i].big+qty[i].baby)>0);
   calc();
 }
 function setQty(i,kind,val){
   var s=SAVEURS[i]; if(!s||s.d==='no') return; if(kind==='baby'&&s.nobaby) return;
-  var n=Math.max(0,parseInt(val,10)||0); qty[i][kind]=n;
+  var other=(kind==='big')?(qty[i].baby||0):(qty[i].big||0);
+  var n=Math.max(0,parseInt(val,10)||0);
+  var mx=stockMax(s); if(n+other>mx){ n=Math.max(0,mx-other); var el=document.getElementById('v-'+i+'-'+kind); if(el&&el.tagName==='INPUT') el.value=n; }
+  qty[i][kind]=n;
   var tile=document.getElementById('tile-'+i); if(tile) tile.classList.toggle('active',(qty[i].big+qty[i].baby)>0);
   calc();
 }
@@ -359,20 +490,37 @@ function totals(){
 function calc(){
   var t=totals();
   document.getElementById('tot').textContent=t.n;
-  var fh=document.getElementById('feehint'); if(fh) fh.textContent=(curMode()==='Livraison')?'Livraison à ton adresse':'À retirer au labo KOOKI';
+  var fh=document.getElementById('feehint'); if(fh){ var cfg=retraitCfg(); fh.textContent=(curMode()==='Livraison')?('Livré à '+(CLIENT_ADR||'ton adresse')):('À retirer au '+cfg.court+(cfg.adr?(' — '+cfg.adr):'')); }
+  renderToppings();
   return t.n;
 }
 
-/* tableau récap (quantités uniquement — pas de prix) */
-function recapTable(lignes,mode){
+/* récap des toppings (uniquement pour les commandes Congelés) */
+function toppingRecapHtml(lignes){
+  var rows='';
+  (lignes||[]).forEach(function(l){
+    var tops=TOPPINGS[l.sav]; if(!tops) return;
+    var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0; if((big+baby)<=0) return;
+    tops.forEach(function(nom){
+      var g=gramTopping(l.sav,nom,big,baby);
+      rows+='<tr><td>'+esc(l.sav)+'</td><td>'+esc(nom)+'</td><td class="r">'+(g?esc(g):'')+'</td></tr>';
+    });
+  });
+  if(!rows) return '';
+  return '<div class="rc-toptitle">Topping</div>'+
+    '<table class="rc"><thead><tr><th>Saveur</th><th>Topping</th><th class="r">Grammage</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+/* tableau récap (quantités uniquement — pas de prix) ; type='cong' ajoute les toppings */
+function recapTable(lignes,mode,type){
   var rows='';
   (lignes||[]).forEach(function(l){
     var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0;
     if(big>0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Big</td><td class="r">'+big+'</td></tr>'; }
     if(baby>0 && NOBABY.indexOf(l.sav)<0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Baby</td><td class="r">'+baby+'</td></tr>'; }
   });
-  var modeHtml='<div class="feeline"><span>'+(mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+'</span></div>';
-  return '<table class="rc"><thead><tr><th>Produit</th><th>Unité</th><th class="r">Qté</th></tr></thead><tbody>'+rows+'</tbody></table>'+modeHtml;
+  var modeHtml='<div class="feeline"><span>'+modeLabel(mode)+'</span></div>';
+  var topHtml=(type==='cong')?toppingRecapHtml(lignes):'';
+  return '<table class="rc"><thead><tr><th>Produit</th><th>Unité</th><th class="r">Qté</th></tr></thead><tbody>'+rows+'</tbody></table>'+topHtml+modeHtml;
 }
 
 /* ---- favoris (par code client, stockés sur l'appareil) ---- */
@@ -391,10 +539,9 @@ function editOrder(id){
   var segType=document.getElementById('seg-type'); Array.prototype.forEach.call(segType.children,function(c){ c.classList.toggle('on', c.getAttribute('data-v')===(o.type||'cuit')); });
   var segMode=document.getElementById('seg-mode'); var wantMode=o.mode||'Livraison'; Array.prototype.forEach.call(segMode.children,function(c){ c.classList.toggle('on', c.getAttribute('data-v')===wantMode); });
   document.getElementById('ddate').value=o.date||'';
-  document.getElementById('comment').value=o.commentaire||'';
   document.getElementById('sendbtn').textContent='Enregistrer →';
   var eb=document.getElementById('editbanner'); eb.hidden=false;
-  eb.innerHTML='✏️ Modification de la commande <b>'+esc(o.numero||('#'+o.id))+'</b> — jusqu\'au '+deadlineLabel(o.date)+' <button onclick="cancelEdit()">Annuler</button>';
+  eb.innerHTML='Modification de la commande <b>'+esc(o.numero||('#'+o.id))+'</b> — jusqu\'au '+deadlineLabel(o.date)+' <button onclick="cancelEdit()">Annuler</button>';
   build(o.lignes);
   window.scrollTo(0,0);
 }
@@ -413,7 +560,7 @@ function send(){
   if(!date){ alert('Choisis une date de livraison.'); return; }
   if(!isDeliveryDay(date)){ alert('Les livraisons ont lieu uniquement le lundi, le mercredi ou le vendredi. Choisis un de ces jours.'); return; }
   if(!editable(date)){ alert('Trop tard pour commander pour cette date : la limite est la veille de la livraison à 16h.'); return; }
-  var comment=document.getElementById('comment').value||'';
+  var comment='';
   var isEdit=!!editId;
   var order={ id:isEdit?editId:Date.now(), numero:isEdit?editNumero:genNumero(), client:CLIENT, date:date, type:type, lignes:lignes, commentaire:comment, mode:curMode() };
   if(isEdit && !order.numero) order.numero=genNumero();
@@ -430,15 +577,15 @@ function showDone(order,isEdit){
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Commande</span><b>'+esc(order.numero)+'</b></div>'+
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Type</span><b>'+typeTxt+'</b></div>'+
     '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#6a6055">Livraison</span><b>'+fmtD(order.date)+'</b></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:#6a6055">Mode</span><b>'+(order.mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+'</b></div>'+
-    recapTable(order.lignes,order.mode)+
-    (order.commentaire?'<div class="hcom">💬 '+esc(order.commentaire)+'</div>':'');
+    '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:#6a6055">Mode</span><b>'+modeLabel(order.mode)+'</b></div>'+
+    recapTable(order.lignes,order.mode,order.type)+
+    (order.commentaire?'<div class="hcom">'+esc(order.commentaire)+'</div>':'');
   var btn=document.getElementById('sendbtn'); btn.disabled=false; btn.textContent='Envoyer →';
   cancelEdit();
   histCache=null; // forcer un rechargement frais
   document.getElementById('order').hidden=true; document.getElementById('done').hidden=false; window.scrollTo(0,0);
 }
-function reset(){ document.getElementById('done').hidden=true; document.getElementById('order').hidden=false; cancelEdit(); document.getElementById('comment').value=''; showTab('shop'); loadDispo(); window.scrollTo(0,0); }
+function reset(){ document.getElementById('done').hidden=true; document.getElementById('order').hidden=false; cancelEdit(); var _cm=document.getElementById('comment'); if(_cm) _cm.value=''; showTab('shop'); loadDispo(); window.scrollTo(0,0); }
 
 /* ---- commandes récurrentes ---- */
 var recCache=null;
@@ -454,9 +601,9 @@ function openRecModal(){
   ov=document.createElement('div'); ov.id='rec-modal';
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:20px';
   ov.innerHTML='<div style="background:#fff;border-radius:18px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:22px">'+
-    '<div style="font-size:18px;font-weight:900;color:var(--bl);margin-bottom:4px">🔁 Commande récurrente</div>'+
+    '<div style="font-size:18px;font-weight:900;color:var(--bl);margin-bottom:4px">Commande récurrente</div>'+
     '<div style="font-size:12.5px;color:var(--mut);margin-bottom:14px">Elle sera envoyée automatiquement à KOOKI chaque semaine, aux jours choisis.</div>'+
-    '<div style="background:var(--cream);border-radius:11px;padding:11px 13px;font-size:12.5px;color:#55606b;margin-bottom:14px"><b>Contenu :</b> '+sumTxt+'<br><b>Mode :</b> '+(curMode()==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+'</div>'+
+    '<div style="background:var(--cream);border-radius:11px;padding:11px 13px;font-size:12.5px;color:#55606b;margin-bottom:14px"><b>Contenu :</b> '+sumTxt+'<br><b>Mode :</b> '+modeLabel(curMode())+'</div>'+
     '<div style="font-size:12px;font-weight:800;color:var(--mut);text-transform:uppercase;margin-bottom:8px">Jours de livraison</div>'+
     chk+
     '<div style="display:flex;gap:8px;margin-top:14px"><button onclick="document.getElementById(\'rec-modal\').remove()" class="btn btn-ghost" style="flex:1">Annuler</button><button onclick="saveRecFromModal()" class="btn btn-primary" style="flex:1">Enregistrer</button></div>'+
@@ -471,7 +618,7 @@ function saveRecFromModal(){
   var lignes=_curLignes(); if(!lignes.length){ ov.remove(); return; }
   var type=document.querySelector('#seg-type .opt.on').getAttribute('data-v');
   fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({ action:'sauverRecurrente', id:'rec'+Date.now(), client:CLIENT, jours:days, lignes:lignes, type:type, mode:curMode(), actif:true })})
-    .then(function(r){return r.json();}).then(function(){ ov.remove(); recCache=null; alert('✅ Commande récurrente enregistrée ! Retrouve-la dans l\'onglet « Récurrent ».'); showTab('rec'); })
+    .then(function(r){return r.json();}).then(function(){ ov.remove(); recCache=null; alert('Commande récurrente enregistrée ! Retrouve-la dans l\'onglet « Récurrent ».'); showTab('rec'); })
     .catch(function(){ alert('Échec de l\'enregistrement. Réessaie.'); });
 }
 function loadRecurrentes(){
@@ -483,19 +630,19 @@ function loadRecurrentes(){
 function renderRecurrentes(){
   var host=document.getElementById('reclist'); if(!host) return;
   if(recCache===null){ host.innerHTML='<div class="loading">Chargement…</div>'; return; }
-  if(!recCache.length){ host.innerHTML='<div class="empty">Aucune commande récurrente.<br>Prépare une commande dans « Commander » puis clique « 🔁 Enregistrer comme commande récurrente ».</div>'; return; }
+  if(!recCache.length){ host.innerHTML='<div class="empty">Aucune commande récurrente.<br>Prépare une commande dans « Commander » puis clique « Enregistrer comme commande récurrente ».</div>'; return; }
   host.innerHTML=recCache.map(function(r){
     var jours=(r.jours||[]).slice().sort(function(a,b){return ((a===0?7:a)-(b===0?7:b));}).map(function(d){return JOURS_LBL[d];}).join(', ');
     var items=(r.lignes||[]).map(function(l){ return esc(l.sav)+' '+(l.big||0)+(l.baby?(' +'+l.baby+'b'):''); }).join(' · ');
-    var modeTxt=(r.mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison');
+    var modeTxt=modeLabel(r.mode);
     var typeTxt=(r.type==='cong'?'Congelés':'Cuits');
     return '<div class="hcard">'+
-      '<div class="hh"><span class="hnum">🔁 '+jours+'</span><span class="hst" style="background:'+(r.actif?'#eaf5ee':'#eef2f6')+';color:'+(r.actif?'#2e7d46':'#8a97a5')+'">'+(r.actif?'Active':'En pause')+'</span></div>'+
+      '<div class="hh"><span class="hnum">'+jours+'</span><span class="hst" style="background:'+(r.actif?'#eaf5ee':'#eef2f6')+';color:'+(r.actif?'#2e7d46':'#8a97a5')+'">'+(r.actif?'Active':'En pause')+'</span></div>'+
       '<div class="hd">'+typeTxt+' · '+modeTxt+'</div>'+
       '<div style="font-size:12.5px;color:#55606b;margin:8px 0">'+items+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-        '<button onclick="toggleRec(\''+esc(String(r.id))+'\','+(r.actif?'false':'true')+')" class="btn btn-ghost" style="flex:1;font-size:13px;padding:10px">'+(r.actif?'⏸ Mettre en pause':'▶️ Réactiver')+'</button>'+
-        '<button onclick="deleteRec(\''+esc(String(r.id))+'\')" class="btn btn-ghost" style="font-size:13px;padding:10px;color:var(--no)">🗑️</button>'+
+        '<button onclick="toggleRec(\''+esc(String(r.id))+'\','+(r.actif?'false':'true')+')" class="btn btn-ghost" style="flex:1;font-size:13px;padding:10px">'+(r.actif?'Mettre en pause':'Réactiver')+'</button>'+
+        '<button onclick="deleteRec(\''+esc(String(r.id))+'\')" class="btn btn-ghost" style="font-size:13px;padding:10px;color:var(--no)">Supprimer</button>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -522,7 +669,7 @@ function loadHistory(silent){
 function renderHistory(){
   var host=document.getElementById('histlist');
   if(histCache===null){ host.innerHTML='<div class="loading">Chargement…</div>'; return; }
-  if(!histCache.length){ host.innerHTML='<div class="empty">Pas encore de commande.<br>Passe ta première commande 🍪</div>'; return; }
+  if(!histCache.length){ host.innerHTML='<div class="empty">Pas encore de commande.<br>Passe ta première commande.</div>'; return; }
   host.innerHTML=histCache.map(function(o){
     var st=STATUT_MAP[o.statut]||['#eef2f6','#44515f',o.statut||'Reçue'];
     var typeTxt=o.type==='cong'?'Congelés':'Cuits';
@@ -530,7 +677,7 @@ function renderHistory(){
     var delivered=(o.statut==='Livrée');
     var remBlock = delivered ? (
       '<div style="margin-top:10px;border-top:1px solid #f0f2f5;padding-top:10px">'+
-        '<div style="font-size:12px;font-weight:800;color:var(--mut);margin-bottom:6px">📝 Ta remarque sur cette livraison</div>'+
+        '<div style="font-size:12px;font-weight:800;color:var(--mut);margin-bottom:6px">Ta remarque sur cette livraison</div>'+
         '<textarea id="rem-'+o.id+'" class="commentbox" style="min-height:44px" placeholder="Qualité, quantité, un mot pour KOOKI…">'+esc(o.remarque||'')+'</textarea>'+
         '<button onclick="sendRemarque(\''+o.id+'\')" class="btn btn-ghost" style="width:100%;margin-top:6px">'+(o.remarque?'Mettre à jour ma remarque':'Envoyer ma remarque')+'</button>'+
       '</div>'
@@ -538,15 +685,15 @@ function renderHistory(){
     return '<div class="hcard">'+
       '<div class="hh"><span class="hnum">N° '+esc(o.numero||o.id)+'</span>'+
         '<span class="hst" style="background:'+st[0]+';color:'+st[1]+'">'+st[2]+'</span></div>'+
-      '<div class="hd">'+typeTxt+' · '+(o.mode==='Retrait au labo'?'Retrait au labo KOOKI':'Livraison')+' · '+fmtD(o.date)+'</div>'+
-      recapTable(o.lignes,o.mode)+
-      (o.commentaire?'<div class="hcom">💬 Toi : '+esc(o.commentaire)+'</div>':'')+
-      (o.messageKooki?'<div class="hmsg">📣 KOOKI : '+esc(o.messageKooki)+'</div>':'')+
+      '<div class="hd">'+typeTxt+' · '+modeLabel(o.mode)+' · '+fmtD(o.date)+'</div>'+
+      recapTable(o.lignes,o.mode,o.type)+
+      (o.commentaire?'<div class="hcom">Toi : '+esc(o.commentaire)+'</div>':'')+
+      (o.messageKooki?'<div class="hmsg">KOOKI : '+esc(o.messageKooki)+'</div>':'')+
       (canEdit
-        ? '<div class="hlock open">🔓 Modifiable jusqu\'au '+deadlineLabel(o.date)+'</div><button class="hedit" onclick="editOrder(\''+o.id+'\')">✏️ Modifier</button>'
-        : '<div class="hlock closed">🔒 Non modifiable (date limite dépassée)</div>')+
+        ? '<div class="hlock open">Modifiable jusqu\'au '+deadlineLabel(o.date)+'</div><button class="hedit" onclick="editOrder(\''+o.id+'\')">Modifier</button>'
+        : '<div class="hlock closed">Non modifiable (date limite dépassée)</div>')+
       (o.blDispo
-        ? '<button onclick="dlBL(\''+o.id+'\')" style="width:100%;margin-top:8px;background:var(--or);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">📄 Télécharger le bon de livraison'+(o.blNumero?(' · '+esc(o.blNumero)):'')+'</button>'
+        ? '<button onclick="dlBL(\''+o.id+'\')" style="width:100%;margin-top:8px;background:var(--or);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">Télécharger le bon de livraison'+(o.blNumero?(' · '+esc(o.blNumero)):'')+'</button>'
         : '')+
       remBlock+
     '</div>';
@@ -555,7 +702,7 @@ function renderHistory(){
 function sendRemarque(id){
   var el=document.getElementById('rem-'+id); if(!el) return; var txt=el.value||'';
   fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify({action:'sauverRemarqueClient', id:id, remarque:txt})})
-    .then(function(){ histCache=null; alert('✅ Merci, ta remarque a bien été transmise à KOOKI.'); loadHistory(true); })
+    .then(function(){ histCache=null; alert('Merci, ta remarque a bien été transmise à KOOKI.'); loadHistory(true); })
     .catch(function(){ alert('Échec de l\'envoi. Réessaie.'); });
 }
 
