@@ -59,13 +59,13 @@
   /* CONTROLS */
   .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:8px}
   @media(max-width:640px){ .controls{grid-template-columns:1fr} }
-  .ctl{background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px;display:flex;flex-direction:column}
+  .ctl{background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px;display:flex;flex-direction:column;min-width:0}
   .ctl .lbl{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--mut);text-transform:uppercase;letter-spacing:.13em;margin-bottom:9px}
   .chint{font-family:var(--mono);font-size:10.5px;color:var(--mut);line-height:1.4;margin-top:auto;padding-top:9px}
   .seg{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--ln);border-radius:7px;padding:3px}
   .seg .opt{flex:1;display:flex;align-items:center;justify-content:center;min-height:38px;line-height:1.15;text-align:center;border:none;background:transparent;border-radius:5px;padding:6px 8px;font-weight:500;cursor:pointer;font-size:13px;color:var(--ink2)}
   .seg .opt.on{background:var(--or);color:#fff;font-weight:600}
-  .datefield,.commentbox{width:100%;padding:9px 11px;border:1px solid var(--line-strong);border-radius:6px;font-size:14px;font-family:var(--mono);outline:none;background:var(--surface)}
+  .datefield,.commentbox{width:100%;max-width:100%;min-width:0;padding:9px 11px;border:1px solid var(--line-strong);border-radius:6px;font-size:14px;font-family:var(--mono);outline:none;background:var(--surface);-webkit-appearance:none;appearance:none;display:block}
   .datefield{min-height:44px}
   .datefield:focus,.commentbox:focus{border-color:var(--bl2)}
   .commentbox{min-height:56px;resize:vertical;font-family:var(--sans)}
