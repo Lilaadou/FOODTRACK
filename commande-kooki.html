@@ -264,7 +264,7 @@
 
 <script>
 /* ===== URL /exec de ton Apps Script ===== */
-var API = 'https://script.google.com/macros/s/AKfycbxOzy6FHkQ2PUjZFY2j4Fb5jY8iduDltu-ZUCpymFtrJu8Jhbay2MPjQ7KgI0UAZl3Dnw/exec';
+var API = 'https://script.google.com/macros/s/AKfycbzy5dBT_G4F1gedV3yEUHhxiipAXbzRWUgzKWqq8U41RBgFvKwe9Qy7DAwE7qNqVAwxEA/exec';
 
 var SAVEURS_ALL=['SUZZY','JACKY','BENNY','DAVY','MOLLY','WALLY','CHARLY','LENI','EMMY','WOODY','DANNY'];
 var NOBABY=['CHARLY','LENI'];
@@ -433,7 +433,7 @@ function build(preset){
     else { pillCls='ok'; pillTxt='Disponible'; }
     var hint=(s.d==='low' && s.reste!=null)?'<div class="stockhint">Commande limitée au stock ('+s.reste+' max)</div>':'';
     function stepper(kind,disabled){
-      return '<div class="step'+(disabled?' dis':'')+'"><div class="sl">'+(kind==='big'?'Big':'Baby')+'</div>'+
+      return '<div class="step'+(disabled?' dis':'')+'"><div class="sl">'+(kind==='big'?'Giant':'Baby')+'</div>'+
         '<div class="stepper"><button onclick="chg('+i+',\''+kind+'\',-1)" '+(disabled?'disabled':'')+'>−</button>'+
         (disabled?'<span class="val" id="v-'+i+'-'+kind+'">—</span>':'<input class="val" id="v-'+i+'-'+kind+'" type="number" min="0" value="0" oninput="setQty('+i+',\''+kind+'\',this.value)">')+
         '<button onclick="chg('+i+',\''+kind+'\',1)" '+(disabled?'disabled':'')+'>+</button></div></div>';
@@ -515,7 +515,7 @@ function recapTable(lignes,mode,type){
   var rows='';
   (lignes||[]).forEach(function(l){
     var big=(l.big!=null?l.big:l.qty)||0, baby=l.baby||0;
-    if(big>0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Big</td><td class="r">'+big+'</td></tr>'; }
+    if(big>0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Giant</td><td class="r">'+big+'</td></tr>'; }
     if(baby>0 && NOBABY.indexOf(l.sav)<0){ rows+='<tr><td>'+esc(l.sav)+'</td><td>Baby</td><td class="r">'+baby+'</td></tr>'; }
   });
   var modeHtml='<div class="feeline"><span>'+modeLabel(mode)+'</span></div>';
@@ -594,7 +594,7 @@ function _curLignes(){ var l=[]; SAVEURS.forEach(function(s,i){ var q=qty[i]; if
 function openRecModal(){
   var lignes=_curLignes();
   if(!lignes.length){ alert('Choisis d\'abord tes saveurs et quantités dans « Commander », puis clique ici.'); return; }
-  var days=[[1,'Lundi'],[2,'Mardi'],[3,'Mercredi'],[4,'Jeudi'],[5,'Vendredi'],[6,'Samedi'],[0,'Dimanche']];
+  var days=[[1,'Lundi'],[3,'Mercredi'],[5,'Vendredi']];
   var chk=days.map(function(d){ return '<label style="display:flex;align-items:center;gap:11px;padding:11px 13px;border:1.5px solid var(--ln);border-radius:11px;margin-bottom:7px;font-weight:700;cursor:pointer"><input type="checkbox" value="'+d[0]+'" style="width:20px;height:20px"> '+d[1]+'</label>'; }).join('');
   var sumTxt=lignes.map(function(l){ return esc(l.sav)+' ('+(l.big||0)+(l.baby?(' + '+l.baby+' baby'):'')+')'; }).join(', ');
   var ov=document.getElementById('rec-modal'); if(ov) ov.remove();
