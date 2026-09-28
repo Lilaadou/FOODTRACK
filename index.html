@@ -2872,7 +2872,7 @@
 </main>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxOzy6FHkQ2PUjZFY2j4Fb5jY8iduDltu-ZUCpymFtrJu8Jhbay2MPjQ7KgI0UAZl3Dnw/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzy5dBT_G4F1gedV3yEUHhxiipAXbzRWUgzKWqq8U41RBgFvKwe9Qy7DAwE7qNqVAwxEA/exec';
 // ─────────────────────────────────────
 // PROFILS & ACCÈS AUX ONGLETS
 // ─────────────────────────────────────
@@ -3627,6 +3627,7 @@ const B2B_CLIENTS = {
   'ZIZI Uccle':      { adresse:'Rue de la Mutualité 57A, 1180 Uccle', contact:'', tel:'02 344 70 81' },
   'KAWA CLUB':       { adresse:'Bd du Souverain 25, 1170 Watermael-Boitsfort', contact:'Nora NEUS', tel:'0491 98 58 83', email:'fox@kawa-club.com' },
   'Le Cocoon Institut': { adresse:'Chaussée de Gand 426, 1080 Bruxelles', contact:'', tel:'0451 08 58 89', siege:'Avenue du Roi Albert 94, 1082 Berchem', tva:'BE1021.925.682' },
+  'Snack Expresso':  { adresse:'Rue Joseph II 13, 1000 Bruxelles', contact:'', tel:'' },
 };
 
 function fillClientInfo() {
@@ -4495,7 +4496,7 @@ function renderBoitesTable() {
   if (!tbody) return;
 
   const boites = JSON.parse(localStorage.getItem('kooki_boites') || '[]');
-  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
+  const B2B_LIST = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut','Snack Expresso'];
 
   tbody.innerHTML = B2B_LIST.map(client => {
     let envoyees = 0, retournees = 0;
@@ -10061,7 +10062,7 @@ function applySorties(data) {
   // Déterminer le type de destination
   const getDestType = (dest) => {
     if (['Magasin Ixelles', 'Magasin Anderlecht'].includes(dest)) return { icon:'🏪', badge:'Magasin', color:'#fbe8e2', textColor:'#d44218' };
-    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
+    const b2b = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut','Snack Expresso'];
     if (b2b.includes(dest)) return { icon:'🤝', badge:'B2B', color:'#e8f8f0', textColor:'#1a8a4a' };
     return { icon:'📦', badge:'Autre', color:'#f0f0f0', textColor:'#888' };
   };
@@ -10697,7 +10698,7 @@ function renderRecapB2b(offset) {
   const b2b = sorties.filter(s => {
     const d = new Date(s.date);
     const clients = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière',
-      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
+      'Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut','Snack Expresso'];
     return d >= monday && d <= sunday && clients.includes(s.destination);
   });
 
@@ -11694,6 +11695,8 @@ async function flConfirmerAnd() {
 function _rmClient(bl){ return (bl.client || bl.clientNom || bl.destinataire || bl.nom || '').trim(); }
 function _rmNumero(bl){ return bl.numeroBL || bl.numero || bl.bl || ''; }
 function _rmBoites(bl){ return Number(bl.boites || bl.boxes || 0) || 0; }
+function _rmIsCong(bl){ var t=String((bl&&(bl.typeCookies||bl.type))||'').toLowerCase(); return t==='crus'||t==='cong'||t==='congelés'||t==='congeles'||t==='surgelés'||t==='surgeles'; }
+function _rmFmtGram(g){ if(g>=1000){ var kg=g/1000; return (Math.round(kg*100)/100).toString().replace('.',',')+' kg'; } return Math.round(g)+' g'; }
 function _rmLots(bl){
   var L = bl.lots;
   if (typeof L === 'string') { try { L = JSON.parse(L); } catch(e){ L = []; } }
@@ -11746,11 +11749,12 @@ async function renderRecapMois(){
   var byClient = {};
   doB.forEach(function(bl){
     var name = _rmClient(bl);
-    if (!byClient[name]) byClient[name] = { name:name, big:0, small:0, cakes:0, boxes:0, flavors:{}, cakeFlavors:{}, bls:[] };
+    if (!byClient[name]) byClient[name] = { name:name, big:0, small:0, cakes:0, boxes:0, flavors:{}, cakeFlavors:{}, bls:[], cuit:0, cong:0 };
     var c = byClient[name];
     var d = _rmParseDate(bl.date);
     var lots = _rmLots(bl);
-    c.bls.push({ n:_rmNumero(bl), d:d?_rmDayLabel(d):'', dt:d||null, lots:lots });
+    var estCong = _rmIsCong(bl);
+    c.bls.push({ n:_rmNumero(bl), d:d?_rmDayLabel(d):'', dt:d||null, lots:lots, cong:estCong });
     c.boxes += _rmBoites(bl);
     lots.forEach(function(l){
       if(l.isCake){
@@ -11761,6 +11765,9 @@ async function renderRecapMois(){
         c.big += l.big; c.small += l.small;
         if(!c.flavors[l.saveur]) c.flavors[l.saveur]=[0,0];
         c.flavors[l.saveur][0]+=l.big; c.flavors[l.saveur][1]+=l.small;
+        // répartition cuits / congelés (par nombre de cookies)
+        if(estCong) c.cong += (l.big||0)+(l.small||0);
+        else        c.cuit += (l.big||0)+(l.small||0);
       }
     });
   });
@@ -11791,9 +11798,12 @@ async function renderRecapMois(){
 
   document.getElementById('rm-total-label').textContent =
     'Total '+_rmMonthName()+' — '+list.length+' clients · '+mBL+' bons de livraison';
+  var mCuit=0,mCong=0; list.forEach(function(c){ mCuit+=c.cuit; mCong+=c.cong; });
   document.getElementById('rm-total-pills').innerHTML =
     '<div class="rm-pill"><div class="n">'+mBig+'</div><div class="l">Big</div></div>'+
     '<div class="rm-pill"><div class="n">'+mSmall+'</div><div class="l">Baby</div></div>'+
+    '<div class="rm-pill"><div class="n">'+mCuit+'</div><div class="l">🔥 Cuits</div></div>'+
+    '<div class="rm-pill"><div class="n">'+mCong+'</div><div class="l">❄️ Congelés</div></div>'+
     '<div class="rm-pill"><div class="n">'+mBox+'</div><div class="l">Boîtes</div></div>';
 
   document.getElementById('rm-client-list').innerHTML = list.length ? list.map(function(c,i){
@@ -11801,6 +11811,8 @@ async function renderRecapMois(){
       '<div class="rm-cn">🏪 '+c.name+'</div><div class="rm-badges">'+
       '<span class="rm-badge rm-bBig">'+c.big+' Big</span>'+
       '<span class="rm-badge rm-bSmall">'+c.small+' Baby</span>'+
+      (c.cuit>0 ? '<span class="rm-badge" style="background:#fbe8e2;color:#b3350f">🔥 '+c.cuit+' cuits</span>' : '')+
+      (c.cong>0 ? '<span class="rm-badge" style="background:#e7f0f9;color:#0662aa">❄️ '+c.cong+' congelés</span>' : '')+
       (c.cakes>0 ? '<span class="rm-badge" style="background:#fff3cc;color:#a07000">'+c.cakes+' cake'+(c.cakes>1?'s':'')+'</span>' : '')+
       '<span class="rm-badge rm-bBox">'+c.boxes+' boîtes</span>'+
       '<span class="rm-chev">Voir le récap →</span></div></div>'+
@@ -12428,7 +12440,7 @@ var _pcEditId = null;
 
 function _pcClients(){
   try { if (typeof B2B_CLIENTS === 'object' && B2B_CLIENTS) return Object.keys(B2B_CLIENTS).sort(); } catch(e){}
-  return ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
+  return ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut','Snack Expresso'];
 }
 var _pcCache = null;
 function _pcLoad(){
@@ -16197,7 +16209,7 @@ var qrcode = function() {
   var scanner = null, current = null;
   var _scanMode = null, _genericCb = null;
 
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut','Snack Expresso'];
   var LIVREURS = ['Tarik','Shippr','Interne'];
   var DEST_TYPES = [
     { v:'b2b',        label:'🏬 Client B2B',       sub:'Livraison + BL',    client:true,  bl:true },
@@ -16659,7 +16671,7 @@ var qrcode = function() {
     { v:'interne', label:'🔧 Usage interne', client:false },
     { v:'autre', label:'🛒 Commande client', client:true }
   ];
-  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut'];
+  var B2B_CLIENTS = ['Ecocyclo','Galler Ixelles','Galler Woluwe','La Fourmilière','Penta Hotel','Café Club','Flippers','Slide Coffee','Kooki Anderlecht','Petit Mercado','La Belladone','JAT Café','Muse Co-stu','ZIZI waterloo','ZIZI Uccle','KAWA CLUB','Le Cocoon Institut','Snack Expresso'];
   function body(){ return document.getElementById('ixelles-body'); }
   function _toast(msg){ try{ if(typeof toast==='function'){ toast('sortie', msg, 'err'); return; } }catch(e){} alert(msg); }
   function _pd(v){ if(!v) return null; var s=String(v).trim(); var m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(m) return new Date(+m[3],+m[2]-1,+m[1]); var d=new Date(s); return isNaN(d)?null:d; }
