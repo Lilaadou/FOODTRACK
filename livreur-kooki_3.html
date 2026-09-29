@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#d44218">
+<title>KOOKI — Livraisons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#f4f4f4;--surface:#ffffff;--surface2:#fafafa;
+    --or:#d44218;--or-d:#b3350f;--or-l:#fbe8e2;
+    --bl:#0c447c;--bl2:#0662aa;--bl-l:#e7f0f9;
+    --ln:#e7e3e0;--line-strong:#cdc7c2;--mut:#7c7570;--ink:#0d0d0d;--ink2:#3c3c3c;
+    --ok:#2e7d46;--ok-l:#eaf5ee;--warn:#b45309;--warn-l:#fff4e6;
+    --r:10px;
+    --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit}
+  a{color:inherit}
+  .wrap{max-width:640px;margin:0 auto;padding:14px 14px 60px}
+  [hidden]{display:none!important}
+
+  .btn{border:none;border-radius:8px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;width:100%}
+  .btn-primary{background:var(--or);color:#fff}
+  .btn-blue{background:var(--bl2);color:#fff}
+  .btn-ok{background:var(--ok);color:#fff}
+  .btn-ghost{background:#fff;border:1px solid var(--line-strong);color:var(--ink2)}
+  .btn:disabled{opacity:.55;cursor:default}
+
+  /* HEADER */
+  .top{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px;margin-bottom:12px}
+  .top::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--or) 0%,var(--or) 45%,var(--bl2) 55%,var(--bl2) 100%)}
+  .top img{height:32px;width:auto}
+  .top .who{font-weight:700;font-size:15px;min-width:0}
+  .top .who small{display:block;font-weight:500;color:var(--mut);font-size:10px;margin-top:1px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .top .acts{margin-left:auto;display:flex;gap:6px}
+  .icbtn{background:#fff;border:1px solid var(--line-strong);border-radius:7px;padding:8px 10px;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap}
+
+  .labo{background:var(--bl);color:#fff;border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+  .labo .t{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+  .labo .a{font-weight:600;font-size:13.5px}
+  .labo a{margin-left:auto;background:rgba(255,255,255,.14);border-radius:7px;padding:8px 10px;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap}
+
+  /* DAYS */
+  .days{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;scrollbar-width:none}
+  .days::-webkit-scrollbar{display:none}
+  .day{flex:0 0 auto;border:1px solid var(--ln);background:#fff;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;text-align:left}
+  .day small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--mut);font-weight:500}
+  .day.on{background:var(--or);border-color:var(--or);color:#fff}
+  .day.on small{color:rgba(255,255,255,.85)}
+
+  .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .sum div{background:#fff;border:1px solid var(--ln);border-radius:8px;padding:9px 10px}
+  .sum b{display:block;font-family:var(--mono);font-size:20px;line-height:1.1}
+  .sum span{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+
+  /* CARD */
+  .card{background:#fff;border:1px solid var(--ln);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+  .card.done{opacity:.72}
+  .chead{display:flex;align-items:stretch;border-bottom:1px solid var(--ln)}
+  .time{flex:0 0 92px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:var(--bl-l);color:var(--bl);padding:10px 6px;text-align:center}
+  .time b{font-family:var(--mono);font-size:21px;font-weight:700;line-height:1}
+  .time span{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+  .time.tbd{background:var(--warn-l);color:var(--warn)}
+  .time.tbd b{font-size:13px}
+  .cmain{flex:1;min-width:0;padding:11px 13px}
+  .cname{font-weight:700;font-size:17px;line-height:1.2}
+  .cnum{font-family:var(--mono);font-size:11px;color:var(--mut)}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+  .p-cong{background:var(--bl2);color:#fff}
+  .p-cuit{background:var(--or-l);color:var(--or-d)}
+  .p-st{background:#eef2f6;color:#44515f}
+  .p-st.env{background:var(--bl-l);color:var(--bl2)}
+  .p-st.liv{background:var(--ok-l);color:var(--ok)}
+  .cold{background:var(--bl-l);color:var(--bl);font-size:12.5px;font-weight:600;padding:8px 13px;border-bottom:1px solid var(--ln)}
+
+  .sec{padding:11px 13px;border-bottom:1px solid var(--ln)}
+  .sec:last-child{border-bottom:0}
+  .lbl{font-family:var(--mono);font-size:9.5px;font-weight:500;color:var(--mut);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}
+  .addr{font-weight:600;font-size:14px}
+  .links{display:flex;gap:8px;margin-top:9px}
+  .links a{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;border-radius:7px;padding:10px;font-size:13.5px;font-weight:700}
+  .l-map{background:var(--bl2);color:#fff}
+  .l-tel{background:#fff;border:1px solid var(--line-strong);color:var(--ink2)}
+  .note{font-size:13px;color:var(--ink2);margin-top:6px}
+  .note b{font-weight:600}
+  .qty{font-family:var(--mono);font-weight:700;font-size:15px}
+  details summary{cursor:pointer;font-size:12.5px;color:var(--bl2);font-weight:600;margin-top:5px}
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  td,th{font-size:12.5px;padding:4px 2px;text-align:left}
+  th{font-family:var(--mono);font-size:9.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+  td.r,th.r{text-align:right;font-family:var(--mono)}
+  .com{background:var(--surface2);border-left:3px solid var(--or);border-radius:6px;padding:8px 10px;font-size:13px;margin-top:4px}
+
+  .boxrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .boxinfo{font-size:12.5px;color:var(--mut)}
+  .stepper{display:flex;align-items:center}
+  .stepper button{width:40px;height:40px;border:1px solid var(--line-strong);background:#fff;font-size:19px;cursor:pointer;color:var(--ink2)}
+  .stepper button:first-child{border-radius:7px 0 0 7px}
+  .stepper button:last-child{border-radius:0 7px 7px 0}
+  .stepper input{width:56px;height:40px;border:1px solid var(--line-strong);border-left:0;border-right:0;text-align:center;font-family:var(--mono);font-size:17px;font-weight:700;outline:none;-moz-appearance:textfield;border-radius:0}
+  .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .savebox{border:none;background:var(--ink);color:#fff;border-radius:7px;padding:0 14px;height:40px;font-weight:700;font-size:13.5px;cursor:pointer}
+  .saved{font-size:12px;color:var(--ok);font-weight:700}
+
+  .actions{padding:11px 13px;background:var(--surface2)}
+  .donebar{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ok)}
+  .donebar button{margin-left:auto;background:none;border:none;color:var(--mut);font-size:12.5px;text-decoration:underline;cursor:pointer}
+
+  .empty{text-align:center;color:var(--mut);background:#fff;border:1px dashed var(--line-strong);border-radius:var(--r);padding:32px 14px;font-weight:600}
+  .loading{text-align:center;color:var(--mut);padding:36px 10px;font-weight:600}
+  .h2{font-size:14px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin:24px 2px 8px}
+  .panel{background:#fff;border:1px solid var(--ln);border-radius:var(--r);padding:13px}
+  select{width:100%;padding:11px;border:1px solid var(--line-strong);border-radius:7px;font-size:14.5px;background:#fff;font-family:inherit;margin-bottom:10px}
+  .upd{text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--mut);margin-top:16px}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:8px;font-size:13.5px;font-weight:600;z-index:50;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+
+<!-- ===== APP ===== -->
+<div id="app" class="wrap">
+  <div class="top">
+    <img src="logo.png" alt="KOOKI" onerror="this.style.display='none'">
+    <div class="who" id="who">—<small>Livraisons</small></div>
+    <div class="acts">
+      <button class="icbtn" onclick="load(true)">↻ Actualiser</button>
+    </div>
+  </div>
+
+  <div class="labo">
+    <div><div class="t">Retrait des commandes</div><div class="a">Labo KOOKI · Avenue Emile Gryson 2D, 1070</div></div>
+    <a href="https://www.google.com/maps/dir/?api=1&destination=Avenue%20Emile%20Gryson%202D%2C%201070%20Bruxelles" target="_blank" rel="noopener">Itinéraire</a>
+  </div>
+
+  <div class="days" id="days"></div>
+  <div class="sum" id="sum"></div>
+  <div id="list"><div class="loading">Chargement…</div></div>
+
+  <div class="h2">Retrait de boîtes sans livraison</div>
+  <div class="panel">
+    <div class="lbl">Client</div>
+    <select id="rb-client"><option value="">— Choisir un client —</option></select>
+    <div class="lbl">Boîtes récupérées</div>
+    <div class="boxrow">
+      <div class="stepper">
+        <button type="button" onclick="stepFree(-1)">−</button>
+        <input id="rb-nb" type="number" min="0" value="0" inputmode="numeric">
+        <button type="button" onclick="stepFree(1)">+</button>
+      </div>
+      <button class="savebox" id="rb-btn" onclick="saveFree()">Enregistrer</button>
+    </div>
+  </div>
+
+  <div class="upd" id="upd"></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ===== URL /exec de ton Apps Script ===== */
+var API = 'https://script.google.com/macros/s/AKfycbwLSiZB4JCOHaSUCMyzjz7VIWYl3lXLhC8ZoZvUoOkycBzf2V0IVY53w5J2HKhcY6ydcQ/exec';
+
+var CODE='', NOM='', DATA=null, DAY='', TODAY='', timer=null;
+var boxEdit={};   // valeurs en cours de saisie (conservées pendant l'actualisation)
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(function(){ t.hidden=true; },2600); }
+function apiGet(action,params){
+  var url=API+'?action='+encodeURIComponent(action);
+  for(var k in (params||{})) url+='&'+k+'='+encodeURIComponent(params[k]);
+  return fetch(url).then(function(r){ return r.json(); });
+}
+function apiPost(body){
+  return fetch(API,{method:'POST',redirect:'follow',body:JSON.stringify(body)}).then(function(r){ return r.json(); });
+}
+
+/* ---- dates ---- */
+var JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+function isoToDate(iso){ var p=String(iso).split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+function addDays(iso,n){ var d=isoToDate(iso); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function dayName(iso){
+  if(iso===TODAY) return "Aujourd'hui";
+  if(iso===addDays(TODAY,1)) return 'Demain';
+  return JOURS[isoToDate(iso).getDay()];
+}
+function dayShort(iso){ var p=String(iso).split('-'); return p[2]+'/'+p[1]; }
+
+/* ---- démarrage (pas de code d'accès) ---- */
+function start(){
+  load(false);
+  clearInterval(timer); timer=setInterval(function(){ if(!document.hidden) load(false); },60000);
+}
+
+/* ---- chargement ---- */
+function load(manual){
+  if(manual) toast('Actualisation…');
+  apiGet('getTourneeLivreur',{code:CODE}).then(function(r){
+    if(!r || !r.ok) throw 0;
+    DATA=r; TODAY=r.today; NOM=r.nom||NOM;
+    document.getElementById('who').innerHTML=esc(NOM)+'<small>Livraisons</small>';
+    fillClients(r.clients||[]);
+    render();
+    var n=new Date(); document.getElementById('upd').textContent='Mis à jour à '+('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2)+' · actualisation automatique chaque minute';
+  }).catch(function(){
+    if(!DATA) document.getElementById('list').innerHTML='<div class="empty">Impossible de charger les livraisons.<br>Vérifie ta connexion et appuie sur « Actualiser ».</div>';
+    else toast('Pas de connexion — données affichées non actualisées');
+  });
+}
+function fillClients(list){
+  var sel=document.getElementById('rb-client'); var cur=sel.value;
+  sel.innerHTML='<option value="">— Choisir un client —</option>'+list.map(function(c){ return '<option'+(c===cur?' selected':'')+'>'+esc(c)+'</option>'; }).join('');
+}
+
+/* ---- rendu ---- */
+function render(){
+  var cmds=DATA.commandes||[];
+  var counts={}; cmds.forEach(function(c){ counts[c.date]=(counts[c.date]||0)+1; });
+  var days=[TODAY, addDays(TODAY,1)];
+  Object.keys(counts).sort().forEach(function(d){ if(days.indexOf(d)<0) days.push(d); });
+  if(!DAY || days.indexOf(DAY)<0) DAY=TODAY;
+  document.getElementById('days').innerHTML=days.map(function(d){
+    return '<button class="day'+(d===DAY?' on':'')+'" onclick="pickDay(\''+d+'\')">'+dayName(d)+'<small>'+dayShort(d)+' · '+(counts[d]||0)+' livr.</small></button>';
+  }).join('');
+
+  var list=cmds.filter(function(c){ return c.date===DAY; });
+  var aFaire=list.filter(function(c){ return c.statut!=='Livrée'; }).length;
+  var cong=list.filter(function(c){ return c.type==='cong'; }).length;
+  var first=list.filter(function(c){ return c.heureRetrait; }).map(function(c){ return c.heureRetrait; }).sort()[0]||'—';
+  document.getElementById('sum').innerHTML=
+    '<div><b>'+aFaire+'/'+list.length+'</b><span>à livrer</span></div>'+
+    '<div><b>'+cong+'</b><span>congelées</span></div>'+
+    '<div><b>'+esc(first)+'</b><span>1er retrait</span></div>';
+
+  var host=document.getElementById('list');
+  if(!list.length){ host.innerHTML='<div class="empty">Aucune livraison '+(DAY===TODAY?"aujourd'hui":'ce jour-là')+'.<br><span style="font-weight:500;font-size:13px">Les commandes apparaissent ici dès que KOOKI les approuve.</span></div>'; return; }
+  host.innerHTML=list.map(card).join('');
+}
+function pickDay(d){ DAY=d; render(); window.scrollTo(0,0); }
+
+function card(c){
+  var done=(c.statut==='Livrée');
+  var cong=(c.type==='cong');
+  var time=c.heureRetrait
+    ? '<div class="time"><b>'+esc(c.heureRetrait)+'</b><span>retrait labo</span></div>'
+    : '<div class="time tbd"><b>À confirmer</b><span>heure retrait</span></div>';
+  var stCls=done?' liv':(c.statut==='Envoyée'?' env':'');
+  var stTxt=done?'Livrée':(c.statut==='Envoyée'?'En route':'À récupérer au labo');
+  var pills='<span class="pill '+(cong?'p-cong':'p-cuit')+'">'+(cong?'❄️ Congelés':'🔥 Cuits')+'</span><span class="pill p-st'+stCls+'">'+stTxt+'</span>';
+
+  var q=[]; if(c.big) q.push(c.big+' Giant'); if(c.baby) q.push(c.baby+' Baby');
+  var det=(c.lignes||[]).map(function(l){ return '<tr><td>'+esc(l.sav)+'</td><td class="r">'+(l.big||'—')+'</td><td class="r">'+(l.baby||'—')+'</td></tr>'; }).join('');
+
+  var mapUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(c.adresse||c.client);
+  var tel=String(c.tel||'').split('·')[0].replace(/[^\d+]/g,'');
+  var addr='<div class="sec"><div class="lbl">Adresse de livraison</div>'+
+    '<div class="addr">'+(c.adresse?esc(c.adresse):'<span style="color:var(--warn)">Adresse non renseignée — demande à KOOKI</span>')+'</div>'+
+    (c.acces?'<div class="note">🔑 <b>Accès :</b> '+esc(c.acces)+'</div>':'')+
+    (c.contact?'<div class="note">👤 <b>Contact :</b> '+esc(c.contact)+(c.tel?' · '+esc(c.tel):'')+'</div>':(c.tel?'<div class="note">📞 '+esc(c.tel)+'</div>':''))+
+    '<div class="links"><a class="l-map" href="'+mapUrl+'" target="_blank" rel="noopener">📍 Itinéraire</a>'+
+    (tel?'<a class="l-tel" href="tel:'+esc(tel)+'">📞 Appeler</a>':'')+'</div></div>';
+
+  var contenu='<div class="sec"><div class="lbl">À livrer</div><div class="qty">'+(q.join(' · ')||'—')+'</div>'+
+    (det?'<details><summary>Voir le détail par saveur</summary><table><tr><th>Saveur</th><th class="r">Giant</th><th class="r">Baby</th></tr>'+det+'</table></details>':'')+
+    (c.commentaire?'<div class="com">💬 '+esc(c.commentaire)+'</div>':'')+'</div>';
+
+  var val=(boxEdit[c.id]!=null)?boxEdit[c.id]:(c.boitesRetirees||0);
+  var boites='<div class="sec"><div class="lbl">Boîtes vides récupérées chez le client</div>'+
+    '<div class="boxrow"><div class="stepper">'+
+      '<button type="button" onclick="stepBox(\''+c.id+'\',-1)">−</button>'+
+      '<input id="bx-'+c.id+'" type="number" min="0" inputmode="numeric" value="'+val+'" oninput="boxEdit[\''+c.id+'\']=this.value">'+
+      '<button type="button" onclick="stepBox(\''+c.id+'\',1)">+</button></div>'+
+      '<button class="savebox" onclick="saveBox(\''+c.id+'\')">Enregistrer</button>'+
+      (c.boitesRetirees?'<span class="saved">✓ '+c.boitesRetirees+' enregistrée'+(c.boitesRetirees>1?'s':'')+'</span>':'')+
+    '</div>'+
+    (c.soldeBoites>0?'<div class="boxinfo" style="margin-top:6px">Selon nos registres, '+c.soldeBoites+' boîte'+(c.soldeBoites>1?'s':'')+' KOOKI chez ce client.</div>':'')+
+  '</div>';
+
+  var act;
+  if(done) act='<div class="actions"><div class="donebar">✓ Livrée<button onclick="setStatut(\''+c.id+'\',\'Envoyée\')">Annuler</button></div></div>';
+  else if(c.statut==='Envoyée') act='<div class="actions"><button class="btn btn-ok" onclick="setStatut(\''+c.id+'\',\'Livrée\')">✓ Commande livrée</button></div>';
+  else act='<div class="actions"><button class="btn btn-blue" onclick="setStatut(\''+c.id+'\',\'Envoyée\')">J\'ai récupéré la commande au labo</button></div>';
+
+  return '<div class="card'+(done?' done':'')+'" id="card-'+c.id+'">'+
+    '<div class="chead">'+time+'<div class="cmain"><div class="cname">'+esc(c.client)+'</div>'+(c.numero?'<div class="cnum">N° '+esc(c.numero)+'</div>':'')+'<div class="pills">'+pills+'</div></div></div>'+
+    (cong&&!done?'<div class="cold">❄️ Commande congelée : garder au froid jusqu\'à la livraison.</div>':'')+
+    addr+contenu+boites+act+'</div>';
+}
+
+/* ---- actions ---- */
+function findCmd(id){ return (DATA.commandes||[]).filter(function(c){ return c.id===id; })[0]; }
+function stepBox(id,d){
+  var el=document.getElementById('bx-'+id); var n=Math.max(0,(parseInt(el.value,10)||0)+d);
+  el.value=n; boxEdit[id]=n;
+}
+function saveBox(id){
+  var c=findCmd(id); if(!c) return;
+  var n=Math.max(0,parseInt(document.getElementById('bx-'+id).value,10)||0);
+  apiPost({action:'livreurMaj',code:CODE,id:id,boites:n}).then(function(r){
+    if(r && r.success){ c.boitesRetirees=n; delete boxEdit[id]; render(); toast(n?('📦 '+n+' boîte'+(n>1?'s':'')+' enregistrée'+(n>1?'s':'')+' pour '+c.client):'Boîtes remises à 0'); }
+    else toast('Échec de l\'enregistrement. Réessaie.');
+  }).catch(function(){ toast('Pas de connexion. Réessaie.'); });
+}
+function setStatut(id,st){
+  var c=findCmd(id); if(!c) return;
+  var body={action:'livreurMaj',code:CODE,id:id,statut:st};
+  // si des boîtes sont saisies mais pas encore enregistrées, on les envoie avec
+  if(boxEdit[id]!=null) body.boites=Math.max(0,parseInt(boxEdit[id],10)||0);
+  var prev=c.statut; c.statut=st; render();
+  apiPost(body).then(function(r){
+    if(r && r.success){
+      if(body.boites!=null){ c.boitesRetirees=body.boites; delete boxEdit[id]; render(); }
+      toast(st==='Livrée'?('✓ '+c.client+' livré'):(prev==='Livrée'?'Livraison annulée':'🚗 Commande récupérée — en route'));
+    } else { c.statut=prev; render(); toast('Échec. Réessaie.'); }
+  }).catch(function(){ c.statut=prev; render(); toast('Pas de connexion. Réessaie.'); });
+}
+function stepFree(d){ var el=document.getElementById('rb-nb'); el.value=Math.max(0,(parseInt(el.value,10)||0)+d); }
+function saveFree(){
+  var client=document.getElementById('rb-client').value;
+  var n=parseInt(document.getElementById('rb-nb').value,10)||0;
+  if(!client||n<=0){ toast('Choisis un client et un nombre de boîtes.'); return; }
+  var btn=document.getElementById('rb-btn'); btn.disabled=true;
+  apiPost({action:'livreurRetraitBoites',code:CODE,client:client,quantite:n}).then(function(r){
+    btn.disabled=false;
+    if(r && r.success){ document.getElementById('rb-nb').value=0; toast('📦 '+n+' boîte'+(n>1?'s':'')+' récupérée'+(n>1?'s':'')+' chez '+client); load(false); }
+    else toast('Échec de l\'enregistrement. Réessaie.');
+  }).catch(function(){ btn.disabled=false; toast('Pas de connexion. Réessaie.'); });
+}
+
+start();
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) load(false); });
+</script>
+</body>
+</html>
